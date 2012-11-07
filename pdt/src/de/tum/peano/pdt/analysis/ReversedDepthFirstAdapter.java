@@ -82,14 +82,6 @@ public class ReversedDepthFirstAdapter extends AnalysisAdapter
         {
             node.getNamespace().apply(this);
         }
-        if(node.getRepository() != null)
-        {
-            node.getRepository().apply(this);
-        }
-        if(node.getConfigurationtag() != null)
-        {
-            node.getConfigurationtag().apply(this);
-        }
         if(node.getName() != null)
         {
             node.getName().apply(this);

@@ -144,11 +144,6 @@ public class AnalysisAdapter implements Analysis
         defaultCase(node);
     }
 
-    public void caseTTokenConfigTag(TTokenConfigTag node)
-    {
-        defaultCase(node);
-    }
-
     public void caseTTokenVertex(TTokenVertex node)
     {
         defaultCase(node);
@@ -210,11 +205,6 @@ public class AnalysisAdapter implements Analysis
     }
 
     public void caseTTokenDastgenFile(TTokenDastgenFile node)
-    {
-        defaultCase(node);
-    }
-
-    public void caseTTokenRepository(TTokenRepository node)
     {
         defaultCase(node);
     }

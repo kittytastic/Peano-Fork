@@ -1,0 +1,14 @@
+/**
+
+\mainpage "Peano Development Toolkit (PDT)"
+  
+
+To (re-)create the parser, change into the pdt directory and type in
+\code
+java -jar lib/sablecc.jar -d src pdt.grammar
+\endcode
+
+
+
+*/
+

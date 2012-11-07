@@ -25,9 +25,6 @@ Helpers
 	
  
 Tokens 
-
-	token_config_tag            = 'configuration-tag:';
-	
   token_vertex                = 'vertex:';
   token_cell                  = 'cell:';
   token_state                 = 'state:';
@@ -44,7 +41,6 @@ Tokens
   	
   token_name                  = 'name:';
   token_dastgen_file          = 'dastgen-file:';
-  token_repository            = 'repository:';
   
   token_event_mapping         = 'event-mapping:';
   
@@ -55,7 +51,7 @@ Tokens
 	blank                       = ( cr | lf | tab | ' ' ) +;
 	identifier 	                = nondigit ( digit | nondigit ) *;
   filename                    = '/' ? (filename_element + '/') * filename_element +;
-  namespace                   = (namespace_element + '::') * namespace_element +;
+  namespace                   = '::' ? (namespace_element + '::') * namespace_element +;
    	
   traditional_comment = '/*' not_star+ '*'+ (not_star_not_slash not_star* '*'+)* '/';
   documentation_comment =    '/**' '*'* (not_star_not_slash not_star* '*'+)* '/';
@@ -71,12 +67,9 @@ Ignored Tokens
 Productions
   
   description {->description} = 
-    token_component [name]:identifier token_config_tag [config]:identifier repository token_namespace namespace vertex cell state event_mapping_list? adapter_list?
-      { -> New description( name,config, repository,namespace,vertex, cell, state, [event_mapping_list.event_mapping], [adapter_list.adapter] ) };
+    token_component [name]:identifier token_namespace namespace vertex cell state event_mapping_list? adapter_list?
+      { -> New description( name,namespace,vertex, cell, state, [event_mapping_list.event_mapping], [adapter_list.adapter] ) };
 
-  repository {->repository} =
-      token_repository [name]:identifier {-> New repository(name) };
-  
   vertex {->vertex} = 
     token_vertex token_name [name]:identifier token_dastgen_file filename operation_list? 
       { -> New vertex( name, filename, [operation_list.operation]) };
@@ -149,7 +142,7 @@ Productions
   
 Abstract Syntax Tree
  
-  description = [name]:identifier [configurationtag]:identifier repository namespace vertex cell state event_mapping* adapter*;
+  description = [name]:identifier namespace vertex cell state event_mapping* adapter*;
   
   repository = [name]:identifier;
   

@@ -54,14 +54,6 @@ public class DepthFirstAdapter extends AnalysisAdapter
         {
             node.getName().apply(this);
         }
-        if(node.getConfigurationtag() != null)
-        {
-            node.getConfigurationtag().apply(this);
-        }
-        if(node.getRepository() != null)
-        {
-            node.getRepository().apply(this);
-        }
         if(node.getNamespace() != null)
         {
             node.getNamespace().apply(this);

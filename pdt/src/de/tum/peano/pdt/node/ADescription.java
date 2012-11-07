@@ -9,8 +9,6 @@ import de.tum.peano.pdt.analysis.*;
 public final class ADescription extends PDescription
 {
     private TIdentifier _name_;
-    private TIdentifier _configurationtag_;
-    private PRepository _repository_;
     private TNamespace _namespace_;
     private PVertex _vertex_;
     private PCell _cell_;
@@ -25,8 +23,6 @@ public final class ADescription extends PDescription
 
     public ADescription(
         @SuppressWarnings("hiding") TIdentifier _name_,
-        @SuppressWarnings("hiding") TIdentifier _configurationtag_,
-        @SuppressWarnings("hiding") PRepository _repository_,
         @SuppressWarnings("hiding") TNamespace _namespace_,
         @SuppressWarnings("hiding") PVertex _vertex_,
         @SuppressWarnings("hiding") PCell _cell_,
@@ -36,10 +32,6 @@ public final class ADescription extends PDescription
     {
         // Constructor
         setName(_name_);
-
-        setConfigurationtag(_configurationtag_);
-
-        setRepository(_repository_);
 
         setNamespace(_namespace_);
 
@@ -60,8 +52,6 @@ public final class ADescription extends PDescription
     {
         return new ADescription(
             cloneNode(this._name_),
-            cloneNode(this._configurationtag_),
-            cloneNode(this._repository_),
             cloneNode(this._namespace_),
             cloneNode(this._vertex_),
             cloneNode(this._cell_),
@@ -98,56 +88,6 @@ public final class ADescription extends PDescription
         }
 
         this._name_ = node;
-    }
-
-    public TIdentifier getConfigurationtag()
-    {
-        return this._configurationtag_;
-    }
-
-    public void setConfigurationtag(TIdentifier node)
-    {
-        if(this._configurationtag_ != null)
-        {
-            this._configurationtag_.parent(null);
-        }
-
-        if(node != null)
-        {
-            if(node.parent() != null)
-            {
-                node.parent().removeChild(node);
-            }
-
-            node.parent(this);
-        }
-
-        this._configurationtag_ = node;
-    }
-
-    public PRepository getRepository()
-    {
-        return this._repository_;
-    }
-
-    public void setRepository(PRepository node)
-    {
-        if(this._repository_ != null)
-        {
-            this._repository_.parent(null);
-        }
-
-        if(node != null)
-        {
-            if(node.parent() != null)
-            {
-                node.parent().removeChild(node);
-            }
-
-            node.parent(this);
-        }
-
-        this._repository_ = node;
     }
 
     public TNamespace getNamespace()
@@ -295,8 +235,6 @@ public final class ADescription extends PDescription
     {
         return ""
             + toString(this._name_)
-            + toString(this._configurationtag_)
-            + toString(this._repository_)
             + toString(this._namespace_)
             + toString(this._vertex_)
             + toString(this._cell_)
@@ -312,18 +250,6 @@ public final class ADescription extends PDescription
         if(this._name_ == child)
         {
             this._name_ = null;
-            return;
-        }
-
-        if(this._configurationtag_ == child)
-        {
-            this._configurationtag_ = null;
-            return;
-        }
-
-        if(this._repository_ == child)
-        {
-            this._repository_ = null;
             return;
         }
 
@@ -371,18 +297,6 @@ public final class ADescription extends PDescription
         if(this._name_ == oldChild)
         {
             setName((TIdentifier) newChild);
-            return;
-        }
-
-        if(this._configurationtag_ == oldChild)
-        {
-            setConfigurationtag((TIdentifier) newChild);
-            return;
-        }
-
-        if(this._repository_ == oldChild)
-        {
-            setRepository((PRepository) newChild);
             return;
         }
 
