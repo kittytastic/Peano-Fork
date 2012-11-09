@@ -1,0 +1,40 @@
+// This file is part of the Peano project. For conditions of distribution and 
+// use, please see the copyright notice at www.peano-framework.org
+#ifndef ___INCLUDE_GUARD_PREFIX___RUNNERS_RUNNER_H_ 
+#define ___INCLUDE_GUARD_PREFIX___RUNNERS_RUNNER_H_ 
+
+
+__OPEN_NAMESPACE__
+    namespace runners {
+      class Runner;
+    }
+
+    namespace repositories {
+      class Repository;
+    }
+__CLOSE_NAMESPACE__
+
+
+
+/**
+ * Runner
+ *
+ */
+class __NAMESPACE__::runners::Runner {
+  private:
+    int runAsMaster(__NAMESPACE__::repositories::Repository& repository);
+    
+    #ifdef Parallel
+    int runAsClient(__NAMESPACE__::repositories::Repository& repository);
+    #endif
+  public:
+    Runner();
+    virtual ~Runner();
+
+    /**
+     * Run
+     */
+    int run(); 
+};
+
+#endif

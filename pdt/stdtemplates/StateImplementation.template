@@ -1,36 +1,35 @@
-#include "__PATH_OF_SPACETREE_GRID_STATE__.h"
-
-#include "__PATH_OF_SPACETREE_GRID_CELL__.h"
-#include "__PATH_OF_SPACETREE_GRID_VERTEX__.h"
+#include "__PROJECT_PATH__/Vertex.h"
+#include "__PROJECT_PATH__/Cell.h"
+#include "__PROJECT_PATH__/Vertex.h"
 
 #include "peano/kernel/gridinterface/Checkpoint.h"
 
 
 
-__FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_STATE__::__NONQUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_STATE__():
+__NAMESPACE__::State::State():
   Base() { 
   // @todo Insert your code here
 }
 
 
-__FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_STATE__::__NONQUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_STATE__(const Base::PersistentState& argument):
+__NAMESPACE__::State::State(const Base::PersistentState& argument):
   Base(argument) {
   // @todo Insert your code here
 }
 
 
-void __FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_STATE__::writeToCheckpoint( peano::kernel::gridinterface::Checkpoint<__FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_VERTEX__, __FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_CELL__>& checkpoint ) const {
+void __NAMESPACE__::State::writeToCheckpoint( peano::kernel::gridinterface::Checkpoint<__FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_VERTEX__, __FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_CELL__>& checkpoint ) const {
   // @todo Insert your code here
 }
 
     
-void __FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_STATE__::readFromCheckpoint( const peano::kernel::gridinterface::Checkpoint<__FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_VERTEX__, __FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_CELL__>& checkpoint ) {
+void __NAMESPACE__::State::readFromCheckpoint( const peano::kernel::gridinterface::Checkpoint<__FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_VERTEX__, __FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_CELL__>& checkpoint ) {
   // @todo Insert your code here
 }
 
 
 #ifdef Parallel
-void __FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_STATE__::mergeWithWorkerState(const __NONQUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_STATE__& workerState) {
+void __NAMESPACE__::State::mergeWithWorkerState(const __NONQUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_STATE__& workerState) {
   Base::mergeWithWorkerState(workerState);
   // @todo Insert your code here
 }

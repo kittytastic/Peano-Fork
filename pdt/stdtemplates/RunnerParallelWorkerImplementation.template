@@ -1,0 +1,35 @@
+#include "__PROJECT_PATH__/runners/Runner.h"
+
+
+#ifdef Parallel
+#include "peano/utils/Globals.h"
+#include "tarch/parallel/NodePool.h"
+#include "peano/kernel/parallel/messages/ForkMessage.h"
+#include "peano/kernel/parallel/SpacetreeGridPartitioner.h"
+
+
+int __NAMESPACE__::runners::Runner::runAsClient(__NAMESPACE__::repositories::Repository& repository) {
+  while ( tarch::parallel::NodePool::getInstance().waitForJob() >= tarch::parallel::NodePool::JobRequestMessageAnswerValues::NewMaster ) {
+    peano::kernel::parallel::messages::ForkMessage forkMessage;
+    forkMessage.receive(tarch::parallel::NodePool::getInstance().getMasterRank(),tarch::parallel::NodePool::getInstance().getTagForForkMessages(), true);
+
+    repository.restart(
+      forkMessage.getH(),
+      forkMessage.getDomainOffset(),
+      forkMessage.getLevel()
+    );
+  
+    while (repository.continueToIterate()) {
+      repository.iterate();
+    }
+
+    // insert your postprocessing here
+    // -------------------------------
+
+    // -------------------------------
+
+    repository.terminate();
+  }
+  return 0;
+}
+#endif
