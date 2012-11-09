@@ -1,0 +1,19 @@
+#include "__PATH_OF_SPACETREE_GRID_CELL__.h"
+
+
+__FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_CELL__::__NONQUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_CELL__():
+  Base() { 
+  // @todo Insert your code here
+}
+
+
+__FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_CELL__::__NONQUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_CELL__(const Base::DoNotCallStandardConstructor& value):
+  Base(value) { 
+  // Please do not insert anything here
+}
+
+
+__FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_CELL__::__NONQUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_CELL__(const Base::PersistentCell& argument):
+  Base(argument) {
+  // @todo Insert your code here
+}

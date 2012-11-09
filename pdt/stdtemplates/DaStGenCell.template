@@ -1,6 +1,6 @@
 // This file is part of the Peano project. For conditions of distribution and
 // use, please see the copyright notice at www.peano-framework.org
-Extends: __DOF_DASTGEN_DEFINITION_CELL__;
+Extends: ../__DOF_DASTGEN_DEFINITION_CELL__;
 
 
 #include "peano/utils/Globals.h"

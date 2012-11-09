@@ -1,0 +1,116 @@
+// Copyright (C) 2009 Technische Universitaet Muenchen
+// This file is part of the Peano project. For conditions of distribution and 
+// use, please see the copyright notice at www5.in.tum.de/peano
+#ifndef ___INCLUDE_GUARD_PREFIX_____NONQUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_STATE___H_ 
+#define ___INCLUDE_GUARD_PREFIX_____NONQUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_STATE___H_
+
+
+#include "peano/kernel/spacetreegrid/State.h"
+
+#include "__PATH_OF_SPACETREE_GRID_DASTGEN_STATE__.h"
+
+#include "peano/kernel/gridinterface/Checkpoint.h"
+
+#include "__PATH_OF_STATE_INTERFACE__.h"
+
+
+__OPEN_NAMESPACE__ 
+      class __NONQUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_STATE__;
+      /**
+       * Forward declaration
+       */
+      class __NONQUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_VERTEX__;
+      /**
+       * Forward declaration
+       */
+      class __NONQUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_CELL__;
+      
+      namespace repositories {
+        /** 
+         * Forward declaration
+         */
+        class __NONQUALIFIED_TYPE_NAME_OF_REPOSITORY__ForSpacetreeGridArrayStackImplementation;
+        class __NONQUALIFIED_TYPE_NAME_OF_REPOSITORY__ForSpacetreeGridFileStackImplementation;
+        class __NONQUALIFIED_TYPE_NAME_OF_REPOSITORY__ForSpacetreeGridSTDDoubleStackImplementation;
+        class __NONQUALIFIED_TYPE_NAME_OF_REPOSITORY__ForSpacetreeGridSTDStackImplementation;
+        class __NONQUALIFIED_TYPE_NAME_OF_REPOSITORY__ForSpacetreeGridDynamicStackImplementation;
+      }
+__CLOSE_NAMESPACE__
+
+/**
+ * Blueprint for solver/application state.
+ * 
+ * This file has originally been created by PeProt and may be manually adapted to 
+ * the needs of your application. We do not recommend to remove anything!
+ * 
+ * \author PeProt
+ */
+
+
+class __FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_STATE__: public peano::kernel::spacetreegrid::State< __FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_DASTGEN_STATE__ >, public __FULL_QUALIFIED_TYPE_NAME_OF_STATE_INTERFACE__ { 
+  private: 
+    typedef class peano::kernel::spacetreegrid::State< __FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_DASTGEN_STATE__ >  Base;
+
+    /**
+     * Needed for checkpointing.
+     */
+    friend class __FULL_QUALIFIED_TYPE_NAME_OF_REPOSITORY__ForSpacetreeGridArrayStackImplementation;
+    friend class __FULL_QUALIFIED_TYPE_NAME_OF_REPOSITORY__ForSpacetreeGridFileStackImplementation;
+    friend class __FULL_QUALIFIED_TYPE_NAME_OF_REPOSITORY__ForSpacetreeGridSTDDoubleStackImplementation;
+    friend class __FULL_QUALIFIED_TYPE_NAME_OF_REPOSITORY__ForSpacetreeGridSTDStackImplementation;
+    friend class __FULL_QUALIFIED_TYPE_NAME_OF_REPOSITORY__ForSpacetreeGridDynamicStackImplementation;
+  
+    void writeToCheckpoint( peano::kernel::gridinterface::Checkpoint<__FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_VERTEX__, __FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_CELL__>& checkpoint ) const;    
+    void readFromCheckpoint( const peano::kernel::gridinterface::Checkpoint<__FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_VERTEX__, __FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_CELL__>& checkpoint );    
+  
+  public:
+    /**
+     * Default Constructor
+     *
+     * This constructor is required by the framework's data container. Do not 
+     * remove it.
+     */
+    __NONQUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_STATE__();
+
+    /**
+     * Constructor
+     *
+     * This constructor is required by the framework's data container. Do not 
+     * remove it. It is kind of a copy constructor that converts an object which 
+     * comprises solely persistent attributes into a full attribute. This very 
+     * functionality is implemented within the super type, i.e. this constructor 
+     * has to invoke the correponsing super type's constructor and not the super 
+     * type standard constructor.
+     */
+    __NONQUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_STATE__(const Base::PersistentState& argument);
+
+    #ifdef Parallel
+    /**
+     * Merge worker state with global master state
+     * 
+     * The state management follows a one-point-holds-it-all policy, i.e. before 
+     * and after each iteration, the global master (rank 0) is the only rank 
+     * that has a valid state object. Whenever the application starts up, this 
+     * valid state object is distributed among the working nodes. Whenever any 
+     * node finishes to iterate, it sends back its state to the global master 
+     * where all the state objects are merged into one big state object.
+     *
+     * This operation implements the merge process (the distribution is just a 
+     * simple copying), i.e. it is called on the master node only. Implement 
+     * your PDE-specific operations such as the computation of a global residual 
+     * here but ensure that you also call the super class' merge operation. The 
+     * this object is the master's state. The argument is the state that the 
+     * node just received from a worker.
+     *
+     * The description above lacks one fact: If the global reduction is 
+     * disabled (see iterate()'s signature), this operation will never be 
+     * invoked as the state is not sent back to the master. Please note that 
+     * the fork process itself is a non-reducing process, i.e. throughout the 
+     * forks, no states are sent back to the masters.  
+     */
+    void mergeWithWorkerState(const __NONQUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_STATE__& workerState);
+    #endif
+};
+
+
+#endif

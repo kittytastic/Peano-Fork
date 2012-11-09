@@ -1,0 +1,61 @@
+// Copyright (C) 2009 Technische Universitaet Muenchen
+// This file is part of the Peano project. For conditions of distribution and 
+// use, please see the copyright notice at www5.in.tum.de/peano
+#ifndef ___INCLUDE_GUARD_PREFIX_____NONQUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_CELL___H_ 
+#define ___INCLUDE_GUARD_PREFIX_____NONQUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_CELL___H_
+
+
+#include "__PATH_OF_SPACETREE_GRID_DASTGEN_CELL__.h"
+#include "peano/kernel/spacetreegrid/Cell.h"
+
+
+__OPEN_NAMESPACE__ 
+      class __NONQUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_CELL__; 
+__CLOSE_NAMESPACE__
+
+
+/**
+ * Blueprint for regular grid cell.
+ * 
+ * This file has originally been created by PeProt and may be manually adapted to 
+ * the needs of your application. We do not recommend to remove anything!
+ * 
+ * \author PeProt
+ */
+
+
+class __FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_CELL__: public peano::kernel::spacetreegrid::Cell< __FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_DASTGEN_CELL__ > { 
+  private: 
+    typedef class peano::kernel::spacetreegrid::Cell< __FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_DASTGEN_CELL__ >  Base;
+
+  public:
+    /**
+     * Default Constructor
+     *
+     * This constructor is required by the framework's data container. Do not 
+     * remove it.
+     */
+    __NONQUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_CELL__();
+
+    /**
+     * This constructor should not set any attributes. It is used by the 
+     * traversal algorithm whenever it allocates an array whose elements 
+     * will be overwritten later anyway.  
+     */
+    __NONQUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_CELL__(const Base::DoNotCallStandardConstructor&);
+
+    /**
+     * Constructor
+     *
+     * This constructor is required by the framework's data container. Do not 
+     * remove it. It is kind of a copy constructor that converts an object which 
+     * comprises solely persistent attributes into a full attribute. This very 
+     * functionality is implemented within the super type, i.e. this constructor 
+     * has to invoke the correponsing super type's constructor and not the super 
+     * type standard constructor.
+     */
+    __NONQUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_CELL__(const Base::PersistentCell& argument);
+};
+
+
+#endif
