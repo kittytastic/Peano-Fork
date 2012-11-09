@@ -614,24 +614,20 @@ public class Parser
     {
         @SuppressWarnings("hiding") ArrayList nodeList = new ArrayList();
 
-        @SuppressWarnings("unused") ArrayList nodeArrayList5 = pop();
-        @SuppressWarnings("unused") ArrayList nodeArrayList4 = pop();
         @SuppressWarnings("unused") ArrayList nodeArrayList3 = pop();
         @SuppressWarnings("unused") ArrayList nodeArrayList2 = pop();
         @SuppressWarnings("unused") ArrayList nodeArrayList1 = pop();
         PVertex pvertexNode1;
         {
             // Block
-        TIdentifier tidentifierNode2;
-        TFilename tfilenameNode3;
-        LinkedList listNode4 = new LinkedList();
-        tidentifierNode2 = (TIdentifier)nodeArrayList3.get(0);
-        tfilenameNode3 = (TFilename)nodeArrayList5.get(0);
+        TFilename tfilenameNode2;
+        LinkedList listNode3 = new LinkedList();
+        tfilenameNode2 = (TFilename)nodeArrayList3.get(0);
         {
             // Block
         }
 
-        pvertexNode1 = new AVertex(tidentifierNode2, tfilenameNode3, listNode4);
+        pvertexNode1 = new AVertex(tfilenameNode2, listNode3);
         }
 	nodeList.add(pvertexNode1);
         return nodeList;
@@ -644,8 +640,6 @@ public class Parser
     {
         @SuppressWarnings("hiding") ArrayList nodeList = new ArrayList();
 
-        @SuppressWarnings("unused") ArrayList nodeArrayList6 = pop();
-        @SuppressWarnings("unused") ArrayList nodeArrayList5 = pop();
         @SuppressWarnings("unused") ArrayList nodeArrayList4 = pop();
         @SuppressWarnings("unused") ArrayList nodeArrayList3 = pop();
         @SuppressWarnings("unused") ArrayList nodeArrayList2 = pop();
@@ -653,22 +647,20 @@ public class Parser
         PVertex pvertexNode1;
         {
             // Block
-        TIdentifier tidentifierNode2;
-        TFilename tfilenameNode3;
-        LinkedList listNode5 = new LinkedList();
-        tidentifierNode2 = (TIdentifier)nodeArrayList3.get(0);
-        tfilenameNode3 = (TFilename)nodeArrayList5.get(0);
+        TFilename tfilenameNode2;
+        LinkedList listNode4 = new LinkedList();
+        tfilenameNode2 = (TFilename)nodeArrayList3.get(0);
         {
             // Block
-        LinkedList listNode4 = new LinkedList();
-        listNode4 = (LinkedList)nodeArrayList6.get(0);
-	if(listNode4 != null)
+        LinkedList listNode3 = new LinkedList();
+        listNode3 = (LinkedList)nodeArrayList4.get(0);
+	if(listNode3 != null)
 	{
-	  listNode5.addAll(listNode4);
+	  listNode4.addAll(listNode3);
 	}
         }
 
-        pvertexNode1 = new AVertex(tidentifierNode2, tfilenameNode3, listNode5);
+        pvertexNode1 = new AVertex(tfilenameNode2, listNode4);
         }
 	nodeList.add(pvertexNode1);
         return nodeList;
@@ -681,20 +673,16 @@ public class Parser
     {
         @SuppressWarnings("hiding") ArrayList nodeList = new ArrayList();
 
-        @SuppressWarnings("unused") ArrayList nodeArrayList5 = pop();
-        @SuppressWarnings("unused") ArrayList nodeArrayList4 = pop();
         @SuppressWarnings("unused") ArrayList nodeArrayList3 = pop();
         @SuppressWarnings("unused") ArrayList nodeArrayList2 = pop();
         @SuppressWarnings("unused") ArrayList nodeArrayList1 = pop();
         PState pstateNode1;
         {
             // Block
-        TIdentifier tidentifierNode2;
-        TFilename tfilenameNode3;
-        tidentifierNode2 = (TIdentifier)nodeArrayList3.get(0);
-        tfilenameNode3 = (TFilename)nodeArrayList5.get(0);
+        TFilename tfilenameNode2;
+        tfilenameNode2 = (TFilename)nodeArrayList3.get(0);
 
-        pstateNode1 = new AState(tidentifierNode2, tfilenameNode3);
+        pstateNode1 = new AState(tfilenameNode2);
         }
 	nodeList.add(pstateNode1);
         return nodeList;
@@ -707,20 +695,16 @@ public class Parser
     {
         @SuppressWarnings("hiding") ArrayList nodeList = new ArrayList();
 
-        @SuppressWarnings("unused") ArrayList nodeArrayList5 = pop();
-        @SuppressWarnings("unused") ArrayList nodeArrayList4 = pop();
         @SuppressWarnings("unused") ArrayList nodeArrayList3 = pop();
         @SuppressWarnings("unused") ArrayList nodeArrayList2 = pop();
         @SuppressWarnings("unused") ArrayList nodeArrayList1 = pop();
         PCell pcellNode1;
         {
             // Block
-        TIdentifier tidentifierNode2;
-        TFilename tfilenameNode3;
-        tidentifierNode2 = (TIdentifier)nodeArrayList3.get(0);
-        tfilenameNode3 = (TFilename)nodeArrayList5.get(0);
+        TFilename tfilenameNode2;
+        tfilenameNode2 = (TFilename)nodeArrayList3.get(0);
 
-        pcellNode1 = new ACell(tidentifierNode2, tfilenameNode3);
+        pcellNode1 = new ACell(tfilenameNode2);
         }
 	nodeList.add(pcellNode1);
         return nodeList;
@@ -1833,63 +1817,46 @@ public class Parser
 			{{-1, ERROR, 3}, {4, SHIFT, 4}, },
 			{{-1, ERROR, 4}, {19, SHIFT, 5}, },
 			{{-1, ERROR, 5}, {0, SHIFT, 6}, },
-			{{-1, ERROR, 6}, {11, SHIFT, 8}, },
+			{{-1, ERROR, 6}, {12, SHIFT, 8}, },
 			{{-1, ERROR, 7}, {1, SHIFT, 9}, },
-			{{-1, ERROR, 8}, {17, SHIFT, 11}, },
-			{{-1, ERROR, 9}, {11, SHIFT, 12}, },
+			{{-1, ERROR, 8}, {18, SHIFT, 11}, },
+			{{-1, ERROR, 9}, {12, SHIFT, 12}, },
 			{{-1, ERROR, 10}, {2, SHIFT, 13}, },
-			{{-1, ERROR, 11}, {12, SHIFT, 15}, },
-			{{-1, ERROR, 12}, {17, SHIFT, 16}, },
-			{{-1, ERROR, 13}, {11, SHIFT, 17}, },
-			{{-1, REDUCE, 0}, {13, SHIFT, 18}, {14, SHIFT, 19}, },
-			{{-1, ERROR, 15}, {18, SHIFT, 22}, },
-			{{-1, ERROR, 16}, {12, SHIFT, 23}, },
-			{{-1, ERROR, 17}, {17, SHIFT, 24}, },
-			{{-1, ERROR, 18}, {11, SHIFT, 25}, },
-			{{-1, ERROR, 19}, {11, SHIFT, 26}, },
-			{{-1, REDUCE, 1}, {14, SHIFT, 19}, },
-			{{-1, REDUCE, 2}, },
-			{{-1, REDUCE, 4}, {5, SHIFT, 28}, {6, SHIFT, 29}, },
-			{{-1, ERROR, 23}, {18, SHIFT, 31}, },
-			{{-1, ERROR, 24}, {12, SHIFT, 32}, },
-			{{-1, ERROR, 25}, {17, SHIFT, 33}, },
-			{{-1, ERROR, 26}, {17, SHIFT, 34}, },
-			{{-1, REDUCE, 3}, },
-			{{-1, ERROR, 28}, {7, SHIFT, 35}, {8, SHIFT, 36}, {9, SHIFT, 37}, {10, SHIFT, 38}, },
-			{{-1, ERROR, 29}, {7, SHIFT, 39}, {8, SHIFT, 40}, {9, SHIFT, 41}, {10, SHIFT, 42}, },
+			{{-1, REDUCE, 4}, {5, SHIFT, 15}, {6, SHIFT, 16}, },
+			{{-1, ERROR, 12}, {18, SHIFT, 18}, },
+			{{-1, ERROR, 13}, {12, SHIFT, 19}, },
+			{{-1, REDUCE, 0}, {13, SHIFT, 20}, {14, SHIFT, 21}, },
+			{{-1, ERROR, 15}, {7, SHIFT, 24}, {8, SHIFT, 25}, {9, SHIFT, 26}, {10, SHIFT, 27}, },
+			{{-1, ERROR, 16}, {7, SHIFT, 28}, {8, SHIFT, 29}, {9, SHIFT, 30}, {10, SHIFT, 31}, },
 			{{-1, REDUCE, 5}, },
 			{{-1, REDUCE, 7}, },
-			{{-1, ERROR, 32}, {18, SHIFT, 43}, },
-			{{-1, REDUCE, 24}, {13, SHIFT, 18}, },
-			{{-1, REDUCE, 26}, {14, SHIFT, 19}, {15, SHIFT, 45}, {16, SHIFT, 46}, },
-			{{-1, ERROR, 35}, {17, SHIFT, 50}, },
-			{{-1, ERROR, 36}, {17, SHIFT, 51}, },
-			{{-1, ERROR, 37}, {17, SHIFT, 52}, },
-			{{-1, ERROR, 38}, {17, SHIFT, 53}, },
-			{{-1, ERROR, 39}, {17, SHIFT, 54}, },
-			{{-1, ERROR, 40}, {17, SHIFT, 55}, },
-			{{-1, ERROR, 41}, {17, SHIFT, 56}, },
-			{{-1, ERROR, 42}, {17, SHIFT, 57}, },
+			{{-1, ERROR, 19}, {18, SHIFT, 32}, },
+			{{-1, ERROR, 20}, {11, SHIFT, 33}, },
+			{{-1, ERROR, 21}, {11, SHIFT, 34}, },
+			{{-1, REDUCE, 1}, {14, SHIFT, 21}, },
+			{{-1, REDUCE, 2}, },
+			{{-1, ERROR, 24}, {17, SHIFT, 36}, },
+			{{-1, ERROR, 25}, {17, SHIFT, 37}, },
+			{{-1, ERROR, 26}, {17, SHIFT, 38}, },
+			{{-1, ERROR, 27}, {17, SHIFT, 39}, },
+			{{-1, ERROR, 28}, {17, SHIFT, 40}, },
+			{{-1, ERROR, 29}, {17, SHIFT, 41}, },
+			{{-1, ERROR, 30}, {17, SHIFT, 42}, },
+			{{-1, ERROR, 31}, {17, SHIFT, 43}, },
 			{{-1, REDUCE, 6}, },
-			{{-1, REDUCE, 25}, },
-			{{-1, ERROR, 45}, {17, SHIFT, 58}, },
-			{{-1, ERROR, 46}, {17, SHIFT, 59}, },
-			{{-1, REDUCE, 30}, },
-			{{-1, REDUCE, 27}, {14, SHIFT, 19}, {16, SHIFT, 46}, },
-			{{-1, REDUCE, 28}, {14, SHIFT, 19}, },
-			{{-1, REDUCE, 8}, {5, SHIFT, 28}, {6, SHIFT, 29}, },
-			{{-1, REDUCE, 10}, {5, SHIFT, 28}, {6, SHIFT, 29}, },
-			{{-1, REDUCE, 12}, {5, SHIFT, 28}, {6, SHIFT, 29}, },
-			{{-1, REDUCE, 14}, {5, SHIFT, 28}, {6, SHIFT, 29}, },
-			{{-1, REDUCE, 16}, {5, SHIFT, 28}, {6, SHIFT, 29}, },
-			{{-1, REDUCE, 20}, {5, SHIFT, 28}, {6, SHIFT, 29}, },
-			{{-1, REDUCE, 18}, {5, SHIFT, 28}, {6, SHIFT, 29}, },
-			{{-1, REDUCE, 22}, {5, SHIFT, 28}, {6, SHIFT, 29}, },
-			{{-1, REDUCE, 34}, {15, SHIFT, 45}, },
-			{{-1, REDUCE, 36}, {16, SHIFT, 46}, },
-			{{-1, REDUCE, 31}, },
-			{{-1, REDUCE, 29}, {14, SHIFT, 19}, },
-			{{-1, REDUCE, 32}, },
+			{{-1, ERROR, 33}, {17, SHIFT, 44}, },
+			{{-1, ERROR, 34}, {17, SHIFT, 45}, },
+			{{-1, REDUCE, 3}, },
+			{{-1, REDUCE, 8}, {5, SHIFT, 15}, {6, SHIFT, 16}, },
+			{{-1, REDUCE, 10}, {5, SHIFT, 15}, {6, SHIFT, 16}, },
+			{{-1, REDUCE, 12}, {5, SHIFT, 15}, {6, SHIFT, 16}, },
+			{{-1, REDUCE, 14}, {5, SHIFT, 15}, {6, SHIFT, 16}, },
+			{{-1, REDUCE, 16}, {5, SHIFT, 15}, {6, SHIFT, 16}, },
+			{{-1, REDUCE, 20}, {5, SHIFT, 15}, {6, SHIFT, 16}, },
+			{{-1, REDUCE, 18}, {5, SHIFT, 15}, {6, SHIFT, 16}, },
+			{{-1, REDUCE, 22}, {5, SHIFT, 15}, {6, SHIFT, 16}, },
+			{{-1, REDUCE, 24}, {13, SHIFT, 20}, },
+			{{-1, REDUCE, 26}, {14, SHIFT, 21}, {15, SHIFT, 55}, {16, SHIFT, 56}, },
 			{{-1, REDUCE, 9}, },
 			{{-1, REDUCE, 11}, },
 			{{-1, REDUCE, 13}, },
@@ -1898,6 +1865,17 @@ public class Parser
 			{{-1, REDUCE, 21}, },
 			{{-1, REDUCE, 19}, },
 			{{-1, REDUCE, 23}, },
+			{{-1, REDUCE, 25}, },
+			{{-1, ERROR, 55}, {17, SHIFT, 60}, },
+			{{-1, ERROR, 56}, {17, SHIFT, 61}, },
+			{{-1, REDUCE, 30}, },
+			{{-1, REDUCE, 27}, {14, SHIFT, 21}, {16, SHIFT, 56}, },
+			{{-1, REDUCE, 28}, {14, SHIFT, 21}, },
+			{{-1, REDUCE, 34}, {15, SHIFT, 55}, },
+			{{-1, REDUCE, 36}, {16, SHIFT, 56}, },
+			{{-1, REDUCE, 31}, },
+			{{-1, REDUCE, 29}, {14, SHIFT, 21}, },
+			{{-1, REDUCE, 32}, },
 			{{-1, REDUCE, 35}, },
 			{{-1, REDUCE, 37}, },
 			{{-1, REDUCE, 33}, },
@@ -1908,11 +1886,11 @@ public class Parser
 			{{-1, 7}, },
 			{{-1, 14}, },
 			{{-1, 10}, },
-			{{-1, 30}, {50, 63}, {51, 64}, {52, 65}, {53, 66}, {54, 67}, {55, 68}, {56, 69}, {57, 70}, },
-			{{-1, 20}, {33, 44}, },
-			{{-1, 21}, {20, 27}, {34, 47}, {48, 60}, {49, 62}, {61, 73}, },
-			{{-1, 48}, {58, 71}, },
-			{{-1, 49}, {48, 61}, {59, 72}, },
+			{{-1, 17}, {36, 46}, {37, 47}, {38, 48}, {39, 49}, {40, 50}, {41, 51}, {42, 52}, {43, 53}, },
+			{{-1, 22}, {44, 54}, },
+			{{-1, 23}, {22, 35}, {45, 57}, {58, 62}, {59, 64}, {63, 67}, },
+			{{-1, 58}, {60, 65}, },
+			{{-1, 59}, {58, 63}, {61, 66}, },
         };*/
     private static String[] errorMessages;
 /*      {
@@ -1922,21 +1900,21 @@ public class Parser
 			"expecting: 'namespace:'",
 			"expecting: namespace",
 			"expecting: 'vertex:'",
-			"expecting: 'name:'",
-			"expecting: 'cell:'",
-			"expecting: 'state:'",
 			"expecting: 'dastgen-file:'",
-			"expecting: 'event-mapping:', 'adapter:', EOF",
+			"expecting: 'cell:'",
 			"expecting: filename",
-			"expecting: 'adapter:', EOF",
+			"expecting: 'state:'",
 			"expecting: 'cell:', 'read', 'write'",
+			"expecting: 'event-mapping:', 'adapter:', EOF",
 			"expecting: 'scalar:', 'vector:', 'vector2PowD:', 'stencil:'",
+			"expecting: 'name:'",
+			"expecting: 'adapter:', EOF",
 			"expecting: 'adapter:', 'merge-with-user-defined-mapping:', 'merge-with-predefined-mapping:', EOF",
 			"expecting: 'adapter:', 'merge-with-predefined-mapping:', EOF",
         };*/
     private static int[] errors;
 /*      {
-			0, 1, 2, 3, 4, 5, 6, 7, 1, 6, 8, 9, 1, 6, 10, 11, 9, 1, 6, 6, 12, 2, 13, 11, 9, 1, 1, 2, 14, 14, 7, 8, 11, 10, 15, 1, 1, 1, 1, 1, 1, 1, 1, 10, 12, 1, 1, 2, 16, 12, 13, 13, 13, 13, 13, 13, 13, 13, 15, 16, 2, 12, 2, 7, 7, 7, 7, 7, 7, 7, 7, 16, 12, 2, 
+			0, 1, 2, 3, 4, 5, 6, 7, 8, 6, 9, 10, 8, 6, 11, 12, 12, 7, 9, 8, 13, 13, 14, 2, 1, 1, 1, 1, 1, 1, 1, 1, 11, 1, 1, 2, 10, 10, 10, 10, 10, 10, 10, 10, 11, 15, 7, 7, 7, 7, 7, 7, 7, 7, 14, 1, 1, 2, 16, 14, 15, 16, 2, 14, 2, 16, 14, 2, 
         };*/
 
     static 

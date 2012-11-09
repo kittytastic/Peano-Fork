@@ -122,10 +122,6 @@ public class DepthFirstAdapter extends AnalysisAdapter
     public void caseAVertex(AVertex node)
     {
         inAVertex(node);
-        if(node.getName() != null)
-        {
-            node.getName().apply(this);
-        }
         if(node.getFilename() != null)
         {
             node.getFilename().apply(this);
@@ -322,10 +318,6 @@ public class DepthFirstAdapter extends AnalysisAdapter
     public void caseACell(ACell node)
     {
         inACell(node);
-        if(node.getName() != null)
-        {
-            node.getName().apply(this);
-        }
         if(node.getFilename() != null)
         {
             node.getFilename().apply(this);
@@ -347,10 +339,6 @@ public class DepthFirstAdapter extends AnalysisAdapter
     public void caseAState(AState node)
     {
         inAState(node);
-        if(node.getName() != null)
-        {
-            node.getName().apply(this);
-        }
         if(node.getFilename() != null)
         {
             node.getFilename().apply(this);

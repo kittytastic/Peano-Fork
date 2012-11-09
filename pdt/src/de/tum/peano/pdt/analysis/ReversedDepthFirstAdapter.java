@@ -136,10 +136,6 @@ public class ReversedDepthFirstAdapter extends AnalysisAdapter
         {
             node.getFilename().apply(this);
         }
-        if(node.getName() != null)
-        {
-            node.getName().apply(this);
-        }
         outAVertex(node);
     }
 
@@ -329,10 +325,6 @@ public class ReversedDepthFirstAdapter extends AnalysisAdapter
         {
             node.getFilename().apply(this);
         }
-        if(node.getName() != null)
-        {
-            node.getName().apply(this);
-        }
         outACell(node);
     }
 
@@ -353,10 +345,6 @@ public class ReversedDepthFirstAdapter extends AnalysisAdapter
         if(node.getFilename() != null)
         {
             node.getFilename().apply(this);
-        }
-        if(node.getName() != null)
-        {
-            node.getName().apply(this);
         }
         outAState(node);
     }

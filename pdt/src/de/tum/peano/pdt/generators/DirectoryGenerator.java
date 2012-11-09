@@ -4,14 +4,17 @@ package de.tum.peano.pdt.generators;
 
 import java.io.File;
 
+import de.tum.peano.pdt.TranslationTable;
 import de.tum.peano.pdt.analysis.DepthFirstAdapter;
 import de.tum.peano.pdt.node.Start;
 
 public class DirectoryGenerator extends DepthFirstAdapter {
-  private File   _outputDirectory;
+  private File                _outputDirectory;
+  private TranslationTable    _translationTable;
 
-  public DirectoryGenerator(File outputDirectory) {
-    _outputDirectory = outputDirectory;
+  public DirectoryGenerator(File outputDirectory, TranslationTable translationTable) {
+    _outputDirectory  = outputDirectory;
+    _translationTable = translationTable;
   }
   
 //  static public String replaceColonsByFileSeparator( String originalString ) {
@@ -25,21 +28,24 @@ public class DirectoryGenerator extends DepthFirstAdapter {
     if (dirRecords.mkdirs()) {
       System.out.print(dirRecords.getAbsolutePath() + " ");
     }
+    _translationTable.copyTemplateFile( "Readme.template", dirRecords.getAbsolutePath() + "/readme.txt", true );
 
-    java.io.File dirAdapter = new java.io.File( getMappingsDirectory() );
-    if (dirAdapter.mkdirs()) {
-      System.out.print(dirAdapter.getAbsolutePath() + " ");
+    java.io.File dirMappings = new java.io.File( getMappingsDirectory() );
+    if (dirMappings.mkdirs()) {
+      System.out.print(dirMappings.getAbsolutePath() + " ");
     }
     
     java.io.File dirRepository = new java.io.File( getRepositoriesDirectory() );
     if (dirRepository.mkdirs()) {
       System.out.print(dirRepository.getAbsolutePath() + " ");
     }
+    _translationTable.copyTemplateFile( "Readme.template", dirRepository.getAbsolutePath() + "/readme.txt", true );
     
-    java.io.File dirGlueAdapter = new java.io.File( getAdaptersDirectory() );
-    if (dirGlueAdapter.mkdirs()) {
-      System.out.print(dirGlueAdapter.getAbsolutePath() + " ");
+    java.io.File dirAdapter = new java.io.File( getAdaptersDirectory() );
+    if (dirAdapter.mkdirs()) {
+      System.out.print(dirAdapter.getAbsolutePath() + " ");
     }
+    _translationTable.copyTemplateFile( "Readme.template", dirAdapter.getAbsolutePath() + "/readme.txt", true );
     
     java.io.File dirRunner = new java.io.File( getRunnersDirectory() );
     if (dirRunner.mkdirs()) {
@@ -56,10 +62,11 @@ public class DirectoryGenerator extends DepthFirstAdapter {
       System.out.print(dirTests.getAbsolutePath() + " ");
     }
     
-    java.io.File dastgenTests = new java.io.File( getDaStGenDirectory() );
-    if (dastgenTests.mkdirs()) {
-      System.out.print(dastgenTests.getAbsolutePath() + " ");
+    java.io.File dirDastgen = new java.io.File( getDaStGenDirectory() );
+    if (dirDastgen.mkdirs()) {
+      System.out.print(dirDastgen.getAbsolutePath() + " ");
     }
+    _translationTable.copyTemplateFile( "Readme.template", dirDastgen.getAbsolutePath() + "/readme.txt", true );
   }
   
   public String getProjectDirectoryAbsolute() {

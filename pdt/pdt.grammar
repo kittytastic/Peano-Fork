@@ -71,16 +71,16 @@ Productions
       { -> New description( name,namespace,vertex, cell, state, [event_mapping_list.event_mapping], [adapter_list.adapter] ) };
 
   vertex {->vertex} = 
-    token_vertex token_name [name]:identifier token_dastgen_file filename operation_list? 
-      { -> New vertex( name, filename, [operation_list.operation]) };
+    token_vertex token_dastgen_file filename operation_list? 
+      { -> New vertex( filename, [operation_list.operation]) };
 
   state {->state} = 
-    token_state token_name [name]:identifier token_dastgen_file filename
-      { -> New state( name, filename) };
+    token_state token_dastgen_file filename
+      { -> New state( filename) };
 
   cell {->cell} = 
-    token_cell token_name [name]:identifier token_dastgen_file filename
-      { -> New cell( name, filename) };
+    token_cell token_dastgen_file filename
+      { -> New cell( filename) };
   
   operation_list { -> operation* } =
       {single_read_scalar} token_read token_scalar identifier
@@ -146,7 +146,7 @@ Abstract Syntax Tree
   
   repository = [name]:identifier;
   
-  vertex = [name]:identifier [filename]:filename operation*;
+  vertex = [filename]:filename operation*;
 
   operation = 
       {read_scalar}       [name]:identifier
@@ -158,9 +158,9 @@ Abstract Syntax Tree
     | {write_vector_two_pow_d} [name]:identifier
     | {write_stencil}     [name]:identifier;
     
-  cell = [name]:identifier [filename]:filename;
+  cell = [filename]:filename;
  
-  state = [name]:identifier [filename]:filename;
+  state = [filename]:filename;
   
   event_mapping = [name]:identifier;
   

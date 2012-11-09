@@ -7,7 +7,6 @@ import de.tum.peano.pdt.analysis.*;
 @SuppressWarnings("nls")
 public final class AState extends PState
 {
-    private TIdentifier _name_;
     private TFilename _filename_;
 
     public AState()
@@ -16,12 +15,9 @@ public final class AState extends PState
     }
 
     public AState(
-        @SuppressWarnings("hiding") TIdentifier _name_,
         @SuppressWarnings("hiding") TFilename _filename_)
     {
         // Constructor
-        setName(_name_);
-
         setFilename(_filename_);
 
     }
@@ -30,38 +26,12 @@ public final class AState extends PState
     public Object clone()
     {
         return new AState(
-            cloneNode(this._name_),
             cloneNode(this._filename_));
     }
 
     public void apply(Switch sw)
     {
         ((Analysis) sw).caseAState(this);
-    }
-
-    public TIdentifier getName()
-    {
-        return this._name_;
-    }
-
-    public void setName(TIdentifier node)
-    {
-        if(this._name_ != null)
-        {
-            this._name_.parent(null);
-        }
-
-        if(node != null)
-        {
-            if(node.parent() != null)
-            {
-                node.parent().removeChild(node);
-            }
-
-            node.parent(this);
-        }
-
-        this._name_ = node;
     }
 
     public TFilename getFilename()
@@ -93,7 +63,6 @@ public final class AState extends PState
     public String toString()
     {
         return ""
-            + toString(this._name_)
             + toString(this._filename_);
     }
 
@@ -101,12 +70,6 @@ public final class AState extends PState
     void removeChild(@SuppressWarnings("unused") Node child)
     {
         // Remove child
-        if(this._name_ == child)
-        {
-            this._name_ = null;
-            return;
-        }
-
         if(this._filename_ == child)
         {
             this._filename_ = null;
@@ -120,12 +83,6 @@ public final class AState extends PState
     void replaceChild(@SuppressWarnings("unused") Node oldChild, @SuppressWarnings("unused") Node newChild)
     {
         // Replace child
-        if(this._name_ == oldChild)
-        {
-            setName((TIdentifier) newChild);
-            return;
-        }
-
         if(this._filename_ == oldChild)
         {
             setFilename((TFilename) newChild);

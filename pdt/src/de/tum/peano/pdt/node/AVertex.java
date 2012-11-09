@@ -8,7 +8,6 @@ import de.tum.peano.pdt.analysis.*;
 @SuppressWarnings("nls")
 public final class AVertex extends PVertex
 {
-    private TIdentifier _name_;
     private TFilename _filename_;
     private final LinkedList<POperation> _operation_ = new LinkedList<POperation>();
 
@@ -18,13 +17,10 @@ public final class AVertex extends PVertex
     }
 
     public AVertex(
-        @SuppressWarnings("hiding") TIdentifier _name_,
         @SuppressWarnings("hiding") TFilename _filename_,
         @SuppressWarnings("hiding") List<POperation> _operation_)
     {
         // Constructor
-        setName(_name_);
-
         setFilename(_filename_);
 
         setOperation(_operation_);
@@ -35,7 +31,6 @@ public final class AVertex extends PVertex
     public Object clone()
     {
         return new AVertex(
-            cloneNode(this._name_),
             cloneNode(this._filename_),
             cloneList(this._operation_));
     }
@@ -43,31 +38,6 @@ public final class AVertex extends PVertex
     public void apply(Switch sw)
     {
         ((Analysis) sw).caseAVertex(this);
-    }
-
-    public TIdentifier getName()
-    {
-        return this._name_;
-    }
-
-    public void setName(TIdentifier node)
-    {
-        if(this._name_ != null)
-        {
-            this._name_.parent(null);
-        }
-
-        if(node != null)
-        {
-            if(node.parent() != null)
-            {
-                node.parent().removeChild(node);
-            }
-
-            node.parent(this);
-        }
-
-        this._name_ = node;
     }
 
     public TFilename getFilename()
@@ -119,7 +89,6 @@ public final class AVertex extends PVertex
     public String toString()
     {
         return ""
-            + toString(this._name_)
             + toString(this._filename_)
             + toString(this._operation_);
     }
@@ -128,12 +97,6 @@ public final class AVertex extends PVertex
     void removeChild(@SuppressWarnings("unused") Node child)
     {
         // Remove child
-        if(this._name_ == child)
-        {
-            this._name_ = null;
-            return;
-        }
-
         if(this._filename_ == child)
         {
             this._filename_ = null;
@@ -152,12 +115,6 @@ public final class AVertex extends PVertex
     void replaceChild(@SuppressWarnings("unused") Node oldChild, @SuppressWarnings("unused") Node newChild)
     {
         // Replace child
-        if(this._name_ == oldChild)
-        {
-            setName((TIdentifier) newChild);
-            return;
-        }
-
         if(this._filename_ == oldChild)
         {
             setFilename((TFilename) newChild);
