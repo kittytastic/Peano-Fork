@@ -3,12 +3,12 @@ package org.peano.pdt.generators;
 import java.net.MalformedURLException;
 import java.net.URLClassLoader;
 
-import org.peano.framework.analysis.DepthFirstAdapter;
+import org.peano.pdt.analysis.DepthFirstAdapter;
 import org.peano.pdt.Main;
 import org.peano.pdt.TranslationTable;
 
 import de.tum.in.dast.DaStGen;
-import de.tum.peano.pdt.node.*;
+import org.peano.pdt.node.*;
 
 
 public class DaStGenGenerator extends DepthFirstAdapter {

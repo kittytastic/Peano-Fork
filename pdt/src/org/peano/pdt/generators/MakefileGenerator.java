@@ -1,8 +1,8 @@
 package org.peano.pdt.generators;
 
-import org.peano.framework.analysis.DepthFirstAdapter;
+import org.peano.pdt.analysis.DepthFirstAdapter;
 
-import de.tum.peano.pdt.node.ADescription;
+import org.peano.pdt.node.ADescription;
 
 public class MakefileGenerator extends DepthFirstAdapter {
   private org.peano.pdt.generators.DirectoryGenerator _directoryGenerator;
@@ -19,7 +19,7 @@ public class MakefileGenerator extends DepthFirstAdapter {
   public void inADescription(ADescription node) {
     _translationTable.convertTemplateFile( 
       "Makefile.template",
-      "makefile",
+      _directoryGenerator.getProjectDirectoryAbsolute() + "/makefile",
       false
     );
   }

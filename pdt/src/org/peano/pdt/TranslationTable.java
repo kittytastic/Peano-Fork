@@ -3,11 +3,9 @@ package org.peano.pdt;
 
 import java.io.FileNotFoundException;
 
-import org.peano.framework.analysis.DepthFirstAdapter;
+import org.peano.pdt.analysis.DepthFirstAdapter;
 
-import com.sun.org.apache.xml.internal.utils.NameSpace;
-
-import de.tum.peano.pdt.node.*;
+import org.peano.pdt.node.*;
 
 
 public class TranslationTable extends DepthFirstAdapter {

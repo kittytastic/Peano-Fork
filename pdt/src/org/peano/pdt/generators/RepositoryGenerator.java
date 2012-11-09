@@ -1,9 +1,8 @@
 package org.peano.pdt.generators;
 
-import org.peano.framework.analysis.DepthFirstAdapter;
+import org.peano.pdt.analysis.DepthFirstAdapter;
 
-import de.tum.peano.pdt.node.ADescription;
-import de.tum.peano.pdt.node.Start;
+import org.peano.pdt.node.*;
 
 public class RepositoryGenerator extends DepthFirstAdapter {
   private org.peano.pdt.generators.DirectoryGenerator _directoryGenerator;
@@ -20,40 +19,40 @@ public class RepositoryGenerator extends DepthFirstAdapter {
   public void inADescription(ADescription node) {
     _translationTable.convertTemplateFile( 
       "RepositoryFactoryHeader.template",
-      "RepositoryFactory.h",
+      _directoryGenerator.getRepositoriesDirectory() + "/RepositoryFactory.h",
       true
     );
     _translationTable.convertTemplateFile( 
       "RepositoryFactoryImplementation.template",
-      "RepositoryFactory.cpp",
+      _directoryGenerator.getRepositoriesDirectory() + "/RepositoryFactory.cpp",
       true
     );
 
     _translationTable.convertTemplateFile( 
       "RepositoryHeader.template",
-      "Repository.h",
+      _directoryGenerator.getRepositoriesDirectory() + "/Repository.h",
       true
     );
 
     _translationTable.convertTemplateFile( 
       "RepositoryArrayStackHeader.template",
-      "RepositoryArrayStack.h",
+      _directoryGenerator.getRepositoriesDirectory() + "/RepositoryArrayStack.h",
       true
     );
     _translationTable.convertTemplateFile( 
       "RepositoryArrayStackImplementation.template",
-      "RepositoryArrayStack.cpp",
+      _directoryGenerator.getRepositoriesDirectory() + "/RepositoryArrayStack.cpp",
       true
     );
 
     _translationTable.convertTemplateFile( 
       "RepositorySTDStackHeader.template",
-      "RepositorySTDStack.h",
+      _directoryGenerator.getRepositoriesDirectory() + "/RepositorySTDStack.h",
       true
     );
     _translationTable.convertTemplateFile( 
       "RepositorySTDStackImplementation.template",
-      "RepositorySTDStack.cpp",
+      _directoryGenerator.getRepositoriesDirectory() + "/RepositorySTDStack.cpp",
       true
     );
   }

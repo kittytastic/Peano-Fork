@@ -45,10 +45,10 @@ public class Main {
         }
 
         System.out.print("read input file " + inputFileName);
-        de.tum.peano.pdt.parser.Parser parser = new de.tum.peano.pdt.parser.Parser(
-            new de.tum.peano.pdt.lexer.Lexer(new java.io.PushbackReader(
+        org.peano.pdt.parser.Parser parser = new org.peano.pdt.parser.Parser(
+            new org.peano.pdt.lexer.Lexer(new java.io.PushbackReader(
                 new java.io.FileReader(inputFileName))));
-        de.tum.peano.pdt.node.Start document = parser.parse();
+        org.peano.pdt.node.Start document = parser.parse();
         System.out.println(" ... ok");
 
         System.out.print("fill translation table");

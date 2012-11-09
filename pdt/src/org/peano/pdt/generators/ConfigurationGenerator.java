@@ -1,8 +1,8 @@
 package org.peano.pdt.generators;
 
-import org.peano.framework.analysis.DepthFirstAdapter;
+import org.peano.pdt.analysis.DepthFirstAdapter;
 
-import de.tum.peano.pdt.node.*;
+import org.peano.pdt.node.*;
 
 public class ConfigurationGenerator extends DepthFirstAdapter {
   private org.peano.pdt.generators.DirectoryGenerator _directoryGenerator;
@@ -20,7 +20,7 @@ public class ConfigurationGenerator extends DepthFirstAdapter {
   public void inADescription(ADescription node) {
     _translationTable.convertTemplateFile( 
       "Configuration.template",
-      "run" + node.getName().getText().trim() + ".xml",
+      _directoryGenerator.getRepositoriesDirectory() + "/run" + node.getName().getText().trim() + ".xml",
       false
     );
 

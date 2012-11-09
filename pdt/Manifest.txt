@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Main-Class: org.peano.pdt.Main
+Class-Path: lib/jargs.jar lib/DaStGen.jar
+

@@ -1,8 +1,8 @@
 package org.peano.pdt.generators;
 
-import org.peano.framework.analysis.DepthFirstAdapter;
+import org.peano.pdt.analysis.DepthFirstAdapter;
 
-import de.tum.peano.pdt.node.*;
+import org.peano.pdt.node.*;
 
 public class TestCaseGenerator extends DepthFirstAdapter {
   private org.peano.pdt.generators.DirectoryGenerator _directoryGenerator;

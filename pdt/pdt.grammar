@@ -1,6 +1,6 @@
 // This file is part of the Peano project. For conditions of distribution and
 // use, please see the copyright notice at www.peano-framework.org.
-Package de.tum.peano.pdt;
+Package org.peano.pdt;
 
 Helpers
 	all 	= 	[ 0 .. 127 ];
