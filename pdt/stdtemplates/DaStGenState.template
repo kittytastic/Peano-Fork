@@ -3,6 +3,9 @@
 Extends: ../__DOF_DASTGEN_DEFINITION_STATE__;
 
 
+#include "peano/utils/Globals.h"
+
+
 Constant: DIMENSIONS hint-value 4;
 
 

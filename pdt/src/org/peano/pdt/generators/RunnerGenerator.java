@@ -19,6 +19,11 @@ public class RunnerGenerator extends DepthFirstAdapter {
   
   public void inADescription(ADescription node) {
     _translationTable.convertTemplateFile( 
+      "Main.template",
+      _directoryGenerator.getProjectDirectoryAbsolute() + "/main.cpp",
+      false
+    );
+    _translationTable.convertTemplateFile( 
       "RunnerHeader.template",
       _directoryGenerator.getRunnersDirectory() + "/Runner.h",
       false

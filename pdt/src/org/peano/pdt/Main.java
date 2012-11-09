@@ -81,12 +81,6 @@ public class Main {
         ));
         System.out.println(" ... ok");
         
-        System.out.print("generate configurations");
-        document.apply(new org.peano.pdt.generators.ConfigurationGenerator(
-          dirGenerator, translationTable
-        ));
-        System.out.println(" ... ok");
-        
          System.out.print("generate runners");
          document.apply(new org.peano.pdt.generators.RunnerGenerator(
            dirGenerator, translationTable

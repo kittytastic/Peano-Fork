@@ -53,11 +53,6 @@ public class DirectoryGenerator extends DepthFirstAdapter {
       System.out.print(dirRunner.getAbsolutePath() + " ");
     }
     
-    java.io.File dirConfiguration = new java.io.File( getConfigurationsDirectory() );
-    if (dirConfiguration.mkdirs()) {
-      System.out.print(dirConfiguration.getAbsolutePath() + " ");
-    }
-    
     java.io.File dirTests = new java.io.File( getTestsDirectory() );
     if (dirTests.mkdirs()) {
       System.out.print(dirTests.getAbsolutePath() + " ");
@@ -98,10 +93,6 @@ public class DirectoryGenerator extends DepthFirstAdapter {
     return getProjectDirectoryAbsolute() + File.separator + getRepositoriesDirectoryRelativeToComponentDirectory();
   }
 
-  public String getCCADirectoryRelativeToComponentDirectory() {
-    return "cca";
-  }
-
   public String getAdaptersDirectoryRelativeToComponentDirectory() {
     return "adapters";
   }
@@ -118,14 +109,6 @@ public class DirectoryGenerator extends DepthFirstAdapter {
     return getProjectDirectoryAbsolute() + File.separator + getRunnersDirectoryRelativeToComponentDirectory();
   }
 
-  public String getConfigurationsDirectoryRelativeToComponentDirectory() {
-    return "configurations";
-  }
-
-  public String getConfigurationsDirectory() {
-    return getProjectDirectoryAbsolute() + File.separator + getConfigurationsDirectoryRelativeToComponentDirectory();
-  }
-  
   public String getTestsDirectoryRelativeToComponentDirectory() {
     return "tests";
   }
