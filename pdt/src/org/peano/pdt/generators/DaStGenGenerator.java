@@ -72,6 +72,8 @@ public class DaStGenGenerator extends DepthFirstAdapter {
       fileName, 
       true
     );
+
+    de.tum.in.dast.DaStGen.main( getDaStGenArguments(fileName) );
   }
 
   
