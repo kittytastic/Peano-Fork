@@ -1,0 +1,96 @@
+// Copyright (C) 2009 Technische Universitaet Muenchen
+// This file is part of the Peano project. For conditions of distribution and
+// use, please see the copyright notice at www5.in.tum.de/peano
+#ifndef __INCLUDE_GUARD_PREFIX___REPOSITORIES___NONQUALIFIED_TYPE_NAME_OF_REPOSITORY___FOR_SPACETREE_GRID_STD_STACK_IMPLEMENTATION_H_
+#define __INCLUDE_GUARD_PREFIX___REPOSITORIES___NONQUALIFIED_TYPE_NAME_OF_REPOSITORY___FOR_SPACETREE_GRID_STD_STACK_IMPLEMENTATION_H_
+
+
+#include "__PATH_OF_REPOSITORY__ForSpacetreeGrid.h"
+
+#include "__PATH_OF_REPOSITORY__State.h"
+#include "__PATH_OF_SPACETREE_GRID_VERTEX__.h"
+#include "__PATH_OF_SPACETREE_GRID_CELL__.h"
+#include "__PATH_OF_SPACETREE_GRID_STATE__.h"
+
+#include "peano/kernel/spacetreegrid/Grid.h"
+#include "peano/kernel/stacks/CellSTDStack.h"
+#include "peano/kernel/stacks/VertexSTDStack.h"
+
+
+__x__NONQUALIFIED_ADAPTER_TYPE__ #include "__PATH_OF_ADAPTER__SpacetreeGrid2__NONQUALIFIED_ADAPTER_TYPE__.h" 
+
+
+__OPEN_NAMESPACE__
+      namespace repositories {
+        class __NONQUALIFIED_TYPE_NAME_OF_REPOSITORY__ForSpacetreeGridSTDStackImplementation;  
+      }
+__CLOSE_NAMESPACE__
+
+
+class __FULL_QUALIFIED_TYPE_NAME_OF_REPOSITORY__ForSpacetreeGridSTDStackImplementation: public __FULL_QUALIFIED_TYPE_NAME_OF_REPOSITORY__ForSpacetreeGrid {
+  private:
+    static tarch::logging::Log _log;
+  
+    peano::geometry::Geometry& _geometry;
+    
+    typedef peano::kernel::stacks::CellSTDStack<__FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_CELL__>       CellStack;
+    typedef peano::kernel::stacks::VertexSTDStack<__FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_VERTEX__>   VertexStack;
+
+    CellStack    _cellStack;
+    VertexStack  _vertexStack;
+    __FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_STATE__          _solverState;
+    peano::kernel::spacetreegrid::RegularGridContainer<__FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_VERTEX__,__FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_CELL__>  _regularGridContainer;
+    peano::kernel::spacetreegrid::TraversalOrderOnTopLevel                                                                                                         _traversalOrderOnTopLevel;
+
+   __x__NONQUALIFIED_ADAPTER_TYPE__ peano::kernel::spacetreegrid::Grid<__FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_VERTEX__,__FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_CELL__,__FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_STATE__,VertexStack,CellStack,adapters::SpacetreeGrid2__NONQUALIFIED_ADAPTER_TYPE__> _gridWith__NONQUALIFIED_ADAPTER_TYPE__;
+     
+   __FULL_QUALIFIED_TYPE_NAME_OF_REPOSITORY__State               _repositoryState;
+   
+  public:
+    __NONQUALIFIED_TYPE_NAME_OF_REPOSITORY__ForSpacetreeGridSTDStackImplementation(
+      peano::geometry::Geometry&                   geometry,
+      const tarch::la::Vector<DIMENSIONS,double>&  domainSize,
+      const tarch::la::Vector<DIMENSIONS,double>&  computationalDomainOffset
+    );
+    
+    /**
+     * Parallel Constructor
+     *
+     * Used in parallel mode only where the size of the domain is not known 
+     * when the type of repository is determined.  
+     */
+    __NONQUALIFIED_TYPE_NAME_OF_REPOSITORY__ForSpacetreeGridSTDStackImplementation(
+      peano::geometry::Geometry&                   geometry
+    );
+    
+    virtual ~__NONQUALIFIED_TYPE_NAME_OF_REPOSITORY__ForSpacetreeGridSTDStackImplementation();
+
+    virtual void restart(
+      const tarch::la::Vector<DIMENSIONS,double>&  domainSize,
+      const tarch::la::Vector<DIMENSIONS,double>&  domainOffset,
+      int                                          domainLevel
+    );
+         
+    virtual void terminate();
+        
+    virtual __FULL_QUALIFIED_TYPE_NAME_OF_STATE_INTERFACE__& getState();
+    virtual __FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_STATE__& getSpacetreeGridState();
+	
+    virtual void iterate( bool reduceState );
+
+    virtual void writeCheckpoint(peano::kernel::gridinterface::Checkpoint<__FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_VERTEX__, __FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_CELL__> * const checkpoint); 
+    virtual void readCheckpoint( peano::kernel::gridinterface::Checkpoint<__FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_VERTEX__, __FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_CELL__> const * const checkpoint );
+    virtual peano::kernel::gridinterface::Checkpoint<__FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_VERTEX__, __FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_CELL__>* createEmptyCheckpoint(); 
+
+   __x__NONQUALIFIED_ADAPTER_TYPE__ virtual void switchTo__NONQUALIFIED_ADAPTER_TYPE__();    
+   __x__NONQUALIFIED_ADAPTER_TYPE__ virtual bool isActiveAdapter__NONQUALIFIED_ADAPTER_TYPE__() const;
+   
+    #ifdef Parallel
+    virtual bool continueToIterate();
+    #endif
+
+    virtual void setMaximumMemoryFootprintForTemporaryRegularGrids(double value);
+};
+
+
+#endif

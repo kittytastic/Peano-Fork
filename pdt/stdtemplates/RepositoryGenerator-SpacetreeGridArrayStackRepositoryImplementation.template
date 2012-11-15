@@ -1,0 +1,225 @@
+#include "__PATH_OF_REPOSITORY__ForSpacetreeGridArrayStackImplementation.h"
+
+#include "tarch/Assertions.h"
+#include "tarch/timing/Watch.h"
+
+#ifdef Parallel
+#include "tarch/parallel/Node.h"
+#include "tarch/parallel/NodePool.h"
+#include "peano/kernel/parallel/SendReceiveBufferPool.h"
+#include "peano/kernel/parallel/loadbalancing/Oracle.h"
+#endif
+
+#include "peano/kernel/datatraversal/autotuning/Oracle.h"
+
+
+tarch::logging::Log __FULL_QUALIFIED_TYPE_NAME_OF_REPOSITORY__ForSpacetreeGridArrayStackImplementation::_log( "__FULL_QUALIFIED_TYPE_NAME_OF_REPOSITORY__ForSpacetreeGridArrayStackImplementation" );
+
+
+__FULL_QUALIFIED_TYPE_NAME_OF_REPOSITORY__ForSpacetreeGridArrayStackImplementation::__NONQUALIFIED_TYPE_NAME_OF_REPOSITORY__ForSpacetreeGridArrayStackImplementation(
+  peano::geometry::Geometry&                   geometry,
+  const tarch::la::Vector<DIMENSIONS,double>&  domainSize,
+  const tarch::la::Vector<DIMENSIONS,double>&  domainOffset,
+  int                                          maximumSizeOfCellInOutStack,
+  int                                          maximumSizeOfVertexInOutStack,
+  int                                          maximumSizeOfVertexTemporaryStack
+):
+  _geometry(geometry),
+  _cellStack(maximumSizeOfCellInOutStack),
+  _vertexStack(maximumSizeOfVertexInOutStack, maximumSizeOfVertexTemporaryStack),
+  _solverState(),
+ __x__NONQUALIFIED_ADAPTER_TYPE__ _gridWith__NONQUALIFIED_ADAPTER_TYPE__(_vertexStack,_cellStack,_geometry,_solverState,domainSize,domainOffset,_regularGridContainer,_traversalOrderOnTopLevel),
+  _repositoryState() {
+  logTraceIn( "__NONQUALIFIED_TYPE_NAME_OF_REPOSITORY__ForSpacetreeGridArrayStackImplementation(...)" );
+  
+  _repositoryState.setAction( __NONQUALIFIED_TYPE_NAME_OF_REPOSITORY__State::Terminate );
+
+  peano::kernel::datatraversal::autotuning::Oracle::getInstance().setNumberOfOracles(__NUMBER_OF_ADAPTERS__ +3);
+  #ifdef Parallel
+  peano::kernel::parallel::loadbalancing::Oracle::getInstance().setNumberOfOracles(__NUMBER_OF_ADAPTERS__ +3 );
+  #endif
+  
+  logTraceOut( "__NONQUALIFIED_TYPE_NAME_OF_REPOSITORY__ForSpacetreeGridArrayStackImplementation(...)" );
+}
+
+
+
+__FULL_QUALIFIED_TYPE_NAME_OF_REPOSITORY__ForSpacetreeGridArrayStackImplementation::__NONQUALIFIED_TYPE_NAME_OF_REPOSITORY__ForSpacetreeGridArrayStackImplementation(
+  peano::geometry::Geometry&                   geometry,
+  int                                          maximumSizeOfCellInOutStack,
+  int                                          maximumSizeOfVertexInOutStack,
+  int                                          maximumSizeOfVertexTemporaryStack
+):
+  _geometry(geometry),
+  _cellStack(maximumSizeOfCellInOutStack),
+  _vertexStack(maximumSizeOfVertexInOutStack,maximumSizeOfVertexTemporaryStack),
+  _solverState(),
+ __x__NONQUALIFIED_ADAPTER_TYPE__ _gridWith__NONQUALIFIED_ADAPTER_TYPE__(_vertexStack,_cellStack,_geometry,_solverState,_regularGridContainer,_traversalOrderOnTopLevel),
+  _repositoryState() {
+  logTraceIn( "__NONQUALIFIED_TYPE_NAME_OF_REPOSITORY__ForSpacetreeGridArrayStackImplementation(Geometry&)" );
+  
+  _repositoryState.setAction( __NONQUALIFIED_TYPE_NAME_OF_REPOSITORY__State::Terminate );
+
+  peano::kernel::datatraversal::autotuning::Oracle::getInstance().setNumberOfOracles(__NUMBER_OF_ADAPTERS__ +3);
+  #ifdef Parallel
+  peano::kernel::parallel::loadbalancing::Oracle::getInstance().setNumberOfOracles(__NUMBER_OF_ADAPTERS__ +3 );
+  #endif
+  
+  logTraceOut( "__NONQUALIFIED_TYPE_NAME_OF_REPOSITORY__ForSpacetreeGridArrayStackImplementation(Geometry&)" );
+}
+    
+   
+__FULL_QUALIFIED_TYPE_NAME_OF_REPOSITORY__ForSpacetreeGridArrayStackImplementation::~__NONQUALIFIED_TYPE_NAME_OF_REPOSITORY__ForSpacetreeGridArrayStackImplementation() {
+  assertion( _repositoryState.getAction() == __NONQUALIFIED_TYPE_NAME_OF_REPOSITORY__State::Terminate );
+}
+
+
+void __FULL_QUALIFIED_TYPE_NAME_OF_REPOSITORY__ForSpacetreeGridArrayStackImplementation::restart(
+  const tarch::la::Vector<DIMENSIONS,double>&  domainSize,
+  const tarch::la::Vector<DIMENSIONS,double>&  domainOffset,
+  int                                          domainLevel
+) {
+  logTraceInWith3Arguments( "restart(...)", domainSize, domainOffset, domainLevel );
+  #ifdef Parallel
+  assertion( !tarch::parallel::Node::getInstance().isGlobalMaster());
+  #endif
+  
+  assertion( _repositoryState.getAction() == __NONQUALIFIED_TYPE_NAME_OF_REPOSITORY__State::Terminate );
+
+  _vertexStack.clear();
+  _cellStack.clear();
+
+ __x__NONQUALIFIED_ADAPTER_TYPE__ _gridWith__NONQUALIFIED_ADAPTER_TYPE__.restart(domainSize,domainOffset,domainLevel);
+ 
+   _solverState.restart();
+ 
+  logTraceOut( "restart(...)" );
+}
+
+
+void __FULL_QUALIFIED_TYPE_NAME_OF_REPOSITORY__ForSpacetreeGridArrayStackImplementation::terminate() {
+  logTraceIn( "terminate()" );
+  
+  _repositoryState.setAction( __NONQUALIFIED_TYPE_NAME_OF_REPOSITORY__State::Terminate );
+  
+  #ifdef Parallel
+  if (tarch::parallel::Node::getInstance().isGlobalMaster()) {
+    tarch::parallel::NodePool::getInstance().broadcastToWorkingNodes(
+      _repositoryState,
+      peano::kernel::parallel::SendReceiveBufferPool::getInstance().getIterationManagementTag()
+    );
+  }
+  peano::kernel::parallel::SendReceiveBufferPool::getInstance().terminate();
+  #endif
+  
+ __x__NONQUALIFIED_ADAPTER_TYPE__ _gridWith__NONQUALIFIED_ADAPTER_TYPE__.terminate();
+  logTraceOut( "terminate()" );
+}
+
+
+__FULL_QUALIFIED_TYPE_NAME_OF_STATE_INTERFACE__& __FULL_QUALIFIED_TYPE_NAME_OF_REPOSITORY__ForSpacetreeGridArrayStackImplementation::getState() {
+  return _solverState;
+}
+
+
+__FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_STATE__&  __FULL_QUALIFIED_TYPE_NAME_OF_REPOSITORY__ForSpacetreeGridArrayStackImplementation::getSpacetreeGridState() {
+  return _solverState;
+}
+
+   
+void __FULL_QUALIFIED_TYPE_NAME_OF_REPOSITORY__ForSpacetreeGridArrayStackImplementation::iterate(bool reduceState) {
+  tarch::timing::Watch watch( "__FULL_QUALIFIED_TYPE_NAME_OF_REPOSITORY__ForSpacetreeGridArrayStackImplementation", "iterate(bool)", false);
+  
+  #ifdef Parallel
+  if (tarch::parallel::Node::getInstance().isGlobalMaster()) {
+    _repositoryState.setReduceState(reduceState);
+    tarch::parallel::NodePool::getInstance().broadcastToWorkingNodes(
+      _repositoryState,
+      peano::kernel::parallel::SendReceiveBufferPool::getInstance().getIterationManagementTag()
+    );
+  }
+  else {
+    reduceState = _repositoryState.getReduceState();
+  }
+  #endif
+
+  peano::kernel::datatraversal::autotuning::Oracle::getInstance().switchToOracle(_repositoryState.getAction());
+  #ifdef Parallel
+  peano::kernel::parallel::loadbalancing::Oracle::getInstance().switchToOracle(_repositoryState.getAction());
+  #endif
+
+  switch ( _repositoryState.getAction()) {
+__x__NONQUALIFIED_ADAPTER_TYPE__    case __NONQUALIFIED_TYPE_NAME_OF_REPOSITORY__State::UseAdapter__NONQUALIFIED_ADAPTER_TYPE__: watch.startTimer(); _gridWith__NONQUALIFIED_ADAPTER_TYPE__.iterate(reduceState); watch.stopTimer(); _measure__NONQUALIFIED_ADAPTER_TYPE__CPUTime.setValue( watch.getCPUTime() ); _measure__NONQUALIFIED_ADAPTER_TYPE__CalendarTime.setValue( watch.getCalendarTime() ); break;
+    case __NONQUALIFIED_TYPE_NAME_OF_REPOSITORY__State::Terminate:
+      assertionMsg( false, "this branch/state should never be reached" ); 
+      break;
+    case __NONQUALIFIED_TYPE_NAME_OF_REPOSITORY__State::ReadCheckpoint:
+      assertionMsg( false, "not implemented yet" );
+      break;
+    case __NONQUALIFIED_TYPE_NAME_OF_REPOSITORY__State::WriteCheckpoint:
+      assertionMsg( false, "not implemented yet" );
+      break;
+  }
+  
+  #ifdef Parallel
+  if (_solverState.isJoiningWithMaster()) {
+    _repositoryState.setAction( __NONQUALIFIED_TYPE_NAME_OF_REPOSITORY__State::Terminate );
+  }
+  #endif
+}
+
+__x__NONQUALIFIED_ADAPTER_TYPE__ void __FULL_QUALIFIED_TYPE_NAME_OF_REPOSITORY__ForSpacetreeGridArrayStackImplementation::switchTo__NONQUALIFIED_ADAPTER_TYPE__() { _repositoryState.setAction(__NONQUALIFIED_TYPE_NAME_OF_REPOSITORY__State::UseAdapter__NONQUALIFIED_ADAPTER_TYPE__); }
+
+
+__x__NONQUALIFIED_ADAPTER_TYPE__ bool __FULL_QUALIFIED_TYPE_NAME_OF_REPOSITORY__ForSpacetreeGridArrayStackImplementation::isActiveAdapter__NONQUALIFIED_ADAPTER_TYPE__() const { return _repositoryState.getAction() == __NONQUALIFIED_TYPE_NAME_OF_REPOSITORY__State::UseAdapter__NONQUALIFIED_ADAPTER_TYPE__; }
+
+
+peano::kernel::gridinterface::Checkpoint<__FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_VERTEX__, __FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_CELL__>* __FULL_QUALIFIED_TYPE_NAME_OF_REPOSITORY__ForSpacetreeGridArrayStackImplementation::createEmptyCheckpoint() {
+  return new peano::kernel::gridinterface::Checkpoint<__FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_VERTEX__, __FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_CELL__>();
+} 
+
+
+void __FULL_QUALIFIED_TYPE_NAME_OF_REPOSITORY__ForSpacetreeGridArrayStackImplementation::writeCheckpoint(peano::kernel::gridinterface::Checkpoint<__FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_VERTEX__, __FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_CELL__> * const checkpoint) {
+  _solverState.writeToCheckpoint( *checkpoint );
+  _vertexStack.writeToCheckpoint( *checkpoint );
+  _cellStack.writeToCheckpoint( *checkpoint );
+} 
+
+
+void __FULL_QUALIFIED_TYPE_NAME_OF_REPOSITORY__ForSpacetreeGridArrayStackImplementation::setMaximumMemoryFootprintForTemporaryRegularGrids(double value) {
+  _regularGridContainer.setMaximumMemoryFootprintForTemporaryRegularGrids(value);
+}
+
+
+void __FULL_QUALIFIED_TYPE_NAME_OF_REPOSITORY__ForSpacetreeGridArrayStackImplementation::readCheckpoint( peano::kernel::gridinterface::Checkpoint<__FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_VERTEX__, __FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_CELL__> const * const checkpoint ) {
+  assertionMsg( checkpoint->isValid(), "checkpoint has to be valid if you call this operation" );
+
+  _solverState.readFromCheckpoint( *checkpoint );
+  _vertexStack.readFromCheckpoint( *checkpoint );
+  _cellStack.readFromCheckpoint( *checkpoint );
+}
+
+
+#ifdef Parallel
+bool __FULL_QUALIFIED_TYPE_NAME_OF_REPOSITORY__ForSpacetreeGridArrayStackImplementation::continueToIterate() {
+  logTraceIn( "continueToIterate()" );
+
+  assertion( !tarch::parallel::Node::getInstance().isGlobalMaster());
+
+  bool result;
+  if ( _solverState.hasJoinedWithMaster() ) {
+    result = false;
+  }
+  else {
+    int masterNode = tarch::parallel::Node::getInstance().getGlobalMasterRank();
+    assertion( masterNode != -1 );
+
+    _repositoryState.receive( masterNode, peano::kernel::parallel::SendReceiveBufferPool::getInstance().getIterationManagementTag(), true );
+
+    result = _repositoryState.getAction()!=__NONQUALIFIED_TYPE_NAME_OF_REPOSITORY__State::Terminate;
+  }
+   
+  logTraceOutWith1Argument( "continueToIterate()", result );
+  return result;
+}
+#endif

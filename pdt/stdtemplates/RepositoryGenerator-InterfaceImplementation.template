@@ -1,0 +1,10 @@
+#include "__PATH_OF_REPOSITORY_INTERFACE__.h"
+
+
+tarch::logging::Log __FULL_QUALIFIED_TYPE_NAME_OF_REPOSITORY_INTERFACE__::_log( "__FULL_QUALIFIED_TYPE_NAME_OF_REPOSITORY_INTERFACE__" );
+
+
+void __FULL_QUALIFIED_TYPE_NAME_OF_REPOSITORY_INTERFACE__::logIterationStatistics() const {
+  logInfo( "logIterationStatistics()", "|| adapter name \t || iterations \t || total CPU time [t]=s \t || average CPU time [t]=s \t || total user time [t]=s \t || average user time [t]=s  || CPU time properties  || user time properties " );  
+ __x__NONQUALIFIED_ADAPTER_TYPE__  logInfo( "logIterationStatistics()", "| __NONQUALIFIED_ADAPTER_TYPE__ \t |  " << _measure__NONQUALIFIED_ADAPTER_TYPE__CPUTime.getNumberOfMeasurements() << " \t |  " << _measure__NONQUALIFIED_ADAPTER_TYPE__CPUTime.getAccumulatedValue() << " \t |  " << _measure__NONQUALIFIED_ADAPTER_TYPE__CPUTime.getValue()  << " \t |  " << _measure__NONQUALIFIED_ADAPTER_TYPE__CalendarTime.getAccumulatedValue() << " \t |  " << _measure__NONQUALIFIED_ADAPTER_TYPE__CalendarTime.getValue() << " \t |  " << _measure__NONQUALIFIED_ADAPTER_TYPE__CPUTime.toString() << " \t |  " << _measure__NONQUALIFIED_ADAPTER_TYPE__CalendarTime.toString() );
+}
