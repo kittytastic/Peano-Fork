@@ -1,32 +1,27 @@
-// Copyright (C) 2009 Technische Universitaet Muenchen
 // This file is part of the Peano project. For conditions of distribution and 
-// use, please see the copyright notice at www5.in.tum.de/peano
-#ifndef ___INCLUDE_GUARD_PREFIX_____NONQUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_CELL___H_ 
-#define ___INCLUDE_GUARD_PREFIX_____NONQUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_CELL___H_
+// use, please see the copyright notice at www.peano-framework.org
+#ifndef ___INCLUDE_GUARD_PREFIX___CELL_H_ 
+#define ___INCLUDE_GUARD_PREFIX___CELL_H_
 
 
-#include "__PATH_OF_SPACETREE_GRID_DASTGEN_CELL__.h"
-#include "peano/kernel/spacetreegrid/Cell.h"
+#include "__PROJECT_PATH__/records/Cell.h"
+#include "peano/grid/Cell.h"
 
 
 __OPEN_NAMESPACE__ 
-      class __NONQUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_CELL__; 
+      class Cell; 
 __CLOSE_NAMESPACE__
 
 
 /**
- * Blueprint for regular grid cell.
+ * Blueprint for cell.
  * 
- * This file has originally been created by PeProt and may be manually adapted to 
+ * This file has originally been created by the PDT and may be manually extended to 
  * the needs of your application. We do not recommend to remove anything!
- * 
- * \author PeProt
  */
-
-
-class __FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_CELL__: public peano::kernel::spacetreegrid::Cell< __FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_DASTGEN_CELL__ > { 
+class __NAMESPACE__::Cell: public peano::grid::Cell< __NAMESPACE__::records::Cell > { 
   private: 
-    typedef class peano::kernel::spacetreegrid::Cell< __FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_DASTGEN_CELL__ >  Base;
+    typedef class peano::grid::Cell< __NAMESPACE__::records::Cell >  Base;
 
   public:
     /**
@@ -35,14 +30,14 @@ class __FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_CELL__: public peano::kernel:
      * This constructor is required by the framework's data container. Do not 
      * remove it.
      */
-    __NONQUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_CELL__();
+    Cell();
 
     /**
      * This constructor should not set any attributes. It is used by the 
      * traversal algorithm whenever it allocates an array whose elements 
      * will be overwritten later anyway.  
      */
-    __NONQUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_CELL__(const Base::DoNotCallStandardConstructor&);
+    Cell(const Base::DoNotCallStandardConstructor&);
 
     /**
      * Constructor
@@ -54,7 +49,7 @@ class __FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_CELL__: public peano::kernel:
      * has to invoke the correponsing super type's constructor and not the super 
      * type standard constructor.
      */
-    __NONQUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_CELL__(const Base::PersistentCell& argument);
+    Cell(const Base::PersistentCell& argument);
 };
 
 

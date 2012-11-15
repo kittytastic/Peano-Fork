@@ -41,7 +41,8 @@ int __NAMESPACE__::runners::Runner::run() {
   //       it).
   
   // Start of dummy implementation
-  peano::geometry::geometry::Hexahedron geometry(
+  peano::geometry::Hexahedron geometry(
+    false,
     tarch::la::Vector<DIMENSIONS,double>(0.0),
     tarch::la::Vector<DIMENSIONS,double>(1.0)
    );

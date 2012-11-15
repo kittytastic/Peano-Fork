@@ -1,67 +1,52 @@
-// Copyright (C) 2009 Technische Universitaet Muenchen
 // This file is part of the Peano project. For conditions of distribution and 
-// use, please see the copyright notice at www5.in.tum.de/peano
-#ifndef ___INCLUDE_GUARD_PREFIX_____NONQUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_STATE___H_ 
-#define ___INCLUDE_GUARD_PREFIX_____NONQUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_STATE___H_
+// use, please see the copyright notice at www.peano-framework.org
+#ifndef ___INCLUDE_GUARD_PREFIX___STATE_H_ 
+#define ___INCLUDE_GUARD_PREFIX___STATE_H_
 
+#include "__PROJECT_PATH__/records/State.h"
+#include "peano/grid/State.h"
 
-#include "peano/kernel/spacetreegrid/State.h"
-
-#include "__PATH_OF_SPACETREE_GRID_DASTGEN_STATE__.h"
-
-#include "peano/kernel/gridinterface/Checkpoint.h"
-
-#include "__PATH_OF_STATE_INTERFACE__.h"
-
+#include "peano/grid/Checkpoint.h"
 
 __OPEN_NAMESPACE__ 
-      class __NONQUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_STATE__;
+      class State;
       /**
        * Forward declaration
        */
-      class __NONQUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_VERTEX__;
+      class Vertex;
       /**
        * Forward declaration
        */
-      class __NONQUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_CELL__;
+      class Cell;
       
       namespace repositories {
         /** 
          * Forward declaration
          */
-        class __NONQUALIFIED_TYPE_NAME_OF_REPOSITORY__ForSpacetreeGridArrayStackImplementation;
-        class __NONQUALIFIED_TYPE_NAME_OF_REPOSITORY__ForSpacetreeGridFileStackImplementation;
-        class __NONQUALIFIED_TYPE_NAME_OF_REPOSITORY__ForSpacetreeGridSTDDoubleStackImplementation;
-        class __NONQUALIFIED_TYPE_NAME_OF_REPOSITORY__ForSpacetreeGridSTDStackImplementation;
-        class __NONQUALIFIED_TYPE_NAME_OF_REPOSITORY__ForSpacetreeGridDynamicStackImplementation;
+        class RepositoryArrayStack;
+        class RepositorySTDStack;
       }
 __CLOSE_NAMESPACE__
 
+
 /**
- * Blueprint for solver/application state.
+ * Blueprint for solver state.
  * 
- * This file has originally been created by PeProt and may be manually adapted to 
+ * This file has originally been created by the PDT and may be manually extended to 
  * the needs of your application. We do not recommend to remove anything!
- * 
- * \author PeProt
  */
-
-
-class __FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_STATE__: public peano::kernel::spacetreegrid::State< __FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_DASTGEN_STATE__ >, public __FULL_QUALIFIED_TYPE_NAME_OF_STATE_INTERFACE__ { 
+class __NAMESPACE__::State: public peano::grid::State< __NAMESPACE__::records::State > { 
   private: 
-    typedef class peano::kernel::spacetreegrid::State< __FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_DASTGEN_STATE__ >  Base;
+    typedef class peano::grid::State< __NAMESPACE__::records::State >  Base;
 
     /**
      * Needed for checkpointing.
      */
-    friend class __FULL_QUALIFIED_TYPE_NAME_OF_REPOSITORY__ForSpacetreeGridArrayStackImplementation;
-    friend class __FULL_QUALIFIED_TYPE_NAME_OF_REPOSITORY__ForSpacetreeGridFileStackImplementation;
-    friend class __FULL_QUALIFIED_TYPE_NAME_OF_REPOSITORY__ForSpacetreeGridSTDDoubleStackImplementation;
-    friend class __FULL_QUALIFIED_TYPE_NAME_OF_REPOSITORY__ForSpacetreeGridSTDStackImplementation;
-    friend class __FULL_QUALIFIED_TYPE_NAME_OF_REPOSITORY__ForSpacetreeGridDynamicStackImplementation;
+    friend class __NAMESPACE__::repositories::RepositoryArrayStack;
+    friend class __NAMESPACE__::repositories::RepositorySTDStack;
   
-    void writeToCheckpoint( peano::kernel::gridinterface::Checkpoint<__FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_VERTEX__, __FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_CELL__>& checkpoint ) const;    
-    void readFromCheckpoint( const peano::kernel::gridinterface::Checkpoint<__FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_VERTEX__, __FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_CELL__>& checkpoint );    
+    void writeToCheckpoint( peano::grid::Checkpoint<Vertex,Cell>&  checkpoint ) const;    
+    void readFromCheckpoint( const peano::grid::Checkpoint<Vertex,Cell>&  checkpoint );    
   
   public:
     /**
@@ -70,7 +55,7 @@ class __FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_STATE__: public peano::kernel
      * This constructor is required by the framework's data container. Do not 
      * remove it.
      */
-    __NONQUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_STATE__();
+    State();
 
     /**
      * Constructor
@@ -82,7 +67,7 @@ class __FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_STATE__: public peano::kernel
      * has to invoke the correponsing super type's constructor and not the super 
      * type standard constructor.
      */
-    __NONQUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_STATE__(const Base::PersistentState& argument);
+    State(const Base::PersistentState& argument);
 
     #ifdef Parallel
     /**
@@ -108,7 +93,7 @@ class __FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_STATE__: public peano::kernel
      * the fork process itself is a non-reducing process, i.e. throughout the 
      * forks, no states are sent back to the masters.  
      */
-    void mergeWithWorkerState(const __NONQUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_STATE__& workerState);
+    void mergeWithWorkerState(const State& workerState);
     #endif
 };
 

@@ -1,8 +1,8 @@
-#include "__PROJECT_PATH__/Vertex.h"
+#include "__PROJECT_PATH__/State.h"
 #include "__PROJECT_PATH__/Cell.h"
 #include "__PROJECT_PATH__/Vertex.h"
 
-#include "peano/kernel/gridinterface/Checkpoint.h"
+#include "peano/grid/Checkpoint.h"
 
 
 
@@ -18,18 +18,18 @@ __NAMESPACE__::State::State(const Base::PersistentState& argument):
 }
 
 
-void __NAMESPACE__::State::writeToCheckpoint( peano::kernel::gridinterface::Checkpoint<__FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_VERTEX__, __FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_CELL__>& checkpoint ) const {
+void __NAMESPACE__::State::writeToCheckpoint( peano::grid::Checkpoint<__NAMESPACE__::Vertex,__NAMESPACE__::Cell>& checkpoint ) const {
   // @todo Insert your code here
 }
 
     
-void __NAMESPACE__::State::readFromCheckpoint( const peano::kernel::gridinterface::Checkpoint<__FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_VERTEX__, __FULL_QUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_CELL__>& checkpoint ) {
+void __NAMESPACE__::State::readFromCheckpoint( const peano::grid::Checkpoint<__NAMESPACE__::Vertex,__NAMESPACE__::Cell>& checkpoint ) {
   // @todo Insert your code here
 }
 
 
 #ifdef Parallel
-void __NAMESPACE__::State::mergeWithWorkerState(const __NONQUALIFIED_TYPE_NAME_OF_SPACETREE_GRID_STATE__& workerState) {
+void __NAMESPACE__::State::mergeWithWorkerState(const __NAMESPACE__::Vertex,__NAMESPACE__::State& workerState) {
   Base::mergeWithWorkerState(workerState);
   // @todo Insert your code here
 }
