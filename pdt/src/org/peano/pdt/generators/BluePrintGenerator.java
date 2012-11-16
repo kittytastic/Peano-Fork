@@ -64,6 +64,9 @@ public class BluePrintGenerator extends DepthFirstAdapter {
     final String headerFileName         = _directoryGenerator.getMappingsDirectory() + "/" + node.getName().getText().trim() + ".h";
     final String implementationFileName = _directoryGenerator.getMappingsDirectory() + "/" + node.getName().getText().trim() + ".cpp";
 
+    String mappingTypeName   = node.getName().getText().trim();
+    _translationTable.setThisTypenameToMappingTypename( mappingTypeName );
+
     _translationTable.convertTemplateFile( headerTemplate,         headerFileName,         false);
     _translationTable.convertTemplateFile( implementationTemplate, implementationFileName, false);
   }

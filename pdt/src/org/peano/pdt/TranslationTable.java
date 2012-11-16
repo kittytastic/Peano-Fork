@@ -21,47 +21,6 @@ public class TranslationTable extends DepthFirstAdapter {
   private static final String _KEYWORD_DOF_DASTGEN_DEFINITION_STATE = "__DOF_DASTGEN_DEFINITION_STATE__";
   private static final String _KEYWORD_DOF_DASTGEN_DEFINITION_VERTEX = "__DOF_DASTGEN_DEFINITION_VERTEX__";
   
-//  private static final String _KEYWORD_FULL_QUALIFIED_TYPE_NAME_OF_CELL       = "__FULL_QUALIFIED_TYPE_NAME_OF_CELL__";
-//  private static final String _KEYWORD_FULL_QUALIFIED_TYPE_NAME_OF_STATE      = "__FULL_QUALIFIED_TYPE_NAME_OF_STATE__";
-//  private static final String _KEYWORD_FULL_QUALIFIED_TYPE_NAME_OF_VERTEX     = "__FULL_QUALIFIED_TYPE_NAME_OF_VERTEX__";
-//  private static final String _KEYWORD_FULL_QUALIFIED_TYPE_NAME_OF_REPOSITORY = "__FULL_QUALIFIED_TYPE_NAME_OF_REPOSITORY__";
-//
-//  private static final String _KEYWORD_UNQUALIFIED_TYPE_NAME_OF_CELL       = "__UNQUALIFIED_TYPE_NAME_OF_CELL__";
-//  private static final String _KEYWORD_UNQUALIFIED_TYPE_NAME_OF_STATE      = "__UNQUALIFIED_TYPE_NAME_OF_STATE__";
-//  private static final String _KEYWORD_UNQUALIFIED_TYPE_NAME_OF_VERTEX     = "__UNQUALIFIED_TYPE_NAME_OF_VERTEX__";
-//  private static final String _KEYWORD_UNQUALIFIED_TYPE_NAME_OF_REPOSITORY = "__UNQUALIFIED_TYPE_NAME_OF_REPOSITORY__";
-//
-//  private static final String _KEYWORD_PATH_OF_CELL       = "__PATH_OF_CELL__";
-//  private static final String _KEYWORD_PATH_OF_STATE      = "__PATH_OF_STATE__";
-//  private static final String _KEYWORD_PATH_OF_VERTEX     = "__PATH_OF_VERTEX__";
-//  private static final String _KEYWORD_PATH_OF_REPOSITORY = "__PATH_OF_REPOSITORY__";
-//
-//  private static final String _KEYWORD_FULL_QUALIFIED_TYPE_NAME_OF_DASTGEN_CELL   = "__FULL_QUALIFIED_TYPE_NAME_OF_DASTGEN_CELL__";
-//  private static final String _KEYWORD_FULL_QUALIFIED_TYPE_NAME_OF_DASTGEN_STATE  = "__FULL_QUALIFIED_TYPE_NAME_OF_DASTGEN_STATE__";
-//  private static final String _KEYWORD_FULL_QUALIFIED_TYPE_NAME_OF_DASTGEN_VERTEX = "__FULL_QUALIFIED_TYPE_NAME_OF_DASTGEN_VERTEX__";
-//
-//  private static final String _KEYWORD_UNQUALIFIED_TYPE_NAME_OF_DASTGEN_CELL   = "__UNQUALIFIED_TYPE_NAME_OF_DASTGEN_CELL__";
-//  private static final String _KEYWORD_UNQUALIFIED_TYPE_NAME_OF_DASTGEN_STATE  = "__UNQUALIFIED_TYPE_NAME_OF_DASTGEN_STATE__";
-//  private static final String _KEYWORD_UNQUALIFIED_TYPE_NAME_OF_DASTGEN_VERTEX = "__UNQUALIFIED_TYPE_NAME_OF_DASTGEN_VERTEX__";
-//
-//  private static final String _KEYWORD_PATH_OF_DASTGEN_CELL   = "__PATH_OF_DASTGEN_CELL__";
-//  private static final String _KEYWORD_PATH_OF_DASTGEN_STATE  = "__PATH_OF_DASTGEN_STATE__";
-//  private static final String _KEYWORD_PATH_OF_DASTGEN_VERTEX = "__PATH_OF_DASTGEN_VERTEX__";
-//
-//  private static final String _KEYWORD_FULL_QUALIFIED_TYPE_NAME_OF_TEST          = "__FULL_QUALIFIED_TYPE_NAME_OF_TEST__";
-//  private static final String _KEYWORD_FULL_QUALIFIED_TYPE_NAME_OF_RUNNER        = "__FULL_QUALIFIED_TYPE_NAME_OF_RUNNER__";
-//  private static final String _KEYWORD_FULL_QUALIFIED_TYPE_NAME_OF_CONFIGURATION = "__FULL_QUALIFIED_TYPE_NAME_OF_CONFIGURATION__";
-//
-//  private static final String _KEYWORD_UNQUALIFIED_TYPE_NAME_OF_TEST          = "__UNQUALIFIED_TYPE_NAME_OF_TEST__";
-//  private static final String _KEYWORD_UNQUALIFIED_TYPE_NAME_OF_RUNNER        = "__UNQUALIFIED_TYPE_NAME_OF_RUNNER__";
-//  private static final String _KEYWORD_UNQUALIFIED_TYPE_NAME_OF_CONFIGURATION = "__UNQUALIFIED_TYPE_NAME_OF_CONFIGURATION__";
-//
-//  private static final String _KEYWORD_PATH_OF_TEST          = "__PATH_OF_TEST__";
-//  private static final String _KEYWORD_PATH_OF_RUNNER        = "__PATH_OF_RUNNER__";
-//  private static final String _KEYWORD_PATH_OF_ADAPTER       = "__PATH_OF_ADAPTER__";
-//  private static final String _KEYWORD_PATH_OF_MAPPINGS      = "__PATH_OF_MAPPINGS__";
-//  private static final String _KEYWORD_PATH_OF_CONFIGURATION = "__PATH_OF_CONFIGURATION__";
-
   private static final String _KEYWORD_NAMESPACE       = "__NAMESPACE__";
   private static final String _KEYWORD_OPEN_NAMESPACE  = "__OPEN_NAMESPACE__";
   private static final String _KEYWORD_CLOSE_NAMESPACE = "__CLOSE_NAMESPACE__";
@@ -241,11 +200,6 @@ public class TranslationTable extends DepthFirstAdapter {
         getOpeningNamespace(_mapping.get(_KEYWORD_NAMESPACE)));
     _mapping.put(_KEYWORD_CLOSE_NAMESPACE,
         getClosingNamespace(_mapping.get(_KEYWORD_NAMESPACE)));
-//
-//    _mapping.put(_KEYWORD_PATH_OF_ADAPTER, _mapping.get(_KEYWORD_NAMESPACE)
-//        .replaceAll("::", "/") + "/adapters/");
-//    _mapping.put(_KEYWORD_PATH_OF_MAPPINGS, _mapping.get(_KEYWORD_NAMESPACE)
-//        .replaceAll("::", "/") + "/mappings/");
   }
 
   public void inAAdapter(AAdapter node) {
@@ -354,12 +308,6 @@ public class TranslationTable extends DepthFirstAdapter {
   ) {
   	destinationFile = destinationFile.replaceAll("\\\\", "/");
 	
-
-//		// Log generated file
-//		String relativeFileName = new File(destinationFile).getAbsolutePath()
-//				.replaceFirst(rootDirectory, "");
-//		Log.writeGeneratedFile(relativeFileName);
-
 		if ((new java.io.File(destinationFile)).exists() && !overwrite) {
 			System.out.print("\n  (blueprint of " + destinationFile
 					+ " already exists)");
@@ -460,30 +408,4 @@ public class TranslationTable extends DepthFirstAdapter {
   ) {
     convertTemplateFile(templateFile,destinationFile,null,null,overwrite);
   }
-  
-//
-//  
-//  public String getRegularStateDefinitionFilePath(String rootSourceDirectory) {
-//	return rootSourceDirectory + File.separator + _mapping.get( _KEYWORD_DOF_DASTGEN_DEFINITION_STATE );
-//  }
-//
-//  public String getRegularVertexDefinitionFilePath(String rootSourceDirectory) {
-//	return rootSourceDirectory + File.separator + _mapping.get( _KEYWORD_DOF_DASTGEN_DEFINITION_STATE );
-//  }
-//
-//  public String getRegularCellDefinitionFilePath(String rootSourceDirectory) {
-//	return rootSourceDirectory + File.separator + _mapping.get( _KEYWORD_DOF_DASTGEN_DEFINITION_STATE );
-//  }
-//
-//  public String getSpacetreeStateDefinitionFilePath(String rootSourceDirectory) {
-//	return rootSourceDirectory + File.separator + _mapping.get( _KEYWORD_DOF_DASTGEN_DEFINITION_STATE );
-//  }
-//
-//  public String getSpacetreeVertexDefinitionFilePath(String rootSourceDirectory) {
-//	return rootSourceDirectory + File.separator + _mapping.get( _KEYWORD_DOF_DASTGEN_DEFINITION_STATE );
-//  }
-//
-//  public String getSpacetreeCellDefinitionFilePath(String rootSourceDirectory) {
-//	return rootSourceDirectory + File.separator + _mapping.get( _KEYWORD_DOF_DASTGEN_DEFINITION_STATE );
-//  }
 }

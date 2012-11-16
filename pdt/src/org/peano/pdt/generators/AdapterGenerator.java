@@ -39,7 +39,7 @@ public class AdapterGenerator extends DepthFirstAdapter {
     );
     _translationTable.convertTemplateFile( 
       "AdapterImplementation.template",
-      _directoryGenerator.getAdaptersDirectory() + "/" + mappingTypeName + ".h",
+      _directoryGenerator.getAdaptersDirectory() + "/" + mappingTypeName + ".cpp",
       true
     );
   }
