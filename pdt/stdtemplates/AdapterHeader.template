@@ -199,6 +199,13 @@ class __THIS_QUALIFIED_TYPENAME__ {
     );
 
 
+    void receiveDataFromMaster(
+      __NAMESPACE__::Cell&                    receivedCell, 
+      __NAMESPACE__::Vertex *                 receivedVertices,
+      const peano::grid::VertexEnumerator&    verticesEnumerator
+    );
+
+
     void mergeWithWorker(
       __NAMESPACE__::Cell&           localCell, 
       const __NAMESPACE__::Cell&     receivedMasterCell

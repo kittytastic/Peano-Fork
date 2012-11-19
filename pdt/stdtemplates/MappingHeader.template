@@ -705,6 +705,44 @@ class __THIS_QUALIFIED_TYPENAME__ {
 
 
     /**
+     * Counterpart of prepareSendToWorker(). This operation is called once when 
+     * we receive data from the master node. You can manipulate the received 
+     * records - get additional data from the heap, e.g. Afterwards, the 
+     * received records are merged into the worker's local data due to 
+     * mergeWithWorker(). While this operation gives you access to both the 
+     * cell and its adjacent vertices in the same order as prepareSendToWorker(),
+     * the mergeWithWorker() operations are called on-the-fly in a (probably) 
+     * different order, as their order depends on the global space-filling curve.
+     *
+     * If you manipulate receivedCell or receivedVertices(), respectively, 
+     * these modified values will be passed to mergeWithWorker(). The classical 
+     * use case is that prepareSendToWorker() sends away some heap data. This 
+     * heap data then should be received in this operation, as you have all data 
+     * available here in the same order as prepareSendToWorker(). Distribute the 
+     * received heap data among the @f$ 2^d +1 @f$ out arguments you have 
+     * available. The modified arguments then are forwarded by Peano to 
+     * mergeWithWorker().
+     *
+     * !!! Rationale
+     * 
+     * The split of the receive process into two stages seems to be artificial 
+     * and not very much straightforward. However, two constraints make it 
+     * necessary:
+     * - Some applications need a single receive point where the data received 
+     *   has the same order as prepareSendToWorker().
+     * - Some applications need well-initialised vertices when they descend 
+     *   somewhere in the worker tree. This descend usually not in the central 
+     *   element but an outer part of the tree, i.e. some vertices have to be 
+     *   merged before we can also merge the cell and all other vertices.
+     */
+    void receiveDataFromMaster(
+      __NAMESPACE__::Cell&                    receivedCell, 
+      __NAMESPACE__::Vertex *                 receivedVertices,
+      const peano::grid::VertexEnumerator&    verticesEnumerator
+    );
+
+
+    /**
      * Counterpart of mergeWithMaster()
      */
     void mergeWithWorker(

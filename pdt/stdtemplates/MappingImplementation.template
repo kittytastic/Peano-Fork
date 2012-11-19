@@ -260,6 +260,7 @@ void __THIS_QUALIFIED_TYPENAME__::prepareSendToMaster(
   logTraceOut( "prepareSendToMaster(...)" );
 }
 
+
 void __THIS_QUALIFIED_TYPENAME__::mergeWithMaster(
   const __NAMESPACE__::Cell&           workerGridCell,
   __NAMESPACE__::Vertex                workerGridVertices[TWO_POWER_D],
@@ -277,6 +278,18 @@ void __THIS_QUALIFIED_TYPENAME__::mergeWithMaster(
   logTraceOut( "mergeWithMaster(...)" );
 }
 
+
+void __THIS_QUALIFIED_TYPENAME__::receiveDataFromMaster(
+  __NAMESPACE__::Cell&                    receivedCell, 
+  __NAMESPACE__::Vertex *                 receivedVertices,
+  const peano::grid::VertexEnumerator&    verticesEnumerator
+) {
+  logTraceInWith2Arguments( "receiveDataFromMaster(...)", receivedCell.toString(), verticesEnumerator.toString() );
+  // @todo Insert your code here
+  logTraceOut( "receiveDataFromMaster(...)" );
+}
+
+
 void __THIS_QUALIFIED_TYPENAME__::mergeWithWorker(
   __NAMESPACE__::Cell&           localCell, 
   const __NAMESPACE__::Cell&     receivedMasterCell
@@ -285,6 +298,7 @@ void __THIS_QUALIFIED_TYPENAME__::mergeWithWorker(
   // @todo Insert your code here
   logTraceOutWith1Argument( "mergeWithWorker(...)", localCell.toString() );
 }
+
 
 void __THIS_QUALIFIED_TYPENAME__::mergeWithWorker(
   __NAMESPACE__::Vertex&        localVertex,

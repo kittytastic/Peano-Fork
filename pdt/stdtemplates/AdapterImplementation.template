@@ -2,9 +2,40 @@
 
 
 
-//const bool __THIS_QUALIFIED_TYPENAME__::touchVertexFirstTimeIsNOP  = true
-//  __x__MAPPINGS__ & __NAMESPACE__::mappings::SpacetreeGrid2__MAPPINGS__::touchVertexFirstTimeIsNOP
-//;
+const peano::MappingSpecification   __THIS_QUALIFIED_TYPENAME__::touchVertexLastTimeSpecification = 
+  peano::MappingSpecification::getMostGeneralSpecification()
+  __x__MAPPINGS__ & __NAMESPACE__::mappings::__MAPPINGS__::touchVertexLastTimeSpecification
+;
+
+
+const peano::MappingSpecification   __THIS_QUALIFIED_TYPENAME__::touchVertexFirstTimeSpecification = 
+  peano::MappingSpecification::getMostGeneralSpecification()
+  __x__MAPPINGS__ & __NAMESPACE__::mappings::__MAPPINGS__::touchVertexFirstTimeSpecification
+;
+
+
+const peano::MappingSpecification   __THIS_QUALIFIED_TYPENAME__::enterCellSpecification = 
+  peano::MappingSpecification::getMostGeneralSpecification()
+  __x__MAPPINGS__ & __NAMESPACE__::mappings::__MAPPINGS__::enterCellSpecification
+;
+
+
+const peano::MappingSpecification   __THIS_QUALIFIED_TYPENAME__::leaveCellSpecification = 
+  peano::MappingSpecification::getMostGeneralSpecification()
+  __x__MAPPINGS__ & __NAMESPACE__::mappings::__MAPPINGS__::leaveCellSpecification
+;
+
+
+const peano::MappingSpecification   __THIS_QUALIFIED_TYPENAME__::ascendSpecification = 
+  peano::MappingSpecification::getMostGeneralSpecification()
+  __x__MAPPINGS__ & __NAMESPACE__::mappings::__MAPPINGS__::ascendSpecification
+;
+
+
+const peano::MappingSpecification   __THIS_QUALIFIED_TYPENAME__::descendSpecification = 
+  peano::MappingSpecification::getMostGeneralSpecification()
+  __x__MAPPINGS__ & __NAMESPACE__::mappings::__MAPPINGS__::descendSpecification
+;
 
 
 __THIS_QUALIFIED_TYPENAME__::__THIS_TYPENAME__() {
@@ -218,6 +249,16 @@ void __THIS_QUALIFIED_TYPENAME__::mergeWithMaster(
 
   __x__MAPPINGS__ _map2__MAPPINGS__.mergeWithMaster( workerGridCell, workerGridVertices, fineGridCell, fineGridVertices, fineGridVerticesEnumerator, coarseGridVertices, coarseGridVerticesEnumerator, coarseGridCell, fineGridPositionOfCell, worker );
 }
+
+void __THIS_QUALIFIED_TYPENAME__::receiveDataFromMaster(
+  __NAMESPACE__::Cell&                    receivedCell, 
+  __NAMESPACE__::Vertex *                 receivedVertices,
+  const peano::grid::VertexEnumerator&    verticesEnumerator
+) {
+
+  __x__MAPPINGS__ _map2__MAPPINGS__.receiveDataFromMaster( receivedCell, receivedVertices, verticesEnumerator );
+}
+
 
 void __THIS_QUALIFIED_TYPENAME__::mergeWithWorker(
   __NAMESPACE__::Cell&           localCell, 
