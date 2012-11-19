@@ -393,12 +393,40 @@ public class DepthFirstAdapter extends AnalysisAdapter
             }
         }
         {
-            List<TIdentifier> copy = new ArrayList<TIdentifier>(node.getPredefinedDefined());
-            for(TIdentifier e : copy)
+            List<PPredefinedAdapter> copy = new ArrayList<PPredefinedAdapter>(node.getPredefinedAdapter());
+            for(PPredefinedAdapter e : copy)
             {
                 e.apply(this);
             }
         }
         outAAdapter(node);
+    }
+
+    public void inAPredefinedAdapter(APredefinedAdapter node)
+    {
+        defaultIn(node);
+    }
+
+    public void outAPredefinedAdapter(APredefinedAdapter node)
+    {
+        defaultOut(node);
+    }
+
+    @Override
+    public void caseAPredefinedAdapter(APredefinedAdapter node)
+    {
+        inAPredefinedAdapter(node);
+        if(node.getName() != null)
+        {
+            node.getName().apply(this);
+        }
+        {
+            List<TIdentifier> copy = new ArrayList<TIdentifier>(node.getParameters());
+            for(TIdentifier e : copy)
+            {
+                e.apply(this);
+            }
+        }
+        outAPredefinedAdapter(node);
     }
 }

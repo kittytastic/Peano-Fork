@@ -5,36 +5,42 @@
 const peano::MappingSpecification   __THIS_QUALIFIED_TYPENAME__::touchVertexLastTimeSpecification = 
   peano::MappingSpecification::getMostGeneralSpecification()
   __x__MAPPINGS__ & __NAMESPACE__::mappings::__MAPPINGS__::touchVertexLastTimeSpecification
+  __x__PREDEFINED_MAPPINGS__ & __NAMESPACE__::mappings::__PREDEFINED_MAPPINGS__::touchVertexLastTimeSpecification
 ;
 
 
 const peano::MappingSpecification   __THIS_QUALIFIED_TYPENAME__::touchVertexFirstTimeSpecification = 
   peano::MappingSpecification::getMostGeneralSpecification()
   __x__MAPPINGS__ & __NAMESPACE__::mappings::__MAPPINGS__::touchVertexFirstTimeSpecification
+  __x__PREDEFINED_MAPPINGS__ & __NAMESPACE__::mappings::__PREDEFINED_MAPPINGS__::touchVertexFirstTimeSpecification
 ;
 
 
 const peano::MappingSpecification   __THIS_QUALIFIED_TYPENAME__::enterCellSpecification = 
   peano::MappingSpecification::getMostGeneralSpecification()
   __x__MAPPINGS__ & __NAMESPACE__::mappings::__MAPPINGS__::enterCellSpecification
+  __x__PREDEFINED_MAPPINGS__ & __NAMESPACE__::mappings::__PREDEFINED_MAPPINGS__::enterCellSpecification
 ;
 
 
 const peano::MappingSpecification   __THIS_QUALIFIED_TYPENAME__::leaveCellSpecification = 
   peano::MappingSpecification::getMostGeneralSpecification()
   __x__MAPPINGS__ & __NAMESPACE__::mappings::__MAPPINGS__::leaveCellSpecification
+  __x__PREDEFINED_MAPPINGS__ & __NAMESPACE__::mappings::__PREDEFINED_MAPPINGS__::leaveCellSpecification
 ;
 
 
 const peano::MappingSpecification   __THIS_QUALIFIED_TYPENAME__::ascendSpecification = 
   peano::MappingSpecification::getMostGeneralSpecification()
   __x__MAPPINGS__ & __NAMESPACE__::mappings::__MAPPINGS__::ascendSpecification
+  __x__PREDEFINED_MAPPINGS__ & __NAMESPACE__::mappings::__PREDEFINED_MAPPINGS__::ascendSpecification
 ;
 
 
 const peano::MappingSpecification   __THIS_QUALIFIED_TYPENAME__::descendSpecification = 
   peano::MappingSpecification::getMostGeneralSpecification()
   __x__MAPPINGS__ & __NAMESPACE__::mappings::__MAPPINGS__::descendSpecification
+  __x__PREDEFINED_MAPPINGS__ & __NAMESPACE__::mappings::__PREDEFINED_MAPPINGS__::descendSpecification
 ;
 
 
@@ -49,6 +55,7 @@ __THIS_QUALIFIED_TYPENAME__::~__THIS_TYPENAME__() {
 #if defined(SharedMemoryParallelisation)
 __THIS_QUALIFIED_TYPENAME__::__THIS_TYPENAME__(const __THIS_TYPENAME__&  masterThread):
  __xc__MAPPINGS__ _map2__MAPPINGS__(masterThread._map2__MAPPINGS__) 
+ __xc__PREDEFINED_MAPPINGS__ _map2__PREDEFINED_MAPPINGS__(masterThread._map2__PREDEFINED_MAPPINGS__) 
 {
 }
 
@@ -56,6 +63,7 @@ __THIS_QUALIFIED_TYPENAME__::__THIS_TYPENAME__(const __THIS_TYPENAME__&  masterT
 void __THIS_QUALIFIED_TYPENAME__::mergeWithWorkerThread(const __THIS_TYPENAME__& workerThread) {
 
  __x__MAPPINGS__ _map2__MAPPINGS__.mergeWithWorkerThread(workerThread._map2__MAPPINGS__);
+ __x__MAPPINGS__ _map2__PREDEFINED_MAPPINGS__.mergeWithWorkerThread(workerThread._map2__PREDEFINED_MAPPINGS__);
 }
 #endif
 
@@ -71,6 +79,7 @@ void __THIS_QUALIFIED_TYPENAME__::createHangingVertex(
 ) {
 
  __x__MAPPINGS__ _map2__MAPPINGS__.createHangingVertex(fineGridVertex, fineGridX, fineGridH, coarseGridVertices, coarseGridVerticesEnumerator, coarseGridCell, fineGridPositionOfVertex );
+ __x__PREDEFINED_MAPPINGS__ _map2__PREDEFINED_MAPPINGS__.createHangingVertex(fineGridVertex, fineGridX, fineGridH, coarseGridVertices, coarseGridVerticesEnumerator, coarseGridCell, fineGridPositionOfVertex );
 }
 
 
@@ -85,6 +94,7 @@ void __THIS_QUALIFIED_TYPENAME__::destroyHangingVertex(
 ) {
 
  __x__MAPPINGS__ _map2__MAPPINGS__.destroyHangingVertex(fineGridVertex, fineGridX, fineGridH, coarseGridVertices, coarseGridVerticesEnumerator, coarseGridCell, fineGridPositionOfVertex );
+ __x__PREDEFINED_MAPPINGS__ _map2__PREDEFINED_MAPPINGS__.destroyHangingVertex(fineGridVertex, fineGridX, fineGridH, coarseGridVertices, coarseGridVerticesEnumerator, coarseGridCell, fineGridPositionOfVertex );
 }
 
 
@@ -99,6 +109,7 @@ void __THIS_QUALIFIED_TYPENAME__::createInnerVertex(
 ) {
 
  __x__MAPPINGS__ _map2__MAPPINGS__.createInnerVertex(fineGridVertex, fineGridX, fineGridH, coarseGridVertices, coarseGridVerticesEnumerator, coarseGridCell, fineGridPositionOfVertex );
+ __x__PREDEFINED_MAPPINGS__ _map2__PREDEFINED_MAPPINGS__.createInnerVertex(fineGridVertex, fineGridX, fineGridH, coarseGridVertices, coarseGridVerticesEnumerator, coarseGridCell, fineGridPositionOfVertex );
 }
 
 
@@ -113,6 +124,7 @@ void __THIS_QUALIFIED_TYPENAME__::createBoundaryVertex(
 ) {
 
  __x__MAPPINGS__ _map2__MAPPINGS__.createBoundaryVertex( fineGridVertex, fineGridX, fineGridH, coarseGridVertices, coarseGridVerticesEnumerator, coarseGridCell, fineGridPositionOfVertex );
+ __x__PREDEFINED_MAPPINGS__ _map2__PREDEFINED_MAPPINGS__.createBoundaryVertex( fineGridVertex, fineGridX, fineGridH, coarseGridVertices, coarseGridVerticesEnumerator, coarseGridCell, fineGridPositionOfVertex );
 }
 
 
@@ -127,6 +139,7 @@ void __THIS_QUALIFIED_TYPENAME__::destroyVertex(
 ) {
 
  __x__MAPPINGS__ _map2__MAPPINGS__.destroyVertex( fineGridVertex, fineGridX, fineGridH, coarseGridVertices, coarseGridVerticesEnumerator, coarseGridCell, fineGridPositionOfVertex );
+ __x__PREDEFINED_MAPPINGS__ _map2__PREDEFINED_MAPPINGS__.destroyVertex( fineGridVertex, fineGridX, fineGridH, coarseGridVertices, coarseGridVerticesEnumerator, coarseGridCell, fineGridPositionOfVertex );
 }
 
 
@@ -141,6 +154,7 @@ void __THIS_QUALIFIED_TYPENAME__::createCell(
 ) {
 
  __x__MAPPINGS__ _map2__MAPPINGS__.createCell( fineGridCell, fineGridVertices, fineGridVerticesEnumerator, coarseGridVertices, coarseGridVerticesEnumerator, coarseGridCell, fineGridPositionOfCell );
+ __x__PREDEFINED_MAPPINGS__ _map2__PREDEFINED_MAPPINGS__.createCell( fineGridCell, fineGridVertices, fineGridVerticesEnumerator, coarseGridVertices, coarseGridVerticesEnumerator, coarseGridCell, fineGridPositionOfCell );
 }
 
 
@@ -155,6 +169,7 @@ void __THIS_QUALIFIED_TYPENAME__::destroyCell(
 ) {
 
  __x__MAPPINGS__ _map2__MAPPINGS__.destroyCell( fineGridCell, fineGridVertices, fineGridVerticesEnumerator, coarseGridVertices, coarseGridVerticesEnumerator, coarseGridCell, fineGridPositionOfCell );
+ __x__PREDEFINED_MAPPINGS__ _map2__PREDEFINED_MAPPINGS__.destroyCell( fineGridCell, fineGridVertices, fineGridVerticesEnumerator, coarseGridVertices, coarseGridVerticesEnumerator, coarseGridCell, fineGridPositionOfCell );
 }
 
 #ifdef Parallel
@@ -167,6 +182,7 @@ void __THIS_QUALIFIED_TYPENAME__::mergeWithNeighbour(
 ) {
 
   __x__MAPPINGS__ _map2__MAPPINGS__.mergeWithNeighbour( vertex, neighbour, fromRank, fineGridX, fineGridH );
+  __x__PREDEFINED_MAPPINGS__ _map2__PREDEFINED_MAPPINGS__.mergeWithNeighbour( vertex, neighbour, fromRank, fineGridX, fineGridH );
 }
 
 void __THIS_QUALIFIED_TYPENAME__::prepareSendToNeighbour(
@@ -175,6 +191,7 @@ void __THIS_QUALIFIED_TYPENAME__::prepareSendToNeighbour(
 ) {
 
   __x__MAPPINGS__ _map2__MAPPINGS__.prepareSendToNeighbour( vertex, toRank );
+  __x__PREDEFINED_MAPPINGS__ _map2__PREDEFINED_MAPPINGS__.prepareSendToNeighbour( vertex, toRank );
 }
 
 void __THIS_QUALIFIED_TYPENAME__::prepareCopyToRemoteNode(
@@ -183,6 +200,7 @@ void __THIS_QUALIFIED_TYPENAME__::prepareCopyToRemoteNode(
 ) {
 
   __x__MAPPINGS__ _map2__MAPPINGS__.prepareCopyToRemoteNode( localVertex, toRank );
+  __x__PREDEFINED_MAPPINGS__ _map2__PREDEFINED_MAPPINGS__.prepareCopyToRemoteNode( localVertex, toRank );
 }
 
 void __THIS_QUALIFIED_TYPENAME__::prepareCopyToRemoteNode(
@@ -191,6 +209,7 @@ void __THIS_QUALIFIED_TYPENAME__::prepareCopyToRemoteNode(
 ) {
 
   __x__MAPPINGS__ _map2__MAPPINGS__.prepareCopyToRemoteNode( localCell, toRank );
+  __x__PREDEFINED_MAPPINGS__ _map2__PREDEFINED_MAPPINGS__.prepareCopyToRemoteNode( localCell, toRank );
 }
 
 void __THIS_QUALIFIED_TYPENAME__::mergeWithRemoteDataDueToForkOrJoin(
@@ -200,6 +219,7 @@ void __THIS_QUALIFIED_TYPENAME__::mergeWithRemoteDataDueToForkOrJoin(
 ) {
 
   __x__MAPPINGS__ _map2__MAPPINGS__.mergeWithRemoteDataDueToForkOrJoin( localVertex, masterOrWorkerVertex, fromRank );
+  __x__PREDEFINED_MAPPINGS__ _map2__PREDEFINED_MAPPINGS__.mergeWithRemoteDataDueToForkOrJoin( localVertex, masterOrWorkerVertex, fromRank );
 }
 
 void __THIS_QUALIFIED_TYPENAME__::mergeWithRemoteDataDueToForkOrJoin(
@@ -209,6 +229,7 @@ void __THIS_QUALIFIED_TYPENAME__::mergeWithRemoteDataDueToForkOrJoin(
 ) {
 
   __x__MAPPINGS__ _map2__MAPPINGS__.mergeWithRemoteDataDueToForkOrJoin( localCell, masterOrWorkerCell, fromRank );
+  __x__PREDEFINED_MAPPINGS__ _map2__PREDEFINED_MAPPINGS__.mergeWithRemoteDataDueToForkOrJoin( localCell, masterOrWorkerCell, fromRank );
 }
 
 void __THIS_QUALIFIED_TYPENAME__::prepareSendToWorker(
@@ -223,6 +244,7 @@ void __THIS_QUALIFIED_TYPENAME__::prepareSendToWorker(
 ) {
 
   __x__MAPPINGS__ _map2__MAPPINGS__.prepareSendToWorker( fineGridCell, fineGridVertices, fineGridVerticesEnumerator, coarseGridVertices, coarseGridVerticesEnumerator, coarseGridCell, fineGridPositionOfCell, worker );
+  __x__PREDEFINED_MAPPINGS__ _map2__PREDEFINED_MAPPINGS__.prepareSendToWorker( fineGridCell, fineGridVertices, fineGridVerticesEnumerator, coarseGridVertices, coarseGridVerticesEnumerator, coarseGridCell, fineGridPositionOfCell, worker );
 }
 
 void __THIS_QUALIFIED_TYPENAME__::prepareSendToMaster(
@@ -232,6 +254,7 @@ void __THIS_QUALIFIED_TYPENAME__::prepareSendToMaster(
 ) {
 
   __x__MAPPINGS__ _map2__MAPPINGS__.prepareSendToMaster( localCell, vertices, verticesEnumerator );
+  __x__PREDEFINED_MAPPINGS__ _map2__PREDEFINED_MAPPINGS__.prepareSendToMaster( localCell, vertices, verticesEnumerator );
 }
 
 void __THIS_QUALIFIED_TYPENAME__::mergeWithMaster(
@@ -248,6 +271,7 @@ void __THIS_QUALIFIED_TYPENAME__::mergeWithMaster(
 ) {
 
   __x__MAPPINGS__ _map2__MAPPINGS__.mergeWithMaster( workerGridCell, workerGridVertices, fineGridCell, fineGridVertices, fineGridVerticesEnumerator, coarseGridVertices, coarseGridVerticesEnumerator, coarseGridCell, fineGridPositionOfCell, worker );
+  __x__PREDEFINED_MAPPINGS__ _map2__PREDEFINED_MAPPINGS__.mergeWithMaster( workerGridCell, workerGridVertices, fineGridCell, fineGridVertices, fineGridVerticesEnumerator, coarseGridVertices, coarseGridVerticesEnumerator, coarseGridCell, fineGridPositionOfCell, worker );
 }
 
 void __THIS_QUALIFIED_TYPENAME__::receiveDataFromMaster(
@@ -257,6 +281,7 @@ void __THIS_QUALIFIED_TYPENAME__::receiveDataFromMaster(
 ) {
 
   __x__MAPPINGS__ _map2__MAPPINGS__.receiveDataFromMaster( receivedCell, receivedVertices, verticesEnumerator );
+  __x__PREDEFINED_MAPPINGS__ _map2__PREDEFINED_MAPPINGS__.receiveDataFromMaster( receivedCell, receivedVertices, verticesEnumerator );
 }
 
 
@@ -266,6 +291,7 @@ void __THIS_QUALIFIED_TYPENAME__::mergeWithWorker(
 ) {
 
   __x__MAPPINGS__ _map2__MAPPINGS__.mergeWithWorker( localCell, receivedMasterCell );
+  __x__PREDEFINED_MAPPINGS__ _map2__PREDEFINED_MAPPINGS__.mergeWithWorker( localCell, receivedMasterCell );
 }
 
 void __THIS_QUALIFIED_TYPENAME__::mergeWithWorker(
@@ -274,6 +300,7 @@ void __THIS_QUALIFIED_TYPENAME__::mergeWithWorker(
 ) {
 
   __x__MAPPINGS__ _map2__MAPPINGS__.mergeWithWorker( localVertex, receivedMasterVertex );
+  __x__PREDEFINED_MAPPINGS__ _map2__PREDEFINED_MAPPINGS__.mergeWithWorker( localVertex, receivedMasterVertex );
 }
 #endif
 
@@ -288,6 +315,7 @@ void __THIS_QUALIFIED_TYPENAME__::touchVertexFirstTime(
 ) {
 
  __x__MAPPINGS__ _map2__MAPPINGS__.touchVertexFirstTime( fineGridVertex, fineGridX, fineGridH, coarseGridVertices, coarseGridVerticesEnumerator, coarseGridCell, fineGridPositionOfVertex );
+ __x__PREDEFINED_MAPPINGS__ _map2__PREDEFINED_MAPPINGS__.touchVertexFirstTime( fineGridVertex, fineGridX, fineGridH, coarseGridVertices, coarseGridVerticesEnumerator, coarseGridCell, fineGridPositionOfVertex );
 }
 
 
@@ -302,6 +330,7 @@ void __THIS_QUALIFIED_TYPENAME__::touchVertexLastTime(
 ) {
 
  __x__MAPPINGS__ _map2__MAPPINGS__.touchVertexLastTime( fineGridVertex, fineGridX, fineGridH, coarseGridVertices, coarseGridVerticesEnumerator, coarseGridCell, fineGridPositionOfVertex );
+ __x__PREDEFINED_MAPPINGS__ _map2__PREDEFINED_MAPPINGS__.touchVertexLastTime( fineGridVertex, fineGridX, fineGridH, coarseGridVertices, coarseGridVerticesEnumerator, coarseGridCell, fineGridPositionOfVertex );
 }
 
 
@@ -316,6 +345,7 @@ void __THIS_QUALIFIED_TYPENAME__::enterCell(
 ) {
 
  __x__MAPPINGS__ _map2__MAPPINGS__.enterCell( fineGridCell, fineGridVertices, fineGridVerticesEnumerator, coarseGridVertices, coarseGridVerticesEnumerator, coarseGridCell, fineGridPositionOfCell );
+ __x__PREDEFINED_MAPPINGS__ _map2__PREDEFINED_MAPPINGS__.enterCell( fineGridCell, fineGridVertices, fineGridVerticesEnumerator, coarseGridVertices, coarseGridVerticesEnumerator, coarseGridCell, fineGridPositionOfCell );
 }
 
 
@@ -330,6 +360,7 @@ void __THIS_QUALIFIED_TYPENAME__::leaveCell(
 ) {
 
  __x__MAPPINGS__ _map2__MAPPINGS__.leaveCell( fineGridCell, fineGridVertices, fineGridVerticesEnumerator, coarseGridVertices, coarseGridVerticesEnumerator, coarseGridCell, fineGridPositionOfCell );
+ __x__PREDEFINED_MAPPINGS__ _map2__PREDEFINED_MAPPINGS__.leaveCell( fineGridCell, fineGridVertices, fineGridVerticesEnumerator, coarseGridVertices, coarseGridVerticesEnumerator, coarseGridCell, fineGridPositionOfCell );
 }
 
 
@@ -338,6 +369,7 @@ void __THIS_QUALIFIED_TYPENAME__::beginIteration(
 ) {
 
  __x__MAPPINGS__ _map2__MAPPINGS__.beginIteration( solverState );
+ __x__PREDEFINED_MAPPINGS__ _map2__PREDEFINED_MAPPINGS__.beginIteration( solverState );
 }
 
 
@@ -346,6 +378,7 @@ void __THIS_QUALIFIED_TYPENAME__::endIteration(
 ) {
 
  __x__MAPPINGS__ _map2__MAPPINGS__.endIteration( solverState );
+ __x__PREDEFINED_MAPPINGS__ _map2__PREDEFINED_MAPPINGS__.endIteration( solverState );
 }
 
 
@@ -361,6 +394,7 @@ void __THIS_QUALIFIED_TYPENAME__::descend(
 ) {
 
  __x__MAPPINGS__ _map2__MAPPINGS__.descend( fineGridCells, fineGridVertices, fineGridVerticesEnumerator, coarseGridVertices, coarseGridVerticesEnumerator, coarseGridCell );
+ __x__PREDEFINED_MAPPINGS__ _map2__PREDEFINED_MAPPINGS__.descend( fineGridCells, fineGridVertices, fineGridVerticesEnumerator, coarseGridVertices, coarseGridVerticesEnumerator, coarseGridCell );
 }
 
 
@@ -374,4 +408,5 @@ void __THIS_QUALIFIED_TYPENAME__::ascend(
 ) {
 
  __x__MAPPINGS__ _map2__MAPPINGS__.ascend( fineGridCells, fineGridVertices, fineGridVerticesEnumerator, coarseGridVertices, coarseGridVerticesEnumerator, coarseGridCell );
+ __x__PREDEFINED_MAPPINGS__ _map2__PREDEFINED_MAPPINGS__.ascend( fineGridCells, fineGridVertices, fineGridVerticesEnumerator, coarseGridVertices, coarseGridVerticesEnumerator, coarseGridCell );
 }

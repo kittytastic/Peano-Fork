@@ -382,16 +382,40 @@ public class Parser
 			push(goTo(7), list);
 		    }
 		    break;
-                    case 36: /* reduce ASingleMergeWithPredefinedAdapterList */
+                    case 36: /* reduce ASingleWithParameterMergeWithPredefinedAdapterList */
 		    {
 			ArrayList list = new36();
 			push(goTo(8), list);
 		    }
 		    break;
-                    case 37: /* reduce AListMergeWithPredefinedAdapterList */
+                    case 37: /* reduce AListWithParameterMergeWithPredefinedAdapterList */
 		    {
 			ArrayList list = new37();
 			push(goTo(8), list);
+		    }
+		    break;
+                    case 38: /* reduce ASingleWithoutParameterMergeWithPredefinedAdapterList */
+		    {
+			ArrayList list = new38();
+			push(goTo(8), list);
+		    }
+		    break;
+                    case 39: /* reduce AListWithoutParameterMergeWithPredefinedAdapterList */
+		    {
+			ArrayList list = new39();
+			push(goTo(8), list);
+		    }
+		    break;
+                    case 40: /* reduce ASinglePredefinedAdapterParameterList */
+		    {
+			ArrayList list = new40();
+			push(goTo(9), list);
+		    }
+		    break;
+                    case 41: /* reduce AListPredefinedAdapterParameterList */
+		    {
+			ArrayList list = new41();
+			push(goTo(9), list);
 		    }
 		    break;
                     }
@@ -1757,17 +1781,184 @@ public class Parser
 
 
     @SuppressWarnings("unchecked")
-    ArrayList new36() /* reduce ASingleMergeWithPredefinedAdapterList */
+    ArrayList new36() /* reduce ASingleWithParameterMergeWithPredefinedAdapterList */
     {
         @SuppressWarnings("hiding") ArrayList nodeList = new ArrayList();
 
+        @SuppressWarnings("unused") ArrayList nodeArrayList5 = pop();
+        @SuppressWarnings("unused") ArrayList nodeArrayList4 = pop();
+        @SuppressWarnings("unused") ArrayList nodeArrayList3 = pop();
         @SuppressWarnings("unused") ArrayList nodeArrayList2 = pop();
+        @SuppressWarnings("unused") ArrayList nodeArrayList1 = pop();
+        LinkedList listNode5 = new LinkedList();
+        {
+            // Block
+        PPredefinedAdapter ppredefinedadapterNode1;
+        {
+            // Block
+        TIdentifier tidentifierNode2;
+        LinkedList listNode4 = new LinkedList();
+        tidentifierNode2 = (TIdentifier)nodeArrayList2.get(0);
+        {
+            // Block
+        LinkedList listNode3 = new LinkedList();
+        listNode3 = (LinkedList)nodeArrayList4.get(0);
+	if(listNode3 != null)
+	{
+	  listNode4.addAll(listNode3);
+	}
+        }
+
+        ppredefinedadapterNode1 = new APredefinedAdapter(tidentifierNode2, listNode4);
+        }
+	if(ppredefinedadapterNode1 != null)
+	{
+	  listNode5.add(ppredefinedadapterNode1);
+	}
+        }
+	nodeList.add(listNode5);
+        return nodeList;
+    }
+
+
+
+    @SuppressWarnings("unchecked")
+    ArrayList new37() /* reduce AListWithParameterMergeWithPredefinedAdapterList */
+    {
+        @SuppressWarnings("hiding") ArrayList nodeList = new ArrayList();
+
+        @SuppressWarnings("unused") ArrayList nodeArrayList6 = pop();
+        @SuppressWarnings("unused") ArrayList nodeArrayList5 = pop();
+        @SuppressWarnings("unused") ArrayList nodeArrayList4 = pop();
+        @SuppressWarnings("unused") ArrayList nodeArrayList3 = pop();
+        @SuppressWarnings("unused") ArrayList nodeArrayList2 = pop();
+        @SuppressWarnings("unused") ArrayList nodeArrayList1 = pop();
+        LinkedList listNode6 = new LinkedList();
+        {
+            // Block
+        PPredefinedAdapter ppredefinedadapterNode1;
+        LinkedList listNode5 = new LinkedList();
+        {
+            // Block
+        TIdentifier tidentifierNode2;
+        LinkedList listNode4 = new LinkedList();
+        tidentifierNode2 = (TIdentifier)nodeArrayList2.get(0);
+        {
+            // Block
+        LinkedList listNode3 = new LinkedList();
+        listNode3 = (LinkedList)nodeArrayList4.get(0);
+	if(listNode3 != null)
+	{
+	  listNode4.addAll(listNode3);
+	}
+        }
+
+        ppredefinedadapterNode1 = new APredefinedAdapter(tidentifierNode2, listNode4);
+        }
+        listNode5 = (LinkedList)nodeArrayList6.get(0);
+	if(ppredefinedadapterNode1 != null)
+	{
+	  listNode6.add(ppredefinedadapterNode1);
+	}
+	if(listNode5 != null)
+	{
+	  listNode6.addAll(listNode5);
+	}
+        }
+	nodeList.add(listNode6);
+        return nodeList;
+    }
+
+
+
+    @SuppressWarnings("unchecked")
+    ArrayList new38() /* reduce ASingleWithoutParameterMergeWithPredefinedAdapterList */
+    {
+        @SuppressWarnings("hiding") ArrayList nodeList = new ArrayList();
+
+        @SuppressWarnings("unused") ArrayList nodeArrayList4 = pop();
+        @SuppressWarnings("unused") ArrayList nodeArrayList3 = pop();
+        @SuppressWarnings("unused") ArrayList nodeArrayList2 = pop();
+        @SuppressWarnings("unused") ArrayList nodeArrayList1 = pop();
+        LinkedList listNode4 = new LinkedList();
+        {
+            // Block
+        PPredefinedAdapter ppredefinedadapterNode1;
+        {
+            // Block
+        TIdentifier tidentifierNode2;
+        LinkedList listNode3 = new LinkedList();
+        tidentifierNode2 = (TIdentifier)nodeArrayList2.get(0);
+        {
+            // Block
+        }
+
+        ppredefinedadapterNode1 = new APredefinedAdapter(tidentifierNode2, listNode3);
+        }
+	if(ppredefinedadapterNode1 != null)
+	{
+	  listNode4.add(ppredefinedadapterNode1);
+	}
+        }
+	nodeList.add(listNode4);
+        return nodeList;
+    }
+
+
+
+    @SuppressWarnings("unchecked")
+    ArrayList new39() /* reduce AListWithoutParameterMergeWithPredefinedAdapterList */
+    {
+        @SuppressWarnings("hiding") ArrayList nodeList = new ArrayList();
+
+        @SuppressWarnings("unused") ArrayList nodeArrayList5 = pop();
+        @SuppressWarnings("unused") ArrayList nodeArrayList4 = pop();
+        @SuppressWarnings("unused") ArrayList nodeArrayList3 = pop();
+        @SuppressWarnings("unused") ArrayList nodeArrayList2 = pop();
+        @SuppressWarnings("unused") ArrayList nodeArrayList1 = pop();
+        LinkedList listNode5 = new LinkedList();
+        {
+            // Block
+        PPredefinedAdapter ppredefinedadapterNode1;
+        LinkedList listNode4 = new LinkedList();
+        {
+            // Block
+        TIdentifier tidentifierNode2;
+        LinkedList listNode3 = new LinkedList();
+        tidentifierNode2 = (TIdentifier)nodeArrayList2.get(0);
+        {
+            // Block
+        }
+
+        ppredefinedadapterNode1 = new APredefinedAdapter(tidentifierNode2, listNode3);
+        }
+        listNode4 = (LinkedList)nodeArrayList5.get(0);
+	if(ppredefinedadapterNode1 != null)
+	{
+	  listNode5.add(ppredefinedadapterNode1);
+	}
+	if(listNode4 != null)
+	{
+	  listNode5.addAll(listNode4);
+	}
+        }
+	nodeList.add(listNode5);
+        return nodeList;
+    }
+
+
+
+    @SuppressWarnings("unchecked")
+    ArrayList new40() /* reduce ASinglePredefinedAdapterParameterList */
+    {
+        @SuppressWarnings("hiding") ArrayList nodeList = new ArrayList();
+
         @SuppressWarnings("unused") ArrayList nodeArrayList1 = pop();
         LinkedList listNode2 = new LinkedList();
         {
             // Block
         TIdentifier tidentifierNode1;
-        tidentifierNode1 = (TIdentifier)nodeArrayList2.get(0);
+        tidentifierNode1 = (TIdentifier)nodeArrayList1.get(0);
 	if(tidentifierNode1 != null)
 	{
 	  listNode2.add(tidentifierNode1);
@@ -1780,7 +1971,7 @@ public class Parser
 
 
     @SuppressWarnings("unchecked")
-    ArrayList new37() /* reduce AListMergeWithPredefinedAdapterList */
+    ArrayList new41() /* reduce AListPredefinedAdapterParameterList */
     {
         @SuppressWarnings("hiding") ArrayList nodeList = new ArrayList();
 
@@ -1792,7 +1983,7 @@ public class Parser
             // Block
         TIdentifier tidentifierNode1;
         LinkedList listNode2 = new LinkedList();
-        tidentifierNode1 = (TIdentifier)nodeArrayList2.get(0);
+        tidentifierNode1 = (TIdentifier)nodeArrayList1.get(0);
         listNode2 = (LinkedList)nodeArrayList3.get(0);
 	if(tidentifierNode1 != null)
 	{
@@ -1812,40 +2003,40 @@ public class Parser
     private static int[][][] actionTable;
 /*      {
 			{{-1, ERROR, 0}, {3, SHIFT, 1}, },
-			{{-1, ERROR, 1}, {17, SHIFT, 3}, },
-			{{-1, ERROR, 2}, {20, ACCEPT, -1}, },
+			{{-1, ERROR, 1}, {20, SHIFT, 3}, },
+			{{-1, ERROR, 2}, {23, ACCEPT, -1}, },
 			{{-1, ERROR, 3}, {4, SHIFT, 4}, },
-			{{-1, ERROR, 4}, {19, SHIFT, 5}, },
+			{{-1, ERROR, 4}, {22, SHIFT, 5}, },
 			{{-1, ERROR, 5}, {0, SHIFT, 6}, },
 			{{-1, ERROR, 6}, {12, SHIFT, 8}, },
 			{{-1, ERROR, 7}, {1, SHIFT, 9}, },
-			{{-1, ERROR, 8}, {18, SHIFT, 11}, },
+			{{-1, ERROR, 8}, {21, SHIFT, 11}, },
 			{{-1, ERROR, 9}, {12, SHIFT, 12}, },
 			{{-1, ERROR, 10}, {2, SHIFT, 13}, },
 			{{-1, REDUCE, 4}, {5, SHIFT, 15}, {6, SHIFT, 16}, },
-			{{-1, ERROR, 12}, {18, SHIFT, 18}, },
+			{{-1, ERROR, 12}, {21, SHIFT, 18}, },
 			{{-1, ERROR, 13}, {12, SHIFT, 19}, },
-			{{-1, REDUCE, 0}, {13, SHIFT, 20}, {14, SHIFT, 21}, },
+			{{-1, REDUCE, 0}, {13, SHIFT, 20}, {17, SHIFT, 21}, },
 			{{-1, ERROR, 15}, {7, SHIFT, 24}, {8, SHIFT, 25}, {9, SHIFT, 26}, {10, SHIFT, 27}, },
 			{{-1, ERROR, 16}, {7, SHIFT, 28}, {8, SHIFT, 29}, {9, SHIFT, 30}, {10, SHIFT, 31}, },
 			{{-1, REDUCE, 5}, },
 			{{-1, REDUCE, 7}, },
-			{{-1, ERROR, 19}, {18, SHIFT, 32}, },
+			{{-1, ERROR, 19}, {21, SHIFT, 32}, },
 			{{-1, ERROR, 20}, {11, SHIFT, 33}, },
 			{{-1, ERROR, 21}, {11, SHIFT, 34}, },
-			{{-1, REDUCE, 1}, {14, SHIFT, 21}, },
+			{{-1, REDUCE, 1}, {17, SHIFT, 21}, },
 			{{-1, REDUCE, 2}, },
-			{{-1, ERROR, 24}, {17, SHIFT, 36}, },
-			{{-1, ERROR, 25}, {17, SHIFT, 37}, },
-			{{-1, ERROR, 26}, {17, SHIFT, 38}, },
-			{{-1, ERROR, 27}, {17, SHIFT, 39}, },
-			{{-1, ERROR, 28}, {17, SHIFT, 40}, },
-			{{-1, ERROR, 29}, {17, SHIFT, 41}, },
-			{{-1, ERROR, 30}, {17, SHIFT, 42}, },
-			{{-1, ERROR, 31}, {17, SHIFT, 43}, },
+			{{-1, ERROR, 24}, {20, SHIFT, 36}, },
+			{{-1, ERROR, 25}, {20, SHIFT, 37}, },
+			{{-1, ERROR, 26}, {20, SHIFT, 38}, },
+			{{-1, ERROR, 27}, {20, SHIFT, 39}, },
+			{{-1, ERROR, 28}, {20, SHIFT, 40}, },
+			{{-1, ERROR, 29}, {20, SHIFT, 41}, },
+			{{-1, ERROR, 30}, {20, SHIFT, 42}, },
+			{{-1, ERROR, 31}, {20, SHIFT, 43}, },
 			{{-1, REDUCE, 6}, },
-			{{-1, ERROR, 33}, {17, SHIFT, 44}, },
-			{{-1, ERROR, 34}, {17, SHIFT, 45}, },
+			{{-1, ERROR, 33}, {20, SHIFT, 44}, },
+			{{-1, ERROR, 34}, {20, SHIFT, 45}, },
 			{{-1, REDUCE, 3}, },
 			{{-1, REDUCE, 8}, {5, SHIFT, 15}, {6, SHIFT, 16}, },
 			{{-1, REDUCE, 10}, {5, SHIFT, 15}, {6, SHIFT, 16}, },
@@ -1856,7 +2047,7 @@ public class Parser
 			{{-1, REDUCE, 18}, {5, SHIFT, 15}, {6, SHIFT, 16}, },
 			{{-1, REDUCE, 22}, {5, SHIFT, 15}, {6, SHIFT, 16}, },
 			{{-1, REDUCE, 24}, {13, SHIFT, 20}, },
-			{{-1, REDUCE, 26}, {14, SHIFT, 21}, {15, SHIFT, 55}, {16, SHIFT, 56}, },
+			{{-1, REDUCE, 26}, {17, SHIFT, 21}, {18, SHIFT, 55}, {19, SHIFT, 56}, },
 			{{-1, REDUCE, 9}, },
 			{{-1, REDUCE, 11}, },
 			{{-1, REDUCE, 13}, },
@@ -1866,19 +2057,27 @@ public class Parser
 			{{-1, REDUCE, 19}, },
 			{{-1, REDUCE, 23}, },
 			{{-1, REDUCE, 25}, },
-			{{-1, ERROR, 55}, {17, SHIFT, 60}, },
-			{{-1, ERROR, 56}, {17, SHIFT, 61}, },
+			{{-1, ERROR, 55}, {20, SHIFT, 60}, },
+			{{-1, ERROR, 56}, {20, SHIFT, 61}, },
 			{{-1, REDUCE, 30}, },
-			{{-1, REDUCE, 27}, {14, SHIFT, 21}, {16, SHIFT, 56}, },
-			{{-1, REDUCE, 28}, {14, SHIFT, 21}, },
-			{{-1, REDUCE, 34}, {15, SHIFT, 55}, },
-			{{-1, REDUCE, 36}, {16, SHIFT, 56}, },
+			{{-1, REDUCE, 27}, {17, SHIFT, 21}, {19, SHIFT, 56}, },
+			{{-1, REDUCE, 28}, {17, SHIFT, 21}, },
+			{{-1, REDUCE, 34}, {18, SHIFT, 55}, },
+			{{-1, ERROR, 61}, {14, SHIFT, 66}, },
 			{{-1, REDUCE, 31}, },
-			{{-1, REDUCE, 29}, {14, SHIFT, 21}, },
+			{{-1, REDUCE, 29}, {17, SHIFT, 21}, },
 			{{-1, REDUCE, 32}, },
 			{{-1, REDUCE, 35}, },
-			{{-1, REDUCE, 37}, },
+			{{-1, ERROR, 66}, {15, SHIFT, 68}, {20, SHIFT, 69}, },
 			{{-1, REDUCE, 33}, },
+			{{-1, REDUCE, 38}, {19, SHIFT, 56}, },
+			{{-1, REDUCE, 40}, {16, SHIFT, 72}, },
+			{{-1, ERROR, 70}, {15, SHIFT, 73}, },
+			{{-1, REDUCE, 39}, },
+			{{-1, ERROR, 72}, {20, SHIFT, 69}, },
+			{{-1, REDUCE, 36}, {19, SHIFT, 56}, },
+			{{-1, REDUCE, 41}, },
+			{{-1, REDUCE, 37}, },
         };*/
     private static int[][][] gotoTable;
 /*      {
@@ -1890,7 +2089,8 @@ public class Parser
 			{{-1, 22}, {44, 54}, },
 			{{-1, 23}, {22, 35}, {45, 57}, {58, 62}, {59, 64}, {63, 67}, },
 			{{-1, 58}, {60, 65}, },
-			{{-1, 59}, {58, 63}, {61, 66}, },
+			{{-1, 59}, {58, 63}, {68, 71}, {73, 75}, },
+			{{-1, 70}, {72, 74}, },
         };*/
     private static String[] errorMessages;
 /*      {
@@ -1911,10 +2111,14 @@ public class Parser
 			"expecting: 'adapter:', EOF",
 			"expecting: 'adapter:', 'merge-with-user-defined-mapping:', 'merge-with-predefined-mapping:', EOF",
 			"expecting: 'adapter:', 'merge-with-predefined-mapping:', EOF",
+			"expecting: '('",
+			"expecting: ')', identifier",
+			"expecting: ')', ','",
+			"expecting: ')'",
         };*/
     private static int[] errors;
 /*      {
-			0, 1, 2, 3, 4, 5, 6, 7, 8, 6, 9, 10, 8, 6, 11, 12, 12, 7, 9, 8, 13, 13, 14, 2, 1, 1, 1, 1, 1, 1, 1, 1, 11, 1, 1, 2, 10, 10, 10, 10, 10, 10, 10, 10, 11, 15, 7, 7, 7, 7, 7, 7, 7, 7, 14, 1, 1, 2, 16, 14, 15, 16, 2, 14, 2, 16, 14, 2, 
+			0, 1, 2, 3, 4, 5, 6, 7, 8, 6, 9, 10, 8, 6, 11, 12, 12, 7, 9, 8, 13, 13, 14, 2, 1, 1, 1, 1, 1, 1, 1, 1, 11, 1, 1, 2, 10, 10, 10, 10, 10, 10, 10, 10, 11, 15, 7, 7, 7, 7, 7, 7, 7, 7, 14, 1, 1, 2, 16, 14, 15, 17, 2, 14, 2, 16, 18, 2, 16, 19, 20, 14, 1, 16, 20, 14, 
         };*/
 
     static 

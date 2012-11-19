@@ -44,6 +44,10 @@ Tokens
   
   token_event_mapping         = 'event-mapping:';
   
+  token_open_bracket          = '(';
+  token_close_bracket         = ')';
+  token_comma                 = ',';
+  
   token_adapter                         = 'adapter:';
   token_merge_with_user_defined_adapter = 'merge-with-user-defined-mapping:';
   token_merge_with_predefined_adapter   = 'merge-with-predefined-mapping:';
@@ -124,9 +128,9 @@ Productions
   
   adapter_list {->adapter*} =
       {single}  token_adapter token_name identifier merge_with_user_defined_adapter_list? merge_with_predefined_adapter_list?
-        { -> [New adapter(identifier,[merge_with_user_defined_adapter_list.identifier],[merge_with_predefined_adapter_list.identifier])] }
+        { -> [New adapter(identifier,[merge_with_user_defined_adapter_list.identifier],[merge_with_predefined_adapter_list.predefined_adapter])] }
     | {list}    token_adapter token_name identifier merge_with_user_defined_adapter_list? merge_with_predefined_adapter_list? adapter_list
-        { -> [New adapter(identifier,[merge_with_user_defined_adapter_list.identifier],[merge_with_predefined_adapter_list.identifier]),adapter_list.adapter] };        
+        { -> [New adapter(identifier,[merge_with_user_defined_adapter_list.identifier],[merge_with_predefined_adapter_list.predefined_adapter]),adapter_list.adapter] };        
  
   merge_with_user_defined_adapter_list {->identifier*} = 
       {single}  token_merge_with_user_defined_adapter identifier
@@ -134,11 +138,23 @@ Productions
     | {list}    token_merge_with_user_defined_adapter identifier merge_with_user_defined_adapter_list
         { -> [identifier,merge_with_user_defined_adapter_list.identifier] };        
   
-  merge_with_predefined_adapter_list {->identifier*} =
-      {single}  token_merge_with_predefined_adapter identifier
-        { -> [identifier] }
-    | {list}    token_merge_with_predefined_adapter identifier merge_with_predefined_adapter_list
-        { -> [identifier,merge_with_predefined_adapter_list.identifier] };        
+  merge_with_predefined_adapter_list {->predefined_adapter*} =
+      {single_with_parameter}     token_merge_with_predefined_adapter identifier token_open_bracket predefined_adapter_parameter_list token_close_bracket
+        { -> [New predefined_adapter(identifier,[predefined_adapter_parameter_list.identifier])] }
+    | {list_with_parameter}       token_merge_with_predefined_adapter identifier token_open_bracket predefined_adapter_parameter_list token_close_bracket merge_with_predefined_adapter_list
+        { -> [New predefined_adapter(identifier,[predefined_adapter_parameter_list.identifier]),merge_with_predefined_adapter_list.predefined_adapter] } 
+    | {single_without_parameter}  token_merge_with_predefined_adapter identifier token_open_bracket token_close_bracket
+        { -> [New predefined_adapter(identifier,[])] }
+    | {list_without_parameter}    token_merge_with_predefined_adapter identifier token_open_bracket token_close_bracket merge_with_predefined_adapter_list
+        { -> [New predefined_adapter(identifier,[]),merge_with_predefined_adapter_list.predefined_adapter] };        
+
+  predefined_adapter_parameter_list {->identifier*} = 
+      {single}    identifier 
+         { -> [identifier] }
+    | {list}      identifier token_comma predefined_adapter_parameter_list
+         { -> [identifier,predefined_adapter_parameter_list.identifier] };
+         
+    
   
 Abstract Syntax Tree
  
@@ -164,5 +180,7 @@ Abstract Syntax Tree
   
   event_mapping = [name]:identifier;
   
-  adapter = [name]:identifier [user_defined]:identifier* [predefined_defined]:identifier*;
+  adapter = [name]:identifier [user_defined]:identifier* predefined_adapter*;
+  
+  predefined_adapter = [name]:identifier [parameters]:identifier*;
   

@@ -70,7 +70,7 @@ public class DaStGenGenerator extends DepthFirstAdapter {
     _translationTable.convertTemplateFile(
       repositoryStateTemplateName,
       fileName, 
-      true
+      true, true
     );
 
     de.tum.in.dast.DaStGen.main( getDaStGenArguments(fileName) );
@@ -87,7 +87,7 @@ public class DaStGenGenerator extends DepthFirstAdapter {
     _translationTable.convertTemplateFile(
       vertexTemplateName,
       vertexFileName, 
-      true
+      true, true
     );
 
     de.tum.in.dast.DaStGen.main( getDaStGenArguments(vertexFileName) );
@@ -104,7 +104,7 @@ public class DaStGenGenerator extends DepthFirstAdapter {
     _translationTable.convertTemplateFile(
       cellTemplateName,
       cellFileName, 
-      true
+      true, true
     );
 
     de.tum.in.dast.DaStGen.main( getDaStGenArguments(cellFileName) );
@@ -121,7 +121,7 @@ public class DaStGenGenerator extends DepthFirstAdapter {
     _translationTable.convertTemplateFile(
       stateTemplateName,
       stateFileName, 
-      true
+      true, true
     );
     
     de.tum.in.dast.DaStGen.main( getDaStGenArguments(stateFileName) );

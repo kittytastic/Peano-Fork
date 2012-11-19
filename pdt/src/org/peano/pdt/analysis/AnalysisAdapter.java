@@ -144,6 +144,11 @@ public class AnalysisAdapter implements Analysis
         defaultCase(node);
     }
 
+    public void caseAPredefinedAdapter(APredefinedAdapter node)
+    {
+        defaultCase(node);
+    }
+
     public void caseTTokenVertex(TTokenVertex node)
     {
         defaultCase(node);
@@ -210,6 +215,21 @@ public class AnalysisAdapter implements Analysis
     }
 
     public void caseTTokenEventMapping(TTokenEventMapping node)
+    {
+        defaultCase(node);
+    }
+
+    public void caseTTokenOpenBracket(TTokenOpenBracket node)
+    {
+        defaultCase(node);
+    }
+
+    public void caseTTokenCloseBracket(TTokenCloseBracket node)
+    {
+        defaultCase(node);
+    }
+
+    public void caseTTokenComma(TTokenComma node)
     {
         defaultCase(node);
     }

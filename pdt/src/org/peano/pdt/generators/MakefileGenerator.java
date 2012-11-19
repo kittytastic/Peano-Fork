@@ -20,7 +20,7 @@ public class MakefileGenerator extends DepthFirstAdapter {
     _translationTable.convertTemplateFile( 
       "Makefile.template",
       _directoryGenerator.getProjectDirectoryAbsolute() + "/makefile",
-      false
+      false, true
     );
   }
 }

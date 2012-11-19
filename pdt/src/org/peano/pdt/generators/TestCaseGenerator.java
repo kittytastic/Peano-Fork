@@ -21,12 +21,12 @@ public class TestCaseGenerator extends DepthFirstAdapter {
     _translationTable.convertTemplateFile( 
       "TestCaseHeader.template",
       _directoryGenerator.getTestsDirectory() + "/TestCase.h",
-      false
+      false, true
     );
     _translationTable.convertTemplateFile( 
       "TestCaseImplementation.template",
       _directoryGenerator.getTestsDirectory() + "/TestCase.cpp",
-      false
+      false, true
     );
   }
 }

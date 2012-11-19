@@ -17,6 +17,7 @@
 #include "__PROJECT_PATH__/State.h"
 
 __x__MAPPINGS__ #include "__PROJECT_PATH__/mappings/__MAPPINGS__.h"
+__x__PREDEFINED_MAPPINGS__ #include "__PROJECT_PATH__/adapters/__PREDEFINED_MAPPINGS__.h"
 
 
 __OPEN_NAMESPACE__
@@ -36,6 +37,7 @@ __CLOSE_NAMESPACE__
 class __THIS_QUALIFIED_TYPENAME__ {
   private:
    __x__MAPPINGS__ __NAMESPACE__::mappings::__MAPPINGS__ _map2__MAPPINGS__;
+   __x__PREDEFINED_MAPPINGS__ __NAMESPACE__::adapters::__PREDEFINED_MAPPINGS__ _map2__PREDEFINED_MAPPINGS__;
   public:
     static const peano::MappingSpecification   touchVertexLastTimeSpecification;
     static const peano::MappingSpecification   touchVertexFirstTimeSpecification;

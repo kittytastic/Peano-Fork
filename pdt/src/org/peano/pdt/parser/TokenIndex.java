@@ -94,44 +94,62 @@ class TokenIndex extends AnalysisAdapter
     }
 
     @Override
-    public void caseTTokenAdapter(@SuppressWarnings("unused") TTokenAdapter node)
+    public void caseTTokenOpenBracket(@SuppressWarnings("unused") TTokenOpenBracket node)
     {
         this.index = 14;
     }
 
     @Override
-    public void caseTTokenMergeWithUserDefinedAdapter(@SuppressWarnings("unused") TTokenMergeWithUserDefinedAdapter node)
+    public void caseTTokenCloseBracket(@SuppressWarnings("unused") TTokenCloseBracket node)
     {
         this.index = 15;
     }
 
     @Override
-    public void caseTTokenMergeWithPredefinedAdapter(@SuppressWarnings("unused") TTokenMergeWithPredefinedAdapter node)
+    public void caseTTokenComma(@SuppressWarnings("unused") TTokenComma node)
     {
         this.index = 16;
     }
 
     @Override
-    public void caseTIdentifier(@SuppressWarnings("unused") TIdentifier node)
+    public void caseTTokenAdapter(@SuppressWarnings("unused") TTokenAdapter node)
     {
         this.index = 17;
     }
 
     @Override
-    public void caseTFilename(@SuppressWarnings("unused") TFilename node)
+    public void caseTTokenMergeWithUserDefinedAdapter(@SuppressWarnings("unused") TTokenMergeWithUserDefinedAdapter node)
     {
         this.index = 18;
     }
 
     @Override
-    public void caseTNamespace(@SuppressWarnings("unused") TNamespace node)
+    public void caseTTokenMergeWithPredefinedAdapter(@SuppressWarnings("unused") TTokenMergeWithPredefinedAdapter node)
     {
         this.index = 19;
     }
 
     @Override
-    public void caseEOF(@SuppressWarnings("unused") EOF node)
+    public void caseTIdentifier(@SuppressWarnings("unused") TIdentifier node)
     {
         this.index = 20;
+    }
+
+    @Override
+    public void caseTFilename(@SuppressWarnings("unused") TFilename node)
+    {
+        this.index = 21;
+    }
+
+    @Override
+    public void caseTNamespace(@SuppressWarnings("unused") TNamespace node)
+    {
+        this.index = 22;
+    }
+
+    @Override
+    public void caseEOF(@SuppressWarnings("unused") EOF node)
+    {
+        this.index = 23;
     }
 }

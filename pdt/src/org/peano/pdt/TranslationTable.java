@@ -42,6 +42,7 @@ public class TranslationTable extends DepthFirstAdapter {
   private static final String _MULTIPLE_LINE_KEYWORD_WRITE_STENCIL_OPERATION = "__WRITE_STENCIL_OPERATION__";
 
   private static final String _MULTIPLE_LINE_KEYWORD_MAPPINGS = "__MAPPINGS__";
+  private static final String _MULTIPLE_LINE_KEYWORD_PREDEFINED_MAPPINGS = "__PREDEFINED_MAPPINGS__";
 
   private static final String _TEMPORARY_KEYWORD_TYPENAME = "__THIS_TYPENAME__";
   private static final String _TEMPORARY_KEYWORD_FULL_QUALIFIED_TYPENAME = "__THIS_QUALIFIED_TYPENAME__";
@@ -138,13 +139,17 @@ public class TranslationTable extends DepthFirstAdapter {
         _mapping.get(_KEYWORD_NAMESPACE) + "::mappings::" + typename);
   }
 
-  public void setThisTypenameToAdapterTypename(String typename,
-      java.util.Vector<String> mappings) {
+  public void setThisTypenameToAdapterTypename(
+      String typename,
+      java.util.Vector<String> mappings,
+      java.util.Vector<String> predefinedMappings
+  ) {
     _mapping.put(_TEMPORARY_KEYWORD_TYPENAME, typename);
     _mapping.put(_TEMPORARY_KEYWORD_FULL_QUALIFIED_TYPENAME,
         _mapping.get(_KEYWORD_NAMESPACE) + "::adapters::" + typename);
 
     _multiMappings.put(_MULTIPLE_LINE_KEYWORD_MAPPINGS, mappings);
+    _multiMappings.put(_MULTIPLE_LINE_KEYWORD_PREDEFINED_MAPPINGS, predefinedMappings);
   }
 
   private String getOpeningNamespace(String fullQualifiedName) {
@@ -302,9 +307,10 @@ public class TranslationTable extends DepthFirstAdapter {
   public void convertTemplateFile(
     String    templateFile, 
     String    destinationFile,
-    String[]  replaceAdditionalString,
-    String[]  withString,
-    boolean   overwrite
+    java.util.ArrayList<String>  replaceAdditionalString,
+    java.util.ArrayList<String>  withString,
+    boolean   overwrite,
+    boolean   extractTemplateFromJar
   ) {
   	destinationFile = destinationFile.replaceAll("\\\\", "/");
 	
@@ -316,7 +322,14 @@ public class TranslationTable extends DepthFirstAdapter {
 				java.io.OutputStreamWriter writer = new java.io.OutputStreamWriter(
 						new java.io.FileOutputStream(destinationFile));
 				String text = new String();
-			  	java.io.BufferedReader reader = getBufferedReaderForStdTemplate(templateFile);
+			  	
+				java.io.BufferedReader reader = null;
+				if (extractTemplateFromJar) {
+				  reader = getBufferedReaderForStdTemplate(templateFile);
+				}
+				else {
+				  reader = getBufferedReaderForUserTemplate(templateFile);
+				}
 
 				while ((text = reader.readLine()) != null) {
 					for (String p : _multiMappings.keySet()) {
@@ -354,8 +367,8 @@ public class TranslationTable extends DepthFirstAdapter {
 					text = replaceKeywords(text);
 
 					if (replaceAdditionalString!=null) {
-						for (int i=0; i<replaceAdditionalString.length; i++) {
-							text = text.replaceAll(replaceAdditionalString[i], withString[i]);
+						for (int i=0; i<replaceAdditionalString.size(); i++) {
+							text = text.replaceAll(replaceAdditionalString.get(i), withString.get(i));
 						}
 					}
 
@@ -404,8 +417,9 @@ public class TranslationTable extends DepthFirstAdapter {
   public void convertTemplateFile(
     String  templateFile, 
     String  destinationFile,
-    boolean overwrite
+    boolean overwrite,
+    boolean extractTemplateFromJar
   ) {
-    convertTemplateFile(templateFile,destinationFile,null,null,overwrite);
+    convertTemplateFile(templateFile,destinationFile,null,null,overwrite,extractTemplateFromJar);
   }
 }

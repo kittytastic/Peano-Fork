@@ -28,8 +28,8 @@ public class BluePrintGenerator extends DepthFirstAdapter {
     final String headerFileName         = _directoryGenerator.getProjectDirectoryAbsolute() + "/Vertex.h";
     final String implementationFileName = _directoryGenerator.getProjectDirectoryAbsolute() + "/Vertex.cpp";
 
-    _translationTable.convertTemplateFile( headerTemplate,         headerFileName,         false);
-    _translationTable.convertTemplateFile( implementationTemplate, implementationFileName, false);
+    _translationTable.convertTemplateFile( headerTemplate,         headerFileName,         false, true);
+    _translationTable.convertTemplateFile( implementationTemplate, implementationFileName, false, true);
 	}
   
 
@@ -40,8 +40,8 @@ public class BluePrintGenerator extends DepthFirstAdapter {
     final String headerFileName         = _directoryGenerator.getProjectDirectoryAbsolute() + "/Cell.h";
     final String implementationFileName = _directoryGenerator.getProjectDirectoryAbsolute() + "/Cell.cpp";
 
-    _translationTable.convertTemplateFile( headerTemplate,         headerFileName,         false);
-    _translationTable.convertTemplateFile( implementationTemplate, implementationFileName, false);
+    _translationTable.convertTemplateFile( headerTemplate,         headerFileName,         false, true);
+    _translationTable.convertTemplateFile( implementationTemplate, implementationFileName, false, true);
   }
 
 
@@ -52,8 +52,8 @@ public class BluePrintGenerator extends DepthFirstAdapter {
     final String headerFileName         = _directoryGenerator.getProjectDirectoryAbsolute() + "/State.h";
     final String implementationFileName = _directoryGenerator.getProjectDirectoryAbsolute() + "/State.cpp";
 
-    _translationTable.convertTemplateFile( headerTemplate,         headerFileName,         false);
-    _translationTable.convertTemplateFile( implementationTemplate, implementationFileName, false);
+    _translationTable.convertTemplateFile( headerTemplate,         headerFileName,         false, true);
+    _translationTable.convertTemplateFile( implementationTemplate, implementationFileName, false, true);
   }
 
   
@@ -67,7 +67,7 @@ public class BluePrintGenerator extends DepthFirstAdapter {
     String mappingTypeName   = node.getName().getText().trim();
     _translationTable.setThisTypenameToMappingTypename( mappingTypeName );
 
-    _translationTable.convertTemplateFile( headerTemplate,         headerFileName,         false);
-    _translationTable.convertTemplateFile( implementationTemplate, implementationFileName, false);
+    _translationTable.convertTemplateFile( headerTemplate,         headerFileName,         false, true);
+    _translationTable.convertTemplateFile( implementationTemplate, implementationFileName, false, true);
   }
 }

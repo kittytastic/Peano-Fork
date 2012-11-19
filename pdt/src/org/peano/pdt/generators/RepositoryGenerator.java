@@ -20,40 +20,40 @@ public class RepositoryGenerator extends DepthFirstAdapter {
     _translationTable.convertTemplateFile( 
       "RepositoryFactoryHeader.template",
       _directoryGenerator.getRepositoriesDirectory() + "/RepositoryFactory.h",
-      true
+      true, true
     );
     _translationTable.convertTemplateFile( 
       "RepositoryFactoryImplementation.template",
       _directoryGenerator.getRepositoriesDirectory() + "/RepositoryFactory.cpp",
-      true
+      true, true
     );
 
     _translationTable.convertTemplateFile( 
       "RepositoryHeader.template",
       _directoryGenerator.getRepositoriesDirectory() + "/Repository.h",
-      true
+      true, true
     );
 
     _translationTable.convertTemplateFile( 
       "RepositoryArrayStackHeader.template",
       _directoryGenerator.getRepositoriesDirectory() + "/RepositoryArrayStack.h",
-      true
+      true, true
     );
     _translationTable.convertTemplateFile( 
       "RepositoryArrayStackImplementation.template",
       _directoryGenerator.getRepositoriesDirectory() + "/RepositoryArrayStack.cpp",
-      true
+      true, true
     );
 
     _translationTable.convertTemplateFile( 
       "RepositorySTDStackHeader.template",
       _directoryGenerator.getRepositoriesDirectory() + "/RepositorySTDStack.h",
-      true
+      true, true
     );
     _translationTable.convertTemplateFile( 
       "RepositorySTDStackImplementation.template",
       _directoryGenerator.getRepositoriesDirectory() + "/RepositorySTDStack.cpp",
-      true
+      true, true
     );
   }
 }

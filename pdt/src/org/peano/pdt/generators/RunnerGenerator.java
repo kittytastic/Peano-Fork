@@ -21,22 +21,22 @@ public class RunnerGenerator extends DepthFirstAdapter {
     _translationTable.convertTemplateFile( 
       "Main.template",
       _directoryGenerator.getProjectDirectoryAbsolute() + "/main.cpp",
-      false
+      false, true
     );
     _translationTable.convertTemplateFile( 
       "RunnerHeader.template",
       _directoryGenerator.getRunnersDirectory() + "/Runner.h",
-      false
+      false, true
     );
     _translationTable.convertTemplateFile( 
       "RunnerImplementation.template",
       _directoryGenerator.getRunnersDirectory() + "/Runner.cpp",
-      false
+      false, true
     );
     _translationTable.convertTemplateFile( 
       "RunnerParallelWorkerImplementation.template",
       _directoryGenerator.getRunnersDirectory() + "/RunnerParallelWorker.cpp",
-      false
+      false, true
     );
   }
 }

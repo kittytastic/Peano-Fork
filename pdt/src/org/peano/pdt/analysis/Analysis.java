@@ -27,6 +27,7 @@ public interface Analysis extends Switch
     void caseAState(AState node);
     void caseAEventMapping(AEventMapping node);
     void caseAAdapter(AAdapter node);
+    void caseAPredefinedAdapter(APredefinedAdapter node);
 
     void caseTTokenVertex(TTokenVertex node);
     void caseTTokenCell(TTokenCell node);
@@ -42,6 +43,9 @@ public interface Analysis extends Switch
     void caseTTokenName(TTokenName node);
     void caseTTokenDastgenFile(TTokenDastgenFile node);
     void caseTTokenEventMapping(TTokenEventMapping node);
+    void caseTTokenOpenBracket(TTokenOpenBracket node);
+    void caseTTokenCloseBracket(TTokenCloseBracket node);
+    void caseTTokenComma(TTokenComma node);
     void caseTTokenAdapter(TTokenAdapter node);
     void caseTTokenMergeWithUserDefinedAdapter(TTokenMergeWithUserDefinedAdapter node);
     void caseTTokenMergeWithPredefinedAdapter(TTokenMergeWithPredefinedAdapter node);

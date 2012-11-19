@@ -385,9 +385,9 @@ public class ReversedDepthFirstAdapter extends AnalysisAdapter
     {
         inAAdapter(node);
         {
-            List<TIdentifier> copy = new ArrayList<TIdentifier>(node.getPredefinedDefined());
+            List<PPredefinedAdapter> copy = new ArrayList<PPredefinedAdapter>(node.getPredefinedAdapter());
             Collections.reverse(copy);
-            for(TIdentifier e : copy)
+            for(PPredefinedAdapter e : copy)
             {
                 e.apply(this);
             }
@@ -405,5 +405,34 @@ public class ReversedDepthFirstAdapter extends AnalysisAdapter
             node.getName().apply(this);
         }
         outAAdapter(node);
+    }
+
+    public void inAPredefinedAdapter(APredefinedAdapter node)
+    {
+        defaultIn(node);
+    }
+
+    public void outAPredefinedAdapter(APredefinedAdapter node)
+    {
+        defaultOut(node);
+    }
+
+    @Override
+    public void caseAPredefinedAdapter(APredefinedAdapter node)
+    {
+        inAPredefinedAdapter(node);
+        {
+            List<TIdentifier> copy = new ArrayList<TIdentifier>(node.getParameters());
+            Collections.reverse(copy);
+            for(TIdentifier e : copy)
+            {
+                e.apply(this);
+            }
+        }
+        if(node.getName() != null)
+        {
+            node.getName().apply(this);
+        }
+        outAPredefinedAdapter(node);
     }
 }
