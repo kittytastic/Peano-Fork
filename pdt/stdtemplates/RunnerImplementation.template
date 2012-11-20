@@ -43,8 +43,8 @@ int __NAMESPACE__::runners::Runner::run() {
   
   // Start of dummy implementation
   peano::geometry::Hexahedron geometry(
-    tarch::la::Vector<DIMENSIONS,double>(0.0),
-    tarch::la::Vector<DIMENSIONS,double>(1.0)
+    tarch::la::Vector<DIMENSIONS,double>(1.0),
+    tarch::la::Vector<DIMENSIONS,double>(0.0)
    );
   __NAMESPACE__::repositories::Repository* repository = 
     __NAMESPACE__::repositories::RepositoryFactory::getInstance().createWithSTDStackImplementation(

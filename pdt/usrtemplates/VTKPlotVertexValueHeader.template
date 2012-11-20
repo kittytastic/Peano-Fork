@@ -31,6 +31,8 @@ __CLOSE_NAMESPACE__
  * This is an adapter plotting a vtk grid file. Please set
  *
  * PARAM0   filename
+ * PARAM1   getter for vertex value (without brackets)
+ * PARAM2   Legend title
  *
  * @author Tobias Weinzierl
  * @version $Revision: 1.10 $
@@ -51,12 +53,7 @@ class __NAMESPACE__::adapters::__THIS_TYPENAME__ {
     tarch::plotter::griddata::unstructured::UnstructuredGridWriter::VertexWriter*   _vertexWriter;
     tarch::plotter::griddata::unstructured::UnstructuredGridWriter::CellWriter*     _cellWriter;
     
-    tarch::plotter::griddata::Writer::VertexDataWriter*                             _vertexTypeWriter;
-    tarch::plotter::griddata::Writer::VertexDataWriter*                             _vertexRefinementControlWriter;
-    tarch::plotter::griddata::Writer::VertexDataWriter*                             _vertexAdjacentCellsHeight;
-    tarch::plotter::griddata::Writer::VertexDataWriter*                             _vertexHangingNodeWriter;
-
-    tarch::plotter::griddata::Writer::CellDataWriter*                               _cellStateWriter;
+    tarch::plotter::griddata::Writer::VertexDataWriter*                             _vertexValueWriter;
     
     static int _snapshotCounter;
     
