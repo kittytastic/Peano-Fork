@@ -41,9 +41,19 @@ public class AdapterGenerator extends DepthFirstAdapter {
       valueList.add( node.getParameters().get(i).toString().trim() );
     }
 
+    _translationTable.setThisTypenameToAdapterTypename(targetName);
+    
     _translationTable.convertTemplateFile( 
-      "xxx.template",
-      _directoryGenerator.getAdaptersDirectory() + "/" + _currentAdapterName + ".h",
+      predefinedAdapterType + "Header.template",
+      _directoryGenerator.getAdaptersDirectory() + "/" + targetName + ".h",
+      paramList,
+      valueList,
+      true,
+      false
+    );
+    _translationTable.convertTemplateFile( 
+      predefinedAdapterType + "Implementation.template",
+      _directoryGenerator.getAdaptersDirectory() + "/" + targetName + ".cpp",
       paramList,
       valueList,
       true,

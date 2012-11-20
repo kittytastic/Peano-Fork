@@ -138,6 +138,15 @@ public class TranslationTable extends DepthFirstAdapter {
     _mapping.put(_TEMPORARY_KEYWORD_FULL_QUALIFIED_TYPENAME,
         _mapping.get(_KEYWORD_NAMESPACE) + "::mappings::" + typename);
   }
+  
+
+  public void setThisTypenameToAdapterTypename(
+      String typename
+  ) {
+    _mapping.put(_TEMPORARY_KEYWORD_TYPENAME, typename);
+    _mapping.put(_TEMPORARY_KEYWORD_FULL_QUALIFIED_TYPENAME,
+        _mapping.get(_KEYWORD_NAMESPACE) + "::adapters::" + typename);
+  }
 
   public void setThisTypenameToAdapterTypename(
       String typename,
@@ -399,7 +408,12 @@ public class TranslationTable extends DepthFirstAdapter {
 
   private java.io.BufferedReader getBufferedReaderForUserTemplate(String templateFile)
 		throws FileNotFoundException {
-	templateFile = _templateDirectory + "/" + templateFile;
+  if (_templateDirectory!=null) {
+    templateFile = _templateDirectory + "/" + templateFile;
+  }
+  else {
+    System.err.println( "\nwarning: No user template directory passed, search for templates in current directory" );
+  }
 	templateFile = templateFile.replaceAll("\\\\", "/");
 	java.io.BufferedReader reader = new java.io.BufferedReader(
 			new java.io.FileReader(new java.io.File(templateFile)));
