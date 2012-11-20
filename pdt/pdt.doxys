@@ -16,5 +16,12 @@ jar cvfm pdt.jar Manifest.txt stdtemplates lib/DaStGen.jar lib/jargs.jar -C bin 
 We here assume that all class files are held in a directory bin and that the 
 command is invoked in the pdt directory. 
 
+
+To create a zip with all the sources, invoke
+\code
+tar -cvf pdt.tar src stdtemplates Manifest.txt pdt.doxys pdt.grammar --exclude=.svn
+gzip pdt.tar
+\endcode
+
 */
 
