@@ -5,42 +5,42 @@
 const peano::MappingSpecification   __THIS_QUALIFIED_TYPENAME__::touchVertexLastTimeSpecification = 
   peano::MappingSpecification::getMostGeneralSpecification()
   __x__MAPPINGS__ & __NAMESPACE__::mappings::__MAPPINGS__::touchVertexLastTimeSpecification
-  __x__PREDEFINED_MAPPINGS__ & __NAMESPACE__::mappings::__PREDEFINED_MAPPINGS__::touchVertexLastTimeSpecification
+  __x__PREDEFINED_MAPPINGS__ & __NAMESPACE__::adapters::__PREDEFINED_MAPPINGS__::touchVertexLastTimeSpecification
 ;
 
 
 const peano::MappingSpecification   __THIS_QUALIFIED_TYPENAME__::touchVertexFirstTimeSpecification = 
   peano::MappingSpecification::getMostGeneralSpecification()
   __x__MAPPINGS__ & __NAMESPACE__::mappings::__MAPPINGS__::touchVertexFirstTimeSpecification
-  __x__PREDEFINED_MAPPINGS__ & __NAMESPACE__::mappings::__PREDEFINED_MAPPINGS__::touchVertexFirstTimeSpecification
+  __x__PREDEFINED_MAPPINGS__ & __NAMESPACE__::adapters::__PREDEFINED_MAPPINGS__::touchVertexFirstTimeSpecification
 ;
 
 
 const peano::MappingSpecification   __THIS_QUALIFIED_TYPENAME__::enterCellSpecification = 
   peano::MappingSpecification::getMostGeneralSpecification()
   __x__MAPPINGS__ & __NAMESPACE__::mappings::__MAPPINGS__::enterCellSpecification
-  __x__PREDEFINED_MAPPINGS__ & __NAMESPACE__::mappings::__PREDEFINED_MAPPINGS__::enterCellSpecification
+  __x__PREDEFINED_MAPPINGS__ & __NAMESPACE__::adapters::__PREDEFINED_MAPPINGS__::enterCellSpecification
 ;
 
 
 const peano::MappingSpecification   __THIS_QUALIFIED_TYPENAME__::leaveCellSpecification = 
   peano::MappingSpecification::getMostGeneralSpecification()
   __x__MAPPINGS__ & __NAMESPACE__::mappings::__MAPPINGS__::leaveCellSpecification
-  __x__PREDEFINED_MAPPINGS__ & __NAMESPACE__::mappings::__PREDEFINED_MAPPINGS__::leaveCellSpecification
+  __x__PREDEFINED_MAPPINGS__ & __NAMESPACE__::adapters::__PREDEFINED_MAPPINGS__::leaveCellSpecification
 ;
 
 
 const peano::MappingSpecification   __THIS_QUALIFIED_TYPENAME__::ascendSpecification = 
   peano::MappingSpecification::getMostGeneralSpecification()
   __x__MAPPINGS__ & __NAMESPACE__::mappings::__MAPPINGS__::ascendSpecification
-  __x__PREDEFINED_MAPPINGS__ & __NAMESPACE__::mappings::__PREDEFINED_MAPPINGS__::ascendSpecification
+  __x__PREDEFINED_MAPPINGS__ & __NAMESPACE__::adapters::__PREDEFINED_MAPPINGS__::ascendSpecification
 ;
 
 
 const peano::MappingSpecification   __THIS_QUALIFIED_TYPENAME__::descendSpecification = 
   peano::MappingSpecification::getMostGeneralSpecification()
   __x__MAPPINGS__ & __NAMESPACE__::mappings::__MAPPINGS__::descendSpecification
-  __x__PREDEFINED_MAPPINGS__ & __NAMESPACE__::mappings::__PREDEFINED_MAPPINGS__::descendSpecification
+  __x__PREDEFINED_MAPPINGS__ & __NAMESPACE__::adapters::__PREDEFINED_MAPPINGS__::descendSpecification
 ;
 
 
