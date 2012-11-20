@@ -327,12 +327,11 @@ void __THIS_QUALIFIED_TYPENAME__::enterCell(
       vertexIndex[iScalar] = _vertex2IndexMap[currentVertexPosition];
     enddforx
   
-    int cellIndex;
     if (DIMENSIONS==2) {
-      cellIndex = _cellWriter->plotQuadrangle(vertexIndex);
+      _cellWriter->plotQuadrangle(vertexIndex);
     }
     if (DIMENSIONS==3) {
-      cellIndex = _cellWriter->plotHexahedron(vertexIndex);
+      _cellWriter->plotHexahedron(vertexIndex);
     }
   }
 }
