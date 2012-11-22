@@ -39,63 +39,18 @@ class __THIS_QUALIFIED_TYPENAME__ {
     static tarch::logging::Log  _log;
   public:
     /**
-     * This flag is used to inform Peano about your operation. It tells the 
+     * These flags are used to inform Peano about your operation. It tells the 
      * framework whether the operation is empty, whether it works only on the 
      * spacetree leaves, whether the operation can restart if the thread 
      * crashes (resiliency), and so forth. This information allows Peano to
      * optimise the code.
      */
-    static const peano::MappingSpecification   touchVertexLastTimeSpecification;
-
-
-    /**
-     * This flag is used to inform Peano about your operation. It tells the 
-     * framework whether the operation is empty, whether it works only on the 
-     * spacetree leaves, whether the operation can restart if the thread 
-     * crashes (resiliency), and so forth. This information allows Peano to
-     * optimise the code.
-     */
-    static const peano::MappingSpecification   touchVertexFirstTimeSpecification;
-
-
-    /**
-     * This flag is used to inform Peano about your operation. It tells the 
-     * framework whether the operation is empty, whether it works only on the 
-     * spacetree leaves, whether the operation can restart if the thread 
-     * crashes (resiliency), and so forth. This information allows Peano to
-     * optimise the code.
-     */
-    static const peano::MappingSpecification   enterCellSpecification;
-
-
-    /**
-     * This flag is used to inform Peano about your operation. It tells the 
-     * framework whether the operation is empty, whether it works only on the 
-     * spacetree leaves, whether the operation can restart if the thread 
-     * crashes (resiliency), and so forth. This information allows Peano to
-     * optimise the code.
-     */
-    static const peano::MappingSpecification   leaveCellSpecification;
-
-
-    /**
-     * This flag is used to inform Peano about your operation. It tells the 
-     * framework whether the operation is empty, whether it works only on the 
-     * spacetree leaves, whether the operation can restart if the thread 
-     * crashes (resiliency), and so forth. This information allows Peano to
-     * optimise the code.
-     */
-    static const peano::MappingSpecification   ascendSpecification;
-
-
-    /**
-     * This flag is used to inform Peano about your operation. It tells the 
-     * framework whether the operation is empty, whether it works only on the 
-     * spacetree leaves, whether the operation can restart if the thread 
-     * crashes (resiliency), and so forth. This information allows Peano to
-     * optimise the code.
-     */
-    static const peano::MappingSpecification   descendSpecification;
+    static peano::MappingSpecification   touchVertexLastTimeSpecification();
+    static peano::MappingSpecification   touchVertexFirstTimeSpecification();
+    static peano::MappingSpecification   enterCellSpecification();
+    static peano::MappingSpecification   leaveCellSpecification();
+    static peano::MappingSpecification   ascendSpecification();
+    static peano::MappingSpecification   descendSpecification();
 
 
     /**

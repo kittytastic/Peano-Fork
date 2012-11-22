@@ -39,12 +39,12 @@ class __THIS_QUALIFIED_TYPENAME__ {
    __x__MAPPINGS__ __NAMESPACE__::mappings::__MAPPINGS__ _map2__MAPPINGS__;
    __x__PREDEFINED_MAPPINGS__ __NAMESPACE__::adapters::__PREDEFINED_MAPPINGS__ _map2__PREDEFINED_MAPPINGS__;
   public:
-    static const peano::MappingSpecification   touchVertexLastTimeSpecification;
-    static const peano::MappingSpecification   touchVertexFirstTimeSpecification;
-    static const peano::MappingSpecification   enterCellSpecification;
-    static const peano::MappingSpecification   leaveCellSpecification;
-    static const peano::MappingSpecification   ascendSpecification;
-    static const peano::MappingSpecification   descendSpecification;
+    static peano::MappingSpecification   touchVertexLastTimeSpecification();
+    static peano::MappingSpecification   touchVertexFirstTimeSpecification();
+    static peano::MappingSpecification   enterCellSpecification();
+    static peano::MappingSpecification   leaveCellSpecification();
+    static peano::MappingSpecification   ascendSpecification();
+    static peano::MappingSpecification   descendSpecification();
 
     __THIS_TYPENAME__();
 
