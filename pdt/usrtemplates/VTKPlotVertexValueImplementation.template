@@ -12,28 +12,34 @@
 int __THIS_QUALIFIED_TYPENAME__::_snapshotCounter = 0;
 
 
-const peano::MappingSpecification   __THIS_QUALIFIED_TYPENAME__::touchVertexLastTimeSpecification = 
-  peano::MappingSpecification(peano::MappingSpecification::WHOLE_TREE,false,false);
+peano::MappingSpecification   __THIS_QUALIFIED_TYPENAME__::touchVertexLastTimeSpecification() {
+  return peano::MappingSpecification(peano::MappingSpecification::NOP,true,true);
+}
 
 
-const peano::MappingSpecification   __THIS_QUALIFIED_TYPENAME__::touchVertexFirstTimeSpecification = 
-  peano::MappingSpecification(peano::MappingSpecification::WHOLE_TREE,false,false);
+peano::MappingSpecification   __THIS_QUALIFIED_TYPENAME__::touchVertexFirstTimeSpecification() { 
+  return peano::MappingSpecification(peano::MappingSpecification::WHOLE_TREE,false,false);
+}
 
 
-const peano::MappingSpecification   __THIS_QUALIFIED_TYPENAME__::enterCellSpecification = 
-  peano::MappingSpecification(peano::MappingSpecification::WHOLE_TREE,false,false);
+peano::MappingSpecification   __THIS_QUALIFIED_TYPENAME__::enterCellSpecification() {
+  return peano::MappingSpecification(peano::MappingSpecification::WHOLE_TREE,false,false);
+}
 
 
-const peano::MappingSpecification   __THIS_QUALIFIED_TYPENAME__::leaveCellSpecification = 
-  peano::MappingSpecification(peano::MappingSpecification::WHOLE_TREE,false,false);
+peano::MappingSpecification   __THIS_QUALIFIED_TYPENAME__::leaveCellSpecification() {
+  return peano::MappingSpecification(peano::MappingSpecification::NOP,true,true);
+}
 
 
-const peano::MappingSpecification   __THIS_QUALIFIED_TYPENAME__::ascendSpecification = 
-  peano::MappingSpecification(peano::MappingSpecification::WHOLE_TREE,false,false);
+peano::MappingSpecification   __THIS_QUALIFIED_TYPENAME__::ascendSpecification() {
+  return peano::MappingSpecification(peano::MappingSpecification::NOP,true,true);
+}
 
 
-const peano::MappingSpecification   __THIS_QUALIFIED_TYPENAME__::descendSpecification = 
-  peano::MappingSpecification(peano::MappingSpecification::WHOLE_TREE,false,false);
+peano::MappingSpecification   __THIS_QUALIFIED_TYPENAME__::descendSpecification() {
+  return peano::MappingSpecification(peano::MappingSpecification::NOP,true,true);
+}
 
 
 std::map<tarch::la::Vector<DIMENSIONS,double> , int, tarch::la::VectorCompare<DIMENSIONS> >  __THIS_QUALIFIED_TYPENAME__::_vertex2IndexMap;

@@ -62,12 +62,12 @@ class __NAMESPACE__::adapters::__THIS_TYPENAME__ {
       const tarch::la::Vector<DIMENSIONS,double>&  fineGridX
     );
   public:
-    static const peano::MappingSpecification   touchVertexLastTimeSpecification;
-    static const peano::MappingSpecification   touchVertexFirstTimeSpecification;
-    static const peano::MappingSpecification   enterCellSpecification;
-    static const peano::MappingSpecification   leaveCellSpecification;
-    static const peano::MappingSpecification   ascendSpecification;
-    static const peano::MappingSpecification   descendSpecification;
+    static peano::MappingSpecification   touchVertexLastTimeSpecification();
+    static peano::MappingSpecification   touchVertexFirstTimeSpecification();
+    static peano::MappingSpecification   enterCellSpecification();
+    static peano::MappingSpecification   leaveCellSpecification();
+    static peano::MappingSpecification   ascendSpecification();
+    static peano::MappingSpecification   descendSpecification();
 
     __THIS_TYPENAME__();
 
