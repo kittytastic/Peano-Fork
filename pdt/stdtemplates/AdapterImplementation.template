@@ -61,6 +61,7 @@ __THIS_QUALIFIED_TYPENAME__::~__THIS_TYPENAME__() {
 #if defined(SharedMemoryParallelisation)
 __THIS_QUALIFIED_TYPENAME__::__THIS_TYPENAME__(const __THIS_TYPENAME__&  masterThread):
  __xc__MAPPINGS__ _map2__MAPPINGS__(masterThread._map2__MAPPINGS__) 
+ __IF_MAPPINGS_EXIST_AND_PREDEFINED_MAPPINGS_EXIST_INSERT_COMMA__
  __xc__PREDEFINED_MAPPINGS__ _map2__PREDEFINED_MAPPINGS__(masterThread._map2__PREDEFINED_MAPPINGS__) 
 {
 }
@@ -69,7 +70,7 @@ __THIS_QUALIFIED_TYPENAME__::__THIS_TYPENAME__(const __THIS_TYPENAME__&  masterT
 void __THIS_QUALIFIED_TYPENAME__::mergeWithWorkerThread(const __THIS_TYPENAME__& workerThread) {
 
  __x__MAPPINGS__ _map2__MAPPINGS__.mergeWithWorkerThread(workerThread._map2__MAPPINGS__);
- __x__MAPPINGS__ _map2__PREDEFINED_MAPPINGS__.mergeWithWorkerThread(workerThread._map2__PREDEFINED_MAPPINGS__);
+ __x__PREDEFINED_MAPPINGS__ _map2__PREDEFINED_MAPPINGS__.mergeWithWorkerThread(workerThread._map2__PREDEFINED_MAPPINGS__);
 }
 #endif
 

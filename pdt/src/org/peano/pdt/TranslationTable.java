@@ -42,6 +42,7 @@ public class TranslationTable extends DepthFirstAdapter {
   private static final String _MULTIPLE_LINE_KEYWORD_WRITE_STENCIL_OPERATION = "__WRITE_STENCIL_OPERATION__";
 
   private static final String _MULTIPLE_LINE_KEYWORD_MAPPINGS = "__MAPPINGS__";
+  private static final String _KEYWORD_IF_MAPPING_EXISTS_AND_PREDEFINED_MAPPING_EXISTS_INSERT_COMMA = "__IF_MAPPINGS_EXIST_AND_PREDEFINED_MAPPINGS_EXIST_INSERT_COMMA__";
   private static final String _MULTIPLE_LINE_KEYWORD_PREDEFINED_MAPPINGS = "__PREDEFINED_MAPPINGS__";
 
   private static final String _TEMPORARY_KEYWORD_TYPENAME = "__THIS_TYPENAME__";
@@ -158,6 +159,13 @@ public class TranslationTable extends DepthFirstAdapter {
         _mapping.get(_KEYWORD_NAMESPACE) + "::adapters::" + typename);
 
     _multiMappings.put(_MULTIPLE_LINE_KEYWORD_MAPPINGS, mappings);
+    if (!mappings.isEmpty() && !predefinedMappings.isEmpty()) {
+      _mapping.put(_KEYWORD_IF_MAPPING_EXISTS_AND_PREDEFINED_MAPPING_EXISTS_INSERT_COMMA, ",");
+    }
+    else {
+      _mapping.put(_KEYWORD_IF_MAPPING_EXISTS_AND_PREDEFINED_MAPPING_EXISTS_INSERT_COMMA, "");
+    }
+      
     _multiMappings.put(_MULTIPLE_LINE_KEYWORD_PREDEFINED_MAPPINGS, predefinedMappings);
   }
 
