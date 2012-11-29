@@ -109,6 +109,12 @@ files.mk:
 	echo -n SOURCES= > files.mk
 	find $(PEANO_HOME) -name '*.cpp' -printf '%p ' >> files.mk
 	find $(PROJECT_HOME) -name '*.cpp' -printf '%p ' >> files.mk
+	find $(PEANO_HOME) -name '*.cpp' -printf 'COMPILE %p \n' >> compiler-minutes.txt
+	find $(PROJECT_HOME) -name '*.cpp' -printf 'COMPILE %p \n' >> compiler-minutes.txt
+	echo -n '\n\nLINK ' >> compiler-minutes.txt
+	find $(PEANO_HOME) -name '*.cpp' -printf '%p ' >> compiler-minutes.txt
+	find $(PROJECT_HOME) -name '*.cpp' -printf '%p ' >> compiler-minutes.txt
+
 
 
 header:
@@ -126,6 +132,7 @@ clean:
 	rm -f $(EXECUTABLE)
 	rm -f $(OBJECTS)
 	rm -f files.mk
+	rm -f compiler-minutes.txt
 
 
 $(OBJECTS): %.o : %.cpp
