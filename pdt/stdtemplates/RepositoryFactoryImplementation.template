@@ -7,13 +7,13 @@
 
 #ifdef Parallel
 #include "tarch/parallel/NodePool.h"
-#include "peano/parallel/SpacetreeGridPartitioner.h"
+#include "peano/parallel/Partitioner.h"
 #endif
 
 
 __NAMESPACE__::repositories::RepositoryFactory::RepositoryFactory() {
   #ifdef Parallel
-  peano::parallel::SpacetreeGridPartitioner::initDatatypes();
+  peano::parallel::Partitioner::initDatatypes();
 
   __NAMESPACE__::State::initDatatype();
   __NAMESPACE__::Vertex::initDatatype();

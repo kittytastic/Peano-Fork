@@ -8,15 +8,6 @@
 
 #include "tarch/Assertions.h"
 
-#ifdef Parallel
-#include "tarch/parallel/NodePool.h"
-#include "tarch/parallel/strategy/defaultstrategies/FCFSNodePoolStrategy.h"
-#endif
-
-#include "tarch/multicore/MulticoreDefinitions.h"
-#include "peano/datatraversal/autotuning/Oracle.h"
-#include "peano/datatraversal/autotuning/OracleForOnePhaseUsingAllThreads.h"
-
 
 // @todo Remove this include as soon as you've created your real-world geometry
 #include "peano/geometry/Hexahedron.h" 
@@ -33,20 +24,6 @@ __NAMESPACE__::runners::Runner::~Runner() {
 
 
 int __NAMESPACE__::runners::Runner::run() {
-  #ifdef Parallel
-  if (tarch::parallel::Node::getInstance().isGlobalMaster()) {
-    // @todo Please realise the strategy of your choice. This is a default strategy. 
-    tarch::parallel::NodePool::getInstance().setStrategy( new tarch::parallel::defaultstrategies::FCFSNodePoolStrategy );
-  }
-  tarch::parallel::NodePool::getInstance().restart();
-  #endif
-
-  #ifdef SharedMemoryParallelisation
-  // @todo Please realise the strategy of your choice. This is a default strategy.
-  const int NumberOfThreads = 2;
-  peano::datatraversal::autotuning::Oracle::getInstance().setOracle( new peano::datatraversal::autotuning::OracleForOnePhaseUsingAllThreads(NumberOfThreads) );
-  #endif
-
   // @todo Insert your geometry generation here and adopt the repository 
   //       generation to your needs. There is a dummy implementation to allow 
   //       for a quick start, but this is really very dummy (it generates 

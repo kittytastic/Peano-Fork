@@ -201,7 +201,7 @@ bool __NAMESPACE__::repositories::RepositorySTDStack::continueToIterate() {
 
     _repositoryState.receive( masterNode, peano::parallel::SendReceiveBufferPool::getInstance().getIterationManagementTag(), true );
 
-    result = _repositoryState.getAction()!=__NAMESPACE__::recors::RepositoryState::Terminate;
+    result = _repositoryState.getAction()!=__NAMESPACE__::records::RepositoryState::Terminate;
   }
    
   logTraceOutWith1Argument( "continueToIterate()", result );

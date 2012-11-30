@@ -22,7 +22,7 @@ DIM=-DDim2
 
 # Configure Peano
 #----------------
-PROJECT_CLFAGS = -DDebug -DAsserts 
+PROJECT_CFLAGS = -DDebug -DAsserts 
 PROJECT_LFLAGS = 
 EXECUTABLE=peano-__COMPONENT_NAME__-debug
 #EXECUTABLE=peano-__COMPONENT_NAME__-debug
@@ -109,9 +109,9 @@ files.mk:
 	echo -n SOURCES= > files.mk
 	find $(PEANO_HOME) -name '*.cpp' -printf '%p ' >> files.mk
 	find $(PROJECT_HOME) -name '*.cpp' -printf '%p ' >> files.mk
-	find $(PEANO_HOME) -name '*.cpp' -printf 'COMPILE %p \n' >> compiler-minutes.txt
-	find $(PROJECT_HOME) -name '*.cpp' -printf 'COMPILE %p \n' >> compiler-minutes.txt
-	echo -n '\n\nLINK ' >> compiler-minutes.txt
+	find $(PEANO_HOME) -name '*.cpp' -printf 'COMPILE %p TO %p OBJECT FILE\n' >> compiler-minutes.txt
+	find $(PROJECT_HOME) -name '*.cpp' -printf 'COMPILE %p TO %p OBJECT FILE\n' >> compiler-minutes.txt
+	echo -n '\n\nLINK OBJECT FILES OF ' >> compiler-minutes.txt
 	find $(PEANO_HOME) -name '*.cpp' -printf '%p ' >> compiler-minutes.txt
 	find $(PROJECT_HOME) -name '*.cpp' -printf '%p ' >> compiler-minutes.txt
 
