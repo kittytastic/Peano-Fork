@@ -193,18 +193,20 @@ void __THIS_QUALIFIED_TYPENAME__::mergeWithNeighbour(
   const __NAMESPACE__::Vertex&  neighbour,
   int                                           fromRank,
   const tarch::la::Vector<DIMENSIONS,double>&   fineGridX,
-  const tarch::la::Vector<DIMENSIONS,double>&   fineGridH
+  const tarch::la::Vector<DIMENSIONS,double>&   fineGridH,
+  int                                           level
 ) {
-  logTraceInWith5Arguments( "mergeWithNeighbour(...)", vertex, neighbour, fromRank, fineGridX, fineGridH );
+  logTraceInWith6Arguments( "mergeWithNeighbour(...)", vertex, neighbour, fromRank, fineGridX, fineGridH, level );
   // @todo Insert your code here
   logTraceOut( "mergeWithNeighbour(...)" );
 }
 
 void __THIS_QUALIFIED_TYPENAME__::prepareSendToNeighbour(
   __NAMESPACE__::Vertex&  vertex,
-  int  toRank
+  int  toRank,
+  int  level
 ) {
-  logTraceInWith2Arguments( "prepareSendToNeighbour(...)", vertex, toRank );
+  logTraceInWith3Arguments( "prepareSendToNeighbour(...)", vertex, toRank, level );
   // @todo Insert your code here
   logTraceOut( "prepareSendToNeighbour(...)" );
 }
@@ -283,7 +285,9 @@ void __THIS_QUALIFIED_TYPENAME__::mergeWithMaster(
   const peano::grid::VertexEnumerator&                coarseGridVerticesEnumerator,
   __NAMESPACE__::Cell&                 coarseGridCell,
   const tarch::la::Vector<DIMENSIONS,int>&                             fineGridPositionOfCell,
-  int                                                                  worker
+  int                                                                  worker,
+  const __NAMESPACE__::State&          workerState,
+  __NAMESPACE__::State&                masterState
 ) {
   logTraceIn( "mergeWithMaster(...)" );
   // @todo Insert your code here

@@ -26,12 +26,3 @@ void __NAMESPACE__::State::writeToCheckpoint( peano::grid::Checkpoint<__NAMESPAC
 void __NAMESPACE__::State::readFromCheckpoint( const peano::grid::Checkpoint<__NAMESPACE__::Vertex,__NAMESPACE__::Cell>& checkpoint ) {
   // @todo Insert your code here
 }
-
-
-#ifdef Parallel
-void __NAMESPACE__::State::mergeWithWorkerState(const __NAMESPACE__::State& workerState) {
-  Base::mergeWithWorkerState(workerState);
-  // @todo Insert your code here
-}
-#endif
- 

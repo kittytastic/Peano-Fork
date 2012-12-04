@@ -185,20 +185,22 @@ void __THIS_QUALIFIED_TYPENAME__::mergeWithNeighbour(
   const __NAMESPACE__::Vertex&  neighbour,
   int                                           fromRank,
   const tarch::la::Vector<DIMENSIONS,double>&   fineGridX,
-  const tarch::la::Vector<DIMENSIONS,double>&   fineGridH
+  const tarch::la::Vector<DIMENSIONS,double>&   fineGridH,
+  int                                           level
 ) {
 
-  __x__MAPPINGS__ _map2__MAPPINGS__.mergeWithNeighbour( vertex, neighbour, fromRank, fineGridX, fineGridH );
-  __x__PREDEFINED_MAPPINGS__ _map2__PREDEFINED_MAPPINGS__.mergeWithNeighbour( vertex, neighbour, fromRank, fineGridX, fineGridH );
+  __x__MAPPINGS__ _map2__MAPPINGS__.mergeWithNeighbour( vertex, neighbour, fromRank, fineGridX, fineGridH, level );
+  __x__PREDEFINED_MAPPINGS__ _map2__PREDEFINED_MAPPINGS__.mergeWithNeighbour( vertex, neighbour, fromRank, fineGridX, fineGridH, level );
 }
 
 void __THIS_QUALIFIED_TYPENAME__::prepareSendToNeighbour(
   __NAMESPACE__::Vertex&  vertex,
-  int  toRank
+  int  toRank,
+  int  level
 ) {
 
-  __x__MAPPINGS__ _map2__MAPPINGS__.prepareSendToNeighbour( vertex, toRank );
-  __x__PREDEFINED_MAPPINGS__ _map2__PREDEFINED_MAPPINGS__.prepareSendToNeighbour( vertex, toRank );
+  __x__MAPPINGS__ _map2__MAPPINGS__.prepareSendToNeighbour( vertex, toRank, level );
+  __x__PREDEFINED_MAPPINGS__ _map2__PREDEFINED_MAPPINGS__.prepareSendToNeighbour( vertex, toRank, level );
 }
 
 void __THIS_QUALIFIED_TYPENAME__::prepareCopyToRemoteNode(
@@ -274,11 +276,13 @@ void __THIS_QUALIFIED_TYPENAME__::mergeWithMaster(
   const peano::grid::VertexEnumerator&                coarseGridVerticesEnumerator,
   __NAMESPACE__::Cell&                 coarseGridCell,
   const tarch::la::Vector<DIMENSIONS,int>&                             fineGridPositionOfCell,
-  int                                                                  worker
+  int                                                                  worker,
+    const __NAMESPACE__::State&          workerState,
+  __NAMESPACE__::State&                masterState
 ) {
 
-  __x__MAPPINGS__ _map2__MAPPINGS__.mergeWithMaster( workerGridCell, workerGridVertices, fineGridCell, fineGridVertices, fineGridVerticesEnumerator, coarseGridVertices, coarseGridVerticesEnumerator, coarseGridCell, fineGridPositionOfCell, worker );
-  __x__PREDEFINED_MAPPINGS__ _map2__PREDEFINED_MAPPINGS__.mergeWithMaster( workerGridCell, workerGridVertices, fineGridCell, fineGridVertices, fineGridVerticesEnumerator, coarseGridVertices, coarseGridVerticesEnumerator, coarseGridCell, fineGridPositionOfCell, worker );
+  __x__MAPPINGS__ _map2__MAPPINGS__.mergeWithMaster( workerGridCell, workerGridVertices, fineGridCell, fineGridVertices, fineGridVerticesEnumerator, coarseGridVertices, coarseGridVerticesEnumerator, coarseGridCell, fineGridPositionOfCell, worker, workerState, masterState );
+  __x__PREDEFINED_MAPPINGS__ _map2__PREDEFINED_MAPPINGS__.mergeWithMaster( workerGridCell, workerGridVertices, fineGridCell, fineGridVertices, fineGridVerticesEnumerator, coarseGridVertices, coarseGridVerticesEnumerator, coarseGridCell, fineGridPositionOfCell, worker, workerState, masterState );
 }
 
 void __THIS_QUALIFIED_TYPENAME__::receiveDataFromMaster(

@@ -166,12 +166,14 @@ class __NAMESPACE__::adapters::__THIS_TYPENAME__ {
       const __NAMESPACE__::Vertex&  neighbour,
       int                                           fromRank,
       const tarch::la::Vector<DIMENSIONS,double>&   fineGridX,
-      const tarch::la::Vector<DIMENSIONS,double>&   fineGridH
+      const tarch::la::Vector<DIMENSIONS,double>&   fineGridH,
+      int                                           level
     );
 
     void prepareSendToNeighbour(
       __NAMESPACE__::Vertex&  vertex,
-      int  toRank
+      int  toRank,
+      int  level
     );
 
     void prepareCopyToRemoteNode(
@@ -223,7 +225,9 @@ class __NAMESPACE__::adapters::__THIS_TYPENAME__ {
       const peano::grid::VertexEnumerator&                coarseGridVerticesEnumerator,
       __NAMESPACE__::Cell&                 coarseGridCell,
       const tarch::la::Vector<DIMENSIONS,int>&                             fineGridPositionOfCell,
-      int                                                                  worker
+      int                                                                  worker,
+      const __NAMESPACE__::State&          workerState,
+      __NAMESPACE__::State&                masterState
     );
 
 

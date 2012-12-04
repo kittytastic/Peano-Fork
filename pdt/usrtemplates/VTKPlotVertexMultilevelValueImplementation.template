@@ -264,14 +264,16 @@ void __THIS_QUALIFIED_TYPENAME__::mergeWithNeighbour(
   const __NAMESPACE__::Vertex&  neighbour,
   int                                           fromRank,
   const tarch::la::Vector<DIMENSIONS,double>&   fineGridX,
-  const tarch::la::Vector<DIMENSIONS,double>&   fineGridH
+  const tarch::la::Vector<DIMENSIONS,double>&   fineGridH,
+  int                                           level
 ) {
 }
 
 
 void __THIS_QUALIFIED_TYPENAME__::prepareSendToNeighbour(
   __NAMESPACE__::Vertex&  vertex,
-  int  toRank
+  int  toRank,
+  int  level
 ) {
 }
 
@@ -337,7 +339,9 @@ void __THIS_QUALIFIED_TYPENAME__::mergeWithMaster(
   const peano::grid::VertexEnumerator&                coarseGridVerticesEnumerator,
   __NAMESPACE__::Cell&                 coarseGridCell,
   const tarch::la::Vector<DIMENSIONS,int>&                             fineGridPositionOfCell,
-  int                                                                  worker
+  int                                                                  worker,
+  const __NAMESPACE__::State&          workerState,
+  __NAMESPACE__::State&                masterState
 ) {
 }
 
