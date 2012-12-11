@@ -228,7 +228,10 @@ void __THIS_QUALIFIED_TYPENAME__::prepareCopyToRemoteNode(
 void __THIS_QUALIFIED_TYPENAME__::mergeWithRemoteDataDueToForkOrJoin(
   __NAMESPACE__::Vertex&  localVertex,
   const __NAMESPACE__::Vertex&  masterOrWorkerVertex,
-  int  fromRank
+  int                                       fromRank,
+  const tarch::la::Vector<DIMENSIONS,double>&  x,
+  const tarch::la::Vector<DIMENSIONS,double>&  h,
+  int                                       level
 ) {
 }
 
@@ -236,7 +239,10 @@ void __THIS_QUALIFIED_TYPENAME__::mergeWithRemoteDataDueToForkOrJoin(
 void __THIS_QUALIFIED_TYPENAME__::mergeWithRemoteDataDueToForkOrJoin(
   __NAMESPACE__::Cell&  localCell,
   const __NAMESPACE__::Cell&  masterOrWorkerCell,
-  int  fromRank
+  int                                       fromRank,
+  const tarch::la::Vector<DIMENSIONS,double>&  x,
+  const tarch::la::Vector<DIMENSIONS,double>&  h,
+  int                                       level
 ) {
 }
 
@@ -423,10 +429,10 @@ void __THIS_QUALIFIED_TYPENAME__::endIteration(
   
   std::ostringstream snapshotFileName;
   snapshotFileName << "PARAM0"
-                   << _snapshotCounter
                    #ifdef Parallel
                    << "-rank-" << tarch::parallel::Node::getInstance().getRank()
                    #endif
+                   << "-" << _snapshotCounter
                    << ".vtk";
   _vtkWriter->writeToFile( snapshotFileName.str() );
   

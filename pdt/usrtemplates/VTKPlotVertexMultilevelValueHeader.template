@@ -201,13 +201,19 @@ class __NAMESPACE__::adapters::__THIS_TYPENAME__ {
     void mergeWithRemoteDataDueToForkOrJoin(
       __NAMESPACE__::Vertex&  localVertex,
       const __NAMESPACE__::Vertex&  masterOrWorkerVertex,
-      int  fromRank
+      int                                       fromRank,
+      const tarch::la::Vector<DIMENSIONS,double>&  x,
+      const tarch::la::Vector<DIMENSIONS,double>&  h,
+      int                                       level
     );
 
     void mergeWithRemoteDataDueToForkOrJoin(
       __NAMESPACE__::Cell&  localCell,
       const __NAMESPACE__::Cell&  masterOrWorkerCell,
-      int  fromRank
+      int                                       fromRank,
+      const tarch::la::Vector<DIMENSIONS,double>&  cellCentre,
+      const tarch::la::Vector<DIMENSIONS,double>&  cellSize,
+      int                                       level
     );
 
     void prepareSendToWorker(

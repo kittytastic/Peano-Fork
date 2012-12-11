@@ -504,6 +504,15 @@ class __THIS_QUALIFIED_TYPENAME__ {
      * the vertex, sent by the computation node, which shares this vertex, is 
      * merged with the local copy of this vertex.
      *
+     * !!! Heap data
+     *
+     * If you are working with a heap data structure, your vertices or cells, 
+     * respectively, hold pointers to the heap. The received records hold 
+     * pointer indices as well. However, these pointers are copies from the 
+     * remote ranks, i.e. the pointers are invalid though seem to be set.
+     * Receive heap data instead separately without taking the pointers in 
+     * the arguments into account. 
+     *
      * @param vertex    Local copy of the vertex.
      * @param neighbour Remote copy of the vertex.
      * @param fromRank  See prepareSendToNeighbour()
@@ -587,7 +596,10 @@ class __THIS_QUALIFIED_TYPENAME__ {
     void mergeWithRemoteDataDueToForkOrJoin(
       __NAMESPACE__::Vertex&  localVertex,
       const __NAMESPACE__::Vertex&  masterOrWorkerVertex,
-      int  fromRank
+      int                                       fromRank,
+      const tarch::la::Vector<DIMENSIONS,double>&  x,
+      const tarch::la::Vector<DIMENSIONS,double>&  h,
+      int                                       level
     );
 
 
@@ -607,7 +619,10 @@ class __THIS_QUALIFIED_TYPENAME__ {
     void mergeWithRemoteDataDueToForkOrJoin(
       __NAMESPACE__::Cell&  localCell,
       const __NAMESPACE__::Cell&  masterOrWorkerCell,
-      int  fromRank
+      int                                       fromRank,
+      const tarch::la::Vector<DIMENSIONS,double>&  cellCentre,
+      const tarch::la::Vector<DIMENSIONS,double>&  cellSize,
+      int                                       level
     );
 
 
@@ -662,6 +677,15 @@ class __THIS_QUALIFIED_TYPENAME__ {
      * Merge data from the worker into the master records. This operation is 
      * called on the master, i.e. the const arguments are received copies from 
      * the worker.
+     *
+     * !!! Heap data
+     *
+     * If you are working with a heap data structure, your vertices or cells, 
+     * respectively, hold pointers to the heap. The received records hold 
+     * pointer indices as well. However, these pointers are copies from the 
+     * remote ranks, i.e. the pointers are invalid though seem to be set.
+     * Receive heap data instead separately without taking the pointers in 
+     * the arguments into account.      
      */
     void mergeWithMaster(
       const __NAMESPACE__::Cell&           workerGridCell,
@@ -709,6 +733,23 @@ class __THIS_QUALIFIED_TYPENAME__ {
      *   somewhere in the worker tree. This descend usually not in the central 
      *   element but an outer part of the tree, i.e. some vertices have to be 
      *   merged before we can also merge the cell and all other vertices.
+     *
+     * !!! Heap data
+     *
+     * If you are working with a heap data structure, your vertices or cells, 
+     * respectively, hold pointers to the heap. The received records hold 
+     * pointer indices as well. However, these pointers are copies from the 
+     * remote ranks, i.e. the pointers are invalid though seem to be set.
+     * Receive heap data instead separately without taking the pointers in 
+     * the arguments into account. 
+     *
+     * If you receive heap data and need it in the actual merge operation, 
+     * i.e. in mergeWithWorker(), we recommend to follow the subsequent steps: 
+     * 
+     * - Create an entry on the heap here for each vertex.
+     * - Store the received data within these heap entries.
+     * - Merge the heap data within mergeWithWorker().
+     * - Remove the heap entries created in this operation within mergeWithWorker(). 
      */
     void receiveDataFromMaster(
       __NAMESPACE__::Cell&                    receivedCell, 

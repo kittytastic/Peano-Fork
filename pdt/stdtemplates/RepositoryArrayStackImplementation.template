@@ -84,6 +84,8 @@ void __NAMESPACE__::repositories::RepositoryArrayStack::restart(
   assertion( !tarch::parallel::Node::getInstance().isGlobalMaster());
   #endif
   
+  logInfo( "restart(...)", "start node for subdomain " << domainOffset << "x" << domainSize << " on level " << domainLevel );
+  
   assertion( _repositoryState.getAction() == __NAMESPACE__::records::RepositoryState::Terminate );
 
   _vertexStack.clear();
@@ -118,6 +120,7 @@ void __NAMESPACE__::repositories::RepositoryArrayStack::terminate() {
 
 
 __NAMESPACE__::State& __NAMESPACE__::repositories::RepositoryArrayStack::getState() {
+  logInfo( "terminate()", "rank has terminated" );
   return _solverState;
 }
 

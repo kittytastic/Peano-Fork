@@ -232,9 +232,12 @@ void __THIS_QUALIFIED_TYPENAME__::prepareCopyToRemoteNode(
 void __THIS_QUALIFIED_TYPENAME__::mergeWithRemoteDataDueToForkOrJoin(
   __NAMESPACE__::Vertex&  localVertex,
   const __NAMESPACE__::Vertex&  masterOrWorkerVertex,
-  int  fromRank
+  int                                       fromRank,
+  const tarch::la::Vector<DIMENSIONS,double>&  x,
+  const tarch::la::Vector<DIMENSIONS,double>&  h,
+  int                                       level
 ) {
-  logTraceInWith3Arguments( "mergeWithRemoteDataDueToForkOrJoin(...)", localVertex, masterOrWorkerVertex, fromRank );
+  logTraceInWith6Arguments( "mergeWithRemoteDataDueToForkOrJoin(...)", localVertex, masterOrWorkerVertex, fromRank, x, h, level );
   // @todo Insert your code here
   logTraceOut( "mergeWithRemoteDataDueToForkOrJoin(...)" );
 }
@@ -242,7 +245,10 @@ void __THIS_QUALIFIED_TYPENAME__::mergeWithRemoteDataDueToForkOrJoin(
 void __THIS_QUALIFIED_TYPENAME__::mergeWithRemoteDataDueToForkOrJoin(
   __NAMESPACE__::Cell&  localCell,
   const __NAMESPACE__::Cell&  masterOrWorkerCell,
-  int  fromRank
+  int                                       fromRank,
+  const tarch::la::Vector<DIMENSIONS,double>&  x,
+  const tarch::la::Vector<DIMENSIONS,double>&  h,
+  int                                       level
 ) {
   logTraceInWith3Arguments( "mergeWithRemoteDataDueToForkOrJoin(...)", localCell, masterOrWorkerCell, fromRank );
   // @todo Insert your code here

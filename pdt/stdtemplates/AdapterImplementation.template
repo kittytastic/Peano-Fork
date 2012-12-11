@@ -224,21 +224,27 @@ void __THIS_QUALIFIED_TYPENAME__::prepareCopyToRemoteNode(
 void __THIS_QUALIFIED_TYPENAME__::mergeWithRemoteDataDueToForkOrJoin(
   __NAMESPACE__::Vertex&  localVertex,
   const __NAMESPACE__::Vertex&  masterOrWorkerVertex,
-  int  fromRank
+  int                                       fromRank,
+  const tarch::la::Vector<DIMENSIONS,double>&  x,
+  const tarch::la::Vector<DIMENSIONS,double>&  h,
+  int                                       level
 ) {
 
-  __x__MAPPINGS__ _map2__MAPPINGS__.mergeWithRemoteDataDueToForkOrJoin( localVertex, masterOrWorkerVertex, fromRank );
-  __x__PREDEFINED_MAPPINGS__ _map2__PREDEFINED_MAPPINGS__.mergeWithRemoteDataDueToForkOrJoin( localVertex, masterOrWorkerVertex, fromRank );
+  __x__MAPPINGS__ _map2__MAPPINGS__.mergeWithRemoteDataDueToForkOrJoin( localVertex, masterOrWorkerVertex, fromRank, x, h, level );
+  __x__PREDEFINED_MAPPINGS__ _map2__PREDEFINED_MAPPINGS__.mergeWithRemoteDataDueToForkOrJoin( localVertex, masterOrWorkerVertex, fromRank, x, h, level );
 }
 
 void __THIS_QUALIFIED_TYPENAME__::mergeWithRemoteDataDueToForkOrJoin(
   __NAMESPACE__::Cell&  localCell,
   const __NAMESPACE__::Cell&  masterOrWorkerCell,
-  int  fromRank
+  int                                       fromRank,
+  const tarch::la::Vector<DIMENSIONS,double>&  x,
+  const tarch::la::Vector<DIMENSIONS,double>&  h,
+  int                                       level
 ) {
 
-  __x__MAPPINGS__ _map2__MAPPINGS__.mergeWithRemoteDataDueToForkOrJoin( localCell, masterOrWorkerCell, fromRank );
-  __x__PREDEFINED_MAPPINGS__ _map2__PREDEFINED_MAPPINGS__.mergeWithRemoteDataDueToForkOrJoin( localCell, masterOrWorkerCell, fromRank );
+  __x__MAPPINGS__ _map2__MAPPINGS__.mergeWithRemoteDataDueToForkOrJoin( localCell, masterOrWorkerCell, fromRank, x, h, level );
+  __x__PREDEFINED_MAPPINGS__ _map2__PREDEFINED_MAPPINGS__.mergeWithRemoteDataDueToForkOrJoin( localCell, masterOrWorkerCell, fromRank, x, h, level );
 }
 
 void __THIS_QUALIFIED_TYPENAME__::prepareSendToWorker(
