@@ -59,6 +59,16 @@ class __NAMESPACE__::repositories::RepositoryFactory {
       const tarch::la::Vector<DIMENSIONS,double>&  domainSize,
       const tarch::la::Vector<DIMENSIONS,double>&  computationalDomainOffset
     );    
+    
+    /**
+     * Shutdown all parallel datatypes and free their memory
+     *
+     * All MPI datatypes are implicitly registered by the factory the first 
+     * time a factory is needed, i.e. by getInstance(). However, they are not 
+     * freed automatically. Please free the datatypes as soon as you are sure 
+     * that you won't need any factory or datatype of this project anymore.   
+     */
+    void shutdownAllParallelDatatypes();
 };
 
 

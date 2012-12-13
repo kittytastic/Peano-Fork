@@ -30,6 +30,22 @@ __NAMESPACE__::repositories::RepositoryFactory::~RepositoryFactory() {
 }
 
 
+void __NAMESPACE__::repositories::RepositoryFactory::shutdownAllParallelDatatypes() {
+  #ifdef Parallel
+  peano::parallel::Partitioner::shutdownDatatypes();
+
+  __NAMESPACE__::State::shutdownDatatype();
+  __NAMESPACE__::Vertex::shutdownDatatype();
+  __NAMESPACE__::Cell::shutdownDatatype();
+
+  if (__NAMESPACE__::records::RepositoryState::Datatype!=0) {
+    __NAMESPACE__::records::RepositoryState::shutdownDatatype();
+    __NAMESPACE__::records::RepositoryState::Datatype = 0;
+  }
+  #endif
+}
+
+
 __NAMESPACE__::repositories::RepositoryFactory& __NAMESPACE__::repositories::RepositoryFactory::getInstance() {
   static __NAMESPACE__::repositories::RepositoryFactory singleton;
   return singleton;
