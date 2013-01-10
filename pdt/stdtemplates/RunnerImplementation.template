@@ -43,14 +43,12 @@ int __NAMESPACE__::runners::Runner::run() {
     );
   // End of dummy implementation
   
-  int result;
-  #if !defined(Parallel)
-  result = runAsMaster( *repository );
-  #else
+  int result = 0;
   if (tarch::parallel::Node::getInstance().isGlobalMaster()) {
     result = runAsMaster( *repository );
     tarch::parallel::NodePool::getInstance().terminate();
   }
+  #ifdef Parallel
   else {
     result = runAsClient( *repository );
   }

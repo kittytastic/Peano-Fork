@@ -63,37 +63,36 @@ COMPILER_LFLAGS=
 # Settings for the GNU Compiler (Release Mode)
 # --------------------------------------------
 #CC=g++
-#CFLAGS=-O3 -fstrict-aliasing -fno-rtti -fno-exceptions
-#LFLAGS=-
+#COMPILER_CFLAGS=-O3 -fstrict-aliasing -fno-rtti -fno-exceptions
+#COMPILER_LFLAGS=
 
 
 # Settings for the Intel Compiler (Debug Mode)
 # --------------------------------------------
 #CC=icpc
-#CFLAGS=-O0 -fstrict-aliasing 
-#LFLAGS=
+#COMPILER_CFLAGS=-O0 -fstrict-aliasing 
+#COMPILER_LFLAGS=
 
 
 # Settings for the Intel Compiler (Release Mode)
 # ----------------------------------------------
 #CC=icpc
-#CFLAGS=-fast -fstrict-aliasing 
-#LFLAGS=
+#COMPILER_CFLAGS=-fast -fstrict-aliasing 
+#COMPILER_LFLAGS=
 
 
 # Settings for the XLC Compiler (Debug Mode)
 # --------------------------------------------
 #CC=xlcc
-#CFLAGS=-O0 -fstrict-aliasing -qpack_semantic=gnu 
-#LFLAGS=
+#COMPILER_CFLAGS=-O0 -fstrict-aliasing -qpack_semantic=gnu 
+#COMPILER_LFLAGS=
 
 
 # Settings for the XLC Compiler (Release Mode)
 # ----------------------------------------------
 #CC=xlcc
-#CFLAGS=-fast -fstrict-aliasing -qpack_semantic=gnu 
-#LFLAGS=-fast 
-#EXECUTABLE=peano-__COMPONENT_NAME__-release
+#COMPILER_CFLAGS=-fast -fstrict-aliasing -qpack_semantic=gnu 
+#COMPILER_LFLAGS=
 
 
 OBJECTS=$(SOURCES:.cpp=.o)
@@ -122,7 +121,7 @@ header:
 
 
 build: files.mk $(OBJECTS)
-	$(CC) $(PROJECT_LFLAGS) $(COMPILER_LFLAGS) $(SYSTEM_LFLAGS) $(OBJECTS) -o $(EXECUTABLE)
+	$(CC) $(OBJECTS) -o $(EXECUTABLE) $(PROJECT_LFLAGS) $(COMPILER_LFLAGS) $(SYSTEM_LFLAGS) 
 	@echo
 	@echo build of Peano with component __COMPONENT_NAME__ successful
 	@echo visit Peano\'s homepage at http://www.peano-framework.org
