@@ -58,6 +58,8 @@ class __NAMESPACE__::repositories::Repository {
      */
     virtual void logIterationStatistics() const = 0;
         
+    virtual void clearIterationStatistics() = 0;
+
     /**
      * Create a checkpoint.
      *

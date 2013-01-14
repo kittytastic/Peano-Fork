@@ -218,3 +218,9 @@ void __NAMESPACE__::repositories::RepositorySTDStack::logIterationStatistics() c
   logInfo( "logIterationStatistics()", "|| adapter name \t || iterations \t || total CPU time [t]=s \t || average CPU time [t]=s \t || total user time [t]=s \t || average user time [t]=s  || CPU time properties  || user time properties " );  
  __x__NONQUALIFIED_ADAPTER_TYPE__  logInfo( "logIterationStatistics()", "| __NONQUALIFIED_ADAPTER_TYPE__ \t |  " << _measure__NONQUALIFIED_ADAPTER_TYPE__CPUTime.getNumberOfMeasurements() << " \t |  " << _measure__NONQUALIFIED_ADAPTER_TYPE__CPUTime.getAccumulatedValue() << " \t |  " << _measure__NONQUALIFIED_ADAPTER_TYPE__CPUTime.getValue()  << " \t |  " << _measure__NONQUALIFIED_ADAPTER_TYPE__CalendarTime.getAccumulatedValue() << " \t |  " << _measure__NONQUALIFIED_ADAPTER_TYPE__CalendarTime.getValue() << " \t |  " << _measure__NONQUALIFIED_ADAPTER_TYPE__CPUTime.toString() << " \t |  " << _measure__NONQUALIFIED_ADAPTER_TYPE__CalendarTime.toString() );
 }
+
+
+void __NAMESPACE__::repositories::RepositorySTDStack::clearIterationStatistics() {
+ __x__NONQUALIFIED_ADAPTER_TYPE__  _measure__NONQUALIFIED_ADAPTER_TYPE__CPUTime.erase();
+ __x__NONQUALIFIED_ADAPTER_TYPE__  _measure__NONQUALIFIED_ADAPTER_TYPE__CalendarTime.erase();
+}
