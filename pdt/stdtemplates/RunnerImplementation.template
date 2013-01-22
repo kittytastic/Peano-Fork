@@ -8,6 +8,9 @@
 
 #include "tarch/Assertions.h"
 
+#include "tarch/parallel/Node.h"
+#include "tarch/parallel/NodePool.h"
+
 
 // @todo Remove this include as soon as you've created your real-world geometry
 #include "peano/geometry/Hexahedron.h" 
