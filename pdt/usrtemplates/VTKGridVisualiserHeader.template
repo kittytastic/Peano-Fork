@@ -54,7 +54,6 @@ class __NAMESPACE__::adapters::__THIS_TYPENAME__ {
     tarch::plotter::griddata::Writer::VertexDataWriter*                             _vertexTypeWriter;
     tarch::plotter::griddata::Writer::VertexDataWriter*                             _vertexRefinementControlWriter;
     tarch::plotter::griddata::Writer::VertexDataWriter*                             _vertexAdjacentCellsHeight;
-    tarch::plotter::griddata::Writer::VertexDataWriter*                             _vertexHangingNodeWriter;
 
     tarch::plotter::griddata::Writer::CellDataWriter*                               _cellStateWriter;
     
