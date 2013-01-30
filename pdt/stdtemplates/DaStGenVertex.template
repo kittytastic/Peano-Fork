@@ -16,7 +16,7 @@ class __NAMESPACE__::records::Vertex {
 
   enum RefinementControl {
     Unrefined,Refined,RefinementTriggered,
-    Refining,EraseTriggered,Erasing
+    Refining,EraseTriggered,Erasing,RefineDueToJoinThoughWorkerIsAlreadyErasing
   };
 
   persistent parallelise packed bool               isHangingNode;

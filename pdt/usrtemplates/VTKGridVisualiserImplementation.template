@@ -314,7 +314,8 @@ void __THIS_QUALIFIED_TYPENAME__::touchVertexFirstTime(
   if (
     fineGridVertex.getRefinementControl()==__NAMESPACE__::Vertex::Records::Unrefined ||
     fineGridVertex.getRefinementControl()==__NAMESPACE__::Vertex::Records::RefinementTriggered ||
-    fineGridVertex.getRefinementControl()==__NAMESPACE__::Vertex::Records::Erasing
+    fineGridVertex.getRefinementControl()==__NAMESPACE__::Vertex::Records::Erasing || 
+    fineGridVertex.getRefinementControl()==__NAMESPACE__::Vertex::Records::RefineDueToJoinThoughWorkerIsAlreadyErasing
   ) {
     plotVertex( fineGridVertex, fineGridX ); 
   }
@@ -390,7 +391,7 @@ void __THIS_QUALIFIED_TYPENAME__::beginIteration(
   _vertexWriter     = _vtkWriter->createVertexWriter();
   _cellWriter       = _vtkWriter->createCellWriter();
   
-  _vertexTypeWriter               = _vtkWriter->createVertexDataWriter(wildlandfire::Vertex::Records::getInsideOutsideDomainMapping()+"/Hanging=-1" ,1);
+  _vertexTypeWriter               = _vtkWriter->createVertexDataWriter(__NAMESPACE__::Vertex::Records::getInsideOutsideDomainMapping()+"/Hanging=-1" ,1);
   _vertexRefinementControlWriter  = _vtkWriter->createVertexDataWriter(__NAMESPACE__::Vertex::Records::getRefinementControlMapping() ,1);
   _vertexAdjacentCellsHeight      = _vtkWriter->createVertexDataWriter( "adjacent-trees(-4=invalidated,-3=not-stationary,-2=parallel-boundary,-1=irregular,0-xxx=regular" ,1);
 
