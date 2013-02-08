@@ -283,7 +283,8 @@ void __THIS_QUALIFIED_TYPENAME__::prepareSendToMaster(
 
 void __THIS_QUALIFIED_TYPENAME__::mergeWithMaster(
   const __NAMESPACE__::Cell&           workerGridCell,
-  __NAMESPACE__::Vertex                workerGridVertices[TWO_POWER_D],
+  __NAMESPACE__::Vertex * const        workerGridVertices,
+ const peano::grid::VertexEnumerator& workerEnumerator,
   __NAMESPACE__::Cell&                 fineGridCell,
   __NAMESPACE__::Vertex * const        fineGridVertices,
   const peano::grid::VertexEnumerator&                fineGridVerticesEnumerator,
