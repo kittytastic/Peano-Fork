@@ -80,6 +80,10 @@ class __NAMESPACE__::records::Cell {
    * Identifies who's in charge of this cell.   
    */
   persistent int  responsibleRank;
+  
+  persistent double  nodeWorkload;
+  persistent double  localWorkload;
+  persistent double  totalWorkload;
   #endif
   
   #ifdef SharedMemoryParallelisation
