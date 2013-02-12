@@ -81,9 +81,9 @@ class __NAMESPACE__::records::Cell {
    */
   persistent int  responsibleRank;
   
-  persistent double  nodeWorkload;
-  persistent double  localWorkload;
-  persistent double  totalWorkload;
+  persistent parallelise double  nodeWorkload;
+  persistent parallelise double  localWorkload;
+  persistent parallelise double  totalWorkload;
   #endif
   
   #ifdef SharedMemoryParallelisation
