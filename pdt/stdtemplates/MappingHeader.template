@@ -272,6 +272,22 @@ class __THIS_QUALIFIED_TYPENAME__ {
      * 
      * Please consult peano/grid/vertex-lifecycle.doxys for details on the 
      * vertex and cell lifecycle.
+     *
+     * !!! Boundary points on the unit square
+     *
+     * If your computational domain is the unit square coinciding with the 
+     * Peano root, then the @f$ 2^d @f$ vertices of the coarsest level are 
+     * boundary vertices. As a consequence, the first adapter specified in 
+     * the specification is asked to create this boundary vertex. Usually 
+     * this is totally irrelevant, as there will be finer grids anyway. 
+     * However, you have to call refine(). As a consequence, I recommend to 
+     * add a statement such as
+     * \code
+       if ( tarch::la::volume(fineGridH)>0.5) {
+         fineGridVertex.refine();
+       }
+     \endcode
+     * to the event in any case.
      * 
      * @param fineGridVertex  Vertex that is to be initialised. This is the 
      *                        central object you should set values to.
