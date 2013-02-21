@@ -80,6 +80,8 @@ class __NAMESPACE__::records::Cell {
    * Identifies who's in charge of this cell.   
    */
   persistent int  responsibleRank;
+
+  persistent parallelise bool    subtreeHoldsWorker;
   
   persistent parallelise double  nodeWorkload;
   persistent parallelise double  localWorkload;

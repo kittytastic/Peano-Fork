@@ -51,7 +51,5 @@ class __NAMESPACE__::records::State {
    * the repository state.
    */  
   persistent packed bool             reduceStateAndCell;
-
-  discard packed parallelise bool    hasWorkerWithWorker;
   #endif
 };
