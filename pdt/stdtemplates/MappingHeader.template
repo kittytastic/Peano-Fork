@@ -1092,6 +1092,10 @@ class __THIS_QUALIFIED_TYPENAME__ {
      *
      * Counterpart of descend(). Is called as soon as all leaveCell() events 
      * have terminated.
+     *
+     * There is always one ascend per descend call. Usually ascend is the last 
+     * operation called for a cell. However, if a cell is gonna be destroyed, 
+     * destroyCell is called afterwards.
      */
     void ascend(
       __NAMESPACE__::Cell * const    fineGridCells,
