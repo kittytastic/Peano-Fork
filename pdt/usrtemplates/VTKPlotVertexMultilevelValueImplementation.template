@@ -3,6 +3,7 @@
 #include <sstream>
 
 #include "peano/utils/Loop.h"
+#include "peano/grid/CellFlags.h"
 
 #ifdef Parallel
 #include "tarch/parallel/Node.h"
@@ -65,7 +66,7 @@ __THIS_QUALIFIED_TYPENAME__::__THIS_TYPENAME__::LevelDataset::LevelDataset():
   
   _vertexTypeWriter               = _vtkWriter->createVertexDataWriter(__NAMESPACE__::Vertex::Records::getInsideOutsideDomainMapping() ,1);
   _vertexRefinementControlWriter  = _vtkWriter->createVertexDataWriter(__NAMESPACE__::Vertex::Records::getRefinementControlMapping() ,1);
-  _vertexAdjacentCellsHeight      = _vtkWriter->createVertexDataWriter( "adjacent-trees(-4=invalidated,-3=not-stationary,-2=parallel-boundary,-1=irregular,0-xxx=regular" ,1);
+  _vertexAdjacentCellsHeight      = _vtkWriter->createVertexDataWriter( peano::grid::getCellFlagsLegend(),1 );
   _vertexHangingNodeWriter        = _vtkWriter->createVertexDataWriter( "is-hanging-node" ,1);
   _vertexValueWriter              = _vtkWriter->createVertexDataWriter( "PARAM2" ,1);
   

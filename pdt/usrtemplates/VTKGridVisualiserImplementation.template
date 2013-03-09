@@ -3,6 +3,7 @@
 #include <sstream>
 
 #include "peano/utils/Loop.h"
+#include "peano/grid/CellFlags.h"
 
 #ifdef Parallel
 #include "tarch/parallel/Node.h"
@@ -394,7 +395,7 @@ void __THIS_QUALIFIED_TYPENAME__::beginIteration(
   
   _vertexTypeWriter               = _vtkWriter->createVertexDataWriter(__NAMESPACE__::Vertex::Records::getInsideOutsideDomainMapping()+"/Hanging=-1" ,1);
   _vertexRefinementControlWriter  = _vtkWriter->createVertexDataWriter(__NAMESPACE__::Vertex::Records::getRefinementControlMapping() ,1);
-  _vertexAdjacentCellsHeight      = _vtkWriter->createVertexDataWriter( "adjacent-trees(-4=invalidated,-3=not-stationary,-2=parallel-boundary,-1=irregular,0-xxx=regular" ,1);
+  _vertexAdjacentCellsHeight      = _vtkWriter->createVertexDataWriter( peano::grid::getCellFlagsLegend(),1);
 
   _cellStateWriter                = _vtkWriter->createCellDataWriter( "cell-flag(>=-1=stationary,-1=parallel-boundary,<=-2=not-stationary" ,1);
 }
