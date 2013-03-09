@@ -161,15 +161,7 @@ __THIS_QUALIFIED_TYPENAME__::~__THIS_TYPENAME__() {
 
 
 #if defined(SharedMemoryParallelisation)
-__THIS_QUALIFIED_TYPENAME__::__THIS_TYPENAME__(const __THIS_TYPENAME__&  masterThread):
-  _vtkWriter(masterThread._vtkWriter),
-  _vertexWriter(masterThread._vertexWriter),
-  _cellWriter(masterThread._cellWriter),
-  _vertexTypeWriter(masterThread._vertexTypeWriter),
-  _vertexRefinementControlWriter(masterThread._vertexRefinementControlWriter),
-  _vertexAdjacentCellsHeight(masterThread._vertexAdjacentCellsHeight),
-  _cellStateWriter(masterThread._cellStateWriter)
-{
+__THIS_QUALIFIED_TYPENAME__::__THIS_TYPENAME__(const __THIS_TYPENAME__&  masterThread) {
 }
 
 
