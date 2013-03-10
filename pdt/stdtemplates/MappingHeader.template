@@ -44,6 +44,8 @@ class __THIS_QUALIFIED_TYPENAME__ {
      * spacetree leaves, whether the operation can restart if the thread 
      * crashes (resiliency), and so forth. This information allows Peano to
      * optimise the code.
+     *
+     * @see peano::MappingSpecification for information on thread safety.
      */
     static peano::MappingSpecification   touchVertexLastTimeSpecification();
     static peano::MappingSpecification   touchVertexFirstTimeSpecification();
@@ -178,16 +180,12 @@ class __THIS_QUALIFIED_TYPENAME__ {
      * vertices and cells. However, only the initialisation of fineGridVertex
      * is mandatory.
      *
-     * !!! Thread-safety
-     *
-     * This operation is not thread safe with respect to the coarse grid 
-     * vertices and the coarse grid cell. With respect to the fine grid 
-     * vertices, it is thread safe.
-     *
      * !!! Vertex and cell lifecycle
      * 
      * Please consult peano/grid/vertex-lifecycle.doxys for details on the 
      * vertex and cell lifecycle.
+     *
+     * @see peano::MappingSpecification for information on thread safety.
      *
      * @param fineGridVertex  Vertex that is to be initialised. This is the 
      *                        central object you should set values to.
@@ -262,12 +260,6 @@ class __THIS_QUALIFIED_TYPENAME__ {
      * vertices and cells. However, only the initialisation of fineGridVertex
      * is mandatory.
      *
-     * !!! Thread-safety
-     *
-     * This operation is not thread safe with respect to the coarse grid 
-     * vertices and the coarse grid cell. With respect to the fine grid 
-     * vertices, it is thread safe.
-     *
      * !!! Vertex and cell lifecycle
      * 
      * Please consult peano/grid/vertex-lifecycle.doxys for details on the 
@@ -288,6 +280,8 @@ class __THIS_QUALIFIED_TYPENAME__ {
        }
      \endcode
      * to the event in any case.
+     *
+     * @see peano::MappingSpecification for information on thread safety.
      * 
      * @param fineGridVertex  Vertex that is to be initialised. This is the 
      *                        central object you should set values to.
@@ -324,16 +318,12 @@ class __THIS_QUALIFIED_TYPENAME__ {
      * have been initialised before, i.e. for each adjacent vertex either 
      * touchVertexFirstTime() or createHangingVertex() has been called. 
      *
-     * !!! Thread-safety
-     *
-     * This operation is not thread safe with respect to the coarse grid 
-     * vertices and the coarse grid cell. With respect to the fine grid 
-     * vertices, it is thread safe.
-     *
      * !!! Vertex and cell lifecycle
      * 
      * Please consult peano/grid/vertex-lifecycle.doxys for details on the 
      * vertex and cell lifecycle.
+     *
+     * @see peano::MappingSpecification for information on thread safety.
      */
     void createHangingVertex(
       __NAMESPACE__::Vertex&               fineGridVertex,
@@ -823,13 +813,6 @@ class __THIS_QUALIFIED_TYPENAME__ {
      * this operation is the right place to initialise the non-persistent 
      * attributes of a vertex.
      *
-     * !!! Thread-safety
-     *
-     * This operation is not thread safe with respect to the coarse grid 
-     * vertices and the coarse grid cell. With respect to the fine grid 
-     * vertices, it is thread safe. It is not thread safe with respect to the 
-     * fine grid cell. 
-     * 
      * !!! Optimisation
      * 
      * This operation is invoked if and only if the corresponding specification 
@@ -844,6 +827,8 @@ class __THIS_QUALIFIED_TYPENAME__ {
      * does not enforce that the operation is not called under certain 
      * circumstances.
      *
+     *
+     * @see peano::MappingSpecification for information on thread safety.
      * @see createInnerVertex() for a description of the arguments. 
      */
     void touchVertexFirstTime(
@@ -885,13 +870,6 @@ class __THIS_QUALIFIED_TYPENAME__ {
      * attributes. As soon as this operation terminates, these attributes are 
      * lost.
      *
-     * !!! Thread-safety
-     *
-     * This operation is not thread safe with respect to the coarse grid 
-     * vertices and the coarse grid cell. With respect to the fine grid 
-     * vertices, it is thread safe. It is not thread safe with respect to the 
-     * fine grid cell. 
-     * 
      * !!! Optimisation
      * 
      * This operation is invoked if and only if the corresponding specification 
@@ -905,6 +883,8 @@ class __THIS_QUALIFIED_TYPENAME__ {
      * sometimes implies that this specification induces and optimisation - it 
      * does not enforce that the operation is not called under certain 
      * circumstances.
+     *
+     * @see peano::MappingSpecification for information on thread safety.
      *
      * @see createInnerVertex() for a description of the arguments. 
      */
@@ -939,12 +919,6 @@ class __THIS_QUALIFIED_TYPENAME__ {
      * If you need the position of the vertices of the cell or its size, use the 
      * enumerator.
      *
-     * !!! Thread-safety
-     *
-     * This operation is not thread safe with respect to the coarse grid 
-     * vertices and the coarse grid cell. With respect to the fine grid 
-     * vertices and the fine grid cell, it is thread safe.
-     * 
      * !!! Optimisation
      * 
      * This operation is invoked if and only if the corresponding specification 
@@ -954,6 +928,8 @@ class __THIS_QUALIFIED_TYPENAME__ {
      * can at least be called multiple times if a thread crashes.
      *     
      * @see createCell() for a description of the arguments. 
+     *
+     * @see peano::MappingSpecification for information on thread safety.
      */
     void enterCell(
       __NAMESPACE__::Cell&                 fineGridCell,
@@ -1058,10 +1034,6 @@ class __THIS_QUALIFIED_TYPENAME__ {
      * To access the fine grid cells, please use the enumerator as you do for 
      * the vertices in any case.   
      *
-     * !!! Thread safety
-     *
-     * Descend is thread-safe with respect to all arguments.
-     *
      * !!! Optimisation
      * 
      * This operation is invoked if and only if the corresponding specification 
@@ -1076,6 +1048,8 @@ class __THIS_QUALIFIED_TYPENAME__ {
      * or precondition on the input arguments. 
      *     
      * @pre coarseGridCell.isInside()
+     *
+     * @see peano::MappingSpecification for information on thread safety.
      */
     void descend(
       __NAMESPACE__::Cell * const          fineGridCells,
