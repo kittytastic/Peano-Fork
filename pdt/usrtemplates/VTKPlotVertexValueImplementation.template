@@ -13,32 +13,32 @@ int __THIS_QUALIFIED_TYPENAME__::_snapshotCounter = 0;
 
 
 peano::MappingSpecification   __THIS_QUALIFIED_TYPENAME__::touchVertexLastTimeSpecification() {
-  return peano::MappingSpecification(peano::MappingSpecification::NOP,true,true);
+  return peano::MappingSpecification(peano::MappingSpecification::NOP,peano::MappingSpecification::AVOID_FINE_GRID_RACES,true);
 }
 
 
 peano::MappingSpecification   __THIS_QUALIFIED_TYPENAME__::touchVertexFirstTimeSpecification() { 
-  return peano::MappingSpecification(peano::MappingSpecification::WHOLE_TREE,false,false);
+  return peano::MappingSpecification(peano::MappingSpecification::WHOLE_TREE,peano::MappingSpecification::SERIAL,false);
 }
 
 
 peano::MappingSpecification   __THIS_QUALIFIED_TYPENAME__::enterCellSpecification() {
-  return peano::MappingSpecification(peano::MappingSpecification::WHOLE_TREE,false,false);
+  return peano::MappingSpecification(peano::MappingSpecification::WHOLE_TREE,peano::MappingSpecification::SERIAL,false);
 }
 
 
 peano::MappingSpecification   __THIS_QUALIFIED_TYPENAME__::leaveCellSpecification() {
-  return peano::MappingSpecification(peano::MappingSpecification::NOP,true,true);
+  return peano::MappingSpecification(peano::MappingSpecification::NOP,peano::MappingSpecification::AVOID_FINE_GRID_RACES,true);
 }
 
 
 peano::MappingSpecification   __THIS_QUALIFIED_TYPENAME__::ascendSpecification() {
-  return peano::MappingSpecification(peano::MappingSpecification::NOP,true,true);
+  return peano::MappingSpecification(peano::MappingSpecification::NOP,peano::MappingSpecification::AVOID_FINE_GRID_RACES,true);
 }
 
 
 peano::MappingSpecification   __THIS_QUALIFIED_TYPENAME__::descendSpecification() {
-  return peano::MappingSpecification(peano::MappingSpecification::NOP,true,true);
+  return peano::MappingSpecification(peano::MappingSpecification::NOP,peano::MappingSpecification::AVOID_FINE_GRID_RACES,true);
 }
 
 
