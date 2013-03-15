@@ -183,18 +183,26 @@ class __NAMESPACE__::adapters::__THIS_TYPENAME__ {
 
     void prepareSendToNeighbour(
       __NAMESPACE__::Vertex&  vertex,
-      int  toRank,
-      int  level
+      int                                           toRank,
+      const tarch::la::Vector<DIMENSIONS,double>&   x,
+      const tarch::la::Vector<DIMENSIONS,double>&   h,
+      int                                           level
     );
 
     void prepareCopyToRemoteNode(
       __NAMESPACE__::Vertex&  localVertex,
-      int  toRank
+      int                                           toRank,
+      const tarch::la::Vector<DIMENSIONS,double>&   x,
+      const tarch::la::Vector<DIMENSIONS,double>&   h,
+      int                                           level
     );
 
     void prepareCopyToRemoteNode(
       __NAMESPACE__::Cell&  localCell,
-      int  toRank
+      int                                           toRank,
+      const tarch::la::Vector<DIMENSIONS,double>&   cellCentre,
+      const tarch::la::Vector<DIMENSIONS,double>&   cellSize,
+      int                                           level
     );
 
     void mergeWithRemoteDataDueToForkOrJoin(
@@ -227,9 +235,13 @@ class __NAMESPACE__::adapters::__THIS_TYPENAME__ {
     );
 
     void prepareSendToMaster(
-      __NAMESPACE__::Cell&     localCell,
-      __NAMESPACE__::Vertex *  vertices,
-      const peano::grid::VertexEnumerator&  verticesEnumerator
+      __NAMESPACE__::Cell&                       localCell,
+      __NAMESPACE__::Vertex *                    vertices,
+      const peano::grid::VertexEnumerator&       verticesEnumerator, 
+      const __NAMESPACE__::Vertex * const        coarseGridVertices,
+      const peano::grid::VertexEnumerator&       coarseGridVerticesEnumerator,
+      const __NAMESPACE__::Cell&                 coarseGridCell,
+      const tarch::la::Vector<DIMENSIONS,int>&   fineGridPositionOfCell
     );
 
     void mergeWithMaster(
@@ -250,21 +262,34 @@ class __NAMESPACE__::adapters::__THIS_TYPENAME__ {
 
 
     void receiveDataFromMaster(
-      __NAMESPACE__::Cell&                    receivedCell, 
-      __NAMESPACE__::Vertex *                 receivedVertices,
-      const peano::grid::VertexEnumerator&    verticesEnumerator
+      __NAMESPACE__::Cell&                        receivedCell, 
+      __NAMESPACE__::Vertex *                     receivedVertices,
+      const peano::grid::VertexEnumerator&        receivedVerticesEnumerator,
+      __NAMESPACE__::Vertex * const               receivedCoarseGridVertices,
+      const peano::grid::VertexEnumerator&        receivedCoarseGridVerticesEnumerator,
+      __NAMESPACE__::Cell&                        receivedCoarseGridCell,
+      __NAMESPACE__::Vertex * const               workersCoarseGridVertices,
+      const peano::grid::VertexEnumerator&        workersCoarseGridVerticesEnumerator,
+      __NAMESPACE__::Cell&                        workersCoarseGridCell,
+      const tarch::la::Vector<DIMENSIONS,int>&    fineGridPositionOfCell
     );
 
 
     void mergeWithWorker(
       __NAMESPACE__::Cell&           localCell, 
-      const __NAMESPACE__::Cell&     receivedMasterCell
+      const __NAMESPACE__::Cell&     receivedMasterCell,
+      const tarch::la::Vector<DIMENSIONS,double>&  cellCentre,
+      const tarch::la::Vector<DIMENSIONS,double>&  cellSize,
+      int                                          level
     );
 
 
     void mergeWithWorker(
       __NAMESPACE__::Vertex&        localVertex,
-      const __NAMESPACE__::Vertex&  receivedMasterVertex
+      const __NAMESPACE__::Vertex&  receivedMasterVertex,
+      const tarch::la::Vector<DIMENSIONS,double>&   x,
+      const tarch::la::Vector<DIMENSIONS,double>&   h,
+      int                                           level
     );
     #endif
 

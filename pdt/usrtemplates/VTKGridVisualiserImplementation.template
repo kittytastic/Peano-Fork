@@ -14,32 +14,32 @@ int __THIS_QUALIFIED_TYPENAME__::_snapshotCounter = 0;
 
 
 peano::MappingSpecification   __THIS_QUALIFIED_TYPENAME__::touchVertexLastTimeSpecification() {
-  return peano::MappingSpecification(peano::MappingSpecification::NOP,peano::MappingSpecification::AVOID_FINE_GRID_RACES,true);
+  return peano::MappingSpecification(peano::MappingSpecification::Nop,peano::MappingSpecification::AvoidFineGridRaces,true);
 }
 
 
 peano::MappingSpecification   __THIS_QUALIFIED_TYPENAME__::touchVertexFirstTimeSpecification() { 
-  return peano::MappingSpecification(peano::MappingSpecification::WHOLE_TREE,peano::MappingSpecification::SERIAL,false);
+  return peano::MappingSpecification(peano::MappingSpecification::WholeTree,peano::MappingSpecification::Serial,false);
 }
 
 
 peano::MappingSpecification   __THIS_QUALIFIED_TYPENAME__::enterCellSpecification() {
-  return peano::MappingSpecification(peano::MappingSpecification::NOP,peano::MappingSpecification::SERIAL,false);
+  return peano::MappingSpecification(peano::MappingSpecification::Nop,peano::MappingSpecification::Serial,false);
 }
 
 
 peano::MappingSpecification   __THIS_QUALIFIED_TYPENAME__::leaveCellSpecification() {
-  return peano::MappingSpecification(peano::MappingSpecification::WHOLE_TREE,peano::MappingSpecification::AVOID_FINE_GRID_RACES,true);
+  return peano::MappingSpecification(peano::MappingSpecification::WholeTree,peano::MappingSpecification::AvoidFineGridRaces,true);
 }
 
 
 peano::MappingSpecification   __THIS_QUALIFIED_TYPENAME__::ascendSpecification() {
-  return peano::MappingSpecification(peano::MappingSpecification::NOP,peano::MappingSpecification::AVOID_FINE_GRID_RACES,true);
+  return peano::MappingSpecification(peano::MappingSpecification::Nop,peano::MappingSpecification::AvoidFineGridRaces,true);
 }
 
 
 peano::MappingSpecification   __THIS_QUALIFIED_TYPENAME__::descendSpecification() {
-  return peano::MappingSpecification(peano::MappingSpecification::NOP,peano::MappingSpecification::AVOID_FINE_GRID_RACES,true);
+  return peano::MappingSpecification(peano::MappingSpecification::Nop,peano::MappingSpecification::AvoidFineGridRaces,true);
 }
 
 
@@ -199,23 +199,31 @@ void __THIS_QUALIFIED_TYPENAME__::mergeWithNeighbour(
 
 
 void __THIS_QUALIFIED_TYPENAME__::prepareSendToNeighbour(
-  __NAMESPACE__::Vertex&  vertex,
-  int  toRank,
-  int  level
+      __NAMESPACE__::Vertex&  vertex,
+      int                                           toRank,
+      const tarch::la::Vector<DIMENSIONS,double>&   x,
+      const tarch::la::Vector<DIMENSIONS,double>&   h,
+      int                                           level
 ) {
 }
 
 
 void __THIS_QUALIFIED_TYPENAME__::prepareCopyToRemoteNode(
-  __NAMESPACE__::Vertex&  localVertex,
-  int  toRank
+      __NAMESPACE__::Vertex&  localVertex,
+      int                                           toRank,
+      const tarch::la::Vector<DIMENSIONS,double>&   x,
+      const tarch::la::Vector<DIMENSIONS,double>&   h,
+      int                                           level
 ) {
 }
 
 
 void __THIS_QUALIFIED_TYPENAME__::prepareCopyToRemoteNode(
-  __NAMESPACE__::Cell&  localCell,
-  int  toRank
+      __NAMESPACE__::Cell&  localCell,
+      int                                           toRank,
+      const tarch::la::Vector<DIMENSIONS,double>&   cellCentre,
+      const tarch::la::Vector<DIMENSIONS,double>&   cellSize,
+      int                                           level
 ) {
 }
 
@@ -256,9 +264,13 @@ void __THIS_QUALIFIED_TYPENAME__::prepareSendToWorker(
 
 
 void __THIS_QUALIFIED_TYPENAME__::prepareSendToMaster(
-  __NAMESPACE__::Cell&     localCell,
-  __NAMESPACE__::Vertex *  vertices,
-  const peano::grid::VertexEnumerator&  verticesEnumerator
+      __NAMESPACE__::Cell&                       localCell,
+      __NAMESPACE__::Vertex *                    vertices,
+      const peano::grid::VertexEnumerator&       verticesEnumerator, 
+      const __NAMESPACE__::Vertex * const        coarseGridVertices,
+      const peano::grid::VertexEnumerator&       coarseGridVerticesEnumerator,
+      const __NAMESPACE__::Cell&                 coarseGridCell,
+      const tarch::la::Vector<DIMENSIONS,int>&   fineGridPositionOfCell
 ) {
 }
 
@@ -282,23 +294,36 @@ void __THIS_QUALIFIED_TYPENAME__::mergeWithMaster(
 
 
 void __THIS_QUALIFIED_TYPENAME__::receiveDataFromMaster(
-  __NAMESPACE__::Cell&                    receivedCell, 
-  __NAMESPACE__::Vertex *                 receivedVertices,
-  const peano::grid::VertexEnumerator&    verticesEnumerator
+      __NAMESPACE__::Cell&                        receivedCell, 
+      __NAMESPACE__::Vertex *                     receivedVertices,
+      const peano::grid::VertexEnumerator&        receivedVerticesEnumerator,
+      __NAMESPACE__::Vertex * const               receivedCoarseGridVertices,
+      const peano::grid::VertexEnumerator&        receivedCoarseGridVerticesEnumerator,
+      __NAMESPACE__::Cell&                        receivedCoarseGridCell,
+      __NAMESPACE__::Vertex * const               workersCoarseGridVertices,
+      const peano::grid::VertexEnumerator&        workersCoarseGridVerticesEnumerator,
+      __NAMESPACE__::Cell&                        workersCoarseGridCell,
+      const tarch::la::Vector<DIMENSIONS,int>&    fineGridPositionOfCell
 ) {
 }
 
 
 void __THIS_QUALIFIED_TYPENAME__::mergeWithWorker(
-  __NAMESPACE__::Cell&           localCell, 
-  const __NAMESPACE__::Cell&     receivedMasterCell
+      __NAMESPACE__::Cell&           localCell, 
+      const __NAMESPACE__::Cell&     receivedMasterCell,
+      const tarch::la::Vector<DIMENSIONS,double>&  cellCentre,
+      const tarch::la::Vector<DIMENSIONS,double>&  cellSize,
+      int                                          level
 ) {
 }
 
 
 void __THIS_QUALIFIED_TYPENAME__::mergeWithWorker(
-  __NAMESPACE__::Vertex&        localVertex,
-  const __NAMESPACE__::Vertex&  receivedMasterVertex
+      __NAMESPACE__::Vertex&        localVertex,
+      const __NAMESPACE__::Vertex&  receivedMasterVertex,
+      const tarch::la::Vector<DIMENSIONS,double>&   x,
+      const tarch::la::Vector<DIMENSIONS,double>&   h,
+      int                                           level
 ) {
 }
 #endif

@@ -6,7 +6,7 @@
  * @todo Please tailor the parameters to your mapping's properties.
  */
 peano::MappingSpecification   __THIS_QUALIFIED_TYPENAME__::touchVertexLastTimeSpecification() {
-  return peano::MappingSpecification(peano::MappingSpecification::WHOLE_TREE,peano::MappingSpecification::AVOID_FINE_GRID_RACES,false);
+  return peano::MappingSpecification(peano::MappingSpecification::WholeTree,peano::MappingSpecification::AvoidFineGridRaces,false);
 }
 
 
@@ -14,7 +14,7 @@ peano::MappingSpecification   __THIS_QUALIFIED_TYPENAME__::touchVertexLastTimeSp
  * @todo Please tailor the parameters to your mapping's properties.
  */
 peano::MappingSpecification   __THIS_QUALIFIED_TYPENAME__::touchVertexFirstTimeSpecification() { 
-  return peano::MappingSpecification(peano::MappingSpecification::WHOLE_TREE,peano::MappingSpecification::AVOID_FINE_GRID_RACES,false);
+  return peano::MappingSpecification(peano::MappingSpecification::WholeTree,peano::MappingSpecification::AvoidFineGridRaces,false);
 }
 
 
@@ -22,7 +22,7 @@ peano::MappingSpecification   __THIS_QUALIFIED_TYPENAME__::touchVertexFirstTimeS
  * @todo Please tailor the parameters to your mapping's properties.
  */
 peano::MappingSpecification   __THIS_QUALIFIED_TYPENAME__::enterCellSpecification() {
-  return peano::MappingSpecification(peano::MappingSpecification::WHOLE_TREE,peano::MappingSpecification::AVOID_FINE_GRID_RACES,false);
+  return peano::MappingSpecification(peano::MappingSpecification::WholeTree,peano::MappingSpecification::AvoidFineGridRaces,false);
 }
 
 
@@ -30,7 +30,7 @@ peano::MappingSpecification   __THIS_QUALIFIED_TYPENAME__::enterCellSpecificatio
  * @todo Please tailor the parameters to your mapping's properties.
  */
 peano::MappingSpecification   __THIS_QUALIFIED_TYPENAME__::leaveCellSpecification() {
-  return peano::MappingSpecification(peano::MappingSpecification::WHOLE_TREE,peano::MappingSpecification::AVOID_FINE_GRID_RACES,false);
+  return peano::MappingSpecification(peano::MappingSpecification::WholeTree,peano::MappingSpecification::AvoidFineGridRaces,false);
 }
 
 
@@ -38,7 +38,7 @@ peano::MappingSpecification   __THIS_QUALIFIED_TYPENAME__::leaveCellSpecificatio
  * @todo Please tailor the parameters to your mapping's properties.
  */
 peano::MappingSpecification   __THIS_QUALIFIED_TYPENAME__::ascendSpecification() {
-  return peano::MappingSpecification(peano::MappingSpecification::WHOLE_TREE,peano::MappingSpecification::AVOID_FINE_GRID_RACES,false);
+  return peano::MappingSpecification(peano::MappingSpecification::WholeTree,peano::MappingSpecification::AvoidFineGridRaces,false);
 }
 
 
@@ -46,7 +46,7 @@ peano::MappingSpecification   __THIS_QUALIFIED_TYPENAME__::ascendSpecification()
  * @todo Please tailor the parameters to your mapping's properties.
  */
 peano::MappingSpecification   __THIS_QUALIFIED_TYPENAME__::descendSpecification() {
-  return peano::MappingSpecification(peano::MappingSpecification::WHOLE_TREE,peano::MappingSpecification::AVOID_FINE_GRID_RACES,false);
+  return peano::MappingSpecification(peano::MappingSpecification::WholeTree,peano::MappingSpecification::AvoidFineGridRaces,false);
 }
 
 
@@ -203,8 +203,10 @@ void __THIS_QUALIFIED_TYPENAME__::mergeWithNeighbour(
 
 void __THIS_QUALIFIED_TYPENAME__::prepareSendToNeighbour(
   __NAMESPACE__::Vertex&  vertex,
-  int  toRank,
-  int  level
+      int                                           toRank,
+      const tarch::la::Vector<DIMENSIONS,double>&   x,
+      const tarch::la::Vector<DIMENSIONS,double>&   h,
+      int                                           level
 ) {
   logTraceInWith3Arguments( "prepareSendToNeighbour(...)", vertex, toRank, level );
   // @todo Insert your code here
@@ -213,7 +215,10 @@ void __THIS_QUALIFIED_TYPENAME__::prepareSendToNeighbour(
 
 void __THIS_QUALIFIED_TYPENAME__::prepareCopyToRemoteNode(
   __NAMESPACE__::Vertex&  localVertex,
-  int  toRank
+      int                                           toRank,
+      const tarch::la::Vector<DIMENSIONS,double>&   x,
+      const tarch::la::Vector<DIMENSIONS,double>&   h,
+      int                                           level
 ) {
   logTraceInWith2Arguments( "prepareCopyToRemoteNode(...)", localVertex, toRank );
   // @todo Insert your code here
@@ -222,7 +227,10 @@ void __THIS_QUALIFIED_TYPENAME__::prepareCopyToRemoteNode(
 
 void __THIS_QUALIFIED_TYPENAME__::prepareCopyToRemoteNode(
   __NAMESPACE__::Cell&  localCell,
-  int  toRank
+      int                                           toRank,
+      const tarch::la::Vector<DIMENSIONS,double>&   x,
+      const tarch::la::Vector<DIMENSIONS,double>&   h,
+      int                                           level
 ) {
   logTraceInWith2Arguments( "prepareCopyToRemoteNode(...)", localCell, toRank );
   // @todo Insert your code here
@@ -271,9 +279,13 @@ void __THIS_QUALIFIED_TYPENAME__::prepareSendToWorker(
 }
 
 void __THIS_QUALIFIED_TYPENAME__::prepareSendToMaster(
-  __NAMESPACE__::Cell&     localCell,
-  __NAMESPACE__::Vertex *  vertices,
-  const peano::grid::VertexEnumerator&  verticesEnumerator
+  __NAMESPACE__::Cell&                       localCell,
+  __NAMESPACE__::Vertex *                    vertices,
+  const peano::grid::VertexEnumerator&       verticesEnumerator, 
+  const __NAMESPACE__::Vertex * const        coarseGridVertices,
+  const peano::grid::VertexEnumerator&       coarseGridVerticesEnumerator,
+  const __NAMESPACE__::Cell&                 coarseGridCell,
+  const tarch::la::Vector<DIMENSIONS,int>&   fineGridPositionOfCell
 ) {
   logTraceInWith2Arguments( "prepareSendToMaster(...)", localCell, verticesEnumerator.toString() );
   // @todo Insert your code here
@@ -303,9 +315,16 @@ void __THIS_QUALIFIED_TYPENAME__::mergeWithMaster(
 
 
 void __THIS_QUALIFIED_TYPENAME__::receiveDataFromMaster(
-  __NAMESPACE__::Cell&                    receivedCell, 
-  __NAMESPACE__::Vertex *                 receivedVertices,
-  const peano::grid::VertexEnumerator&    verticesEnumerator
+      __NAMESPACE__::Cell&                        receivedCell, 
+      __NAMESPACE__::Vertex *                     receivedVertices,
+      const peano::grid::VertexEnumerator&        receivedVerticesEnumerator,
+      __NAMESPACE__::Vertex * const               receivedCoarseGridVertices,
+      const peano::grid::VertexEnumerator&        receivedCoarseGridVerticesEnumerator,
+      __NAMESPACE__::Cell&                        receivedCoarseGridCell,
+      __NAMESPACE__::Vertex * const               workersCoarseGridVertices,
+      const peano::grid::VertexEnumerator&        workersCoarseGridVerticesEnumerator,
+      __NAMESPACE__::Cell&                        workersCoarseGridCell,
+      const tarch::la::Vector<DIMENSIONS,int>&    fineGridPositionOfCell
 ) {
   logTraceInWith2Arguments( "receiveDataFromMaster(...)", receivedCell.toString(), verticesEnumerator.toString() );
   // @todo Insert your code here
@@ -315,7 +334,10 @@ void __THIS_QUALIFIED_TYPENAME__::receiveDataFromMaster(
 
 void __THIS_QUALIFIED_TYPENAME__::mergeWithWorker(
   __NAMESPACE__::Cell&           localCell, 
-  const __NAMESPACE__::Cell&     receivedMasterCell
+  const __NAMESPACE__::Cell&     receivedMasterCell,
+  const tarch::la::Vector<DIMENSIONS,double>&  cellCentre,
+  const tarch::la::Vector<DIMENSIONS,double>&  cellSize,
+  int                                          level
 ) {
   logTraceInWith2Arguments( "mergeWithWorker(...)", localCell.toString(), receivedMasterCell.toString() );
   // @todo Insert your code here
@@ -325,7 +347,10 @@ void __THIS_QUALIFIED_TYPENAME__::mergeWithWorker(
 
 void __THIS_QUALIFIED_TYPENAME__::mergeWithWorker(
   __NAMESPACE__::Vertex&        localVertex,
-  const __NAMESPACE__::Vertex&  receivedMasterVertex
+  const __NAMESPACE__::Vertex&  receivedMasterVertex,
+  const tarch::la::Vector<DIMENSIONS,double>&   x,
+  const tarch::la::Vector<DIMENSIONS,double>&   h,
+  int                                           level
 ) {
   logTraceInWith2Arguments( "mergeWithWorker(...)", localVertex.toString(), receivedMasterVertex.toString() );
   // @todo Insert your code here

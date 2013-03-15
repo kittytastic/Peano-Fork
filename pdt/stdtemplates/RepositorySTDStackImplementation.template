@@ -72,9 +72,10 @@ __NAMESPACE__::repositories::RepositorySTDStack::~RepositorySTDStack() {
 void __NAMESPACE__::repositories::RepositorySTDStack::restart(
   const tarch::la::Vector<DIMENSIONS,double>&  domainSize,
   const tarch::la::Vector<DIMENSIONS,double>&  domainOffset,
-  int                                          domainLevel
+  int                                          domainLevel,
+  const tarch::la::Vector<DIMENSIONS,int>&     positionOfCentralElementWithRespectToCoarserRemoteLevel
 ) {
-  logTraceInWith3Arguments( "restart(...)", domainSize, domainOffset, domainLevel );
+  logTraceInWith4Arguments( "restart(...)", domainSize, domainOffset, domainLevel, positionOfCentralElementWithRespectToCoarserRemoteLevel );
   #ifdef Parallel
   assertion( !tarch::parallel::Node::getInstance().isGlobalMaster());
   #endif
@@ -86,7 +87,7 @@ void __NAMESPACE__::repositories::RepositorySTDStack::restart(
   _vertexStack.clear();
   _cellStack.clear();
 
- __x__NONQUALIFIED_ADAPTER_TYPE__ _gridWith__NONQUALIFIED_ADAPTER_TYPE__.restart(domainSize,domainOffset,domainLevel);
+ __x__NONQUALIFIED_ADAPTER_TYPE__ _gridWith__NONQUALIFIED_ADAPTER_TYPE__.restart(domainSize,domainOffset,domainLevel, positionOfCentralElementWithRespectToCoarserRemoteLevel);
 
   _solverState.restart();
 

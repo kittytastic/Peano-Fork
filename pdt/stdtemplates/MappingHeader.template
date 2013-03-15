@@ -528,8 +528,8 @@ class __THIS_QUALIFIED_TYPENAME__ {
       __NAMESPACE__::Vertex&  vertex,
       const __NAMESPACE__::Vertex&  neighbour,
       int                                           fromRank,
-      const tarch::la::Vector<DIMENSIONS,double>&   fineGridX,
-      const tarch::la::Vector<DIMENSIONS,double>&   fineGridH,
+      const tarch::la::Vector<DIMENSIONS,double>&   x,
+      const tarch::la::Vector<DIMENSIONS,double>&   h,
       int                                           level
     );
 
@@ -548,8 +548,10 @@ class __THIS_QUALIFIED_TYPENAME__ {
      */
     void prepareSendToNeighbour(
       __NAMESPACE__::Vertex&  vertex,
-      int  toRank,
-      int  level
+      int                                           toRank,
+      const tarch::la::Vector<DIMENSIONS,double>&   x,
+      const tarch::la::Vector<DIMENSIONS,double>&   h,
+      int                                           level
     );
 
 
@@ -573,7 +575,10 @@ class __THIS_QUALIFIED_TYPENAME__ {
      */
     void prepareCopyToRemoteNode(
       __NAMESPACE__::Vertex&  localVertex,
-      int  toRank
+      int                                           toRank,
+      const tarch::la::Vector<DIMENSIONS,double>&   x,
+      const tarch::la::Vector<DIMENSIONS,double>&   h,
+      int                                           level
     );
     
 
@@ -582,7 +587,10 @@ class __THIS_QUALIFIED_TYPENAME__ {
      */
     void prepareCopyToRemoteNode(
       __NAMESPACE__::Cell&  localCell,
-      int  toRank
+      int                                           toRank,
+      const tarch::la::Vector<DIMENSIONS,double>&   cellCentre,
+      const tarch::la::Vector<DIMENSIONS,double>&   cellSize,
+      int                                           level
     );
 
 
@@ -602,10 +610,10 @@ class __THIS_QUALIFIED_TYPENAME__ {
     void mergeWithRemoteDataDueToForkOrJoin(
       __NAMESPACE__::Vertex&  localVertex,
       const __NAMESPACE__::Vertex&  masterOrWorkerVertex,
-      int                                       fromRank,
+      int                                          fromRank,
       const tarch::la::Vector<DIMENSIONS,double>&  x,
       const tarch::la::Vector<DIMENSIONS,double>&  h,
-      int                                       level
+      int                                          level
     );
 
 
@@ -625,10 +633,10 @@ class __THIS_QUALIFIED_TYPENAME__ {
     void mergeWithRemoteDataDueToForkOrJoin(
       __NAMESPACE__::Cell&  localCell,
       const __NAMESPACE__::Cell&  masterOrWorkerCell,
-      int                                       fromRank,
+      int                                          fromRank,
       const tarch::la::Vector<DIMENSIONS,double>&  cellCentre,
       const tarch::la::Vector<DIMENSIONS,double>&  cellSize,
-      int                                       level
+      int                                          level
     );
 
 
@@ -636,19 +644,52 @@ class __THIS_QUALIFIED_TYPENAME__ {
      * Perpare startup send to worker
      *
      * This operation is called always when we send data to a worker. It is not 
-     * called when we are right in a join or fork.
+     * called when we are right in a join or fork. The operation is kind of the 
+     * replacement of enterCell() on the master, i.e. called for this one instead 
+     * of.
      *
      * @see peano::kernel::spacetreegrid::nodes::Node::updateCellsParallelStateAfterLoad()
      */
     void prepareSendToWorker(
-      __NAMESPACE__::Cell&                 fineGridCell,
-      __NAMESPACE__::Vertex * const        fineGridVertices,
-      const peano::grid::VertexEnumerator&                fineGridVerticesEnumerator,
-      __NAMESPACE__::Vertex * const        coarseGridVertices,
-      const peano::grid::VertexEnumerator&                coarseGridVerticesEnumerator,
-      __NAMESPACE__::Cell&                 coarseGridCell,
-      const tarch::la::Vector<DIMENSIONS,int>&                             fineGridPositionOfCell,
-      int                                                                  worker
+      __NAMESPACE__::Cell&                       fineGridCell,
+      __NAMESPACE__::Vertex * const              fineGridVertices,
+      const peano::grid::VertexEnumerator&       fineGridVerticesEnumerator,
+      __NAMESPACE__::Vertex * const              coarseGridVertices,
+      const peano::grid::VertexEnumerator&       coarseGridVerticesEnumerator,
+      __NAMESPACE__::Cell&                       coarseGridCell,
+      const tarch::la::Vector<DIMENSIONS,int>&   fineGridPositionOfCell,
+      int                                        worker
+    );
+    
+    
+    /**
+     * Merge data from the worker into the master records. This operation is 
+     * called on the master, i.e. the const arguments are received copies from 
+     * the worker.
+     *
+     * !!! Heap data
+     *
+     * If you are working with a heap data structure, your vertices or cells, 
+     * respectively, hold pointers to the heap. The received records hold 
+     * pointer indices as well. However, these pointers are copies from the 
+     * remote ranks, i.e. the pointers are invalid though seem to be set.
+     * Receive heap data instead separately without taking the pointers in 
+     * the arguments into account.      
+     */
+    void mergeWithMaster(
+      const __NAMESPACE__::Cell&                       workerGridCell,
+      __NAMESPACE__::Vertex * const                    workerGridVertices,
+      const peano::grid::VertexEnumerator&             workerEnumerator,
+      __NAMESPACE__::Cell&                             fineGridCell,
+      __NAMESPACE__::Vertex * const                    fineGridVertices,
+      const peano::grid::VertexEnumerator&             fineGridVerticesEnumerator,
+      __NAMESPACE__::Vertex * const                    coarseGridVertices,
+      const peano::grid::VertexEnumerator&             coarseGridVerticesEnumerator,
+      __NAMESPACE__::Cell&                             coarseGridCell,
+      const tarch::la::Vector<DIMENSIONS,int>&         fineGridPositionOfCell,
+      int                                              worker,
+      const __NAMESPACE__::State&                      workerState,
+      __NAMESPACE__::State&                            masterState
     );
 
 
@@ -671,42 +712,17 @@ class __THIS_QUALIFIED_TYPENAME__ {
      * feeds the worker withe the new valid state of vertices and cells. 
      * Receive from master operations thus overwrite the worker's local 
      * records with the master's data, as the master always rules.  
+     *
+     * The coarse data is a copy from the master and may not be modified. 
      */
     void prepareSendToMaster(
-      __NAMESPACE__::Cell&     localCell,
-      __NAMESPACE__::Vertex *  vertices,
-      const peano::grid::VertexEnumerator&  verticesEnumerator
-    );
-
-
-    /**
-     * Merge data from the worker into the master records. This operation is 
-     * called on the master, i.e. the const arguments are received copies from 
-     * the worker.
-     *
-     * !!! Heap data
-     *
-     * If you are working with a heap data structure, your vertices or cells, 
-     * respectively, hold pointers to the heap. The received records hold 
-     * pointer indices as well. However, these pointers are copies from the 
-     * remote ranks, i.e. the pointers are invalid though seem to be set.
-     * Receive heap data instead separately without taking the pointers in 
-     * the arguments into account.      
-     */
-    void mergeWithMaster(
-      const __NAMESPACE__::Cell&           workerGridCell,
-      __NAMESPACE__::Vertex * const        workerGridVertices,
-      const peano::grid::VertexEnumerator& workerEnumerator,
-      __NAMESPACE__::Cell&                 fineGridCell,
-      __NAMESPACE__::Vertex * const        fineGridVertices,
-      const peano::grid::VertexEnumerator&                fineGridVerticesEnumerator,
-      __NAMESPACE__::Vertex * const        coarseGridVertices,
-      const peano::grid::VertexEnumerator&                coarseGridVerticesEnumerator,
-      __NAMESPACE__::Cell&                 coarseGridCell,
-      const tarch::la::Vector<DIMENSIONS,int>&                             fineGridPositionOfCell,
-      int                                                                  worker,
-      const __NAMESPACE__::State&          workerState,
-      __NAMESPACE__::State&                masterState
+      __NAMESPACE__::Cell&                       localCell,
+      __NAMESPACE__::Vertex *                    vertices,
+      const peano::grid::VertexEnumerator&       verticesEnumerator, 
+      const __NAMESPACE__::Vertex * const        coarseGridVertices,
+      const peano::grid::VertexEnumerator&       coarseGridVerticesEnumerator,
+      const __NAMESPACE__::Cell&                 coarseGridCell,
+      const tarch::la::Vector<DIMENSIONS,int>&   fineGridPositionOfCell
     );
 
 
@@ -756,12 +772,33 @@ class __THIS_QUALIFIED_TYPENAME__ {
      * - Create an entry on the heap here for each vertex.
      * - Store the received data within these heap entries.
      * - Merge the heap data within mergeWithWorker().
-     * - Remove the heap entries created in this operation within mergeWithWorker(). 
+     *
+     * - Remove the heap entries created in this operation within mergeWithWorker().
+     * @param coarseGridVertices  Copy of the coarse vertices of the master 
+     *                            node as well worker's records. As you receive 
+     *                            the copy, you can alter the local ones, but 
+     *                            any change to this data will remain local on this 
+     *                            worker, i.e. changes are not committed back to the 
+     *                            master. Also, the changes might be lost from adapter
+     *                            run to adapter run, i.e. if you switch the adapter
+     *                            you wanna use, Peano might come up with different
+     *                            coarse vertices and you have to reset data there 
+     *                            again. 
+     * @param coarseGridCell      Copy fo the coarse cell of the master.
+     * @param fineGridPositionOfCell Position of receivedCell relative to coarse 
+     *                            cell on master.
      */
     void receiveDataFromMaster(
-      __NAMESPACE__::Cell&                    receivedCell, 
-      __NAMESPACE__::Vertex *                 receivedVertices,
-      const peano::grid::VertexEnumerator&    verticesEnumerator
+      __NAMESPACE__::Cell&                        receivedCell, 
+      __NAMESPACE__::Vertex *                     receivedVertices,
+      const peano::grid::VertexEnumerator&        receivedVerticesEnumerator,
+      __NAMESPACE__::Vertex * const               receivedCoarseGridVertices,
+      const peano::grid::VertexEnumerator&        receivedCoarseGridVerticesEnumerator,
+      __NAMESPACE__::Cell&                        receivedCoarseGridCell,
+      __NAMESPACE__::Vertex * const               workersCoarseGridVertices,
+      const peano::grid::VertexEnumerator&        workersCoarseGridVerticesEnumerator,
+      __NAMESPACE__::Cell&                        workersCoarseGridCell,
+      const tarch::la::Vector<DIMENSIONS,int>&    fineGridPositionOfCell
     );
 
 
@@ -770,7 +807,10 @@ class __THIS_QUALIFIED_TYPENAME__ {
      */
     void mergeWithWorker(
       __NAMESPACE__::Cell&           localCell, 
-      const __NAMESPACE__::Cell&     receivedMasterCell
+      const __NAMESPACE__::Cell&     receivedMasterCell,
+      const tarch::la::Vector<DIMENSIONS,double>&  cellCentre,
+      const tarch::la::Vector<DIMENSIONS,double>&  cellSize,
+      int                                          level
     );
 
 
@@ -779,7 +819,10 @@ class __THIS_QUALIFIED_TYPENAME__ {
      */
     void mergeWithWorker(
       __NAMESPACE__::Vertex&        localVertex,
-      const __NAMESPACE__::Vertex&  receivedMasterVertex
+      const __NAMESPACE__::Vertex&  receivedMasterVertex,
+      const tarch::la::Vector<DIMENSIONS,double>&   x,
+      const tarch::la::Vector<DIMENSIONS,double>&   h,
+      int                                           level
     );
     #endif
 

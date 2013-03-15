@@ -76,7 +76,8 @@ class __NAMESPACE__::repositories::RepositoryArrayStack: public __NAMESPACE__::r
     virtual void restart(
       const tarch::la::Vector<DIMENSIONS,double>&  domainSize,
       const tarch::la::Vector<DIMENSIONS,double>&  domainOffset,
-      int                                          domainLevel
+      int                                          domainLevel,
+      const tarch::la::Vector<DIMENSIONS,int>&     positionOfCentralElementWithRespectToCoarserRemoteLevel
     );
          
     virtual void terminate();

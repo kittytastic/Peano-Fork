@@ -16,7 +16,8 @@ int __NAMESPACE__::runners::Runner::runAsClient(__NAMESPACE__::repositories::Rep
     repository.restart(
       forkMessage.getH(),
       forkMessage.getDomainOffset(),
-      forkMessage.getLevel()
+      forkMessage.getLevel(),
+      forkMessage.getPositionOfFineGridCellRelativeToCoarseGridCell()
     );
   
     while (repository.continueToIterate()) {

@@ -70,7 +70,8 @@ class __NAMESPACE__::repositories::RepositorySTDStack: public __NAMESPACE__::rep
     virtual void restart(
       const tarch::la::Vector<DIMENSIONS,double>&  domainSize,
       const tarch::la::Vector<DIMENSIONS,double>&  domainOffset,
-      int                                          domainLevel
+      int                                          domainLevel,
+      const tarch::la::Vector<DIMENSIONS,int>&     positionOfCentralElementWithRespectToCoarserRemoteLevel
     );
          
     virtual void terminate();
