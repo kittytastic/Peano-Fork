@@ -1,35 +1,41 @@
-// This file originally was created by pdt (Peano Development Toolkit) as part 
+// This file originally was created by pdt (Peano Development Toolkit) as part
 // of a code based upon the Peano project by Tobias Weinzierl. For conditions 
 // of distribution and use of this project, please see the copyright notice at
 // www.peano-framework.org. Feel free to adopt the license and authorship of 
 // this file and your project to your needs as long as the license is in 
-// agreement with the original Peano user constraints. A reference to/citation 
+// agreement with the original Peano user constraints. A reference to/citation  
 // of  Peano and its author is highly appreciated.
-#ifndef _MULTIGRID_CELL_H_ 
-#define _MULTIGRID_CELL_H_
+#ifndef _MULTIGRID_VERTEX_H_ 
+#define _MULTIGRID_VERTEX_H_
 
 
-#include "multigrid/records/Cell.h"
-#include "peano/grid/Cell.h"
-#include "matrixfree/stencil/Stencil.h"
-#include "matrixfree/stencil/ElementMatrix.h"
+#include "multigrid/records/Vertex.h"
+#include "peano/grid/Vertex.h"
+#include "peano/grid/VertexEnumerator.h"
+#include "peano/utils/Globals.h"
 
 
 namespace multigrid { 
-      class Cell; 
+      class Vertex; 
+      
+      /**
+       * Forward declaration
+       */ 
+      class VertexOperations;
 }
 
 
 /**
- * Blueprint for cell.
+ * Blueprint for grid vertex.
  * 
  * This file has originally been created by the PDT and may be manually extended to 
  * the needs of your application. We do not recommend to remove anything!
  */
-class multigrid::Cell: public peano::grid::Cell< multigrid::records::Cell > { 
+class multigrid::Vertex: public peano::grid::Vertex< multigrid::records::Vertex > { 
   private: 
-    typedef class peano::grid::Cell< multigrid::records::Cell >  Base;
+    typedef class peano::grid::Vertex< multigrid::records::Vertex >  Base;
 
+    friend class VertexOperations;
   public:
     /**
      * Default Constructor
@@ -37,15 +43,15 @@ class multigrid::Cell: public peano::grid::Cell< multigrid::records::Cell > {
      * This constructor is required by the framework's data container. Do not 
      * remove it.
      */
-    Cell();
-
+    Vertex();
+    
     /**
      * This constructor should not set any attributes. It is used by the 
      * traversal algorithm whenever it allocates an array whose elements 
      * will be overwritten later anyway.  
      */
-    Cell(const Base::DoNotCallStandardConstructor&);
-
+    Vertex(const Base::DoNotCallStandardConstructor&);
+    
     /**
      * Constructor
      *
@@ -56,20 +62,9 @@ class multigrid::Cell: public peano::grid::Cell< multigrid::records::Cell > {
      * has to invoke the correponsing super type's constructor and not the super 
      * type standard constructor.
      */
-    Cell(const Base::PersistentCell& argument);
+    Vertex(const Base::PersistentVertex& argument);
 
-
-    tarch::la::Vector<DIMENSIONS,double> getEpsilon() const;
-    tarch::la::Vector<DIMENSIONS,double> getV() const;
-
-    void init(const tarch::la::Vector<DIMENSIONS,double>&  epsilon, const tarch::la::Vector<DIMENSIONS,double>& v);
-
-
-    /**
-     * @param h Size of the current cell.
-     */
-    matrixfree::stencil::ElementWiseAssemblyMatrix getElementsAssemblyMatrix(const tarch::la::Vector<DIMENSIONS,double>&  h) const;
-
+    void initInnerVertex(double f);
 };
 
 
