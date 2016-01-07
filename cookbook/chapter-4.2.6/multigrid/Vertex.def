@@ -15,7 +15,7 @@ class multigrid::records::Vertex {
   persistent parallelise double  f;
   
   /**
-   * Residual
+   * Hierarchical residual
    */
   discard parallelise double   r;
 
@@ -24,6 +24,21 @@ class multigrid::records::Vertex {
    */
   discard parallelise double   d;
   
+  /**
+   * Hierarchical solution
+   */
+  discard parallelise double   hierarchicalU;
+
+  /**
+   * Residual
+   */
+  discard parallelise double   hierarchicalR;
+
+  /**
+   * Update of solution
+   */
+  persistent parallelise double   uUpdate;
+
   enum VertexType {
     Unknown, Dirichlet, Neumann
   };
