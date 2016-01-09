@@ -5,8 +5,8 @@
 // this file and your project to your needs as long as the license is in 
 // agreement with the original Peano user constraints. A reference to/citation  
 // of  Peano and its author is highly appreciated.
-#ifndef MULTIGRID_MAPPINGS_PlotCells_H_
-#define MULTIGRID_MAPPINGS_PlotCells_H_
+#ifndef MULTIGRID_MAPPINGS_HierarchicalTransformAndRHSRestriction_H_
+#define MULTIGRID_MAPPINGS_HierarchicalTransformAndRHSRestriction_H_
 
 
 #include "tarch/logging/Log.h"
@@ -23,13 +23,13 @@
 #include "multigrid/State.h"
 
 
-#include "tarch/plotter/griddata/unstructured/vtk/VTKBinaryFileWriter.h"
-#include "tarch/la/VectorCompare.h"
+#include "matrixfree/solver/Multigrid.h"
+
 
 
 namespace multigrid {
   namespace mappings {
-    class PlotCells;
+    class HierarchicalTransformAndRHSRestriction;
   }
 }
 
@@ -41,21 +41,14 @@ namespace multigrid {
  * @author Peano Development Toolkit (PDT) by  Tobias Weinzierl
  * @version $Revision: 1.10 $
  */
-class multigrid::mappings::PlotCells {
+class multigrid::mappings::HierarchicalTransformAndRHSRestriction {
   private:
     /**
      * Logging device for the trace macros.
      */
-    static tarch::logging::Log  _log;
+    static tarch::logging::Log     _log;
 
-    tarch::plotter::griddata::unstructured::vtk::VTKBinaryFileWriter*                  _vtkWriter;
-    tarch::plotter::griddata::unstructured::UnstructuredGridWriter::VertexWriter*      _vertexWriter;
-    tarch::plotter::griddata::unstructured::UnstructuredGridWriter::CellWriter*        _cellWriter;
-    tarch::plotter::griddata::unstructured::UnstructuredGridWriter::CellDataWriter*    _epsilonWriter;
-    tarch::plotter::griddata::unstructured::UnstructuredGridWriter::CellDataWriter*    _vWriter;
-
-    static int                                                                                          _snapshotCounter;
-    static std::map<tarch::la::Vector<DIMENSIONS,double> , int, tarch::la::VectorCompare<DIMENSIONS> >  _vertex2IndexMap;
+    matrixfree::solver::Multigrid  _multigrid;
   public:
     /**
      * These flags are used to inform Peano about your operation. It tells the 
@@ -106,7 +99,7 @@ class multigrid::mappings::PlotCells {
      * that your code works on a parallel machine and for any mapping/algorithm 
      * modification.
      */
-    PlotCells();
+    HierarchicalTransformAndRHSRestriction();
 
     #if defined(SharedMemoryParallelisation)
     /**
@@ -119,13 +112,13 @@ class multigrid::mappings::PlotCells {
      *
      * @see mergeWithWorkerThread()
      */
-    PlotCells(const PlotCells& masterThread);
+    HierarchicalTransformAndRHSRestriction(const HierarchicalTransformAndRHSRestriction& masterThread);
     #endif
 
     /**
      * Destructor. Typically does not implement any operation.
      */
-    virtual ~PlotCells();
+    virtual ~HierarchicalTransformAndRHSRestriction();
   
     #if defined(SharedMemoryParallelisation)
     /**
@@ -156,7 +149,7 @@ class multigrid::mappings::PlotCells {
      * on the heap. However, you should protect this object by a BooleanSemaphore 
      * and a lock to serialise all accesses to the plotter.    
      */   
-    void mergeWithWorkerThread(const PlotCells& workerThread);
+    void mergeWithWorkerThread(const HierarchicalTransformAndRHSRestriction& workerThread);
     #endif
 
     /**
@@ -1151,7 +1144,7 @@ class multigrid::mappings::PlotCells {
      * beginIteration() might not be called prior to any other event. See the 
      * documentation of CommunicationSpecification for details.
      *
-     * @see PlotCells()
+     * @see HierarchicalTransformAndRHSRestriction()
      */
     void beginIteration(
       multigrid::State&  solverState
@@ -1184,7 +1177,7 @@ class multigrid::mappings::PlotCells {
      * might not be called after all other events. See the documentation 
      * of CommunicationSpecification for details.
      *
-     * @see PlotCells()
+     * @see HierarchicalTransformAndRHSRestriction()
      */
     void endIteration(
       multigrid::State&  solverState

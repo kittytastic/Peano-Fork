@@ -1,12 +1,17 @@
-#include "multigrid/mappings/JacobiSmoother.h"
+
+#include "multigrid/mappings/RefinementCriterion.h"
+#include "multigrid/mappings/CreateGrid.h"
 #include "multigrid/VertexOperations.h"
 
+
+#include "peano/grid/aspects/VertexStateAnalysis.h"
+#include "peano/utils/Loop.h"
 
 
 /**
  * @todo Please tailor the parameters to your mapping's properties.
  */
-peano::CommunicationSpecification   multigrid::mappings::JacobiSmoother::communicationSpecification() {
+peano::CommunicationSpecification   multigrid::mappings::RefinementCriterion::communicationSpecification() {
   return peano::CommunicationSpecification(peano::CommunicationSpecification::SendDataAndStateBeforeFirstTouchVertexFirstTime,peano::CommunicationSpecification::SendDataAndStateAfterLastTouchVertexLastTime,false);
 }
 
@@ -14,7 +19,7 @@ peano::CommunicationSpecification   multigrid::mappings::JacobiSmoother::communi
 /**
  * @todo Please tailor the parameters to your mapping's properties.
  */
-peano::MappingSpecification   multigrid::mappings::JacobiSmoother::touchVertexLastTimeSpecification() {
+peano::MappingSpecification   multigrid::mappings::RefinementCriterion::touchVertexLastTimeSpecification() {
   return peano::MappingSpecification(peano::MappingSpecification::WholeTree,peano::MappingSpecification::RunConcurrentlyOnFineGrid);
 }
 
@@ -22,7 +27,7 @@ peano::MappingSpecification   multigrid::mappings::JacobiSmoother::touchVertexLa
 /**
  * @todo Please tailor the parameters to your mapping's properties.
  */
-peano::MappingSpecification   multigrid::mappings::JacobiSmoother::touchVertexFirstTimeSpecification() { 
+peano::MappingSpecification   multigrid::mappings::RefinementCriterion::touchVertexFirstTimeSpecification() { 
   return peano::MappingSpecification(peano::MappingSpecification::WholeTree,peano::MappingSpecification::RunConcurrentlyOnFineGrid);
 }
 
@@ -30,7 +35,7 @@ peano::MappingSpecification   multigrid::mappings::JacobiSmoother::touchVertexFi
 /**
  * @todo Please tailor the parameters to your mapping's properties.
  */
-peano::MappingSpecification   multigrid::mappings::JacobiSmoother::enterCellSpecification() {
+peano::MappingSpecification   multigrid::mappings::RefinementCriterion::enterCellSpecification() {
   return peano::MappingSpecification(peano::MappingSpecification::WholeTree,peano::MappingSpecification::AvoidFineGridRaces);
 }
 
@@ -38,7 +43,7 @@ peano::MappingSpecification   multigrid::mappings::JacobiSmoother::enterCellSpec
 /**
  * @todo Please tailor the parameters to your mapping's properties.
  */
-peano::MappingSpecification   multigrid::mappings::JacobiSmoother::leaveCellSpecification() {
+peano::MappingSpecification   multigrid::mappings::RefinementCriterion::leaveCellSpecification() {
   return peano::MappingSpecification(peano::MappingSpecification::WholeTree,peano::MappingSpecification::AvoidFineGridRaces);
 }
 
@@ -46,7 +51,7 @@ peano::MappingSpecification   multigrid::mappings::JacobiSmoother::leaveCellSpec
 /**
  * @todo Please tailor the parameters to your mapping's properties.
  */
-peano::MappingSpecification   multigrid::mappings::JacobiSmoother::ascendSpecification() {
+peano::MappingSpecification   multigrid::mappings::RefinementCriterion::ascendSpecification() {
   return peano::MappingSpecification(peano::MappingSpecification::WholeTree,peano::MappingSpecification::AvoidCoarseGridRaces);
 }
 
@@ -54,60 +59,122 @@ peano::MappingSpecification   multigrid::mappings::JacobiSmoother::ascendSpecifi
 /**
  * @todo Please tailor the parameters to your mapping's properties.
  */
-peano::MappingSpecification   multigrid::mappings::JacobiSmoother::descendSpecification() {
+peano::MappingSpecification   multigrid::mappings::RefinementCriterion::descendSpecification() {
   return peano::MappingSpecification(peano::MappingSpecification::WholeTree,peano::MappingSpecification::AvoidCoarseGridRaces);
 }
 
 
-tarch::logging::Log  multigrid::mappings::JacobiSmoother::_log( "multigrid::mappings::JacobiSmoother" );
-double               multigrid::mappings::JacobiSmoother::omega(0.0);
+tarch::logging::Log  multigrid::mappings::RefinementCriterion::_log( "multigrid::mappings::RefinementCriterion" );
+double               multigrid::mappings::RefinementCriterion::_convergenceThreshold(1e-2);
 
 
+multigrid::mappings::RefinementCriterion::RefinementCriterion():
+  _refinementCriterion(
+    0.1,                   // refinementPercentage,
+    0.0,                   // deletePercentage,
+    0.5,                   // minimumMeshSize,
+    0.5                    // maximumMeshSize
+  ) {
+}
 
 
-void multigrid::mappings::JacobiSmoother::beginIteration(
+void multigrid::mappings::RefinementCriterion::beginIteration(
   multigrid::State&  solverState
 ) {
   logTraceInWith1Argument( "beginIteration(State)", solverState );
 
-  _state = solverState;
-  _state.clearAccumulatedAttributes();
+  switch (multigrid::mappings::CreateGrid::_scenario) {
+    case multigrid::mappings::CreateGrid::Poisson2:
+    case multigrid::mappings::CreateGrid::AdaptivePoisson2:
+      _refinementCriterion.setMinMaxMeshWidth( 1.0/3.0, 0.5 );
+      break;
+    case multigrid::mappings::CreateGrid::Poisson3:
+    case multigrid::mappings::CreateGrid::AdaptivePoisson3:
+      _refinementCriterion.setMinMaxMeshWidth( 1.0/3.0/3.0, 0.5 );
+      break;
+    case multigrid::mappings::CreateGrid::Poisson4:
+    case multigrid::mappings::CreateGrid::AdaptivePoisson4:
+      _refinementCriterion.setMinMaxMeshWidth( 1.0/3.0/3.0/3.0, 0.5 );
+      break;
+    case multigrid::mappings::CreateGrid::Poisson5:
+    case multigrid::mappings::CreateGrid::AdaptivePoisson5:
+      _refinementCriterion.setMinMaxMeshWidth( 1.0/3.0/3.0/3.0/3.0, 0.5 );
+      break;
+    default:
+      assertionMsg( false, "not supported yet" );
+  }
+
+  _refinementCriterion.clearMeasurements(0.0);
 
   logTraceOutWith1Argument( "beginIteration(State)", solverState);
 }
 
 
-void multigrid::mappings::JacobiSmoother::endIteration(
-  multigrid::State&  solverState
-) {
-  logTraceInWith1Argument( "endIteration(State)", solverState );
-
-  solverState.merge(_state);
-
-  logTraceOutWith1Argument( "endIteration(State)", solverState);
-}
-
-
-
-
-void multigrid::mappings::JacobiSmoother::touchVertexFirstTime(
-  multigrid::Vertex&               fineGridVertex,
-  const tarch::la::Vector<DIMENSIONS,double>&                          fineGridX,
-  const tarch::la::Vector<DIMENSIONS,double>&                          fineGridH,
-  multigrid::Vertex * const        coarseGridVertices,
-  const peano::grid::VertexEnumerator&                coarseGridVerticesEnumerator,
-  multigrid::Cell&                 coarseGridCell,
-  const tarch::la::Vector<DIMENSIONS,int>&                             fineGridPositionOfVertex
+void multigrid::mappings::RefinementCriterion::touchVertexFirstTime(
+      multigrid::Vertex&               fineGridVertex,
+      const tarch::la::Vector<DIMENSIONS,double>&                          fineGridX,
+      const tarch::la::Vector<DIMENSIONS,double>&                          fineGridH,
+      multigrid::Vertex * const        coarseGridVertices,
+      const peano::grid::VertexEnumerator&                coarseGridVerticesEnumerator,
+      multigrid::Cell&                 coarseGridCell,
+      const tarch::la::Vector<DIMENSIONS,int>&                             fineGridPositionOfVertex
 ) {
   logTraceInWith6Arguments( "touchVertexFirstTime(...)", fineGridVertex, fineGridX, fineGridH, coarseGridVerticesEnumerator.toString(), coarseGridCell, fineGridPositionOfVertex );
 
-  fineGridVertex.clearAccumulatedAttributes();
+  VertexOperations::writeLinearSurplus(fineGridVertex,0.0);
 
   logTraceOutWith1Argument( "touchVertexFirstTime(...)", fineGridVertex );
 }
 
 
-void multigrid::mappings::JacobiSmoother::touchVertexLastTime(
+
+
+void multigrid::mappings::RefinementCriterion::enterCell(
+      multigrid::Cell&                 fineGridCell,
+      multigrid::Vertex * const        fineGridVertices,
+      const peano::grid::VertexEnumerator&                fineGridVerticesEnumerator,
+      multigrid::Vertex * const        coarseGridVertices,
+      const peano::grid::VertexEnumerator&                coarseGridVerticesEnumerator,
+      multigrid::Cell&                 coarseGridCell,
+      const tarch::la::Vector<DIMENSIONS,int>&                             fineGridPositionOfCell
+) {
+  logTraceInWith4Arguments( "enterCell(...)", fineGridCell, fineGridVerticesEnumerator.toString(), coarseGridCell, fineGridPositionOfCell );
+
+  VertexOperations::writeLinearSurplus(
+    fineGridVerticesEnumerator,
+    fineGridVertices,
+    _refinementCriterion.getNewLinearSurplus(
+      VertexOperations::readU(fineGridVerticesEnumerator,fineGridVertices),
+      VertexOperations::readLinearSurplus(fineGridVerticesEnumerator,fineGridVertices)
+    )
+  );
+
+
+  if (
+    fineGridCell.isRefined()
+    &&
+    peano::grid::aspects::VertexStateAnalysis::doesOneVertexCarryRefinementFlag(
+      fineGridVertices, fineGridVerticesEnumerator, Vertex::Records::Unrefined
+    )
+  ) {
+    bool isOneVertexABoundaryVertex = false;
+    dfor2(k)
+      isOneVertexABoundaryVertex |= fineGridVertices[ fineGridVerticesEnumerator(k) ].isBoundary();
+    enddforx
+    if (isOneVertexABoundaryVertex) {
+      dfor2(k)
+        if (fineGridVertices[ fineGridVerticesEnumerator(k) ].getRefinementControl()==Vertex::Records::Unrefined) {
+          fineGridVertices[ fineGridVerticesEnumerator(k) ].refine();
+        }
+      enddforx
+    }
+  }
+
+  logTraceOutWith1Argument( "enterCell(...)", fineGridCell );
+}
+
+
+void multigrid::mappings::RefinementCriterion::touchVertexLastTime(
   multigrid::Vertex&                           fineGridVertex,
   const tarch::la::Vector<DIMENSIONS,double>&  fineGridX,
   const tarch::la::Vector<DIMENSIONS,double>&  fineGridH,
@@ -118,83 +185,47 @@ void multigrid::mappings::JacobiSmoother::touchVertexLastTime(
 ) {
   logTraceInWith6Arguments( "touchVertexLastTime(...)", fineGridVertex, fineGridX, fineGridH, coarseGridVerticesEnumerator.toString(), coarseGridCell, fineGridPositionOfVertex );
 
-  const bool hasUpdated = fineGridVertex.performJacobiSmoothingStep( omega );
-  if (hasUpdated) {
-    _state.notifyAboutFineGridVertexUpdate(
-      fineGridVertex.getResidual(),
-      fineGridVertex.getU(),
-      fineGridH
-    );
-  }
+  if ( fineGridVertex.isInside() ) {
+    const tarch::la::Vector<TWO_POWER_D_TIMES_D,double > coarseGridLinearSurplus =
+      VertexOperations::readLinearSurplus(coarseGridVerticesEnumerator, coarseGridVertices)
+      +
+      _refinementCriterion.getLinearSurplusContributionFromFineGrid(
+        VertexOperations::readLinearSurplus( fineGridVertex ),
+        fineGridVertex.getRefinementControl()==Vertex::Records::Unrefined,
+        fineGridPositionOfVertex
+      );
 
-  if (
-   peano::grid::SingleLevelEnumerator::isVertexPositionAlsoACoarseVertexPosition(
-     fineGridPositionOfVertex
-   )
-  ) {
-    const peano::grid::SingleLevelEnumerator::LocalVertexIntegerIndex coarseGridPosition =
-      peano::grid::SingleLevelEnumerator::getVertexPositionOnCoarserLevel(fineGridPositionOfVertex);
-    coarseGridVertices[ coarseGridVerticesEnumerator(coarseGridPosition) ].inject(fineGridVertex);
+    VertexOperations::writeLinearSurplus( coarseGridVerticesEnumerator, coarseGridVertices, coarseGridLinearSurplus );
+
+    switch (
+      _refinementCriterion.analyse(
+        VertexOperations::readLinearSurplus(fineGridVertex),
+        fineGridVertex.getRefinementControl()==Vertex::Records::Refined,
+        fineGridVertex.getRefinementControl()==Vertex::Records::Unrefined,
+        fineGridH
+      )
+    ) {
+      case matrixfree::adaptivitycriteria::LinearSurplusRefinementCriterion::Refine:
+        if ( tarch::la::abs( fineGridVertex.getResidual() )<_convergenceThreshold) {
+          fineGridVertex.refine();
+        }
+        else {
+          logDebug( "touchVertexLastTime(...)", "skip refinement as vertex has not converged yet. r=" << fineGridVertex.getR() << ", |r|=" << tarch::la::abs(fineGridVertex.getR()) );
+        }
+        break;
+      case matrixfree::adaptivitycriteria::LinearSurplusRefinementCriterion::Delete:
+        //fineGridVertex.erase();
+        break;
+      case matrixfree::adaptivitycriteria::LinearSurplusRefinementCriterion::NoAction:
+        break;
+    }
   }
 
   logTraceOutWith1Argument( "touchVertexLastTime(...)", fineGridVertex );
 }
 
 
-void multigrid::mappings::JacobiSmoother::enterCell(
-  multigrid::Cell&                 fineGridCell,
-  multigrid::Vertex * const        fineGridVertices,
-  const peano::grid::VertexEnumerator&                fineGridVerticesEnumerator,
-  multigrid::Vertex * const        coarseGridVertices,
-  const peano::grid::VertexEnumerator&                coarseGridVerticesEnumerator,
-  multigrid::Cell&                 coarseGridCell,
-  const tarch::la::Vector<DIMENSIONS,int>&                             fineGridPositionOfCell
-) {
-  logTraceInWith4Arguments( "enterCell(...)", fineGridCell, fineGridVerticesEnumerator.toString(), coarseGridCell, fineGridPositionOfCell );
-
-  const tarch::la::Vector<TWO_POWER_D,double> u    =
-    VertexOperations::readU( fineGridVerticesEnumerator, fineGridVertices );
-  const tarch::la::Vector<TWO_POWER_D,double> dOld    =
-    VertexOperations::readD( fineGridVerticesEnumerator, fineGridVertices );
-  const tarch::la::Vector<TWO_POWER_D,double> rOld =
-    VertexOperations::readR( fineGridVerticesEnumerator, fineGridVertices );
-  const matrixfree::stencil::ElementWiseAssemblyMatrix A =
-    fineGridCell.getElementsAssemblyMatrix( fineGridVerticesEnumerator.getCellSize() );
-
-  tarch::la::Vector<TWO_POWER_D,double> r = rOld - A * u;
-  tarch::la::Vector<TWO_POWER_D,double> d = dOld + tarch::la::diag(A);
-
-  VertexOperations::writeR( fineGridVerticesEnumerator, fineGridVertices, r );
-  VertexOperations::writeD( fineGridVerticesEnumerator, fineGridVertices, d );
-
-  logTraceOutWith1Argument( "enterCell(...)", fineGridCell );
-}
-
-
-void multigrid::mappings::JacobiSmoother::createHangingVertex(
-  multigrid::Vertex&                           fineGridVertex,
-  const tarch::la::Vector<DIMENSIONS,double>&  fineGridX,
-  const tarch::la::Vector<DIMENSIONS,double>&  fineGridH,
-  multigrid::Vertex * const                    coarseGridVertices,
-  const peano::grid::VertexEnumerator&         coarseGridVerticesEnumerator,
-  multigrid::Cell&                             coarseGridCell,
-  const tarch::la::Vector<DIMENSIONS,int>&     fineGridPositionOfVertex
-) {
-  logTraceInWith6Arguments( "createHangingVertex(...)", fineGridVertex, fineGridX, fineGridH, coarseGridVerticesEnumerator.toString(), coarseGridCell, fineGridPositionOfVertex );
-
-  fineGridVertex.setU(
-    _multigrid.getDLinearInterpolatedValue(
-      VertexOperations::readU( coarseGridVerticesEnumerator, coarseGridVertices ),
-      fineGridPositionOfVertex
-    )
-  );
-
-  logTraceOutWith1Argument( "createHangingVertex(...)", fineGridVertex );
-}
-
-
-
-void multigrid::mappings::JacobiSmoother::createInnerVertex(
+void multigrid::mappings::RefinementCriterion::createInnerVertex(
       multigrid::Vertex&               fineGridVertex,
       const tarch::la::Vector<DIMENSIONS,double>&                          fineGridX,
       const tarch::la::Vector<DIMENSIONS,double>&                          fineGridH,
@@ -205,54 +236,70 @@ void multigrid::mappings::JacobiSmoother::createInnerVertex(
 ) {
   logTraceInWith6Arguments( "createInnerVertex(...)", fineGridVertex, fineGridX, fineGridH, coarseGridVerticesEnumerator.toString(), coarseGridCell, fineGridPositionOfVertex );
 
-  fineGridVertex.setU(
-    _multigrid.getDLinearInterpolatedValue(
-      VertexOperations::readU( coarseGridVerticesEnumerator, coarseGridVertices ),
-      fineGridPositionOfVertex
-    )
-  );
+  // We would like to write the following here:
+  //
+  // fineGridVertex.setU(
+  //   _multigrid.getDLinearInterpolatedValue(
+  //     VertexOperations::readU( coarseGridVerticesEnumerator, coarseGridVertices ),
+  //     fineGridPositionOfVertex
+  //   )
+  // );
+  //
+  // This does not work as we have no instance of the multigrid solver here at
+  // hands. Rather than introducing yet another multigrid solver instance here,
+  // we thus implement the createInnerVertex in the smoother mapping.
 
   logTraceOutWith1Argument( "createInnerVertex(...)", fineGridVertex );
 }
 
 
 
-
 //
-//   NOP
-// =======
+//   Nop
+// ========
 //
-multigrid::mappings::JacobiSmoother::JacobiSmoother() {
-  logTraceIn( "JacobiSmoother()" );
-  // @todo Insert your code here
-  logTraceOut( "JacobiSmoother()" );
+void multigrid::mappings::RefinementCriterion::endIteration(
+  multigrid::State&  solverState
+) {
 }
 
 
-multigrid::mappings::JacobiSmoother::~JacobiSmoother() {
-  logTraceIn( "~JacobiSmoother()" );
-  // @todo Insert your code here
-  logTraceOut( "~JacobiSmoother()" );
+multigrid::mappings::RefinementCriterion::~RefinementCriterion() {
 }
 
 
 #if defined(SharedMemoryParallelisation)
-multigrid::mappings::JacobiSmoother::JacobiSmoother(const JacobiSmoother&  masterThread) {
-  logTraceIn( "JacobiSmoother(JacobiSmoother)" );
+multigrid::mappings::RefinementCriterion::RefinementCriterion(const RefinementCriterion&  masterThread) {
+  logTraceIn( "RefinementCriterion(RefinementCriterion)" );
   // @todo Insert your code here
-  logTraceOut( "JacobiSmoother(JacobiSmoother)" );
+  logTraceOut( "RefinementCriterion(RefinementCriterion)" );
 }
 
 
-void multigrid::mappings::JacobiSmoother::mergeWithWorkerThread(const JacobiSmoother& workerThread) {
-  logTraceIn( "mergeWithWorkerThread(JacobiSmoother)" );
+void multigrid::mappings::RefinementCriterion::mergeWithWorkerThread(const RefinementCriterion& workerThread) {
+  logTraceIn( "mergeWithWorkerThread(RefinementCriterion)" );
   // @todo Insert your code here
-  logTraceOut( "mergeWithWorkerThread(JacobiSmoother)" );
+  logTraceOut( "mergeWithWorkerThread(RefinementCriterion)" );
 }
 #endif
 
 
-void multigrid::mappings::JacobiSmoother::destroyHangingVertex(
+void multigrid::mappings::RefinementCriterion::createHangingVertex(
+      multigrid::Vertex&     fineGridVertex,
+      const tarch::la::Vector<DIMENSIONS,double>&                fineGridX,
+      const tarch::la::Vector<DIMENSIONS,double>&                fineGridH,
+      multigrid::Vertex * const   coarseGridVertices,
+      const peano::grid::VertexEnumerator&      coarseGridVerticesEnumerator,
+      multigrid::Cell&       coarseGridCell,
+      const tarch::la::Vector<DIMENSIONS,int>&                   fineGridPositionOfVertex
+) {
+  logTraceInWith6Arguments( "createHangingVertex(...)", fineGridVertex, fineGridX, fineGridH, coarseGridVerticesEnumerator.toString(), coarseGridCell, fineGridPositionOfVertex );
+  // @todo Insert your code here
+  logTraceOutWith1Argument( "createHangingVertex(...)", fineGridVertex );
+}
+
+
+void multigrid::mappings::RefinementCriterion::destroyHangingVertex(
       const multigrid::Vertex&   fineGridVertex,
       const tarch::la::Vector<DIMENSIONS,double>&                    fineGridX,
       const tarch::la::Vector<DIMENSIONS,double>&                    fineGridH,
@@ -261,13 +308,10 @@ void multigrid::mappings::JacobiSmoother::destroyHangingVertex(
       multigrid::Cell&           coarseGridCell,
       const tarch::la::Vector<DIMENSIONS,int>&                       fineGridPositionOfVertex
 ) {
-  logTraceInWith6Arguments( "destroyHangingVertex(...)", fineGridVertex, fineGridX, fineGridH, coarseGridVerticesEnumerator.toString(), coarseGridCell, fineGridPositionOfVertex );
-  // @todo Insert your code here
-  logTraceOutWith1Argument( "destroyHangingVertex(...)", fineGridVertex );
 }
 
 
-void multigrid::mappings::JacobiSmoother::createBoundaryVertex(
+void multigrid::mappings::RefinementCriterion::createBoundaryVertex(
       multigrid::Vertex&               fineGridVertex,
       const tarch::la::Vector<DIMENSIONS,double>&                          fineGridX,
       const tarch::la::Vector<DIMENSIONS,double>&                          fineGridH,
@@ -276,13 +320,10 @@ void multigrid::mappings::JacobiSmoother::createBoundaryVertex(
       multigrid::Cell&                 coarseGridCell,
       const tarch::la::Vector<DIMENSIONS,int>&                             fineGridPositionOfVertex
 ) {
-  logTraceInWith6Arguments( "createBoundaryVertex(...)", fineGridVertex, fineGridX, fineGridH, coarseGridVerticesEnumerator.toString(), coarseGridCell, fineGridPositionOfVertex );
-  // @todo Insert your code here
-  logTraceOutWith1Argument( "createBoundaryVertex(...)", fineGridVertex );
 }
 
 
-void multigrid::mappings::JacobiSmoother::destroyVertex(
+void multigrid::mappings::RefinementCriterion::destroyVertex(
       const multigrid::Vertex&   fineGridVertex,
       const tarch::la::Vector<DIMENSIONS,double>&                    fineGridX,
       const tarch::la::Vector<DIMENSIONS,double>&                    fineGridH,
@@ -297,7 +338,7 @@ void multigrid::mappings::JacobiSmoother::destroyVertex(
 }
 
 
-void multigrid::mappings::JacobiSmoother::createCell(
+void multigrid::mappings::RefinementCriterion::createCell(
       multigrid::Cell&                 fineGridCell,
       multigrid::Vertex * const        fineGridVertices,
       const peano::grid::VertexEnumerator&                fineGridVerticesEnumerator,
@@ -312,7 +353,7 @@ void multigrid::mappings::JacobiSmoother::createCell(
 }
 
 
-void multigrid::mappings::JacobiSmoother::destroyCell(
+void multigrid::mappings::RefinementCriterion::destroyCell(
       const multigrid::Cell&           fineGridCell,
       multigrid::Vertex * const        fineGridVertices,
       const peano::grid::VertexEnumerator&                fineGridVerticesEnumerator,
@@ -327,7 +368,7 @@ void multigrid::mappings::JacobiSmoother::destroyCell(
 }
 
 #ifdef Parallel
-void multigrid::mappings::JacobiSmoother::mergeWithNeighbour(
+void multigrid::mappings::RefinementCriterion::mergeWithNeighbour(
   multigrid::Vertex&  vertex,
   const multigrid::Vertex&  neighbour,
   int                                           fromRank,
@@ -340,7 +381,7 @@ void multigrid::mappings::JacobiSmoother::mergeWithNeighbour(
   logTraceOut( "mergeWithNeighbour(...)" );
 }
 
-void multigrid::mappings::JacobiSmoother::prepareSendToNeighbour(
+void multigrid::mappings::RefinementCriterion::prepareSendToNeighbour(
   multigrid::Vertex&  vertex,
       int                                           toRank,
       const tarch::la::Vector<DIMENSIONS,double>&   x,
@@ -352,7 +393,7 @@ void multigrid::mappings::JacobiSmoother::prepareSendToNeighbour(
   logTraceOut( "prepareSendToNeighbour(...)" );
 }
 
-void multigrid::mappings::JacobiSmoother::prepareCopyToRemoteNode(
+void multigrid::mappings::RefinementCriterion::prepareCopyToRemoteNode(
   multigrid::Vertex&  localVertex,
       int                                           toRank,
       const tarch::la::Vector<DIMENSIONS,double>&   x,
@@ -364,7 +405,7 @@ void multigrid::mappings::JacobiSmoother::prepareCopyToRemoteNode(
   logTraceOut( "prepareCopyToRemoteNode(...)" );
 }
 
-void multigrid::mappings::JacobiSmoother::prepareCopyToRemoteNode(
+void multigrid::mappings::RefinementCriterion::prepareCopyToRemoteNode(
   multigrid::Cell&  localCell,
       int                                           toRank,
       const tarch::la::Vector<DIMENSIONS,double>&   cellCentre,
@@ -376,7 +417,7 @@ void multigrid::mappings::JacobiSmoother::prepareCopyToRemoteNode(
   logTraceOut( "prepareCopyToRemoteNode(...)" );
 }
 
-void multigrid::mappings::JacobiSmoother::mergeWithRemoteDataDueToForkOrJoin(
+void multigrid::mappings::RefinementCriterion::mergeWithRemoteDataDueToForkOrJoin(
   multigrid::Vertex&  localVertex,
   const multigrid::Vertex&  masterOrWorkerVertex,
   int                                       fromRank,
@@ -389,7 +430,7 @@ void multigrid::mappings::JacobiSmoother::mergeWithRemoteDataDueToForkOrJoin(
   logTraceOut( "mergeWithRemoteDataDueToForkOrJoin(...)" );
 }
 
-void multigrid::mappings::JacobiSmoother::mergeWithRemoteDataDueToForkOrJoin(
+void multigrid::mappings::RefinementCriterion::mergeWithRemoteDataDueToForkOrJoin(
   multigrid::Cell&  localCell,
   const multigrid::Cell&  masterOrWorkerCell,
   int                                       fromRank,
@@ -402,7 +443,7 @@ void multigrid::mappings::JacobiSmoother::mergeWithRemoteDataDueToForkOrJoin(
   logTraceOut( "mergeWithRemoteDataDueToForkOrJoin(...)" );
 }
 
-bool multigrid::mappings::JacobiSmoother::prepareSendToWorker(
+bool multigrid::mappings::RefinementCriterion::prepareSendToWorker(
   multigrid::Cell&                 fineGridCell,
   multigrid::Vertex * const        fineGridVertices,
   const peano::grid::VertexEnumerator&                fineGridVerticesEnumerator,
@@ -418,7 +459,7 @@ bool multigrid::mappings::JacobiSmoother::prepareSendToWorker(
   return true;
 }
 
-void multigrid::mappings::JacobiSmoother::prepareSendToMaster(
+void multigrid::mappings::RefinementCriterion::prepareSendToMaster(
   multigrid::Cell&                       localCell,
   multigrid::Vertex *                    vertices,
   const peano::grid::VertexEnumerator&       verticesEnumerator, 
@@ -433,7 +474,7 @@ void multigrid::mappings::JacobiSmoother::prepareSendToMaster(
 }
 
 
-void multigrid::mappings::JacobiSmoother::mergeWithMaster(
+void multigrid::mappings::RefinementCriterion::mergeWithMaster(
   const multigrid::Cell&           workerGridCell,
   multigrid::Vertex * const        workerGridVertices,
  const peano::grid::VertexEnumerator& workerEnumerator,
@@ -454,7 +495,7 @@ void multigrid::mappings::JacobiSmoother::mergeWithMaster(
 }
 
 
-void multigrid::mappings::JacobiSmoother::receiveDataFromMaster(
+void multigrid::mappings::RefinementCriterion::receiveDataFromMaster(
       multigrid::Cell&                        receivedCell, 
       multigrid::Vertex *                     receivedVertices,
       const peano::grid::VertexEnumerator&        receivedVerticesEnumerator,
@@ -472,7 +513,7 @@ void multigrid::mappings::JacobiSmoother::receiveDataFromMaster(
 }
 
 
-void multigrid::mappings::JacobiSmoother::mergeWithWorker(
+void multigrid::mappings::RefinementCriterion::mergeWithWorker(
   multigrid::Cell&           localCell, 
   const multigrid::Cell&     receivedMasterCell,
   const tarch::la::Vector<DIMENSIONS,double>&  cellCentre,
@@ -485,7 +526,7 @@ void multigrid::mappings::JacobiSmoother::mergeWithWorker(
 }
 
 
-void multigrid::mappings::JacobiSmoother::mergeWithWorker(
+void multigrid::mappings::RefinementCriterion::mergeWithWorker(
   multigrid::Vertex&        localVertex,
   const multigrid::Vertex&  receivedMasterVertex,
   const tarch::la::Vector<DIMENSIONS,double>&   x,
@@ -499,7 +540,8 @@ void multigrid::mappings::JacobiSmoother::mergeWithWorker(
 #endif
 
 
-void multigrid::mappings::JacobiSmoother::leaveCell(
+
+void multigrid::mappings::RefinementCriterion::leaveCell(
       multigrid::Cell&           fineGridCell,
       multigrid::Vertex * const  fineGridVertices,
       const peano::grid::VertexEnumerator&          fineGridVerticesEnumerator,
@@ -514,7 +556,7 @@ void multigrid::mappings::JacobiSmoother::leaveCell(
 }
 
 
-void multigrid::mappings::JacobiSmoother::descend(
+void multigrid::mappings::RefinementCriterion::descend(
   multigrid::Cell * const          fineGridCells,
   multigrid::Vertex * const        fineGridVertices,
   const peano::grid::VertexEnumerator&                fineGridVerticesEnumerator,
@@ -528,7 +570,7 @@ void multigrid::mappings::JacobiSmoother::descend(
 }
 
 
-void multigrid::mappings::JacobiSmoother::ascend(
+void multigrid::mappings::RefinementCriterion::ascend(
   multigrid::Cell * const    fineGridCells,
   multigrid::Vertex * const  fineGridVertices,
   const peano::grid::VertexEnumerator&          fineGridVerticesEnumerator,
