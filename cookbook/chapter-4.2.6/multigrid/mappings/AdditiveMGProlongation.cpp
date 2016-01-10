@@ -1,4 +1,4 @@
-#include "multigrid/mappings/HierarchicalTransformAndRHSRestriction.h"
+#include "multigrid/mappings/AdditiveMGProlongation.h"
 #include "multigrid/VertexOperations.h"
 
 
@@ -6,7 +6,7 @@
 /**
  * @todo Please tailor the parameters to your mapping's properties.
  */
-peano::CommunicationSpecification   multigrid::mappings::HierarchicalTransformAndRHSRestriction::communicationSpecification() {
+peano::CommunicationSpecification   multigrid::mappings::AdditiveMGProlongation::communicationSpecification() {
   return peano::CommunicationSpecification(peano::CommunicationSpecification::SendDataAndStateBeforeFirstTouchVertexFirstTime,peano::CommunicationSpecification::SendDataAndStateAfterLastTouchVertexLastTime,false);
 }
 
@@ -14,7 +14,7 @@ peano::CommunicationSpecification   multigrid::mappings::HierarchicalTransformAn
 /**
  * @todo Please tailor the parameters to your mapping's properties.
  */
-peano::MappingSpecification   multigrid::mappings::HierarchicalTransformAndRHSRestriction::touchVertexLastTimeSpecification() {
+peano::MappingSpecification   multigrid::mappings::AdditiveMGProlongation::touchVertexLastTimeSpecification() {
   return peano::MappingSpecification(peano::MappingSpecification::WholeTree,peano::MappingSpecification::RunConcurrentlyOnFineGrid);
 }
 
@@ -22,7 +22,7 @@ peano::MappingSpecification   multigrid::mappings::HierarchicalTransformAndRHSRe
 /**
  * @todo Please tailor the parameters to your mapping's properties.
  */
-peano::MappingSpecification   multigrid::mappings::HierarchicalTransformAndRHSRestriction::touchVertexFirstTimeSpecification() { 
+peano::MappingSpecification   multigrid::mappings::AdditiveMGProlongation::touchVertexFirstTimeSpecification() { 
   return peano::MappingSpecification(peano::MappingSpecification::WholeTree,peano::MappingSpecification::RunConcurrentlyOnFineGrid);
 }
 
@@ -30,7 +30,7 @@ peano::MappingSpecification   multigrid::mappings::HierarchicalTransformAndRHSRe
 /**
  * @todo Please tailor the parameters to your mapping's properties.
  */
-peano::MappingSpecification   multigrid::mappings::HierarchicalTransformAndRHSRestriction::enterCellSpecification() {
+peano::MappingSpecification   multigrid::mappings::AdditiveMGProlongation::enterCellSpecification() {
   return peano::MappingSpecification(peano::MappingSpecification::WholeTree,peano::MappingSpecification::AvoidFineGridRaces);
 }
 
@@ -38,7 +38,7 @@ peano::MappingSpecification   multigrid::mappings::HierarchicalTransformAndRHSRe
 /**
  * @todo Please tailor the parameters to your mapping's properties.
  */
-peano::MappingSpecification   multigrid::mappings::HierarchicalTransformAndRHSRestriction::leaveCellSpecification() {
+peano::MappingSpecification   multigrid::mappings::AdditiveMGProlongation::leaveCellSpecification() {
   return peano::MappingSpecification(peano::MappingSpecification::WholeTree,peano::MappingSpecification::AvoidFineGridRaces);
 }
 
@@ -46,7 +46,7 @@ peano::MappingSpecification   multigrid::mappings::HierarchicalTransformAndRHSRe
 /**
  * @todo Please tailor the parameters to your mapping's properties.
  */
-peano::MappingSpecification   multigrid::mappings::HierarchicalTransformAndRHSRestriction::ascendSpecification() {
+peano::MappingSpecification   multigrid::mappings::AdditiveMGProlongation::ascendSpecification() {
   return peano::MappingSpecification(peano::MappingSpecification::WholeTree,peano::MappingSpecification::AvoidCoarseGridRaces);
 }
 
@@ -54,120 +54,37 @@ peano::MappingSpecification   multigrid::mappings::HierarchicalTransformAndRHSRe
 /**
  * @todo Please tailor the parameters to your mapping's properties.
  */
-peano::MappingSpecification   multigrid::mappings::HierarchicalTransformAndRHSRestriction::descendSpecification() {
+peano::MappingSpecification   multigrid::mappings::AdditiveMGProlongation::descendSpecification() {
   return peano::MappingSpecification(peano::MappingSpecification::WholeTree,peano::MappingSpecification::AvoidCoarseGridRaces);
 }
 
 
-tarch::logging::Log                multigrid::mappings::HierarchicalTransformAndRHSRestriction::_log( "multigrid::mappings::HierarchicalTransformAndRHSRestriction" ); 
+tarch::logging::Log                multigrid::mappings::AdditiveMGProlongation::_log( "multigrid::mappings::AdditiveMGProlongation" ); 
 
 
 
-
-
-void multigrid::mappings::HierarchicalTransformAndRHSRestriction::createHangingVertex(
-  multigrid::Vertex&     fineGridVertex,
-  const tarch::la::Vector<DIMENSIONS,double>&                fineGridX,
-  const tarch::la::Vector<DIMENSIONS,double>&                fineGridH,
-  multigrid::Vertex * const   coarseGridVertices,
-  const peano::grid::VertexEnumerator&      coarseGridVerticesEnumerator,
-  multigrid::Cell&       coarseGridCell,
-  const tarch::la::Vector<DIMENSIONS,int>&                   fineGridPositionOfVertex
-) {
-  logTraceInWith6Arguments( "createHangingVertex(...)", fineGridVertex, fineGridX, fineGridH, coarseGridVerticesEnumerator.toString(), coarseGridCell, fineGridPositionOfVertex );
-
-  fineGridVertex.clearHierarchicalValues();
-
-  logTraceOutWith1Argument( "createHangingVertex(...)", fineGridVertex );
-}
-
-
-
-
-void multigrid::mappings::HierarchicalTransformAndRHSRestriction::touchVertexFirstTime(
-      multigrid::Vertex&               fineGridVertex,
-      const tarch::la::Vector<DIMENSIONS,double>&                          fineGridX,
-      const tarch::la::Vector<DIMENSIONS,double>&                          fineGridH,
-      multigrid::Vertex * const        coarseGridVertices,
-      const peano::grid::VertexEnumerator&                coarseGridVerticesEnumerator,
-      multigrid::Cell&                 coarseGridCell,
-      const tarch::la::Vector<DIMENSIONS,int>&                             fineGridPositionOfVertex
+void multigrid::mappings::AdditiveMGProlongation::touchVertexFirstTime(
+  multigrid::Vertex&               fineGridVertex,
+  const tarch::la::Vector<DIMENSIONS,double>&                          fineGridX,
+  const tarch::la::Vector<DIMENSIONS,double>&                          fineGridH,
+  multigrid::Vertex * const        coarseGridVertices,
+  const peano::grid::VertexEnumerator&                coarseGridVerticesEnumerator,
+  multigrid::Cell&                 coarseGridCell,
+  const tarch::la::Vector<DIMENSIONS,int>&                             fineGridPositionOfVertex
 ) {
   logTraceInWith6Arguments( "touchVertexFirstTime(...)", fineGridVertex, fineGridX, fineGridH, coarseGridVerticesEnumerator.toString(), coarseGridCell, fineGridPositionOfVertex );
 
-  fineGridVertex.clearHierarchicalValues();
+  if (fineGridVertex.isInside()) {
+    const tarch::la::Vector<TWO_POWER_D,double > e_3h  = VertexOperations::readUUpdate(coarseGridVerticesEnumerator,coarseGridVertices);
+    const double                                 Pe_3h = _multigrid.getDLinearInterpolatedValue(e_3h,fineGridPositionOfVertex);
 
-  if ( fineGridVertex.isInside() ) {
-    const tarch::la::Vector<TWO_POWER_D,double > u_3h  = VertexOperations::readU(coarseGridVerticesEnumerator,coarseGridVertices);
-    const double                                 Pu_3h = _multigrid.getDLinearInterpolatedValue(u_3h,fineGridPositionOfVertex);
-
-    fineGridVertex.determineUHierarchical(Pu_3h);
-
-    if (fineGridVertex.getRefinementControl()!=Vertex::Records::Unrefined) {
-      fineGridVertex.clearF();
-    }
+    fineGridVertex.correctU( Pe_3h );
   }
+
+  // hier muss ich auch noch die Level beruecksichtigen. Das kann aber innerhalb der Vertex erfolgen.
 
   logTraceOutWith1Argument( "touchVertexFirstTime(...)", fineGridVertex );
 }
-
-
-void multigrid::mappings::HierarchicalTransformAndRHSRestriction::enterCell(
-      multigrid::Cell&                 fineGridCell,
-      multigrid::Vertex * const        fineGridVertices,
-      const peano::grid::VertexEnumerator&                fineGridVerticesEnumerator,
-      multigrid::Vertex * const        coarseGridVertices,
-      const peano::grid::VertexEnumerator&                coarseGridVerticesEnumerator,
-      multigrid::Cell&                 coarseGridCell,
-      const tarch::la::Vector<DIMENSIONS,int>&                             fineGridPositionOfCell
-) {
-  logTraceInWith4Arguments( "enterCell(...)", fineGridCell, fineGridVerticesEnumerator.toString(), coarseGridCell, fineGridPositionOfCell );
-
-  const tarch::la::Vector<TWO_POWER_D,double> hierarchicalU    =
-     VertexOperations::readHierarchicalU( fineGridVerticesEnumerator, fineGridVertices );
-   const tarch::la::Vector<TWO_POWER_D,double> hierarchicalROld =
-     VertexOperations::readHierarchicalR( fineGridVerticesEnumerator, fineGridVertices );
-   const matrixfree::stencil::ElementWiseAssemblyMatrix A =
-     fineGridCell.getElementsAssemblyMatrix( fineGridVerticesEnumerator.getCellSize() );
-
-   tarch::la::Vector<TWO_POWER_D,double> hierarchicalR = hierarchicalROld - A * hierarchicalU;
-
-   VertexOperations::writeHierarchicalR( fineGridVerticesEnumerator, fineGridVertices, hierarchicalR );
-
-   logTraceOutWith1Argument( "enterCell(...)", fineGridCell );
-}
-
-
-void multigrid::mappings::HierarchicalTransformAndRHSRestriction::touchVertexLastTime(
-      multigrid::Vertex&         fineGridVertex,
-      const tarch::la::Vector<DIMENSIONS,double>&                    fineGridX,
-      const tarch::la::Vector<DIMENSIONS,double>&                    fineGridH,
-      multigrid::Vertex * const  coarseGridVertices,
-      const peano::grid::VertexEnumerator&          coarseGridVerticesEnumerator,
-      multigrid::Cell&           coarseGridCell,
-      const tarch::la::Vector<DIMENSIONS,int>&                       fineGridPositionOfVertex
-) {
-  logTraceInWith6Arguments( "touchVertexLastTime(...)", fineGridVertex, fineGridX, fineGridH, coarseGridVerticesEnumerator.toString(), coarseGridCell, fineGridPositionOfVertex );
-
-  if ( fineGridVertex.isInside() ) {
-    const tarch::la::Vector<TWO_POWER_D, double > P = _multigrid.calculateP(fineGridPositionOfVertex);
-
-    dfor2(k)
-      // There is no need to exclude boundary points here (the rhs does not play
-      // there a role anyway), but it makes the visualisation nicer.
-      if (
-        coarseGridVertices[ coarseGridVerticesEnumerator(k) ].getRefinementControl()==Vertex::Records::Refined
-        &&
-        coarseGridVertices[ coarseGridVerticesEnumerator(k) ].isInside()
-      ) {
-        coarseGridVertices[ coarseGridVerticesEnumerator(k) ].incF(  P(kScalar) * fineGridVertex.getHierarchicalResidual() );
-      }
-    enddforx
-  }
-
-  logTraceOutWith1Argument( "touchVertexLastTime(...)", fineGridVertex );
-}
-
 
 
 
@@ -175,37 +92,53 @@ void multigrid::mappings::HierarchicalTransformAndRHSRestriction::touchVertexLas
 //   NOP
 // =======
 //
-multigrid::mappings::HierarchicalTransformAndRHSRestriction::HierarchicalTransformAndRHSRestriction() {
-  logTraceIn( "HierarchicalTransformAndRHSRestriction()" );
+
+multigrid::mappings::AdditiveMGProlongation::AdditiveMGProlongation() {
+  logTraceIn( "AdditiveMGProlongation()" );
   // @todo Insert your code here
-  logTraceOut( "HierarchicalTransformAndRHSRestriction()" );
+  logTraceOut( "AdditiveMGProlongation()" );
 }
 
 
-multigrid::mappings::HierarchicalTransformAndRHSRestriction::~HierarchicalTransformAndRHSRestriction() {
-  logTraceIn( "~HierarchicalTransformAndRHSRestriction()" );
+multigrid::mappings::AdditiveMGProlongation::~AdditiveMGProlongation() {
+  logTraceIn( "~AdditiveMGProlongation()" );
   // @todo Insert your code here
-  logTraceOut( "~HierarchicalTransformAndRHSRestriction()" );
+  logTraceOut( "~AdditiveMGProlongation()" );
 }
 
 
 #if defined(SharedMemoryParallelisation)
-multigrid::mappings::HierarchicalTransformAndRHSRestriction::HierarchicalTransformAndRHSRestriction(const HierarchicalTransformAndRHSRestriction&  masterThread) {
-  logTraceIn( "HierarchicalTransformAndRHSRestriction(HierarchicalTransformAndRHSRestriction)" );
+multigrid::mappings::AdditiveMGProlongation::AdditiveMGProlongation(const AdditiveMGProlongation&  masterThread) {
+  logTraceIn( "AdditiveMGProlongation(AdditiveMGProlongation)" );
   // @todo Insert your code here
-  logTraceOut( "HierarchicalTransformAndRHSRestriction(HierarchicalTransformAndRHSRestriction)" );
+  logTraceOut( "AdditiveMGProlongation(AdditiveMGProlongation)" );
 }
 
 
-void multigrid::mappings::HierarchicalTransformAndRHSRestriction::mergeWithWorkerThread(const HierarchicalTransformAndRHSRestriction& workerThread) {
-  logTraceIn( "mergeWithWorkerThread(HierarchicalTransformAndRHSRestriction)" );
+void multigrid::mappings::AdditiveMGProlongation::mergeWithWorkerThread(const AdditiveMGProlongation& workerThread) {
+  logTraceIn( "mergeWithWorkerThread(AdditiveMGProlongation)" );
   // @todo Insert your code here
-  logTraceOut( "mergeWithWorkerThread(HierarchicalTransformAndRHSRestriction)" );
+  logTraceOut( "mergeWithWorkerThread(AdditiveMGProlongation)" );
 }
 #endif
 
 
-void multigrid::mappings::HierarchicalTransformAndRHSRestriction::destroyHangingVertex(
+void multigrid::mappings::AdditiveMGProlongation::createHangingVertex(
+      multigrid::Vertex&     fineGridVertex,
+      const tarch::la::Vector<DIMENSIONS,double>&                fineGridX,
+      const tarch::la::Vector<DIMENSIONS,double>&                fineGridH,
+      multigrid::Vertex * const   coarseGridVertices,
+      const peano::grid::VertexEnumerator&      coarseGridVerticesEnumerator,
+      multigrid::Cell&       coarseGridCell,
+      const tarch::la::Vector<DIMENSIONS,int>&                   fineGridPositionOfVertex
+) {
+  logTraceInWith6Arguments( "createHangingVertex(...)", fineGridVertex, fineGridX, fineGridH, coarseGridVerticesEnumerator.toString(), coarseGridCell, fineGridPositionOfVertex );
+  // @todo Insert your code here
+  logTraceOutWith1Argument( "createHangingVertex(...)", fineGridVertex );
+}
+
+
+void multigrid::mappings::AdditiveMGProlongation::destroyHangingVertex(
       const multigrid::Vertex&   fineGridVertex,
       const tarch::la::Vector<DIMENSIONS,double>&                    fineGridX,
       const tarch::la::Vector<DIMENSIONS,double>&                    fineGridH,
@@ -220,7 +153,7 @@ void multigrid::mappings::HierarchicalTransformAndRHSRestriction::destroyHanging
 }
 
 
-void multigrid::mappings::HierarchicalTransformAndRHSRestriction::createInnerVertex(
+void multigrid::mappings::AdditiveMGProlongation::createInnerVertex(
       multigrid::Vertex&               fineGridVertex,
       const tarch::la::Vector<DIMENSIONS,double>&                          fineGridX,
       const tarch::la::Vector<DIMENSIONS,double>&                          fineGridH,
@@ -235,7 +168,7 @@ void multigrid::mappings::HierarchicalTransformAndRHSRestriction::createInnerVer
 }
 
 
-void multigrid::mappings::HierarchicalTransformAndRHSRestriction::createBoundaryVertex(
+void multigrid::mappings::AdditiveMGProlongation::createBoundaryVertex(
       multigrid::Vertex&               fineGridVertex,
       const tarch::la::Vector<DIMENSIONS,double>&                          fineGridX,
       const tarch::la::Vector<DIMENSIONS,double>&                          fineGridH,
@@ -250,7 +183,7 @@ void multigrid::mappings::HierarchicalTransformAndRHSRestriction::createBoundary
 }
 
 
-void multigrid::mappings::HierarchicalTransformAndRHSRestriction::destroyVertex(
+void multigrid::mappings::AdditiveMGProlongation::destroyVertex(
       const multigrid::Vertex&   fineGridVertex,
       const tarch::la::Vector<DIMENSIONS,double>&                    fineGridX,
       const tarch::la::Vector<DIMENSIONS,double>&                    fineGridH,
@@ -265,7 +198,7 @@ void multigrid::mappings::HierarchicalTransformAndRHSRestriction::destroyVertex(
 }
 
 
-void multigrid::mappings::HierarchicalTransformAndRHSRestriction::createCell(
+void multigrid::mappings::AdditiveMGProlongation::createCell(
       multigrid::Cell&                 fineGridCell,
       multigrid::Vertex * const        fineGridVertices,
       const peano::grid::VertexEnumerator&                fineGridVerticesEnumerator,
@@ -280,7 +213,7 @@ void multigrid::mappings::HierarchicalTransformAndRHSRestriction::createCell(
 }
 
 
-void multigrid::mappings::HierarchicalTransformAndRHSRestriction::destroyCell(
+void multigrid::mappings::AdditiveMGProlongation::destroyCell(
       const multigrid::Cell&           fineGridCell,
       multigrid::Vertex * const        fineGridVertices,
       const peano::grid::VertexEnumerator&                fineGridVerticesEnumerator,
@@ -295,7 +228,7 @@ void multigrid::mappings::HierarchicalTransformAndRHSRestriction::destroyCell(
 }
 
 #ifdef Parallel
-void multigrid::mappings::HierarchicalTransformAndRHSRestriction::mergeWithNeighbour(
+void multigrid::mappings::AdditiveMGProlongation::mergeWithNeighbour(
   multigrid::Vertex&  vertex,
   const multigrid::Vertex&  neighbour,
   int                                           fromRank,
@@ -308,7 +241,7 @@ void multigrid::mappings::HierarchicalTransformAndRHSRestriction::mergeWithNeigh
   logTraceOut( "mergeWithNeighbour(...)" );
 }
 
-void multigrid::mappings::HierarchicalTransformAndRHSRestriction::prepareSendToNeighbour(
+void multigrid::mappings::AdditiveMGProlongation::prepareSendToNeighbour(
   multigrid::Vertex&  vertex,
       int                                           toRank,
       const tarch::la::Vector<DIMENSIONS,double>&   x,
@@ -320,7 +253,7 @@ void multigrid::mappings::HierarchicalTransformAndRHSRestriction::prepareSendToN
   logTraceOut( "prepareSendToNeighbour(...)" );
 }
 
-void multigrid::mappings::HierarchicalTransformAndRHSRestriction::prepareCopyToRemoteNode(
+void multigrid::mappings::AdditiveMGProlongation::prepareCopyToRemoteNode(
   multigrid::Vertex&  localVertex,
       int                                           toRank,
       const tarch::la::Vector<DIMENSIONS,double>&   x,
@@ -332,7 +265,7 @@ void multigrid::mappings::HierarchicalTransformAndRHSRestriction::prepareCopyToR
   logTraceOut( "prepareCopyToRemoteNode(...)" );
 }
 
-void multigrid::mappings::HierarchicalTransformAndRHSRestriction::prepareCopyToRemoteNode(
+void multigrid::mappings::AdditiveMGProlongation::prepareCopyToRemoteNode(
   multigrid::Cell&  localCell,
       int                                           toRank,
       const tarch::la::Vector<DIMENSIONS,double>&   cellCentre,
@@ -344,7 +277,7 @@ void multigrid::mappings::HierarchicalTransformAndRHSRestriction::prepareCopyToR
   logTraceOut( "prepareCopyToRemoteNode(...)" );
 }
 
-void multigrid::mappings::HierarchicalTransformAndRHSRestriction::mergeWithRemoteDataDueToForkOrJoin(
+void multigrid::mappings::AdditiveMGProlongation::mergeWithRemoteDataDueToForkOrJoin(
   multigrid::Vertex&  localVertex,
   const multigrid::Vertex&  masterOrWorkerVertex,
   int                                       fromRank,
@@ -357,7 +290,7 @@ void multigrid::mappings::HierarchicalTransformAndRHSRestriction::mergeWithRemot
   logTraceOut( "mergeWithRemoteDataDueToForkOrJoin(...)" );
 }
 
-void multigrid::mappings::HierarchicalTransformAndRHSRestriction::mergeWithRemoteDataDueToForkOrJoin(
+void multigrid::mappings::AdditiveMGProlongation::mergeWithRemoteDataDueToForkOrJoin(
   multigrid::Cell&  localCell,
   const multigrid::Cell&  masterOrWorkerCell,
   int                                       fromRank,
@@ -370,7 +303,7 @@ void multigrid::mappings::HierarchicalTransformAndRHSRestriction::mergeWithRemot
   logTraceOut( "mergeWithRemoteDataDueToForkOrJoin(...)" );
 }
 
-bool multigrid::mappings::HierarchicalTransformAndRHSRestriction::prepareSendToWorker(
+bool multigrid::mappings::AdditiveMGProlongation::prepareSendToWorker(
   multigrid::Cell&                 fineGridCell,
   multigrid::Vertex * const        fineGridVertices,
   const peano::grid::VertexEnumerator&                fineGridVerticesEnumerator,
@@ -386,7 +319,7 @@ bool multigrid::mappings::HierarchicalTransformAndRHSRestriction::prepareSendToW
   return true;
 }
 
-void multigrid::mappings::HierarchicalTransformAndRHSRestriction::prepareSendToMaster(
+void multigrid::mappings::AdditiveMGProlongation::prepareSendToMaster(
   multigrid::Cell&                       localCell,
   multigrid::Vertex *                    vertices,
   const peano::grid::VertexEnumerator&       verticesEnumerator, 
@@ -401,7 +334,7 @@ void multigrid::mappings::HierarchicalTransformAndRHSRestriction::prepareSendToM
 }
 
 
-void multigrid::mappings::HierarchicalTransformAndRHSRestriction::mergeWithMaster(
+void multigrid::mappings::AdditiveMGProlongation::mergeWithMaster(
   const multigrid::Cell&           workerGridCell,
   multigrid::Vertex * const        workerGridVertices,
  const peano::grid::VertexEnumerator& workerEnumerator,
@@ -422,7 +355,7 @@ void multigrid::mappings::HierarchicalTransformAndRHSRestriction::mergeWithMaste
 }
 
 
-void multigrid::mappings::HierarchicalTransformAndRHSRestriction::receiveDataFromMaster(
+void multigrid::mappings::AdditiveMGProlongation::receiveDataFromMaster(
       multigrid::Cell&                        receivedCell, 
       multigrid::Vertex *                     receivedVertices,
       const peano::grid::VertexEnumerator&        receivedVerticesEnumerator,
@@ -440,7 +373,7 @@ void multigrid::mappings::HierarchicalTransformAndRHSRestriction::receiveDataFro
 }
 
 
-void multigrid::mappings::HierarchicalTransformAndRHSRestriction::mergeWithWorker(
+void multigrid::mappings::AdditiveMGProlongation::mergeWithWorker(
   multigrid::Cell&           localCell, 
   const multigrid::Cell&     receivedMasterCell,
   const tarch::la::Vector<DIMENSIONS,double>&  cellCentre,
@@ -453,7 +386,7 @@ void multigrid::mappings::HierarchicalTransformAndRHSRestriction::mergeWithWorke
 }
 
 
-void multigrid::mappings::HierarchicalTransformAndRHSRestriction::mergeWithWorker(
+void multigrid::mappings::AdditiveMGProlongation::mergeWithWorker(
   multigrid::Vertex&        localVertex,
   const multigrid::Vertex&  receivedMasterVertex,
   const tarch::la::Vector<DIMENSIONS,double>&   x,
@@ -467,7 +400,37 @@ void multigrid::mappings::HierarchicalTransformAndRHSRestriction::mergeWithWorke
 #endif
 
 
-void multigrid::mappings::HierarchicalTransformAndRHSRestriction::leaveCell(
+void multigrid::mappings::AdditiveMGProlongation::touchVertexLastTime(
+      multigrid::Vertex&         fineGridVertex,
+      const tarch::la::Vector<DIMENSIONS,double>&                    fineGridX,
+      const tarch::la::Vector<DIMENSIONS,double>&                    fineGridH,
+      multigrid::Vertex * const  coarseGridVertices,
+      const peano::grid::VertexEnumerator&          coarseGridVerticesEnumerator,
+      multigrid::Cell&           coarseGridCell,
+      const tarch::la::Vector<DIMENSIONS,int>&                       fineGridPositionOfVertex
+) {
+  logTraceInWith6Arguments( "touchVertexLastTime(...)", fineGridVertex, fineGridX, fineGridH, coarseGridVerticesEnumerator.toString(), coarseGridCell, fineGridPositionOfVertex );
+  // @todo Insert your code here
+  logTraceOutWith1Argument( "touchVertexLastTime(...)", fineGridVertex );
+}
+
+
+void multigrid::mappings::AdditiveMGProlongation::enterCell(
+      multigrid::Cell&                 fineGridCell,
+      multigrid::Vertex * const        fineGridVertices,
+      const peano::grid::VertexEnumerator&                fineGridVerticesEnumerator,
+      multigrid::Vertex * const        coarseGridVertices,
+      const peano::grid::VertexEnumerator&                coarseGridVerticesEnumerator,
+      multigrid::Cell&                 coarseGridCell,
+      const tarch::la::Vector<DIMENSIONS,int>&                             fineGridPositionOfCell
+) {
+  logTraceInWith4Arguments( "enterCell(...)", fineGridCell, fineGridVerticesEnumerator.toString(), coarseGridCell, fineGridPositionOfCell );
+  // @todo Insert your code here
+  logTraceOutWith1Argument( "enterCell(...)", fineGridCell );
+}
+
+
+void multigrid::mappings::AdditiveMGProlongation::leaveCell(
       multigrid::Cell&           fineGridCell,
       multigrid::Vertex * const  fineGridVertices,
       const peano::grid::VertexEnumerator&          fineGridVerticesEnumerator,
@@ -482,7 +445,7 @@ void multigrid::mappings::HierarchicalTransformAndRHSRestriction::leaveCell(
 }
 
 
-void multigrid::mappings::HierarchicalTransformAndRHSRestriction::beginIteration(
+void multigrid::mappings::AdditiveMGProlongation::beginIteration(
   multigrid::State&  solverState
 ) {
   logTraceInWith1Argument( "beginIteration(State)", solverState );
@@ -491,7 +454,7 @@ void multigrid::mappings::HierarchicalTransformAndRHSRestriction::beginIteration
 }
 
 
-void multigrid::mappings::HierarchicalTransformAndRHSRestriction::endIteration(
+void multigrid::mappings::AdditiveMGProlongation::endIteration(
   multigrid::State&  solverState
 ) {
   logTraceInWith1Argument( "endIteration(State)", solverState );
@@ -501,7 +464,7 @@ void multigrid::mappings::HierarchicalTransformAndRHSRestriction::endIteration(
 
 
 
-void multigrid::mappings::HierarchicalTransformAndRHSRestriction::descend(
+void multigrid::mappings::AdditiveMGProlongation::descend(
   multigrid::Cell * const          fineGridCells,
   multigrid::Vertex * const        fineGridVertices,
   const peano::grid::VertexEnumerator&                fineGridVerticesEnumerator,
@@ -515,7 +478,7 @@ void multigrid::mappings::HierarchicalTransformAndRHSRestriction::descend(
 }
 
 
-void multigrid::mappings::HierarchicalTransformAndRHSRestriction::ascend(
+void multigrid::mappings::AdditiveMGProlongation::ascend(
   multigrid::Cell * const    fineGridCells,
   multigrid::Vertex * const  fineGridVertices,
   const peano::grid::VertexEnumerator&          fineGridVerticesEnumerator,
