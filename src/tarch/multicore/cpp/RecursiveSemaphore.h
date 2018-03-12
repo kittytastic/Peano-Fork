@@ -2,18 +2,12 @@
 // use, please see the copyright notice at www.peano-framework.org
 #include "tarch/multicore/MulticoreDefinitions.h"
 
-#include "tarch/multicore/cpp/RecursiveSemaphore.h"
-#include "tarch/multicore/tbb/RecursiveSemaphore.h"
-
-
-#if !defined(_TARCH_MULTICORE_RECURSIVE_SEMAPHORE_H_) && !defined(SharedMemoryParallelisation)
+#if !defined(_TARCH_MULTICORE_RECURSIVE_SEMAPHORE_H_) && defined(SharedCPP)
 #define _TARCH_MULTICORE_RECURSIVE_SEMAPHORE_H_
 
 #include <string>
 #include <thread>
-
-#include "tarch/multicore/BooleanSemaphore.h"
-#include "tarch/logging/Log.h"
+#include <mutex>
 
 
 namespace tarch {
@@ -22,7 +16,6 @@ namespace tarch {
     class RecursiveLock;
   }
 }
-
 
 
 /**
@@ -37,6 +30,8 @@ namespace tarch {
 class tarch::multicore::RecursiveSemaphore {
   private:
     friend class tarch::multicore::RecursiveLock;
+
+    std::recursive_mutex  _recursiveMutex;
 
     /**
      * Waits until I can enter the critical section.
