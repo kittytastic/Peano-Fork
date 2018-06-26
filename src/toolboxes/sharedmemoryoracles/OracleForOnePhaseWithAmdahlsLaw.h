@@ -1,11 +1,12 @@
 // This file is part of the Peano project. For conditions of distribution and
 // use, please see the copyright notice at www.peano-framework.org
-#ifndef _SHARED_MEMORY_ORAClES_ORACLE_FOR_ONE_PHASE_WITH_GRAIN_SIZE_SAMPLING_H_
-#define _SHARED_MEMORY_ORAClES_ORACLE_FOR_ONE_PHASE_WITH_GRAIN_SIZE_SAMPLING_H_
+#ifndef _SHARED_MEMORY_ORAClES_ORACLE_FOR_ONE_PHASE_WITH_AMDAHLS_LAW_H_
+#define _SHARED_MEMORY_ORAClES_ORACLE_FOR_ONE_PHASE_WITH_AMDAHLS_LAW_H_
 
 
 #include "tarch/logging/Log.h"
 #include "peano/datatraversal/autotuning/OracleForOnePhase.h"
+#include "peano/performanceanalysis/SpeedupLaws.h"
 #include "tarch/timing/Measurement.h"
 
 
@@ -14,7 +15,7 @@
 
 
 namespace sharedmemoryoracles {
-  class OracleForOnePhaseWithGrainSizeSampling;
+  class OracleForOnePhaseWithAmdahlsLaw;
 }
 
 
@@ -41,41 +42,18 @@ namespace sharedmemoryoracles {
  *
  * @author Tobias Weinzierl
  */
-class sharedmemoryoracles::OracleForOnePhaseWithGrainSizeSampling: public peano::datatraversal::autotuning::OracleForOnePhase {
+class sharedmemoryoracles::OracleForOnePhaseWithAmdahlsLaw: public peano::datatraversal::autotuning::OracleForOnePhase {
   private:
     static tarch::logging::Log  _log;
-
-    /**
-     * What do we consider to be an exact value.
-     */
-    static const double ExactValue;
+    static constexpr int MinSampleInterval = 2;
 
     struct DataBaseEntry {
-      private:
-        /**
-         * First entry is the number of the bin, the second one is the grain size represented by this bin
-         */
-        int getBin( int problemSize, int currentBin ) const;
+      peano::performanceanalysis::SpeedupLaws   _statistics;
 
-        int getGrainSize(int bin) const;
-      public:
-        const int                                _numberOfSamples;
-        const bool                               _logarithmicDistribution;
+      int _optimalGrainSize;
+      int _maxProblemSize;
 
-        /**
-         * Map each bin onto one measurement
-         */
-        std::vector<tarch::timing::Measurement>   _measurements;
-        int                                       _maxProblemSize;
-
-
-        DataBaseEntry();
-        DataBaseEntry(int numberOfSamples, bool logarithmicDistribution, int problemSizeForFirstRequest);
-        void ensureThatRequestIsCoveredBySamplingRange(int problemSize);
-        bool requiresMoreData(int problemSize,int currentBin) const;
-        int getGrainSize(int problemSize,int currentBin) const;
-        void updateMeasurement(int problemSize,int currentBin,double value);
-        std::string toString() const;
+      DataBaseEntry();
     };
 
 
@@ -84,24 +62,16 @@ class sharedmemoryoracles::OracleForOnePhaseWithGrainSizeSampling: public peano:
      */
     typedef std::map< peano::datatraversal::autotuning::MethodTrace, DataBaseEntry >    ExecutionTimeDatabase;
 
-    ExecutionTimeDatabase                _executionTimes;
+    ExecutionTimeDatabase                   _executionTimeDatabase;
 
-    /**
-     * Per iteration we do sample only one bin
-     */
-    int                                  _currentBin;
-
-    const int                            _numberOfSamples;
-    const bool                           _logarithmicDistribution;
+    int                                     _sampleEveryXQueries;
+    int                                     _sampleCounter;
   public:
     /**
-     * @param numberOfSamples The number of samples that the Oracle will use.
-     * @param logarithmicDistribution Decides whether the samples will be distributed in an logarithmic (true) or
-     * an equidistant (false) way.
      */
-    OracleForOnePhaseWithGrainSizeSampling(int numberOfSamples, bool logarithmicDistribution, int adapterNumber=-1);
+    OracleForOnePhaseWithAmdahlsLaw();
 
-    virtual ~OracleForOnePhaseWithGrainSizeSampling();
+    virtual ~OracleForOnePhaseWithAmdahlsLaw();
 
     peano::datatraversal::autotuning::GrainSize parallelise(int problemSize, peano::datatraversal::autotuning::MethodTrace askingMethod) override;
 
