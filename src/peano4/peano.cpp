@@ -1,8 +1,6 @@
 #include "peano.h"
 
-
 #include "peano4/utils/Loop.h"
-
 
 #include "tarch/multicore/MulticoreDefinitions.h"
 
@@ -67,3 +65,4 @@ void peano4::shutdownSharedMemoryEnvironment() {
   tarch::multicore::Core::getInstance().shutDown();
   #endif
 }
+
