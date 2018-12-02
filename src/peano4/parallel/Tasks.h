@@ -1,26 +1,19 @@
 // This file is part of the Peano project. For conditions of distribution and
 // use, please see the copyright notice at www.peano-framework.org
-#ifndef _PEANO_DATA_TRAVERSAL_TASK_SET_H_
-#define _PEANO_DATA_TRAVERSAL_TASK_SET_H_
+#ifndef _PEANO4_PARALLEL_TASKS_H_
+#define _PEANO4_PARALLEL_TASKS_H_
 
-#include "tarch/multicore/MulticoreDefinitions.h"
+
 #include "tarch/logging/Log.h"
-#include "peano/performanceanalysis/Analysis.h"
+#include "tarch/multicore/Tasks.h"
 
 
 #include <functional>
-#include "../../tarch/multicore/Tasks.h"
 
 
-#if defined(TBBInvade)
-#include "shminvade/SHMInvade.h"
-#endif
-
-
-
-namespace peano {
-  namespace datatraversal {
-    class TaskSet;
+namespace peano4 {
+  namespace parallel {
+    class Tasks;
   }
 }
 
@@ -55,7 +48,7 @@ namespace peano {
  * holding pointers too moves around.
  *
  * If you want to get data back from a background tasks, you have to take into
- * account that the task you hand over to the TaskSet constructor is not directly executed
+ * account that the task you hand over to the Tasks constructor is not directly executed
  *   if you declare it as background task.
  *   Instead, the runtime system makes a copy of your functor/task, stores it
  *   safely away and executes this one. That means once you hand over a
@@ -99,72 +92,41 @@ while (!taskHasTerminated) {
  * terminate. Jobs in turn might internally wait for further input data. As a
  * consequence, jobs easily deadlock. Tasks are a special case of jobs.
  *
- * The name TaskSet consequently is not perfect. It should be JobSet. Anyway, you
+ * The name Tasks consequently is not perfect. It should be JobSet. Anyway, you
  * can always tell Peano whether a job you pass is actually a task. If it is a
  * task, Peano can optimise the execution pattern.
  *
  * @author Tobias Weinzierl
  */
-class peano::datatraversal::TaskSet {
+class peano4::parallel::Tasks {
   public:
     enum class TaskType {
       /**
        * Job does not depend on any other job or input or IO at all. Peano
-       * runs it as soon as possible. If you use this arguments for TaskSet
+       * runs it as soon as possible. If you use this arguments for Tasks
        * with a single task, it does not really make sense: The whole thing
        * become a direct function call. Otherwise, eapch call is deployed to
        * its own task.
        */
-      IsTaskAndRunImmediately,
-	  IsBandwidthBoundTask,
+      Task,
 	  /**
-	   * Not different to IsTaskAndRunImmediately if used in a construct with 
-       * multiple functors. If you use only the single functor, it usually 
-       * behaves the same as IsTaskAndRunImmediately, but technically it 
-       * launches a new task, i.e. something else might squeeze in-between.
+	   * This is a background task which is bandwidth bound. Not too many of
+	   * these guys should run in parallel.
 	   */
-	  IsTaskAndRunAsSoonAsPossible,
-      /**
-       * A classic background task that is processed any time Peano thinks it
-       * to be appropriate. You can set an upper bound on the number of 
-       * background tasks that run concurrently. See tarch::multicore::jobs.
-       *
-       * Please note that job passed has to be a task. See class documentation
-       * on the difference between jobs and tasks.
-       */
-  	  Background,
-      /**
-       * Used by Peano's grid management.
-       */
-	  LoadCells,
-      /**
-       * Used by Peano's grid management.
-       */
-	  LoadVertices,
-      /**
-       * Used by Peano's grid management.
-       */
-	  TriggerEvents,
-      /**
-       * Used by Peano's grid management.
-       */
-	  StoreCells,
-      /**
-       * Used by Peano's grid management.
-       */
-	  StoreVertices
+	  HighBandwidthTask,
+	  HighPriorityTask
     };
   private:
     static tarch::logging::Log  _log;
 
-    static int                               translateIntoJobClass( TaskType type );
-    static tarch::multicore::jobs::JobType   translateIntoJobType( TaskType type );
-
-    #if defined(TBBInvade)
-    static shminvade::SHMInvade*  _backgroundTaskInvade;
-    #endif
-
+    static int                  _locationCounter;
   public:
+    /**
+     * Codes create an identifier (int) per parallel region through this
+     * operation. This identifier then can be used internally for autotuning.
+     */
+    static int getLocationIdentifier(const std::string&  trace);
+
     /**
      * Spawn One Task
      *
@@ -206,7 +168,7 @@ public:
      * This task then is used as follows:
      * <pre>
 PredictionTask predictionTask( myPointer, cellDescription );
-peano::datatraversal::TaskSet spawnedSet( predictionTask, peano::datatraversal::TaskSet::TaskType::Background  );
+peano::datatraversal::Tasks spawnedSet( predictionTask, peano::datatraversal::Tasks::TaskType::Background  );
        </pre>
      *
      *
@@ -217,12 +179,12 @@ peano::datatraversal::TaskSet spawnedSet( predictionTask, peano::datatraversal::
      * defined functor:
      *
      * <pre>
-peano::datatraversal::TaskSet backgroundTask(
+peano::datatraversal::Tasks backgroundTask(
   [=] () -> bool {
     // do something
     return false; // don't want to repeat this one forever
   },
-  peano::datatraversal::TaskSet::TaskType::Background
+  peano::datatraversal::Tasks::TaskType::Background
 );
        </pre>
      *
@@ -235,60 +197,36 @@ peano::datatraversal::TaskSet backgroundTask(
      * your routine checks whether the tasks are all complete before it
      * terminates.
      */
-    TaskSet(
-      std::function<bool()>&&  task,
-      TaskType                 taskType
+    Tasks(
+      std::function<bool()>&  task,
+      TaskType                taskType,
+	  int                     location
     );
 
+
     /**
-     * Alternative to other TaskSet constructor. Ownership goes to TaskSet
+     * Alternative to other Tasks constructor. Ownership goes to Tasks
      * class, i.e. you don't have to delete it.
      */
-    template <typename T>
-    TaskSet(
-      T*                      myTask,
-      TaskType                taskType
-    ) {
-      if (taskType==peano::datatraversal::TaskSet::TaskType::Background) {
-        peano::performanceanalysis::Analysis::getInstance().minuteNumberOfBackgroundTasks(
-          tarch::multicore::jobs::getNumberOfWaitingBackgroundJobs()
-        );
-      }
-      tarch::multicore::jobs::spawn( new tarch::multicore::jobs::GenericJobWithPointer<T>(myTask,translateIntoJobType(taskType),translateIntoJobClass(taskType) ) );
-    }
+    Tasks(
+      tarch::multicore::Task*  task,
+      TaskType                 type,
+	  int                      location
+    );
 
 
-    /**
-     * Third alternative to other TaskSet constructors.
-     *
-     * Ownership goes to TaskSet class, i.e. you don't have to delete it.
-     * Basically all in here is a simple wrapper around the tarch. Allows you
-     * to pass Jobs that also provide prefetch routines, e.g.
-     *
-     * <h2> Usage </h2>
-     *
-     * - Create a new subclass of tarch::multicore::jobs::Job.
-     * - Ensure it has type tarch::multicore::jobs::JobType::BackgroundTask or
-     *   the bandwidth variation is passed to the superclass in its constructor
-     * - Create it via new in the calling code
-     * - Pass the instance to this constructor
-     */
-    TaskSet(
-      tarch::multicore::jobs::Job*  job
-    ) {
-      peano::performanceanalysis::Analysis::getInstance().minuteNumberOfBackgroundTasks(
-        tarch::multicore::jobs::getNumberOfWaitingBackgroundJobs()
-      );
-      tarch::multicore::jobs::spawn( job );
-    }
-
+    Tasks(
+      const std::vector< tarch::multicore::Task* >& tasks,
+      TaskType                 type,
+	  int                      location
+    );
 
     /**
      * Invoke operations in parallel. Works fine with lambda
      * expressions:
      *
      * <pre>
-peano::datatraversal::TaskSet runParallelTasks(
+peano::datatraversal::Tasks runParallelTasks(
   [&]() -> bool {
    ...
   },
@@ -303,52 +241,45 @@ peano::datatraversal::TaskSet runParallelTasks(
      * Please do not invoke any background threads through this operation. In
      * return, you can use catching via the reference operator.
      */
-    TaskSet(
+/*
+    Tasks(
       std::function<bool ()>&&  function1,
       std::function<bool ()>&&  function2,
-	  TaskType                  taskType1,
-	  TaskType                  taskType2,
-      bool                      parallelise
+	  TaskType                  taskType,
+      int                       location
     );
+*/
 
-    TaskSet(
+/*
+    Tasks(
       std::function<bool ()>&& function1,
       std::function<bool ()>&& function2,
       std::function<bool ()>&& function3,
-	  TaskType                 taskType1,
-	  TaskType                 taskType2,
-	  TaskType                 taskType3,
-      bool                     parallelise
+	  TaskType                 taskType,
+      int                      location
     );
 
-    TaskSet(
+    Tasks(
       std::function<bool ()>&& function1,
       std::function<bool ()>&& function2,
       std::function<bool ()>&& function3,
       std::function<bool ()>&& function4,
-	  TaskType                 taskType1,
-	  TaskType                 taskType2,
-	  TaskType                 taskType3,
-	  TaskType                 taskType4,
-      bool                     parallelise
+	  TaskType                 taskType,
+	  int                      location
     );
 
-    TaskSet(
+    Tasks(
       std::function<bool ()>&& function1,
       std::function<bool ()>&& function2,
       std::function<bool ()>&& function3,
       std::function<bool ()>&& function4,
       std::function<bool ()>&& function5,
-	  TaskType                 taskType1,
-	  TaskType                 taskType2,
-	  TaskType                 taskType3,
-	  TaskType                 taskType4,
-	  TaskType                 taskType5,
-      bool                     parallelise
+	  TaskType                 taskType,
+      int                      location
     );
 
 
-    TaskSet(
+    Tasks(
       std::function<bool ()>&& function1,
       std::function<bool ()>&& function2,
       std::function<bool ()>&& function3,
@@ -361,50 +292,10 @@ peano::datatraversal::TaskSet runParallelTasks(
       std::function<bool ()>&& function10,
       std::function<bool ()>&& function11,
       std::function<bool ()>&& function12,
-	  TaskType                 taskType1,
-	  TaskType                 taskType2,
-	  TaskType                 taskType3,
-	  TaskType                 taskType4,
-	  TaskType                 taskType5,
-	  TaskType                 taskType6,
-	  TaskType                 taskType7,
-	  TaskType                 taskType8,
-	  TaskType                 taskType9,
-	  TaskType                 taskType10,
-	  TaskType                 taskType11,
-	  TaskType                 taskType12,
-      bool                     parallelise
+	  TaskType                 taskType,
+      int                      location
     );
-
-    /**
-     * <h2> Use waitFor within busy waiting loop </h2>
-     *
-     * waitForXXX is often used within while loops actually implementing busy
-     * waiting. In principle, that's what the waits have been designed for.
-     * However, there's one pitfall: If a job from class K splits up into many
-     * other jobs of class K, none of these jobs may wait for the other class
-     * K jobs to complete. In general, no job shall ever wait for jobs of the
-     * same class.
-     *
-     * The reason is that we allow Peano's tasking systems to grab multiple
-     * jobs of one class in one rush and process them en block. If jobs wait
-     * for their own class, it might happen that one hardware thread graps
-     * 10 jobs of class K, removes them from the job queue, starts to run the
-     * first job, and then deadlocks as the first one is waiting for the
-     * other nine guys.
-     */
-    static void waitForLoadCellsTask();
-	static void waitForLoadVerticesTask();
-	static void waitForEventTask();
-	static void waitForStoreCellsTask();
-	static void waitForStoreVerticesTask();
-
-	/**
-	 * There is such a routine in Peano's tarch as well. This essentially is a
-	 * wrapper which however also keeps track of the statistics.
-	 */
-	static void startToProcessBackgroundJobs();
-	static bool finishToProcessBackgroundJobs();
+*/
 };
 
 

@@ -1,127 +1,111 @@
-#include "peano/datatraversal/TaskSet.h"
+#include "peano4/parallel/Tasks.h"
 
-
-#include <chrono>
-#include <thread>
-
-#include "../../tarch/multicore/Tasks.h"
 
 #include "tarch/Assertions.h"
+#include "tarch/multicore/Tasks.h"
 
 
+tarch::logging::Log  peano4::parallel::Tasks::_log( "peano4::parallel::Tasks" );
+int                  peano4::parallel::Tasks::_locationCounter(0);
 
-tarch::logging::Log  peano::datatraversal::TaskSet::_log( "peano::datatraversal::TaskSet" );
+
+int peano4::parallel::Tasks::getLocationIdentifier(const std::string&  trace) {
+  _locationCounter++;
+  return _locationCounter-1;
+}
 
 
 #if defined(TBBInvade)
 #include "tarch/multicore/Core.h"
 
 
-shminvade::SHMInvade*  peano::datatraversal::TaskSet::_backgroundTaskInvade = nullptr;
+shminvade::SHMInvade*  peano4::parallel::Tasks::_backgroundTaskInvade = nullptr;
 #endif
 
 
-
-int  peano::datatraversal::TaskSet::translateIntoJobClass( TaskType type ) {
-  const int Default = 7;
-  switch ( type ) {
-    case TaskType::IsTaskAndRunAsSoonAsPossible:
-   	  return 0;
-    case TaskType::IsTaskAndRunImmediately:
-     	  return Default;
-    case TaskType::LoadCells:
- 	  return 1;
-    case TaskType::LoadVertices:
- 	  return 2;
-    case TaskType::TriggerEvents:
- 	  return 3;
-    case TaskType::StoreCells:
- 	  return 4;
-    case TaskType::StoreVertices:
- 	  return 5;
-    case TaskType::Background:
-   	  return Default;
-    case TaskType::IsBandwidthBoundTask:
-      return Default;
+peano4::parallel::Tasks::Tasks(
+  std::function<bool ()>& function,
+  TaskType                type,
+  int                     location
+) {
+  switch (type) {
+    case TaskType::Task:
+      tarch::multicore::spawnTask( new tarch::multicore::TaskWithCopyOfFunctor(function) );
+      break;
+    case TaskType::HighBandwidthTask:
+      tarch::multicore::spawnHighBandwidthTask( new tarch::multicore::TaskWithCopyOfFunctor(function) );
+      break;
+    case TaskType::HighPriorityTask:
+      tarch::multicore::spawnHighPriorityTask( new tarch::multicore::TaskWithCopyOfFunctor(function) );
+      break;
   }
-  return Default;
 }
 
 
-tarch::multicore::jobs::JobType peano::datatraversal::TaskSet::translateIntoJobType( TaskType type ) {
-  switch ( type ) {
-    case TaskType::IsTaskAndRunAsSoonAsPossible:
-      return tarch::multicore::jobs::JobType::RunTaskAsSoonAsPossible;
-    case TaskType::IsTaskAndRunImmediately:
-   	  return tarch::multicore::jobs::JobType::ProcessImmediately;
-    case TaskType::LoadCells:
-    case TaskType::LoadVertices:
-    case TaskType::TriggerEvents:
-    case TaskType::StoreCells:
-    case TaskType::StoreVertices:
-   	  return tarch::multicore::jobs::JobType::Job;
-    case TaskType::Background:
-   	  return tarch::multicore::jobs::JobType::BackgroundTask;
-    case TaskType::IsBandwidthBoundTask:
-      return tarch::multicore::jobs::JobType::BandwidthBoundTask;
+peano4::parallel::Tasks::Tasks(
+  tarch::multicore::Task*  task,
+  TaskType                 type,
+  int                      location
+) {
+  switch (type) {
+    case TaskType::Task:
+      tarch::multicore::spawnTask( task );
+      break;
+    case TaskType::HighBandwidthTask:
+      tarch::multicore::spawnHighBandwidthTask( task );
+      break;
+    case TaskType::HighPriorityTask:
+      tarch::multicore::spawnHighPriorityTask( task );
+      break;
   }
-  return tarch::multicore::jobs::JobType::ProcessImmediately;
 }
 
 
-void peano::datatraversal::TaskSet::waitForLoadCellsTask() {
-  logDebug( "waitForAllLoadCellsTasks()", "start to wait for load cell tasks" );
-  tarch::multicore::jobs::processJobs(translateIntoJobClass(TaskType::LoadCells));
-  logDebug( "waitForAllLoadCellsTasks()", "wait for load cell tasks finished" );
+peano4::parallel::Tasks::Tasks(
+  const std::vector< tarch::multicore::Task* >& tasks,
+  TaskType                 type,
+  int                      location
+) {
+  switch (type) {
+    case TaskType::Task:
+      tarch::multicore::spawnAndWait( tasks );
+      break;
+    case TaskType::HighBandwidthTask:
+      for (auto& p: tasks) {
+        tarch::multicore::spawnHighBandwidthTask( p );
+      }
+      break;
+    case TaskType::HighPriorityTask:
+      for (auto& p: tasks) {
+        tarch::multicore::spawnHighPriorityTask( p );
+      }
+      break;
+  }
 }
 
 
-void peano::datatraversal::TaskSet::waitForLoadVerticesTask() {
-  logDebug( "waitForAllLoadVerticesTasks()", "start to wait for load vertices tasks" );
-  tarch::multicore::jobs::processJobs(translateIntoJobClass(TaskType::LoadVertices));
-  logDebug( "waitForAllLoadVerticesTasks()", "wait for load vertices tasks finished" );
-}
 
-
-void peano::datatraversal::TaskSet::waitForEventTask() {
-  logDebug( "waitForAllEventTasks()", "start to wait for event tasks" );
-  tarch::multicore::jobs::processJobs(translateIntoJobClass(TaskType::TriggerEvents));
-  logDebug( "waitForAllEventTasks()", "wait for event tasks finished" );
-}
-
-
-void peano::datatraversal::TaskSet::waitForStoreCellsTask() {
-  logDebug( "waitForAllStoreCellsTasks()", "start to wait for store cell tasks" );
-  tarch::multicore::jobs::processJobs(translateIntoJobClass(TaskType::StoreCells));
-  logDebug( "waitForAllStoreCellsTasks()", "wait for store cell tasks finished" );
-}
-
-
-void peano::datatraversal::TaskSet::waitForStoreVerticesTask() {
-  logDebug( "waitForAllStoreVerticesTasks()", "start to wait for store vertices tasks" );
-  tarch::multicore::jobs::processJobs(translateIntoJobClass(TaskType::StoreVertices));
-  logDebug( "waitForAllStoreVerticesTasks()", "wait for store vertices tasks finished" );
-}
-
-
-peano::datatraversal::TaskSet::TaskSet(
+/*
+peano4::parallel::Tasks::Tasks(
   std::function<bool ()>&& function1,
   std::function<bool ()>&& function2,
-  TaskType                 type1,
-  TaskType                 type2,
-  bool                     parallelise
+  TaskType                 type,
+  int                      location
 ) {
-  if (parallelise) {
-    peano::performanceanalysis::Analysis::getInstance().changeConcurrencyLevel(2,2);
-
-    #if defined(TBBInvade)
-    shminvade::SHMInvade invade( 2 );
-    #endif
-
-    tarch::multicore::jobs::spawnAndWait(
-      function1,
-	  function2,
-	  translateIntoJobType(type1),
+  switch (type) {
+    case TaskType::Task:
+      tarch::multicore::tasks::spawnAndWait(
+        function1,
+        function2
+	  );
+      break;
+    case TaskType::BackgroundTask:
+      tarch::multicore::tasks::spawnBackgroundTask( new );
+      break;
+    case TaskType::BandwidthBoundBackgroundTask:
+      break;
+  }
+ translateIntoJobType(type1),
 	  translateIntoJobType(type2),
 	  translateIntoJobClass(type1),
 	  translateIntoJobClass(type2)
@@ -142,14 +126,14 @@ peano::datatraversal::TaskSet::TaskSet(
 }
 
 
-peano::datatraversal::TaskSet::TaskSet(
+peano4::parallel::Tasks::Tasks(
   std::function<bool ()>&& function1,
   std::function<bool ()>&& function2,
   std::function<bool ()>&& function3,
   TaskType                 type1,
   TaskType                 type2,
   TaskType                 type3,
-  bool                     parallelise
+  int                      location
 ) {
   if (parallelise) {
     peano::performanceanalysis::Analysis::getInstance().changeConcurrencyLevel(3,3);
@@ -186,7 +170,7 @@ peano::datatraversal::TaskSet::TaskSet(
 }
 
 
-peano::datatraversal::TaskSet::TaskSet(
+peano4::parallel::Tasks::Tasks(
   std::function<bool ()>&& function1,
   std::function<bool ()>&& function2,
   std::function<bool ()>&& function3,
@@ -195,7 +179,7 @@ peano::datatraversal::TaskSet::TaskSet(
   TaskType                 type2,
   TaskType                 type3,
   TaskType                 type4,
-  bool                     parallelise
+  int                      location
 ) {
   if (parallelise) {
     peano::performanceanalysis::Analysis::getInstance().changeConcurrencyLevel(4,4);
@@ -236,7 +220,7 @@ peano::datatraversal::TaskSet::TaskSet(
 }
 
 
-peano::datatraversal::TaskSet::TaskSet(
+peano4::parallel::Tasks::Tasks(
   std::function<bool ()>&& function1,
   std::function<bool ()>&& function2,
   std::function<bool ()>&& function3,
@@ -247,7 +231,7 @@ peano::datatraversal::TaskSet::TaskSet(
   TaskType                 type3,
   TaskType                 type4,
   TaskType                 type5,
-  bool                     parallelise
+  int                      location
 ) {
   if (parallelise) {
     peano::performanceanalysis::Analysis::getInstance().changeConcurrencyLevel(4,4);
@@ -295,7 +279,7 @@ peano::datatraversal::TaskSet::TaskSet(
 
 
 
-peano::datatraversal::TaskSet::TaskSet(
+peano4::parallel::Tasks::Tasks(
   std::function<bool ()>&& function1,
   std::function<bool ()>&& function2,
   std::function<bool ()>&& function3,
@@ -320,7 +304,7 @@ peano::datatraversal::TaskSet::TaskSet(
   TaskType                 type10,
   TaskType                 type11,
   TaskType                 type12,
-  bool                     parallelise
+  int                      location
 ) {
   if (parallelise) {
     peano::performanceanalysis::Analysis::getInstance().changeConcurrencyLevel(12-1,12-1);
@@ -393,16 +377,18 @@ peano::datatraversal::TaskSet::TaskSet(
 }
 
 
-peano::datatraversal::TaskSet::TaskSet(
+peano4::parallel::Tasks::Tasks(
   std::function<bool ()>&&  myTask,
   TaskType                  taskType
 ) {
   typedef tarch::multicore::jobs::GenericJobWithCopyOfFunctor           Job;
   tarch::multicore::jobs::spawn( new Job(myTask,translateIntoJobType(taskType),translateIntoJobClass(taskType) ) );
 }
+*/
 
 
-void peano::datatraversal::TaskSet::startToProcessBackgroundJobs() {
+/*
+void peano4::parallel::Tasks::processBackgroundTasks() {
   #if defined(TBBInvade)
   if (_backgroundTaskInvade==nullptr) {
 	_backgroundTaskInvade = new shminvade::SHMInvade(
@@ -415,7 +401,7 @@ void peano::datatraversal::TaskSet::startToProcessBackgroundJobs() {
 }
 
 
-bool peano::datatraversal::TaskSet::finishToProcessBackgroundJobs() {
+bool peano4::parallel::Tasks::finishToProcessBackgroundJobs() {
   bool result = tarch::multicore::jobs::finishToProcessBackgroundJobs();
   peano::performanceanalysis::Analysis::getInstance().minuteNumberOfBackgroundTasks(
     tarch::multicore::jobs::getNumberOfWaitingBackgroundJobs()
@@ -430,3 +416,4 @@ bool peano::datatraversal::TaskSet::finishToProcessBackgroundJobs() {
 
   return result;
 }
+*/
