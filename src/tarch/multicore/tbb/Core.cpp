@@ -8,16 +8,8 @@
 #endif
 
 
-
-
-std::thread::id tarch::multicore::getThreadNumber() {
-  return std::this_thread::get_id();
-}
-
-
-#ifndef SharedMemoryParallelisation
-
-#include "tarch/multicore/Core.h"
+#if defined(SharedTBB)
+#include <sstream>
 
 
 tarch::multicore::Core::Core() {
@@ -47,12 +39,15 @@ bool tarch::multicore::Core::isInitialised() const {
 
 
 int tarch::multicore::Core::getNumberOfThreads() const {
-  return 1;
+	// @todo
+  return std::thread::hardware_concurrency();
 }
 
 
 std::string tarch::multicore::Core::getThreadId() const {
-  return "master";
+  std::ostringstream msg;
+  msg << std::this_thread::get_id();
+  return msg.str();
 }
 
 
