@@ -1,5 +1,5 @@
-#ifndef _PEANO4_PARALLEL_TREEENTRY_H
-#define _PEANO4_PARALLEL_TREEENTRY_H
+#ifndef _PEANO4_PARALLEL_TREEMANAGEMENTMESSAGE_H
+#define _PEANO4_PARALLEL_TREEMANAGEMENTMESSAGE_H
 
 #include "config.h"
 #include "peano4/utils/Globals.h"
@@ -15,8 +15,8 @@
 
 namespace peano4 {
    namespace parallel {
-      class TreeEntry;
-      class TreeEntryPacked;
+      class TreeManagementMessage;
+      class TreeManagementMessagePacked;
    }
 }
 
@@ -28,17 +28,21 @@ namespace peano4 {
  *
  * 		   build date: 09-02-2014 14:40
  *
- * @date   18/01/2019 12:10
+ * @date   18/01/2019 15:59
  */
-class peano4::parallel::TreeEntry { 
+class peano4::parallel::TreeManagementMessage { 
    
    public:
       
-      typedef peano4::parallel::TreeEntryPacked Packed;
+      typedef peano4::parallel::TreeManagementMessagePacked Packed;
+      
+      enum Action {
+         RequestNewRemoteTree = 0, BookedNewRemoteTree = 1
+      };
       
       struct PersistentRecords {
-         int _id;
-         int _master;
+         int _spacetreeId;
+         Action _action;
          /**
           * Generated
           */
@@ -47,27 +51,27 @@ class peano4::parallel::TreeEntry {
          /**
           * Generated
           */
-         PersistentRecords(const int& id, const int& master);
+         PersistentRecords(const int& spacetreeId, const Action& action);
          
          /**
           * Generated
           */
-          int getId() const ;
+          int getSpacetreeId() const ;
          
          /**
           * Generated
           */
-          void setId(const int& id) ;
+          void setSpacetreeId(const int& spacetreeId) ;
          
          /**
           * Generated
           */
-          int getMaster() const ;
+          Action getAction() const ;
          
          /**
           * Generated
           */
-          void setMaster(const int& master) ;
+          void setAction(const Action& action) ;
          
          
       };
@@ -78,42 +82,52 @@ class peano4::parallel::TreeEntry {
          /**
           * Generated
           */
-         TreeEntry();
+         TreeManagementMessage();
          
          /**
           * Generated
           */
-         TreeEntry(const PersistentRecords& persistentRecords);
+         TreeManagementMessage(const PersistentRecords& persistentRecords);
          
          /**
           * Generated
           */
-         TreeEntry(const int& id, const int& master);
+         TreeManagementMessage(const int& spacetreeId, const Action& action);
          
          /**
           * Generated
           */
-         virtual ~TreeEntry();
+         virtual ~TreeManagementMessage();
          
          /**
           * Generated
           */
-          int getId() const ;
+          int getSpacetreeId() const ;
          
          /**
           * Generated
           */
-          void setId(const int& id) ;
+          void setSpacetreeId(const int& spacetreeId) ;
          
          /**
           * Generated
           */
-          int getMaster() const ;
+          Action getAction() const ;
          
          /**
           * Generated
           */
-          void setMaster(const int& master) ;
+          void setAction(const Action& action) ;
+         
+         /**
+          * Generated
+          */
+         static std::string toString(const Action& param);
+         
+         /**
+          * Generated
+          */
+         static std::string getActionMapping();
          
          /**
           * Generated
@@ -130,7 +144,7 @@ class peano4::parallel::TreeEntry {
          /**
           * Generated
           */
-         TreeEntryPacked convert() const;
+         TreeManagementMessagePacked convert() const;
          
          
       #ifdef Parallel
@@ -178,15 +192,23 @@ class peano4::parallel::TreeEntry {
  *
  * 		   build date: 09-02-2014 14:40
  *
- * @date   18/01/2019 12:10
+ * @date   18/01/2019 15:59
  */
-class peano4::parallel::TreeEntryPacked { 
+class peano4::parallel::TreeManagementMessagePacked { 
    
    public:
       
+      typedef peano4::parallel::TreeManagementMessage::Action Action;
+      
       struct PersistentRecords {
-         int _id;
-         int _master;
+         int _spacetreeId;
+         
+         /** mapping of records:
+         || Member 	|| startbit 	|| length
+          |  action	| startbit 0	| #bits 1
+          */
+         short int _packedRecords0;
+         
          /**
           * Generated
           */
@@ -195,27 +217,27 @@ class peano4::parallel::TreeEntryPacked {
          /**
           * Generated
           */
-         PersistentRecords(const int& id, const int& master);
+         PersistentRecords(const int& spacetreeId, const Action& action);
          
          /**
           * Generated
           */
-          int getId() const ;
+          int getSpacetreeId() const ;
          
          /**
           * Generated
           */
-          void setId(const int& id) ;
+          void setSpacetreeId(const int& spacetreeId) ;
          
          /**
           * Generated
           */
-          int getMaster() const ;
+          Action getAction() const ;
          
          /**
           * Generated
           */
-          void setMaster(const int& master) ;
+          void setAction(const Action& action) ;
          
          
       };
@@ -226,42 +248,52 @@ class peano4::parallel::TreeEntryPacked {
          /**
           * Generated
           */
-         TreeEntryPacked();
+         TreeManagementMessagePacked();
          
          /**
           * Generated
           */
-         TreeEntryPacked(const PersistentRecords& persistentRecords);
+         TreeManagementMessagePacked(const PersistentRecords& persistentRecords);
          
          /**
           * Generated
           */
-         TreeEntryPacked(const int& id, const int& master);
+         TreeManagementMessagePacked(const int& spacetreeId, const Action& action);
          
          /**
           * Generated
           */
-         virtual ~TreeEntryPacked();
+         virtual ~TreeManagementMessagePacked();
          
          /**
           * Generated
           */
-          int getId() const ;
+          int getSpacetreeId() const ;
          
          /**
           * Generated
           */
-          void setId(const int& id) ;
+          void setSpacetreeId(const int& spacetreeId) ;
          
          /**
           * Generated
           */
-          int getMaster() const ;
+          Action getAction() const ;
          
          /**
           * Generated
           */
-          void setMaster(const int& master) ;
+          void setAction(const Action& action) ;
+         
+         /**
+          * Generated
+          */
+         static std::string toString(const Action& param);
+         
+         /**
+          * Generated
+          */
+         static std::string getActionMapping();
          
          /**
           * Generated
@@ -278,7 +310,7 @@ class peano4::parallel::TreeEntryPacked {
          /**
           * Generated
           */
-         TreeEntry convert() const;
+         TreeManagementMessage convert() const;
          
          
       #ifdef Parallel

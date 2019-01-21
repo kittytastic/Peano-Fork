@@ -1,121 +1,132 @@
-#include "peano4/parallel/TreeEntry.h"
+#include "peano4/parallel/TreeManagementMessage.h"
 
-peano4::parallel::TreeEntry::PersistentRecords::PersistentRecords() {
+peano4::parallel::TreeManagementMessage::PersistentRecords::PersistentRecords() {
    
 }
 
 
-peano4::parallel::TreeEntry::PersistentRecords::PersistentRecords(const int& id, const int& master):
-_id(id),
-_master(master) {
+peano4::parallel::TreeManagementMessage::PersistentRecords::PersistentRecords(const int& spacetreeId, const Action& action):
+_spacetreeId(spacetreeId),
+_action(action) {
    
 }
 
 
- int peano4::parallel::TreeEntry::PersistentRecords::getId() const  {
-   return _id;
+ int peano4::parallel::TreeManagementMessage::PersistentRecords::getSpacetreeId() const  {
+   return _spacetreeId;
 }
 
 
 
- void peano4::parallel::TreeEntry::PersistentRecords::setId(const int& id)  {
-   _id = id;
+ void peano4::parallel::TreeManagementMessage::PersistentRecords::setSpacetreeId(const int& spacetreeId)  {
+   _spacetreeId = spacetreeId;
 }
 
 
 
- int peano4::parallel::TreeEntry::PersistentRecords::getMaster() const  {
-   return _master;
+ peano4::parallel::TreeManagementMessage::Action peano4::parallel::TreeManagementMessage::PersistentRecords::getAction() const  {
+   return _action;
 }
 
 
 
- void peano4::parallel::TreeEntry::PersistentRecords::setMaster(const int& master)  {
-   _master = master;
+ void peano4::parallel::TreeManagementMessage::PersistentRecords::setAction(const Action& action)  {
+   _action = action;
 }
 
 
-peano4::parallel::TreeEntry::TreeEntry() {
+peano4::parallel::TreeManagementMessage::TreeManagementMessage() {
    
 }
 
 
-peano4::parallel::TreeEntry::TreeEntry(const PersistentRecords& persistentRecords):
-_persistentRecords(persistentRecords._id, persistentRecords._master) {
+peano4::parallel::TreeManagementMessage::TreeManagementMessage(const PersistentRecords& persistentRecords):
+_persistentRecords(persistentRecords._spacetreeId, persistentRecords._action) {
    
 }
 
 
-peano4::parallel::TreeEntry::TreeEntry(const int& id, const int& master):
-_persistentRecords(id, master) {
+peano4::parallel::TreeManagementMessage::TreeManagementMessage(const int& spacetreeId, const Action& action):
+_persistentRecords(spacetreeId, action) {
    
 }
 
 
-peano4::parallel::TreeEntry::~TreeEntry() { }
+peano4::parallel::TreeManagementMessage::~TreeManagementMessage() { }
 
 
- int peano4::parallel::TreeEntry::getId() const  {
-   return _persistentRecords._id;
+ int peano4::parallel::TreeManagementMessage::getSpacetreeId() const  {
+   return _persistentRecords._spacetreeId;
 }
 
 
 
- void peano4::parallel::TreeEntry::setId(const int& id)  {
-   _persistentRecords._id = id;
+ void peano4::parallel::TreeManagementMessage::setSpacetreeId(const int& spacetreeId)  {
+   _persistentRecords._spacetreeId = spacetreeId;
 }
 
 
 
- int peano4::parallel::TreeEntry::getMaster() const  {
-   return _persistentRecords._master;
+ peano4::parallel::TreeManagementMessage::Action peano4::parallel::TreeManagementMessage::getAction() const  {
+   return _persistentRecords._action;
 }
 
 
 
- void peano4::parallel::TreeEntry::setMaster(const int& master)  {
-   _persistentRecords._master = master;
+ void peano4::parallel::TreeManagementMessage::setAction(const Action& action)  {
+   _persistentRecords._action = action;
 }
 
 
+std::string peano4::parallel::TreeManagementMessage::toString(const Action& param) {
+   switch (param) {
+      case RequestNewRemoteTree: return "RequestNewRemoteTree";
+      case BookedNewRemoteTree: return "BookedNewRemoteTree";
+   }
+   return "undefined";
+}
+
+std::string peano4::parallel::TreeManagementMessage::getActionMapping() {
+   return "Action(RequestNewRemoteTree=0,BookedNewRemoteTree=1)";
+}
 
 
-std::string peano4::parallel::TreeEntry::toString() const {
+std::string peano4::parallel::TreeManagementMessage::toString() const {
    std::ostringstream stringstr;
    toString(stringstr);
    return stringstr.str();
 }
 
-void peano4::parallel::TreeEntry::toString (std::ostream& out) const {
+void peano4::parallel::TreeManagementMessage::toString (std::ostream& out) const {
    out << "("; 
-   out << "id:" << getId();
+   out << "spacetreeId:" << getSpacetreeId();
    out << ",";
-   out << "master:" << getMaster();
+   out << "action:" << toString(getAction());
    out <<  ")";
 }
 
 
-peano4::parallel::TreeEntry::PersistentRecords peano4::parallel::TreeEntry::getPersistentRecords() const {
+peano4::parallel::TreeManagementMessage::PersistentRecords peano4::parallel::TreeManagementMessage::getPersistentRecords() const {
    return _persistentRecords;
 }
 
-peano4::parallel::TreeEntryPacked peano4::parallel::TreeEntry::convert() const{
-   return TreeEntryPacked(
-      getId(),
-      getMaster()
+peano4::parallel::TreeManagementMessagePacked peano4::parallel::TreeManagementMessage::convert() const{
+   return TreeManagementMessagePacked(
+      getSpacetreeId(),
+      getAction()
    );
 }
 
 #ifdef Parallel
-   tarch::logging::Log peano4::parallel::TreeEntry::_log( "peano4::parallel::TreeEntry" );
+   tarch::logging::Log peano4::parallel::TreeManagementMessage::_log( "peano4::parallel::TreeManagementMessage" );
    
-   MPI_Datatype peano4::parallel::TreeEntry::Datatype = 0;
-   MPI_Datatype peano4::parallel::TreeEntry::FullDatatype = 0;
+   MPI_Datatype peano4::parallel::TreeManagementMessage::Datatype = 0;
+   MPI_Datatype peano4::parallel::TreeManagementMessage::FullDatatype = 0;
    
    
-   void peano4::parallel::TreeEntry::initDatatype() {
+   void peano4::parallel::TreeManagementMessage::initDatatype() {
       {
-         TreeEntry dummyTreeEntry[16];
+         TreeManagementMessage dummyTreeManagementMessage[16];
          
          #ifdef MPI2
          const int Attributes = 2;
@@ -126,8 +137,8 @@ peano4::parallel::TreeEntryPacked peano4::parallel::TreeEntry::convert() const{
             #ifndef MPI2
               MPI_LB,
             #endif
-              MPI_INT		 //id
-            , MPI_INT		 //master
+              MPI_INT		 //spacetreeId
+            , MPI_INT		 //action
             #ifndef MPI2
             , MPI_UB
             #endif
@@ -138,8 +149,8 @@ peano4::parallel::TreeEntryPacked peano4::parallel::TreeEntry::convert() const{
             #ifndef MPI2
             1, // lower bound
             #endif
-              1		 //id
-            , 1		 //master
+              1		 //spacetreeId
+            , 1		 //action
             #ifndef MPI2
             , 1 // upper bound
             #endif
@@ -150,23 +161,23 @@ peano4::parallel::TreeEntryPacked peano4::parallel::TreeEntry::convert() const{
          int       currentAddress = -1;
          #ifndef MPI2
          currentAddress++;
-         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntry[0]))), &disp[currentAddress]);
+         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyTreeManagementMessage[0]))), &disp[currentAddress]);
          #endif
          currentAddress++;
          #ifdef MPI2
-         MPI_Get_address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntry[0]._persistentRecords._id))), 		&disp[currentAddress] );
+         MPI_Get_address( const_cast<void*>(static_cast<const void*>(&(dummyTreeManagementMessage[0]._persistentRecords._spacetreeId))), 		&disp[currentAddress] );
          #else
-         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntry[0]._persistentRecords._id))), 		&disp[currentAddress] );
+         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyTreeManagementMessage[0]._persistentRecords._spacetreeId))), 		&disp[currentAddress] );
          #endif
          currentAddress++;
          #ifdef MPI2
-         MPI_Get_address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntry[0]._persistentRecords._master))), 		&disp[currentAddress] );
+         MPI_Get_address( const_cast<void*>(static_cast<const void*>(&(dummyTreeManagementMessage[0]._persistentRecords._action))), 		&disp[currentAddress] );
          #else
-         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntry[0]._persistentRecords._master))), 		&disp[currentAddress] );
+         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyTreeManagementMessage[0]._persistentRecords._action))), 		&disp[currentAddress] );
          #endif
          #ifndef MPI2
          currentAddress++;
-         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntry[1]))), &disp[currentAddress]);
+         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyTreeManagementMessage[1]))), &disp[currentAddress]);
          #endif
          for (int i=1; i<Attributes; i++) {
          
@@ -174,9 +185,9 @@ peano4::parallel::TreeEntryPacked peano4::parallel::TreeEntry::convert() const{
          }
          MPI_Aint base;
          #ifdef MPI2
-         MPI_Get_address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntry[0]))), &base);
+         MPI_Get_address( const_cast<void*>(static_cast<const void*>(&(dummyTreeManagementMessage[0]))), &base);
          #else
-         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntry[0]))), &base);
+         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyTreeManagementMessage[0]))), &base);
          #endif
          for (int i=0; i<Attributes; i++) {
          
@@ -187,18 +198,18 @@ peano4::parallel::TreeEntryPacked peano4::parallel::TreeEntry::convert() const{
          MPI_Datatype tmpType; 
          MPI_Type_create_struct( Attributes, blocklen, disp, subtypes, &tmpType );
          MPI_Aint typeExtent; 
-         MPI_Get_address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntry[1]))), &typeExtent);
+         MPI_Get_address( const_cast<void*>(static_cast<const void*>(&(dummyTreeManagementMessage[1]))), &typeExtent);
          typeExtent = MPI_Aint_diff(typeExtent, base);
-         MPI_Type_create_resized( tmpType, 0, typeExtent, &TreeEntry::Datatype );
-         MPI_Type_commit( &TreeEntry::Datatype );
+         MPI_Type_create_resized( tmpType, 0, typeExtent, &TreeManagementMessage::Datatype );
+         MPI_Type_commit( &TreeManagementMessage::Datatype );
          #else
-         MPI_Type_struct( Attributes, blocklen, disp, subtypes, &TreeEntry::Datatype);
-         MPI_Type_commit( &TreeEntry::Datatype );
+         MPI_Type_struct( Attributes, blocklen, disp, subtypes, &TreeManagementMessage::Datatype);
+         MPI_Type_commit( &TreeManagementMessage::Datatype );
          #endif
          
       }
       {
-         TreeEntry dummyTreeEntry[16];
+         TreeManagementMessage dummyTreeManagementMessage[16];
          
          #ifdef MPI2
          const int Attributes = 2;
@@ -209,8 +220,8 @@ peano4::parallel::TreeEntryPacked peano4::parallel::TreeEntry::convert() const{
             #ifndef MPI2
               MPI_LB,
             #endif
-              MPI_INT		 //id
-            , MPI_INT		 //master
+              MPI_INT		 //spacetreeId
+            , MPI_INT		 //action
             #ifndef MPI2
             , MPI_UB
             #endif
@@ -221,8 +232,8 @@ peano4::parallel::TreeEntryPacked peano4::parallel::TreeEntry::convert() const{
             #ifndef MPI2
             1, // lower bound
             #endif
-              1		 //id
-            , 1		 //master
+              1		 //spacetreeId
+            , 1		 //action
             #ifndef MPI2
             , 1 // upper bound
             #endif
@@ -233,23 +244,23 @@ peano4::parallel::TreeEntryPacked peano4::parallel::TreeEntry::convert() const{
          int       currentAddress = -1;
          #ifndef MPI2
          currentAddress++;
-         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntry[0]))), &disp[currentAddress]);
+         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyTreeManagementMessage[0]))), &disp[currentAddress]);
          #endif
          currentAddress++;
          #ifdef MPI2
-         MPI_Get_address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntry[0]._persistentRecords._id))), 		&disp[currentAddress] );
+         MPI_Get_address( const_cast<void*>(static_cast<const void*>(&(dummyTreeManagementMessage[0]._persistentRecords._spacetreeId))), 		&disp[currentAddress] );
          #else
-         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntry[0]._persistentRecords._id))), 		&disp[currentAddress] );
+         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyTreeManagementMessage[0]._persistentRecords._spacetreeId))), 		&disp[currentAddress] );
          #endif
          currentAddress++;
          #ifdef MPI2
-         MPI_Get_address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntry[0]._persistentRecords._master))), 		&disp[currentAddress] );
+         MPI_Get_address( const_cast<void*>(static_cast<const void*>(&(dummyTreeManagementMessage[0]._persistentRecords._action))), 		&disp[currentAddress] );
          #else
-         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntry[0]._persistentRecords._master))), 		&disp[currentAddress] );
+         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyTreeManagementMessage[0]._persistentRecords._action))), 		&disp[currentAddress] );
          #endif
          #ifndef MPI2
          currentAddress++;
-         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntry[1]))), &disp[currentAddress]);
+         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyTreeManagementMessage[1]))), &disp[currentAddress]);
          #endif
          for (int i=1; i<Attributes; i++) {
          
@@ -257,9 +268,9 @@ peano4::parallel::TreeEntryPacked peano4::parallel::TreeEntry::convert() const{
          }
          MPI_Aint base;
          #ifdef MPI2
-         MPI_Get_address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntry[0]))), &base);
+         MPI_Get_address( const_cast<void*>(static_cast<const void*>(&(dummyTreeManagementMessage[0]))), &base);
          #else
-         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntry[0]))), &base);
+         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyTreeManagementMessage[0]))), &base);
          #endif
          for (int i=0; i<Attributes; i++) {
          
@@ -270,13 +281,13 @@ peano4::parallel::TreeEntryPacked peano4::parallel::TreeEntry::convert() const{
          MPI_Datatype tmpType; 
          MPI_Type_create_struct( Attributes, blocklen, disp, subtypes, &tmpType );
          MPI_Aint typeExtent; 
-         MPI_Get_address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntry[1]))), &typeExtent);
+         MPI_Get_address( const_cast<void*>(static_cast<const void*>(&(dummyTreeManagementMessage[1]))), &typeExtent);
          typeExtent = MPI_Aint_diff(typeExtent, base);
-         MPI_Type_create_resized( tmpType, 0, typeExtent, &TreeEntry::FullDatatype );
-         MPI_Type_commit( &TreeEntry::FullDatatype );
+         MPI_Type_create_resized( tmpType, 0, typeExtent, &TreeManagementMessage::FullDatatype );
+         MPI_Type_commit( &TreeManagementMessage::FullDatatype );
          #else
-         MPI_Type_struct( Attributes, blocklen, disp, subtypes, &TreeEntry::FullDatatype);
-         MPI_Type_commit( &TreeEntry::FullDatatype );
+         MPI_Type_struct( Attributes, blocklen, disp, subtypes, &TreeManagementMessage::FullDatatype);
+         MPI_Type_commit( &TreeManagementMessage::FullDatatype );
          #endif
          
       }
@@ -284,13 +295,13 @@ peano4::parallel::TreeEntryPacked peano4::parallel::TreeEntry::convert() const{
    }
    
    
-   void peano4::parallel::TreeEntry::shutdownDatatype() {
-      MPI_Type_free( &TreeEntry::Datatype );
-      MPI_Type_free( &TreeEntry::FullDatatype );
+   void peano4::parallel::TreeManagementMessage::shutdownDatatype() {
+      MPI_Type_free( &TreeManagementMessage::Datatype );
+      MPI_Type_free( &TreeManagementMessage::FullDatatype );
       
    }
    
-   void peano4::parallel::TreeEntry::send(int destination, int tag, bool exchangeOnlyAttributesMarkedWithParallelise, ExchangeMode mode) {
+   void peano4::parallel::TreeManagementMessage::send(int destination, int tag, bool exchangeOnlyAttributesMarkedWithParallelise, ExchangeMode mode) {
       // ============================= 
 // start injected snippet/aspect 
 // ============================= 
@@ -300,7 +311,7 @@ switch (mode) {
       const int result = MPI_Send(this, 1, exchangeOnlyAttributesMarkedWithParallelise ? Datatype : FullDatatype, destination, tag, tarch::mpi::Rank::getInstance().getCommunicator()); 
        if  (result!=MPI_SUCCESS) { 
          std::ostringstream msg; 
-         msg << "was not able to send message peano4::parallel::TreeEntry " 
+         msg << "was not able to send message peano4::parallel::TreeManagementMessage " 
              << toString() 
              << " to node " << destination 
              << ": " << tarch::mpi::MPIReturnValueToString(result); 
@@ -323,7 +334,7 @@ switch (mode) {
        ); 
        if  (result!=MPI_SUCCESS) {  
          std::ostringstream msg;  
-         msg << "was not able to send message peano4::parallel::TreeEntry "  
+         msg << "was not able to send message peano4::parallel::TreeManagementMessage "  
              << toString() 
              << " to node " << destination 
              << ": " << tarch::mpi::MPIReturnValueToString(result);  
@@ -336,7 +347,7 @@ switch (mode) {
          result = MPI_Test( sendRequestHandle, &flag, MPI_STATUS_IGNORE ); 
          if (result!=MPI_SUCCESS) { 
            std::ostringstream msg; 
-           msg << "testing for finished send task for peano4::parallel::TreeEntry " 
+           msg << "testing for finished send task for peano4::parallel::TreeManagementMessage " 
                << toString() 
                << " sent to node " << destination 
                << " failed: " << tarch::mpi::MPIReturnValueToString(result); 
@@ -348,7 +359,7 @@ switch (mode) {
            (!triggeredTimeoutWarning) 
          ) { 
            tarch::mpi::Rank::getInstance().writeTimeOutWarning( 
-             "peano4::parallel::TreeEntry", 
+             "peano4::parallel::TreeManagementMessage", 
              "send(int)", destination,tag,1 
            ); 
            triggeredTimeoutWarning = true; 
@@ -358,7 +369,7 @@ switch (mode) {
            (clock()>timeOutShutdown) 
          ) { 
            tarch::mpi::Rank::getInstance().triggerDeadlockTimeOut( 
-             "peano4::parallel::TreeEntry", 
+             "peano4::parallel::TreeManagementMessage", 
              "send(int)", destination,tag,1 
            ); 
          } 
@@ -380,7 +391,7 @@ switch (mode) {
    
    
    
-   void peano4::parallel::TreeEntry::receive(int source, int tag, bool exchangeOnlyAttributesMarkedWithParallelise, ExchangeMode mode) {
+   void peano4::parallel::TreeManagementMessage::receive(int source, int tag, bool exchangeOnlyAttributesMarkedWithParallelise, ExchangeMode mode) {
       // ============================= 
 // start injected snippet/aspect 
 // ============================= 
@@ -391,7 +402,7 @@ switch (mode) {
       const int   result = MPI_Recv(this, 1, exchangeOnlyAttributesMarkedWithParallelise ? Datatype : FullDatatype, source, tag, tarch::mpi::Rank::getInstance().getCommunicator(), source==MPI_ANY_SOURCE ? &status : MPI_STATUS_IGNORE ); 
       if ( result != MPI_SUCCESS ) { 
         std::ostringstream msg; 
-        msg << "failed to start to receive peano4::parallel::TreeEntry from node " 
+        msg << "failed to start to receive peano4::parallel::TreeManagementMessage from node " 
             << source << ": " << tarch::mpi::MPIReturnValueToString(result); 
         _log.error( "receive(int)", msg.str() ); 
       } 
@@ -411,7 +422,7 @@ switch (mode) {
       ); 
       if ( result != MPI_SUCCESS ) { 
         std::ostringstream msg; 
-        msg << "failed to start to receive peano4::parallel::TreeEntry from node " 
+        msg << "failed to start to receive peano4::parallel::TreeManagementMessage from node " 
              << source << ": " << tarch::mpi::MPIReturnValueToString(result); 
         _log.error( "receive(int)", msg.str() ); 
       } 
@@ -425,7 +436,7 @@ switch (mode) {
           (!triggeredTimeoutWarning) 
         ) { 
           tarch::mpi::Rank::getInstance().writeTimeOutWarning( 
-            "peano4::parallel::TreeEntry", 
+            "peano4::parallel::TreeManagementMessage", 
             "receive(int)", source,tag,1 
           ); 
           triggeredTimeoutWarning = true; 
@@ -435,7 +446,7 @@ switch (mode) {
           (clock()>timeOutShutdown) 
         ) { 
           tarch::mpi::Rank::getInstance().triggerDeadlockTimeOut( 
-            "peano4::parallel::TreeEntry", 
+            "peano4::parallel::TreeManagementMessage", 
             "receive(int)", source,tag,1 
           ); 
         } 
@@ -443,7 +454,7 @@ switch (mode) {
         result = MPI_Test( sendRequestHandle, &flag, source==MPI_ANY_SOURCE ? &status : MPI_STATUS_IGNORE ); 
         if (result!=MPI_SUCCESS) { 
           std::ostringstream msg; 
-          msg << "testing for finished receive task for peano4::parallel::TreeEntry failed: " 
+          msg << "testing for finished receive task for peano4::parallel::TreeManagementMessage failed: " 
               << tarch::mpi::MPIReturnValueToString(result); 
           _log.error("receive(int)", msg.str() ); 
         } 
@@ -459,7 +470,7 @@ switch (mode) {
       int result = MPI_Iprobe(source, tag, tarch::mpi::Rank::getInstance().getCommunicator(), &flag, MPI_STATUS_IGNORE ); 
        if (result!=MPI_SUCCESS) { 
         std::ostringstream msg; 
-        msg << "testing for finished receive task for peano4::parallel::TreeEntry failed: " 
+        msg << "testing for finished receive task for peano4::parallel::TreeManagementMessage failed: " 
             << tarch::mpi::MPIReturnValueToString(result); 
         _log.error("receive(int)", msg.str() ); 
       } 
@@ -472,7 +483,7 @@ switch (mode) {
           (!triggeredTimeoutWarning) 
         ) { 
           tarch::mpi::Rank::getInstance().writeTimeOutWarning( 
-            "peano4::parallel::TreeEntry", 
+            "peano4::parallel::TreeManagementMessage", 
             "receive(int)", source,tag,1 
           ); 
           triggeredTimeoutWarning = true; 
@@ -482,7 +493,7 @@ switch (mode) {
           (clock()>timeOutShutdown) 
         ) { 
           tarch::mpi::Rank::getInstance().triggerDeadlockTimeOut( 
-            "peano4::parallel::TreeEntry", 
+            "peano4::parallel::TreeManagementMessage", 
             "receive(int)", source,tag,1 
           ); 
         } 
@@ -490,7 +501,7 @@ switch (mode) {
         result = MPI_Iprobe(source, tag, tarch::mpi::Rank::getInstance().getCommunicator(), &flag, MPI_STATUS_IGNORE ); 
          if (result!=MPI_SUCCESS) { 
           std::ostringstream msg; 
-          msg << "testing for finished receive task for peano4::parallel::TreeEntry failed: " 
+          msg << "testing for finished receive task for peano4::parallel::TreeManagementMessage failed: " 
               << tarch::mpi::MPIReturnValueToString(result); 
           _log.error("receive(int)", msg.str() ); 
         } 
@@ -498,7 +509,7 @@ switch (mode) {
       result = MPI_Recv(this, 1, exchangeOnlyAttributesMarkedWithParallelise ? Datatype : FullDatatype, source, tag, tarch::mpi::Rank::getInstance().getCommunicator(), source==MPI_ANY_SOURCE ? &status : MPI_STATUS_IGNORE ); 
       if ( result != MPI_SUCCESS ) { 
         std::ostringstream msg; 
-        msg << "failed to start to receive peano4::parallel::TreeEntry from node " 
+        msg << "failed to start to receive peano4::parallel::TreeManagementMessage from node " 
             << source << ": " << tarch::mpi::MPIReturnValueToString(result); 
         _log.error( "receive(int)", msg.str() ); 
       } 
@@ -515,7 +526,7 @@ switch (mode) {
    
    
    
-   bool peano4::parallel::TreeEntry::isMessageInQueue(int tag, bool exchangeOnlyAttributesMarkedWithParallelise) {
+   bool peano4::parallel::TreeManagementMessage::isMessageInQueue(int tag, bool exchangeOnlyAttributesMarkedWithParallelise) {
       MPI_Status status;
       int  flag        = 0;
       MPI_Iprobe(
@@ -536,7 +547,7 @@ switch (mode) {
       
    }
    
-   int peano4::parallel::TreeEntry::getSenderRank() const {
+   int peano4::parallel::TreeManagementMessage::getSenderRank() const {
       assertion( _senderDestinationRank!=-1 );
       return _senderDestinationRank;
       
@@ -544,122 +555,178 @@ switch (mode) {
 #endif
 
 
-peano4::parallel::TreeEntryPacked::PersistentRecords::PersistentRecords() {
+peano4::parallel::TreeManagementMessagePacked::PersistentRecords::PersistentRecords() {
+   if ((1 >= (8 * sizeof(short int)))) {
+      std::cerr << "Packed-Type in " << __FILE__ << " too small. Either use bigger data type or append " << std::endl << std::endl;
+      std::cerr << "  Packed-Type: short int hint-size no-of-bits;  " << std::endl << std::endl;
+      std::cerr << "to your data type spec to guide DaStGen how many bits (no-of-bits) a data type has on your machine. DaStGen then can split up the bitfields into several attributes. " << std::endl; 
+   }
+   assertion((1 < (8 * sizeof(short int))));
    
 }
 
 
-peano4::parallel::TreeEntryPacked::PersistentRecords::PersistentRecords(const int& id, const int& master):
-_id(id),
-_master(master) {
+peano4::parallel::TreeManagementMessagePacked::PersistentRecords::PersistentRecords(const int& spacetreeId, const Action& action):
+_spacetreeId(spacetreeId) {
+   setAction(action);
+   if ((1 >= (8 * sizeof(short int)))) {
+      std::cerr << "Packed-Type in " << __FILE__ << " too small. Either use bigger data type or append " << std::endl << std::endl;
+      std::cerr << "  Packed-Type: short int hint-size no-of-bits;  " << std::endl << std::endl;
+      std::cerr << "to your data type spec to guide DaStGen how many bits (no-of-bits) a data type has on your machine. DaStGen then can split up the bitfields into several attributes. " << std::endl; 
+   }
+   assertion((1 < (8 * sizeof(short int))));
    
 }
 
 
- int peano4::parallel::TreeEntryPacked::PersistentRecords::getId() const  {
-   return _id;
+ int peano4::parallel::TreeManagementMessagePacked::PersistentRecords::getSpacetreeId() const  {
+   return _spacetreeId;
 }
 
 
 
- void peano4::parallel::TreeEntryPacked::PersistentRecords::setId(const int& id)  {
-   _id = id;
+ void peano4::parallel::TreeManagementMessagePacked::PersistentRecords::setSpacetreeId(const int& spacetreeId)  {
+   _spacetreeId = spacetreeId;
 }
 
 
 
- int peano4::parallel::TreeEntryPacked::PersistentRecords::getMaster() const  {
-   return _master;
+ peano4::parallel::TreeManagementMessage::Action peano4::parallel::TreeManagementMessagePacked::PersistentRecords::getAction() const  {
+   short int mask =  (1 << (1)) - 1;
+   mask = static_cast<short int>(mask << (0));
+   short int tmp = static_cast<short int>(_packedRecords0 & mask);
+   tmp = static_cast<short int>(tmp >> (0));
+   assertion(( tmp >= 0 &&  tmp <= 1));
+   return (Action) tmp;
 }
 
 
 
- void peano4::parallel::TreeEntryPacked::PersistentRecords::setMaster(const int& master)  {
-   _master = master;
+ void peano4::parallel::TreeManagementMessagePacked::PersistentRecords::setAction(const Action& action)  {
+   assertion((action >= 0 && action <= 1));
+   short int mask =  (1 << (1)) - 1;
+   mask = static_cast<short int>(mask << (0));
+   _packedRecords0 = static_cast<short int>(_packedRecords0 & ~mask);
+   _packedRecords0 = static_cast<short int>(_packedRecords0 | static_cast<short int>(action) << (0));
 }
 
 
-peano4::parallel::TreeEntryPacked::TreeEntryPacked() {
+peano4::parallel::TreeManagementMessagePacked::TreeManagementMessagePacked() {
+   if ((1 >= (8 * sizeof(short int)))) {
+      std::cerr << "Packed-Type in " << __FILE__ << " too small. Either use bigger data type or append " << std::endl << std::endl;
+      std::cerr << "  Packed-Type: short int hint-size no-of-bits;  " << std::endl << std::endl;
+      std::cerr << "to your data type spec to guide DaStGen how many bits (no-of-bits) a data type has on your machine. DaStGen then can split up the bitfields into several attributes. " << std::endl; 
+   }
+   assertion((1 < (8 * sizeof(short int))));
    
 }
 
 
-peano4::parallel::TreeEntryPacked::TreeEntryPacked(const PersistentRecords& persistentRecords):
-_persistentRecords(persistentRecords._id, persistentRecords._master) {
+peano4::parallel::TreeManagementMessagePacked::TreeManagementMessagePacked(const PersistentRecords& persistentRecords):
+_persistentRecords(persistentRecords._spacetreeId, persistentRecords.getAction()) {
+   if ((1 >= (8 * sizeof(short int)))) {
+      std::cerr << "Packed-Type in " << __FILE__ << " too small. Either use bigger data type or append " << std::endl << std::endl;
+      std::cerr << "  Packed-Type: short int hint-size no-of-bits;  " << std::endl << std::endl;
+      std::cerr << "to your data type spec to guide DaStGen how many bits (no-of-bits) a data type has on your machine. DaStGen then can split up the bitfields into several attributes. " << std::endl; 
+   }
+   assertion((1 < (8 * sizeof(short int))));
    
 }
 
 
-peano4::parallel::TreeEntryPacked::TreeEntryPacked(const int& id, const int& master):
-_persistentRecords(id, master) {
+peano4::parallel::TreeManagementMessagePacked::TreeManagementMessagePacked(const int& spacetreeId, const Action& action):
+_persistentRecords(spacetreeId, action) {
+   if ((1 >= (8 * sizeof(short int)))) {
+      std::cerr << "Packed-Type in " << __FILE__ << " too small. Either use bigger data type or append " << std::endl << std::endl;
+      std::cerr << "  Packed-Type: short int hint-size no-of-bits;  " << std::endl << std::endl;
+      std::cerr << "to your data type spec to guide DaStGen how many bits (no-of-bits) a data type has on your machine. DaStGen then can split up the bitfields into several attributes. " << std::endl; 
+   }
+   assertion((1 < (8 * sizeof(short int))));
    
 }
 
 
-peano4::parallel::TreeEntryPacked::~TreeEntryPacked() { }
+peano4::parallel::TreeManagementMessagePacked::~TreeManagementMessagePacked() { }
 
 
- int peano4::parallel::TreeEntryPacked::getId() const  {
-   return _persistentRecords._id;
+ int peano4::parallel::TreeManagementMessagePacked::getSpacetreeId() const  {
+   return _persistentRecords._spacetreeId;
 }
 
 
 
- void peano4::parallel::TreeEntryPacked::setId(const int& id)  {
-   _persistentRecords._id = id;
+ void peano4::parallel::TreeManagementMessagePacked::setSpacetreeId(const int& spacetreeId)  {
+   _persistentRecords._spacetreeId = spacetreeId;
 }
 
 
 
- int peano4::parallel::TreeEntryPacked::getMaster() const  {
-   return _persistentRecords._master;
+ peano4::parallel::TreeManagementMessage::Action peano4::parallel::TreeManagementMessagePacked::getAction() const  {
+   short int mask =  (1 << (1)) - 1;
+   mask = static_cast<short int>(mask << (0));
+   short int tmp = static_cast<short int>(_persistentRecords._packedRecords0 & mask);
+   tmp = static_cast<short int>(tmp >> (0));
+   assertion(( tmp >= 0 &&  tmp <= 1));
+   return (Action) tmp;
 }
 
 
 
- void peano4::parallel::TreeEntryPacked::setMaster(const int& master)  {
-   _persistentRecords._master = master;
+ void peano4::parallel::TreeManagementMessagePacked::setAction(const Action& action)  {
+   assertion((action >= 0 && action <= 1));
+   short int mask =  (1 << (1)) - 1;
+   mask = static_cast<short int>(mask << (0));
+   _persistentRecords._packedRecords0 = static_cast<short int>(_persistentRecords._packedRecords0 & ~mask);
+   _persistentRecords._packedRecords0 = static_cast<short int>(_persistentRecords._packedRecords0 | static_cast<short int>(action) << (0));
+}
+
+
+std::string peano4::parallel::TreeManagementMessagePacked::toString(const Action& param) {
+   return peano4::parallel::TreeManagementMessage::toString(param);
+}
+
+std::string peano4::parallel::TreeManagementMessagePacked::getActionMapping() {
+   return peano4::parallel::TreeManagementMessage::getActionMapping();
 }
 
 
 
-
-std::string peano4::parallel::TreeEntryPacked::toString() const {
+std::string peano4::parallel::TreeManagementMessagePacked::toString() const {
    std::ostringstream stringstr;
    toString(stringstr);
    return stringstr.str();
 }
 
-void peano4::parallel::TreeEntryPacked::toString (std::ostream& out) const {
+void peano4::parallel::TreeManagementMessagePacked::toString (std::ostream& out) const {
    out << "("; 
-   out << "id:" << getId();
+   out << "spacetreeId:" << getSpacetreeId();
    out << ",";
-   out << "master:" << getMaster();
+   out << "action:" << toString(getAction());
    out <<  ")";
 }
 
 
-peano4::parallel::TreeEntryPacked::PersistentRecords peano4::parallel::TreeEntryPacked::getPersistentRecords() const {
+peano4::parallel::TreeManagementMessagePacked::PersistentRecords peano4::parallel::TreeManagementMessagePacked::getPersistentRecords() const {
    return _persistentRecords;
 }
 
-peano4::parallel::TreeEntry peano4::parallel::TreeEntryPacked::convert() const{
-   return TreeEntry(
-      getId(),
-      getMaster()
+peano4::parallel::TreeManagementMessage peano4::parallel::TreeManagementMessagePacked::convert() const{
+   return TreeManagementMessage(
+      getSpacetreeId(),
+      getAction()
    );
 }
 
 #ifdef Parallel
-   tarch::logging::Log peano4::parallel::TreeEntryPacked::_log( "peano4::parallel::TreeEntryPacked" );
+   tarch::logging::Log peano4::parallel::TreeManagementMessagePacked::_log( "peano4::parallel::TreeManagementMessagePacked" );
    
-   MPI_Datatype peano4::parallel::TreeEntryPacked::Datatype = 0;
-   MPI_Datatype peano4::parallel::TreeEntryPacked::FullDatatype = 0;
+   MPI_Datatype peano4::parallel::TreeManagementMessagePacked::Datatype = 0;
+   MPI_Datatype peano4::parallel::TreeManagementMessagePacked::FullDatatype = 0;
    
    
-   void peano4::parallel::TreeEntryPacked::initDatatype() {
+   void peano4::parallel::TreeManagementMessagePacked::initDatatype() {
       {
-         TreeEntryPacked dummyTreeEntryPacked[16];
+         TreeManagementMessagePacked dummyTreeManagementMessagePacked[16];
          
          #ifdef MPI2
          const int Attributes = 2;
@@ -670,8 +737,8 @@ peano4::parallel::TreeEntry peano4::parallel::TreeEntryPacked::convert() const{
             #ifndef MPI2
               MPI_LB,
             #endif
-              MPI_INT		 //id
-            , MPI_INT		 //master
+              MPI_INT		 //spacetreeId
+            , MPI_SHORT		 //_packedRecords0
             #ifndef MPI2
             , MPI_UB
             #endif
@@ -682,8 +749,8 @@ peano4::parallel::TreeEntry peano4::parallel::TreeEntryPacked::convert() const{
             #ifndef MPI2
             1, // lower bound
             #endif
-              1		 //id
-            , 1		 //master
+              1		 //spacetreeId
+            , 1		 //_packedRecords0
             #ifndef MPI2
             , 1 // upper bound
             #endif
@@ -694,23 +761,23 @@ peano4::parallel::TreeEntry peano4::parallel::TreeEntryPacked::convert() const{
          int       currentAddress = -1;
          #ifndef MPI2
          currentAddress++;
-         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntryPacked[0]))), &disp[currentAddress]);
+         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyTreeManagementMessagePacked[0]))), &disp[currentAddress]);
          #endif
          currentAddress++;
          #ifdef MPI2
-         MPI_Get_address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntryPacked[0]._persistentRecords._id))), 		&disp[currentAddress] );
+         MPI_Get_address( const_cast<void*>(static_cast<const void*>(&(dummyTreeManagementMessagePacked[0]._persistentRecords._spacetreeId))), 		&disp[currentAddress] );
          #else
-         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntryPacked[0]._persistentRecords._id))), 		&disp[currentAddress] );
+         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyTreeManagementMessagePacked[0]._persistentRecords._spacetreeId))), 		&disp[currentAddress] );
          #endif
          currentAddress++;
          #ifdef MPI2
-         MPI_Get_address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntryPacked[0]._persistentRecords._master))), 		&disp[currentAddress] );
+         MPI_Get_address( const_cast<void*>(static_cast<const void*>(&(dummyTreeManagementMessagePacked[0]._persistentRecords._packedRecords0))), 		&disp[currentAddress] );
          #else
-         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntryPacked[0]._persistentRecords._master))), 		&disp[currentAddress] );
+         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyTreeManagementMessagePacked[0]._persistentRecords._packedRecords0))), 		&disp[currentAddress] );
          #endif
          #ifndef MPI2
          currentAddress++;
-         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntryPacked[1]))), &disp[currentAddress]);
+         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyTreeManagementMessagePacked[1]))), &disp[currentAddress]);
          #endif
          for (int i=1; i<Attributes; i++) {
          
@@ -718,9 +785,9 @@ peano4::parallel::TreeEntry peano4::parallel::TreeEntryPacked::convert() const{
          }
          MPI_Aint base;
          #ifdef MPI2
-         MPI_Get_address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntryPacked[0]))), &base);
+         MPI_Get_address( const_cast<void*>(static_cast<const void*>(&(dummyTreeManagementMessagePacked[0]))), &base);
          #else
-         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntryPacked[0]))), &base);
+         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyTreeManagementMessagePacked[0]))), &base);
          #endif
          for (int i=0; i<Attributes; i++) {
          
@@ -731,18 +798,18 @@ peano4::parallel::TreeEntry peano4::parallel::TreeEntryPacked::convert() const{
          MPI_Datatype tmpType; 
          MPI_Type_create_struct( Attributes, blocklen, disp, subtypes, &tmpType );
          MPI_Aint typeExtent; 
-         MPI_Get_address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntryPacked[1]))), &typeExtent);
+         MPI_Get_address( const_cast<void*>(static_cast<const void*>(&(dummyTreeManagementMessagePacked[1]))), &typeExtent);
          typeExtent = MPI_Aint_diff(typeExtent, base);
-         MPI_Type_create_resized( tmpType, 0, typeExtent, &TreeEntryPacked::Datatype );
-         MPI_Type_commit( &TreeEntryPacked::Datatype );
+         MPI_Type_create_resized( tmpType, 0, typeExtent, &TreeManagementMessagePacked::Datatype );
+         MPI_Type_commit( &TreeManagementMessagePacked::Datatype );
          #else
-         MPI_Type_struct( Attributes, blocklen, disp, subtypes, &TreeEntryPacked::Datatype);
-         MPI_Type_commit( &TreeEntryPacked::Datatype );
+         MPI_Type_struct( Attributes, blocklen, disp, subtypes, &TreeManagementMessagePacked::Datatype);
+         MPI_Type_commit( &TreeManagementMessagePacked::Datatype );
          #endif
          
       }
       {
-         TreeEntryPacked dummyTreeEntryPacked[16];
+         TreeManagementMessagePacked dummyTreeManagementMessagePacked[16];
          
          #ifdef MPI2
          const int Attributes = 2;
@@ -753,8 +820,8 @@ peano4::parallel::TreeEntry peano4::parallel::TreeEntryPacked::convert() const{
             #ifndef MPI2
               MPI_LB,
             #endif
-              MPI_INT		 //id
-            , MPI_INT		 //master
+              MPI_INT		 //spacetreeId
+            , MPI_SHORT		 //_packedRecords0
             #ifndef MPI2
             , MPI_UB
             #endif
@@ -765,8 +832,8 @@ peano4::parallel::TreeEntry peano4::parallel::TreeEntryPacked::convert() const{
             #ifndef MPI2
             1, // lower bound
             #endif
-              1		 //id
-            , 1		 //master
+              1		 //spacetreeId
+            , 1		 //_packedRecords0
             #ifndef MPI2
             , 1 // upper bound
             #endif
@@ -777,23 +844,23 @@ peano4::parallel::TreeEntry peano4::parallel::TreeEntryPacked::convert() const{
          int       currentAddress = -1;
          #ifndef MPI2
          currentAddress++;
-         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntryPacked[0]))), &disp[currentAddress]);
+         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyTreeManagementMessagePacked[0]))), &disp[currentAddress]);
          #endif
          currentAddress++;
          #ifdef MPI2
-         MPI_Get_address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntryPacked[0]._persistentRecords._id))), 		&disp[currentAddress] );
+         MPI_Get_address( const_cast<void*>(static_cast<const void*>(&(dummyTreeManagementMessagePacked[0]._persistentRecords._spacetreeId))), 		&disp[currentAddress] );
          #else
-         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntryPacked[0]._persistentRecords._id))), 		&disp[currentAddress] );
+         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyTreeManagementMessagePacked[0]._persistentRecords._spacetreeId))), 		&disp[currentAddress] );
          #endif
          currentAddress++;
          #ifdef MPI2
-         MPI_Get_address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntryPacked[0]._persistentRecords._master))), 		&disp[currentAddress] );
+         MPI_Get_address( const_cast<void*>(static_cast<const void*>(&(dummyTreeManagementMessagePacked[0]._persistentRecords._packedRecords0))), 		&disp[currentAddress] );
          #else
-         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntryPacked[0]._persistentRecords._master))), 		&disp[currentAddress] );
+         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyTreeManagementMessagePacked[0]._persistentRecords._packedRecords0))), 		&disp[currentAddress] );
          #endif
          #ifndef MPI2
          currentAddress++;
-         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntryPacked[1]))), &disp[currentAddress]);
+         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyTreeManagementMessagePacked[1]))), &disp[currentAddress]);
          #endif
          for (int i=1; i<Attributes; i++) {
          
@@ -801,9 +868,9 @@ peano4::parallel::TreeEntry peano4::parallel::TreeEntryPacked::convert() const{
          }
          MPI_Aint base;
          #ifdef MPI2
-         MPI_Get_address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntryPacked[0]))), &base);
+         MPI_Get_address( const_cast<void*>(static_cast<const void*>(&(dummyTreeManagementMessagePacked[0]))), &base);
          #else
-         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntryPacked[0]))), &base);
+         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyTreeManagementMessagePacked[0]))), &base);
          #endif
          for (int i=0; i<Attributes; i++) {
          
@@ -814,13 +881,13 @@ peano4::parallel::TreeEntry peano4::parallel::TreeEntryPacked::convert() const{
          MPI_Datatype tmpType; 
          MPI_Type_create_struct( Attributes, blocklen, disp, subtypes, &tmpType );
          MPI_Aint typeExtent; 
-         MPI_Get_address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntryPacked[1]))), &typeExtent);
+         MPI_Get_address( const_cast<void*>(static_cast<const void*>(&(dummyTreeManagementMessagePacked[1]))), &typeExtent);
          typeExtent = MPI_Aint_diff(typeExtent, base);
-         MPI_Type_create_resized( tmpType, 0, typeExtent, &TreeEntryPacked::FullDatatype );
-         MPI_Type_commit( &TreeEntryPacked::FullDatatype );
+         MPI_Type_create_resized( tmpType, 0, typeExtent, &TreeManagementMessagePacked::FullDatatype );
+         MPI_Type_commit( &TreeManagementMessagePacked::FullDatatype );
          #else
-         MPI_Type_struct( Attributes, blocklen, disp, subtypes, &TreeEntryPacked::FullDatatype);
-         MPI_Type_commit( &TreeEntryPacked::FullDatatype );
+         MPI_Type_struct( Attributes, blocklen, disp, subtypes, &TreeManagementMessagePacked::FullDatatype);
+         MPI_Type_commit( &TreeManagementMessagePacked::FullDatatype );
          #endif
          
       }
@@ -828,13 +895,13 @@ peano4::parallel::TreeEntry peano4::parallel::TreeEntryPacked::convert() const{
    }
    
    
-   void peano4::parallel::TreeEntryPacked::shutdownDatatype() {
-      MPI_Type_free( &TreeEntryPacked::Datatype );
-      MPI_Type_free( &TreeEntryPacked::FullDatatype );
+   void peano4::parallel::TreeManagementMessagePacked::shutdownDatatype() {
+      MPI_Type_free( &TreeManagementMessagePacked::Datatype );
+      MPI_Type_free( &TreeManagementMessagePacked::FullDatatype );
       
    }
    
-   void peano4::parallel::TreeEntryPacked::send(int destination, int tag, bool exchangeOnlyAttributesMarkedWithParallelise, ExchangeMode mode) {
+   void peano4::parallel::TreeManagementMessagePacked::send(int destination, int tag, bool exchangeOnlyAttributesMarkedWithParallelise, ExchangeMode mode) {
       // ============================= 
 // start injected snippet/aspect 
 // ============================= 
@@ -844,7 +911,7 @@ switch (mode) {
       const int result = MPI_Send(this, 1, exchangeOnlyAttributesMarkedWithParallelise ? Datatype : FullDatatype, destination, tag, tarch::mpi::Rank::getInstance().getCommunicator()); 
        if  (result!=MPI_SUCCESS) { 
          std::ostringstream msg; 
-         msg << "was not able to send message peano4::parallel::TreeEntryPacked " 
+         msg << "was not able to send message peano4::parallel::TreeManagementMessagePacked " 
              << toString() 
              << " to node " << destination 
              << ": " << tarch::mpi::MPIReturnValueToString(result); 
@@ -867,7 +934,7 @@ switch (mode) {
        ); 
        if  (result!=MPI_SUCCESS) {  
          std::ostringstream msg;  
-         msg << "was not able to send message peano4::parallel::TreeEntryPacked "  
+         msg << "was not able to send message peano4::parallel::TreeManagementMessagePacked "  
              << toString() 
              << " to node " << destination 
              << ": " << tarch::mpi::MPIReturnValueToString(result);  
@@ -880,7 +947,7 @@ switch (mode) {
          result = MPI_Test( sendRequestHandle, &flag, MPI_STATUS_IGNORE ); 
          if (result!=MPI_SUCCESS) { 
            std::ostringstream msg; 
-           msg << "testing for finished send task for peano4::parallel::TreeEntryPacked " 
+           msg << "testing for finished send task for peano4::parallel::TreeManagementMessagePacked " 
                << toString() 
                << " sent to node " << destination 
                << " failed: " << tarch::mpi::MPIReturnValueToString(result); 
@@ -892,7 +959,7 @@ switch (mode) {
            (!triggeredTimeoutWarning) 
          ) { 
            tarch::mpi::Rank::getInstance().writeTimeOutWarning( 
-             "peano4::parallel::TreeEntryPacked", 
+             "peano4::parallel::TreeManagementMessagePacked", 
              "send(int)", destination,tag,1 
            ); 
            triggeredTimeoutWarning = true; 
@@ -902,7 +969,7 @@ switch (mode) {
            (clock()>timeOutShutdown) 
          ) { 
            tarch::mpi::Rank::getInstance().triggerDeadlockTimeOut( 
-             "peano4::parallel::TreeEntryPacked", 
+             "peano4::parallel::TreeManagementMessagePacked", 
              "send(int)", destination,tag,1 
            ); 
          } 
@@ -924,7 +991,7 @@ switch (mode) {
    
    
    
-   void peano4::parallel::TreeEntryPacked::receive(int source, int tag, bool exchangeOnlyAttributesMarkedWithParallelise, ExchangeMode mode) {
+   void peano4::parallel::TreeManagementMessagePacked::receive(int source, int tag, bool exchangeOnlyAttributesMarkedWithParallelise, ExchangeMode mode) {
       // ============================= 
 // start injected snippet/aspect 
 // ============================= 
@@ -935,7 +1002,7 @@ switch (mode) {
       const int   result = MPI_Recv(this, 1, exchangeOnlyAttributesMarkedWithParallelise ? Datatype : FullDatatype, source, tag, tarch::mpi::Rank::getInstance().getCommunicator(), source==MPI_ANY_SOURCE ? &status : MPI_STATUS_IGNORE ); 
       if ( result != MPI_SUCCESS ) { 
         std::ostringstream msg; 
-        msg << "failed to start to receive peano4::parallel::TreeEntryPacked from node " 
+        msg << "failed to start to receive peano4::parallel::TreeManagementMessagePacked from node " 
             << source << ": " << tarch::mpi::MPIReturnValueToString(result); 
         _log.error( "receive(int)", msg.str() ); 
       } 
@@ -955,7 +1022,7 @@ switch (mode) {
       ); 
       if ( result != MPI_SUCCESS ) { 
         std::ostringstream msg; 
-        msg << "failed to start to receive peano4::parallel::TreeEntryPacked from node " 
+        msg << "failed to start to receive peano4::parallel::TreeManagementMessagePacked from node " 
              << source << ": " << tarch::mpi::MPIReturnValueToString(result); 
         _log.error( "receive(int)", msg.str() ); 
       } 
@@ -969,7 +1036,7 @@ switch (mode) {
           (!triggeredTimeoutWarning) 
         ) { 
           tarch::mpi::Rank::getInstance().writeTimeOutWarning( 
-            "peano4::parallel::TreeEntryPacked", 
+            "peano4::parallel::TreeManagementMessagePacked", 
             "receive(int)", source,tag,1 
           ); 
           triggeredTimeoutWarning = true; 
@@ -979,7 +1046,7 @@ switch (mode) {
           (clock()>timeOutShutdown) 
         ) { 
           tarch::mpi::Rank::getInstance().triggerDeadlockTimeOut( 
-            "peano4::parallel::TreeEntryPacked", 
+            "peano4::parallel::TreeManagementMessagePacked", 
             "receive(int)", source,tag,1 
           ); 
         } 
@@ -987,7 +1054,7 @@ switch (mode) {
         result = MPI_Test( sendRequestHandle, &flag, source==MPI_ANY_SOURCE ? &status : MPI_STATUS_IGNORE ); 
         if (result!=MPI_SUCCESS) { 
           std::ostringstream msg; 
-          msg << "testing for finished receive task for peano4::parallel::TreeEntryPacked failed: " 
+          msg << "testing for finished receive task for peano4::parallel::TreeManagementMessagePacked failed: " 
               << tarch::mpi::MPIReturnValueToString(result); 
           _log.error("receive(int)", msg.str() ); 
         } 
@@ -1003,7 +1070,7 @@ switch (mode) {
       int result = MPI_Iprobe(source, tag, tarch::mpi::Rank::getInstance().getCommunicator(), &flag, MPI_STATUS_IGNORE ); 
        if (result!=MPI_SUCCESS) { 
         std::ostringstream msg; 
-        msg << "testing for finished receive task for peano4::parallel::TreeEntryPacked failed: " 
+        msg << "testing for finished receive task for peano4::parallel::TreeManagementMessagePacked failed: " 
             << tarch::mpi::MPIReturnValueToString(result); 
         _log.error("receive(int)", msg.str() ); 
       } 
@@ -1016,7 +1083,7 @@ switch (mode) {
           (!triggeredTimeoutWarning) 
         ) { 
           tarch::mpi::Rank::getInstance().writeTimeOutWarning( 
-            "peano4::parallel::TreeEntryPacked", 
+            "peano4::parallel::TreeManagementMessagePacked", 
             "receive(int)", source,tag,1 
           ); 
           triggeredTimeoutWarning = true; 
@@ -1026,7 +1093,7 @@ switch (mode) {
           (clock()>timeOutShutdown) 
         ) { 
           tarch::mpi::Rank::getInstance().triggerDeadlockTimeOut( 
-            "peano4::parallel::TreeEntryPacked", 
+            "peano4::parallel::TreeManagementMessagePacked", 
             "receive(int)", source,tag,1 
           ); 
         } 
@@ -1034,7 +1101,7 @@ switch (mode) {
         result = MPI_Iprobe(source, tag, tarch::mpi::Rank::getInstance().getCommunicator(), &flag, MPI_STATUS_IGNORE ); 
          if (result!=MPI_SUCCESS) { 
           std::ostringstream msg; 
-          msg << "testing for finished receive task for peano4::parallel::TreeEntryPacked failed: " 
+          msg << "testing for finished receive task for peano4::parallel::TreeManagementMessagePacked failed: " 
               << tarch::mpi::MPIReturnValueToString(result); 
           _log.error("receive(int)", msg.str() ); 
         } 
@@ -1042,7 +1109,7 @@ switch (mode) {
       result = MPI_Recv(this, 1, exchangeOnlyAttributesMarkedWithParallelise ? Datatype : FullDatatype, source, tag, tarch::mpi::Rank::getInstance().getCommunicator(), source==MPI_ANY_SOURCE ? &status : MPI_STATUS_IGNORE ); 
       if ( result != MPI_SUCCESS ) { 
         std::ostringstream msg; 
-        msg << "failed to start to receive peano4::parallel::TreeEntryPacked from node " 
+        msg << "failed to start to receive peano4::parallel::TreeManagementMessagePacked from node " 
             << source << ": " << tarch::mpi::MPIReturnValueToString(result); 
         _log.error( "receive(int)", msg.str() ); 
       } 
@@ -1059,7 +1126,7 @@ switch (mode) {
    
    
    
-   bool peano4::parallel::TreeEntryPacked::isMessageInQueue(int tag, bool exchangeOnlyAttributesMarkedWithParallelise) {
+   bool peano4::parallel::TreeManagementMessagePacked::isMessageInQueue(int tag, bool exchangeOnlyAttributesMarkedWithParallelise) {
       MPI_Status status;
       int  flag        = 0;
       MPI_Iprobe(
@@ -1080,7 +1147,7 @@ switch (mode) {
       
    }
    
-   int peano4::parallel::TreeEntryPacked::getSenderRank() const {
+   int peano4::parallel::TreeManagementMessagePacked::getSenderRank() const {
       assertion( _senderDestinationRank!=-1 );
       return _senderDestinationRank;
       

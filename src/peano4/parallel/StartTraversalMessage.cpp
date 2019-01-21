@@ -1,133 +1,104 @@
-#include "peano4/parallel/TreeEntry.h"
+#include "peano4/parallel/StartTraversalMessage.h"
 
-peano4::parallel::TreeEntry::PersistentRecords::PersistentRecords() {
+peano4::parallel::StartTraversalMessage::PersistentRecords::PersistentRecords() {
    
 }
 
 
-peano4::parallel::TreeEntry::PersistentRecords::PersistentRecords(const int& id, const int& master):
-_id(id),
-_master(master) {
+peano4::parallel::StartTraversalMessage::PersistentRecords::PersistentRecords(const int& stepIdentifier):
+_stepIdentifier(stepIdentifier) {
    
 }
 
 
- int peano4::parallel::TreeEntry::PersistentRecords::getId() const  {
-   return _id;
+ int peano4::parallel::StartTraversalMessage::PersistentRecords::getStepIdentifier() const  {
+   return _stepIdentifier;
 }
 
 
 
- void peano4::parallel::TreeEntry::PersistentRecords::setId(const int& id)  {
-   _id = id;
+ void peano4::parallel::StartTraversalMessage::PersistentRecords::setStepIdentifier(const int& stepIdentifier)  {
+   _stepIdentifier = stepIdentifier;
 }
 
 
-
- int peano4::parallel::TreeEntry::PersistentRecords::getMaster() const  {
-   return _master;
-}
-
-
-
- void peano4::parallel::TreeEntry::PersistentRecords::setMaster(const int& master)  {
-   _master = master;
-}
-
-
-peano4::parallel::TreeEntry::TreeEntry() {
+peano4::parallel::StartTraversalMessage::StartTraversalMessage() {
    
 }
 
 
-peano4::parallel::TreeEntry::TreeEntry(const PersistentRecords& persistentRecords):
-_persistentRecords(persistentRecords._id, persistentRecords._master) {
+peano4::parallel::StartTraversalMessage::StartTraversalMessage(const PersistentRecords& persistentRecords):
+_persistentRecords(persistentRecords._stepIdentifier) {
    
 }
 
 
-peano4::parallel::TreeEntry::TreeEntry(const int& id, const int& master):
-_persistentRecords(id, master) {
+peano4::parallel::StartTraversalMessage::StartTraversalMessage(const int& stepIdentifier):
+_persistentRecords(stepIdentifier) {
    
 }
 
 
-peano4::parallel::TreeEntry::~TreeEntry() { }
+peano4::parallel::StartTraversalMessage::~StartTraversalMessage() { }
 
 
- int peano4::parallel::TreeEntry::getId() const  {
-   return _persistentRecords._id;
+ int peano4::parallel::StartTraversalMessage::getStepIdentifier() const  {
+   return _persistentRecords._stepIdentifier;
 }
 
 
 
- void peano4::parallel::TreeEntry::setId(const int& id)  {
-   _persistentRecords._id = id;
-}
-
-
-
- int peano4::parallel::TreeEntry::getMaster() const  {
-   return _persistentRecords._master;
-}
-
-
-
- void peano4::parallel::TreeEntry::setMaster(const int& master)  {
-   _persistentRecords._master = master;
+ void peano4::parallel::StartTraversalMessage::setStepIdentifier(const int& stepIdentifier)  {
+   _persistentRecords._stepIdentifier = stepIdentifier;
 }
 
 
 
 
-std::string peano4::parallel::TreeEntry::toString() const {
+std::string peano4::parallel::StartTraversalMessage::toString() const {
    std::ostringstream stringstr;
    toString(stringstr);
    return stringstr.str();
 }
 
-void peano4::parallel::TreeEntry::toString (std::ostream& out) const {
+void peano4::parallel::StartTraversalMessage::toString (std::ostream& out) const {
    out << "("; 
-   out << "id:" << getId();
-   out << ",";
-   out << "master:" << getMaster();
+   out << "stepIdentifier:" << getStepIdentifier();
    out <<  ")";
 }
 
 
-peano4::parallel::TreeEntry::PersistentRecords peano4::parallel::TreeEntry::getPersistentRecords() const {
+peano4::parallel::StartTraversalMessage::PersistentRecords peano4::parallel::StartTraversalMessage::getPersistentRecords() const {
    return _persistentRecords;
 }
 
-peano4::parallel::TreeEntryPacked peano4::parallel::TreeEntry::convert() const{
-   return TreeEntryPacked(
-      getId(),
-      getMaster()
+peano4::parallel::StartTraversalMessagePacked peano4::parallel::StartTraversalMessage::convert() const{
+   return StartTraversalMessagePacked(
+      getStepIdentifier()
    );
 }
 
 #ifdef Parallel
-   tarch::logging::Log peano4::parallel::TreeEntry::_log( "peano4::parallel::TreeEntry" );
+   tarch::logging::Log peano4::parallel::StartTraversalMessage::_log( "peano4::parallel::StartTraversalMessage" );
    
-   MPI_Datatype peano4::parallel::TreeEntry::Datatype = 0;
-   MPI_Datatype peano4::parallel::TreeEntry::FullDatatype = 0;
+   MPI_Datatype peano4::parallel::StartTraversalMessage::Datatype = 0;
+   MPI_Datatype peano4::parallel::StartTraversalMessage::FullDatatype = 0;
    
    
-   void peano4::parallel::TreeEntry::initDatatype() {
+   void peano4::parallel::StartTraversalMessage::initDatatype() {
       {
-         TreeEntry dummyTreeEntry[16];
+         StartTraversalMessage dummyStartTraversalMessage[16];
          
          #ifdef MPI2
-         const int Attributes = 2;
+         const int Attributes = 1;
          #else
-         const int Attributes = 2+2;
+         const int Attributes = 1+2;
          #endif
          MPI_Datatype subtypes[Attributes] = {
             #ifndef MPI2
               MPI_LB,
             #endif
-              MPI_INT		 //id
-            , MPI_INT		 //master
+              MPI_INT		 //stepIdentifier
             #ifndef MPI2
             , MPI_UB
             #endif
@@ -138,8 +109,7 @@ peano4::parallel::TreeEntryPacked peano4::parallel::TreeEntry::convert() const{
             #ifndef MPI2
             1, // lower bound
             #endif
-              1		 //id
-            , 1		 //master
+              1		 //stepIdentifier
             #ifndef MPI2
             , 1 // upper bound
             #endif
@@ -150,23 +120,17 @@ peano4::parallel::TreeEntryPacked peano4::parallel::TreeEntry::convert() const{
          int       currentAddress = -1;
          #ifndef MPI2
          currentAddress++;
-         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntry[0]))), &disp[currentAddress]);
+         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyStartTraversalMessage[0]))), &disp[currentAddress]);
          #endif
          currentAddress++;
          #ifdef MPI2
-         MPI_Get_address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntry[0]._persistentRecords._id))), 		&disp[currentAddress] );
+         MPI_Get_address( const_cast<void*>(static_cast<const void*>(&(dummyStartTraversalMessage[0]._persistentRecords._stepIdentifier))), 		&disp[currentAddress] );
          #else
-         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntry[0]._persistentRecords._id))), 		&disp[currentAddress] );
-         #endif
-         currentAddress++;
-         #ifdef MPI2
-         MPI_Get_address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntry[0]._persistentRecords._master))), 		&disp[currentAddress] );
-         #else
-         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntry[0]._persistentRecords._master))), 		&disp[currentAddress] );
+         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyStartTraversalMessage[0]._persistentRecords._stepIdentifier))), 		&disp[currentAddress] );
          #endif
          #ifndef MPI2
          currentAddress++;
-         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntry[1]))), &disp[currentAddress]);
+         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyStartTraversalMessage[1]))), &disp[currentAddress]);
          #endif
          for (int i=1; i<Attributes; i++) {
          
@@ -174,9 +138,9 @@ peano4::parallel::TreeEntryPacked peano4::parallel::TreeEntry::convert() const{
          }
          MPI_Aint base;
          #ifdef MPI2
-         MPI_Get_address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntry[0]))), &base);
+         MPI_Get_address( const_cast<void*>(static_cast<const void*>(&(dummyStartTraversalMessage[0]))), &base);
          #else
-         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntry[0]))), &base);
+         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyStartTraversalMessage[0]))), &base);
          #endif
          for (int i=0; i<Attributes; i++) {
          
@@ -187,30 +151,29 @@ peano4::parallel::TreeEntryPacked peano4::parallel::TreeEntry::convert() const{
          MPI_Datatype tmpType; 
          MPI_Type_create_struct( Attributes, blocklen, disp, subtypes, &tmpType );
          MPI_Aint typeExtent; 
-         MPI_Get_address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntry[1]))), &typeExtent);
+         MPI_Get_address( const_cast<void*>(static_cast<const void*>(&(dummyStartTraversalMessage[1]))), &typeExtent);
          typeExtent = MPI_Aint_diff(typeExtent, base);
-         MPI_Type_create_resized( tmpType, 0, typeExtent, &TreeEntry::Datatype );
-         MPI_Type_commit( &TreeEntry::Datatype );
+         MPI_Type_create_resized( tmpType, 0, typeExtent, &StartTraversalMessage::Datatype );
+         MPI_Type_commit( &StartTraversalMessage::Datatype );
          #else
-         MPI_Type_struct( Attributes, blocklen, disp, subtypes, &TreeEntry::Datatype);
-         MPI_Type_commit( &TreeEntry::Datatype );
+         MPI_Type_struct( Attributes, blocklen, disp, subtypes, &StartTraversalMessage::Datatype);
+         MPI_Type_commit( &StartTraversalMessage::Datatype );
          #endif
          
       }
       {
-         TreeEntry dummyTreeEntry[16];
+         StartTraversalMessage dummyStartTraversalMessage[16];
          
          #ifdef MPI2
-         const int Attributes = 2;
+         const int Attributes = 1;
          #else
-         const int Attributes = 2+2;
+         const int Attributes = 1+2;
          #endif
          MPI_Datatype subtypes[Attributes] = {
             #ifndef MPI2
               MPI_LB,
             #endif
-              MPI_INT		 //id
-            , MPI_INT		 //master
+              MPI_INT		 //stepIdentifier
             #ifndef MPI2
             , MPI_UB
             #endif
@@ -221,8 +184,7 @@ peano4::parallel::TreeEntryPacked peano4::parallel::TreeEntry::convert() const{
             #ifndef MPI2
             1, // lower bound
             #endif
-              1		 //id
-            , 1		 //master
+              1		 //stepIdentifier
             #ifndef MPI2
             , 1 // upper bound
             #endif
@@ -233,23 +195,17 @@ peano4::parallel::TreeEntryPacked peano4::parallel::TreeEntry::convert() const{
          int       currentAddress = -1;
          #ifndef MPI2
          currentAddress++;
-         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntry[0]))), &disp[currentAddress]);
+         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyStartTraversalMessage[0]))), &disp[currentAddress]);
          #endif
          currentAddress++;
          #ifdef MPI2
-         MPI_Get_address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntry[0]._persistentRecords._id))), 		&disp[currentAddress] );
+         MPI_Get_address( const_cast<void*>(static_cast<const void*>(&(dummyStartTraversalMessage[0]._persistentRecords._stepIdentifier))), 		&disp[currentAddress] );
          #else
-         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntry[0]._persistentRecords._id))), 		&disp[currentAddress] );
-         #endif
-         currentAddress++;
-         #ifdef MPI2
-         MPI_Get_address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntry[0]._persistentRecords._master))), 		&disp[currentAddress] );
-         #else
-         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntry[0]._persistentRecords._master))), 		&disp[currentAddress] );
+         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyStartTraversalMessage[0]._persistentRecords._stepIdentifier))), 		&disp[currentAddress] );
          #endif
          #ifndef MPI2
          currentAddress++;
-         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntry[1]))), &disp[currentAddress]);
+         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyStartTraversalMessage[1]))), &disp[currentAddress]);
          #endif
          for (int i=1; i<Attributes; i++) {
          
@@ -257,9 +213,9 @@ peano4::parallel::TreeEntryPacked peano4::parallel::TreeEntry::convert() const{
          }
          MPI_Aint base;
          #ifdef MPI2
-         MPI_Get_address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntry[0]))), &base);
+         MPI_Get_address( const_cast<void*>(static_cast<const void*>(&(dummyStartTraversalMessage[0]))), &base);
          #else
-         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntry[0]))), &base);
+         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyStartTraversalMessage[0]))), &base);
          #endif
          for (int i=0; i<Attributes; i++) {
          
@@ -270,13 +226,13 @@ peano4::parallel::TreeEntryPacked peano4::parallel::TreeEntry::convert() const{
          MPI_Datatype tmpType; 
          MPI_Type_create_struct( Attributes, blocklen, disp, subtypes, &tmpType );
          MPI_Aint typeExtent; 
-         MPI_Get_address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntry[1]))), &typeExtent);
+         MPI_Get_address( const_cast<void*>(static_cast<const void*>(&(dummyStartTraversalMessage[1]))), &typeExtent);
          typeExtent = MPI_Aint_diff(typeExtent, base);
-         MPI_Type_create_resized( tmpType, 0, typeExtent, &TreeEntry::FullDatatype );
-         MPI_Type_commit( &TreeEntry::FullDatatype );
+         MPI_Type_create_resized( tmpType, 0, typeExtent, &StartTraversalMessage::FullDatatype );
+         MPI_Type_commit( &StartTraversalMessage::FullDatatype );
          #else
-         MPI_Type_struct( Attributes, blocklen, disp, subtypes, &TreeEntry::FullDatatype);
-         MPI_Type_commit( &TreeEntry::FullDatatype );
+         MPI_Type_struct( Attributes, blocklen, disp, subtypes, &StartTraversalMessage::FullDatatype);
+         MPI_Type_commit( &StartTraversalMessage::FullDatatype );
          #endif
          
       }
@@ -284,13 +240,13 @@ peano4::parallel::TreeEntryPacked peano4::parallel::TreeEntry::convert() const{
    }
    
    
-   void peano4::parallel::TreeEntry::shutdownDatatype() {
-      MPI_Type_free( &TreeEntry::Datatype );
-      MPI_Type_free( &TreeEntry::FullDatatype );
+   void peano4::parallel::StartTraversalMessage::shutdownDatatype() {
+      MPI_Type_free( &StartTraversalMessage::Datatype );
+      MPI_Type_free( &StartTraversalMessage::FullDatatype );
       
    }
    
-   void peano4::parallel::TreeEntry::send(int destination, int tag, bool exchangeOnlyAttributesMarkedWithParallelise, ExchangeMode mode) {
+   void peano4::parallel::StartTraversalMessage::send(int destination, int tag, bool exchangeOnlyAttributesMarkedWithParallelise, ExchangeMode mode) {
       // ============================= 
 // start injected snippet/aspect 
 // ============================= 
@@ -300,7 +256,7 @@ switch (mode) {
       const int result = MPI_Send(this, 1, exchangeOnlyAttributesMarkedWithParallelise ? Datatype : FullDatatype, destination, tag, tarch::mpi::Rank::getInstance().getCommunicator()); 
        if  (result!=MPI_SUCCESS) { 
          std::ostringstream msg; 
-         msg << "was not able to send message peano4::parallel::TreeEntry " 
+         msg << "was not able to send message peano4::parallel::StartTraversalMessage " 
              << toString() 
              << " to node " << destination 
              << ": " << tarch::mpi::MPIReturnValueToString(result); 
@@ -323,7 +279,7 @@ switch (mode) {
        ); 
        if  (result!=MPI_SUCCESS) {  
          std::ostringstream msg;  
-         msg << "was not able to send message peano4::parallel::TreeEntry "  
+         msg << "was not able to send message peano4::parallel::StartTraversalMessage "  
              << toString() 
              << " to node " << destination 
              << ": " << tarch::mpi::MPIReturnValueToString(result);  
@@ -336,7 +292,7 @@ switch (mode) {
          result = MPI_Test( sendRequestHandle, &flag, MPI_STATUS_IGNORE ); 
          if (result!=MPI_SUCCESS) { 
            std::ostringstream msg; 
-           msg << "testing for finished send task for peano4::parallel::TreeEntry " 
+           msg << "testing for finished send task for peano4::parallel::StartTraversalMessage " 
                << toString() 
                << " sent to node " << destination 
                << " failed: " << tarch::mpi::MPIReturnValueToString(result); 
@@ -348,7 +304,7 @@ switch (mode) {
            (!triggeredTimeoutWarning) 
          ) { 
            tarch::mpi::Rank::getInstance().writeTimeOutWarning( 
-             "peano4::parallel::TreeEntry", 
+             "peano4::parallel::StartTraversalMessage", 
              "send(int)", destination,tag,1 
            ); 
            triggeredTimeoutWarning = true; 
@@ -358,7 +314,7 @@ switch (mode) {
            (clock()>timeOutShutdown) 
          ) { 
            tarch::mpi::Rank::getInstance().triggerDeadlockTimeOut( 
-             "peano4::parallel::TreeEntry", 
+             "peano4::parallel::StartTraversalMessage", 
              "send(int)", destination,tag,1 
            ); 
          } 
@@ -380,7 +336,7 @@ switch (mode) {
    
    
    
-   void peano4::parallel::TreeEntry::receive(int source, int tag, bool exchangeOnlyAttributesMarkedWithParallelise, ExchangeMode mode) {
+   void peano4::parallel::StartTraversalMessage::receive(int source, int tag, bool exchangeOnlyAttributesMarkedWithParallelise, ExchangeMode mode) {
       // ============================= 
 // start injected snippet/aspect 
 // ============================= 
@@ -391,7 +347,7 @@ switch (mode) {
       const int   result = MPI_Recv(this, 1, exchangeOnlyAttributesMarkedWithParallelise ? Datatype : FullDatatype, source, tag, tarch::mpi::Rank::getInstance().getCommunicator(), source==MPI_ANY_SOURCE ? &status : MPI_STATUS_IGNORE ); 
       if ( result != MPI_SUCCESS ) { 
         std::ostringstream msg; 
-        msg << "failed to start to receive peano4::parallel::TreeEntry from node " 
+        msg << "failed to start to receive peano4::parallel::StartTraversalMessage from node " 
             << source << ": " << tarch::mpi::MPIReturnValueToString(result); 
         _log.error( "receive(int)", msg.str() ); 
       } 
@@ -411,7 +367,7 @@ switch (mode) {
       ); 
       if ( result != MPI_SUCCESS ) { 
         std::ostringstream msg; 
-        msg << "failed to start to receive peano4::parallel::TreeEntry from node " 
+        msg << "failed to start to receive peano4::parallel::StartTraversalMessage from node " 
              << source << ": " << tarch::mpi::MPIReturnValueToString(result); 
         _log.error( "receive(int)", msg.str() ); 
       } 
@@ -425,7 +381,7 @@ switch (mode) {
           (!triggeredTimeoutWarning) 
         ) { 
           tarch::mpi::Rank::getInstance().writeTimeOutWarning( 
-            "peano4::parallel::TreeEntry", 
+            "peano4::parallel::StartTraversalMessage", 
             "receive(int)", source,tag,1 
           ); 
           triggeredTimeoutWarning = true; 
@@ -435,7 +391,7 @@ switch (mode) {
           (clock()>timeOutShutdown) 
         ) { 
           tarch::mpi::Rank::getInstance().triggerDeadlockTimeOut( 
-            "peano4::parallel::TreeEntry", 
+            "peano4::parallel::StartTraversalMessage", 
             "receive(int)", source,tag,1 
           ); 
         } 
@@ -443,7 +399,7 @@ switch (mode) {
         result = MPI_Test( sendRequestHandle, &flag, source==MPI_ANY_SOURCE ? &status : MPI_STATUS_IGNORE ); 
         if (result!=MPI_SUCCESS) { 
           std::ostringstream msg; 
-          msg << "testing for finished receive task for peano4::parallel::TreeEntry failed: " 
+          msg << "testing for finished receive task for peano4::parallel::StartTraversalMessage failed: " 
               << tarch::mpi::MPIReturnValueToString(result); 
           _log.error("receive(int)", msg.str() ); 
         } 
@@ -459,7 +415,7 @@ switch (mode) {
       int result = MPI_Iprobe(source, tag, tarch::mpi::Rank::getInstance().getCommunicator(), &flag, MPI_STATUS_IGNORE ); 
        if (result!=MPI_SUCCESS) { 
         std::ostringstream msg; 
-        msg << "testing for finished receive task for peano4::parallel::TreeEntry failed: " 
+        msg << "testing for finished receive task for peano4::parallel::StartTraversalMessage failed: " 
             << tarch::mpi::MPIReturnValueToString(result); 
         _log.error("receive(int)", msg.str() ); 
       } 
@@ -472,7 +428,7 @@ switch (mode) {
           (!triggeredTimeoutWarning) 
         ) { 
           tarch::mpi::Rank::getInstance().writeTimeOutWarning( 
-            "peano4::parallel::TreeEntry", 
+            "peano4::parallel::StartTraversalMessage", 
             "receive(int)", source,tag,1 
           ); 
           triggeredTimeoutWarning = true; 
@@ -482,7 +438,7 @@ switch (mode) {
           (clock()>timeOutShutdown) 
         ) { 
           tarch::mpi::Rank::getInstance().triggerDeadlockTimeOut( 
-            "peano4::parallel::TreeEntry", 
+            "peano4::parallel::StartTraversalMessage", 
             "receive(int)", source,tag,1 
           ); 
         } 
@@ -490,7 +446,7 @@ switch (mode) {
         result = MPI_Iprobe(source, tag, tarch::mpi::Rank::getInstance().getCommunicator(), &flag, MPI_STATUS_IGNORE ); 
          if (result!=MPI_SUCCESS) { 
           std::ostringstream msg; 
-          msg << "testing for finished receive task for peano4::parallel::TreeEntry failed: " 
+          msg << "testing for finished receive task for peano4::parallel::StartTraversalMessage failed: " 
               << tarch::mpi::MPIReturnValueToString(result); 
           _log.error("receive(int)", msg.str() ); 
         } 
@@ -498,7 +454,7 @@ switch (mode) {
       result = MPI_Recv(this, 1, exchangeOnlyAttributesMarkedWithParallelise ? Datatype : FullDatatype, source, tag, tarch::mpi::Rank::getInstance().getCommunicator(), source==MPI_ANY_SOURCE ? &status : MPI_STATUS_IGNORE ); 
       if ( result != MPI_SUCCESS ) { 
         std::ostringstream msg; 
-        msg << "failed to start to receive peano4::parallel::TreeEntry from node " 
+        msg << "failed to start to receive peano4::parallel::StartTraversalMessage from node " 
             << source << ": " << tarch::mpi::MPIReturnValueToString(result); 
         _log.error( "receive(int)", msg.str() ); 
       } 
@@ -515,7 +471,7 @@ switch (mode) {
    
    
    
-   bool peano4::parallel::TreeEntry::isMessageInQueue(int tag, bool exchangeOnlyAttributesMarkedWithParallelise) {
+   bool peano4::parallel::StartTraversalMessage::isMessageInQueue(int tag, bool exchangeOnlyAttributesMarkedWithParallelise) {
       MPI_Status status;
       int  flag        = 0;
       MPI_Iprobe(
@@ -536,7 +492,7 @@ switch (mode) {
       
    }
    
-   int peano4::parallel::TreeEntry::getSenderRank() const {
+   int peano4::parallel::StartTraversalMessage::getSenderRank() const {
       assertion( _senderDestinationRank!=-1 );
       return _senderDestinationRank;
       
@@ -544,134 +500,105 @@ switch (mode) {
 #endif
 
 
-peano4::parallel::TreeEntryPacked::PersistentRecords::PersistentRecords() {
+peano4::parallel::StartTraversalMessagePacked::PersistentRecords::PersistentRecords() {
    
 }
 
 
-peano4::parallel::TreeEntryPacked::PersistentRecords::PersistentRecords(const int& id, const int& master):
-_id(id),
-_master(master) {
+peano4::parallel::StartTraversalMessagePacked::PersistentRecords::PersistentRecords(const int& stepIdentifier):
+_stepIdentifier(stepIdentifier) {
    
 }
 
 
- int peano4::parallel::TreeEntryPacked::PersistentRecords::getId() const  {
-   return _id;
+ int peano4::parallel::StartTraversalMessagePacked::PersistentRecords::getStepIdentifier() const  {
+   return _stepIdentifier;
 }
 
 
 
- void peano4::parallel::TreeEntryPacked::PersistentRecords::setId(const int& id)  {
-   _id = id;
+ void peano4::parallel::StartTraversalMessagePacked::PersistentRecords::setStepIdentifier(const int& stepIdentifier)  {
+   _stepIdentifier = stepIdentifier;
 }
 
 
-
- int peano4::parallel::TreeEntryPacked::PersistentRecords::getMaster() const  {
-   return _master;
-}
-
-
-
- void peano4::parallel::TreeEntryPacked::PersistentRecords::setMaster(const int& master)  {
-   _master = master;
-}
-
-
-peano4::parallel::TreeEntryPacked::TreeEntryPacked() {
+peano4::parallel::StartTraversalMessagePacked::StartTraversalMessagePacked() {
    
 }
 
 
-peano4::parallel::TreeEntryPacked::TreeEntryPacked(const PersistentRecords& persistentRecords):
-_persistentRecords(persistentRecords._id, persistentRecords._master) {
+peano4::parallel::StartTraversalMessagePacked::StartTraversalMessagePacked(const PersistentRecords& persistentRecords):
+_persistentRecords(persistentRecords._stepIdentifier) {
    
 }
 
 
-peano4::parallel::TreeEntryPacked::TreeEntryPacked(const int& id, const int& master):
-_persistentRecords(id, master) {
+peano4::parallel::StartTraversalMessagePacked::StartTraversalMessagePacked(const int& stepIdentifier):
+_persistentRecords(stepIdentifier) {
    
 }
 
 
-peano4::parallel::TreeEntryPacked::~TreeEntryPacked() { }
+peano4::parallel::StartTraversalMessagePacked::~StartTraversalMessagePacked() { }
 
 
- int peano4::parallel::TreeEntryPacked::getId() const  {
-   return _persistentRecords._id;
+ int peano4::parallel::StartTraversalMessagePacked::getStepIdentifier() const  {
+   return _persistentRecords._stepIdentifier;
 }
 
 
 
- void peano4::parallel::TreeEntryPacked::setId(const int& id)  {
-   _persistentRecords._id = id;
-}
-
-
-
- int peano4::parallel::TreeEntryPacked::getMaster() const  {
-   return _persistentRecords._master;
-}
-
-
-
- void peano4::parallel::TreeEntryPacked::setMaster(const int& master)  {
-   _persistentRecords._master = master;
+ void peano4::parallel::StartTraversalMessagePacked::setStepIdentifier(const int& stepIdentifier)  {
+   _persistentRecords._stepIdentifier = stepIdentifier;
 }
 
 
 
 
-std::string peano4::parallel::TreeEntryPacked::toString() const {
+std::string peano4::parallel::StartTraversalMessagePacked::toString() const {
    std::ostringstream stringstr;
    toString(stringstr);
    return stringstr.str();
 }
 
-void peano4::parallel::TreeEntryPacked::toString (std::ostream& out) const {
+void peano4::parallel::StartTraversalMessagePacked::toString (std::ostream& out) const {
    out << "("; 
-   out << "id:" << getId();
-   out << ",";
-   out << "master:" << getMaster();
+   out << "stepIdentifier:" << getStepIdentifier();
    out <<  ")";
 }
 
 
-peano4::parallel::TreeEntryPacked::PersistentRecords peano4::parallel::TreeEntryPacked::getPersistentRecords() const {
+peano4::parallel::StartTraversalMessagePacked::PersistentRecords peano4::parallel::StartTraversalMessagePacked::getPersistentRecords() const {
    return _persistentRecords;
 }
 
-peano4::parallel::TreeEntry peano4::parallel::TreeEntryPacked::convert() const{
-   return TreeEntry(
-      getId(),
-      getMaster()
+peano4::parallel::StartTraversalMessage peano4::parallel::StartTraversalMessagePacked::convert() const{
+   return StartTraversalMessage(
+      getStepIdentifier()
    );
 }
 
 #ifdef Parallel
-   tarch::logging::Log peano4::parallel::TreeEntryPacked::_log( "peano4::parallel::TreeEntryPacked" );
+   tarch::logging::Log peano4::parallel::StartTraversalMessagePacked::_log( "peano4::parallel::StartTraversalMessagePacked" );
    
-   MPI_Datatype peano4::parallel::TreeEntryPacked::Datatype = 0;
-   MPI_Datatype peano4::parallel::TreeEntryPacked::FullDatatype = 0;
+   MPI_Datatype peano4::parallel::StartTraversalMessagePacked::Datatype = 0;
+   MPI_Datatype peano4::parallel::StartTraversalMessagePacked::FullDatatype = 0;
    
    
-   void peano4::parallel::TreeEntryPacked::initDatatype() {
+   void peano4::parallel::StartTraversalMessagePacked::initDatatype() {
       {
-         TreeEntryPacked dummyTreeEntryPacked[16];
+         StartTraversalMessagePacked dummyStartTraversalMessagePacked[16];
          
          #ifdef MPI2
-         const int Attributes = 2;
+         const int Attributes = 1;
          #else
-         const int Attributes = 2+2;
+         const int Attributes = 1+2;
          #endif
          MPI_Datatype subtypes[Attributes] = {
             #ifndef MPI2
               MPI_LB,
             #endif
-              MPI_INT		 //id
-            , MPI_INT		 //master
+              MPI_INT		 //stepIdentifier
             #ifndef MPI2
             , MPI_UB
             #endif
@@ -682,8 +609,7 @@ peano4::parallel::TreeEntry peano4::parallel::TreeEntryPacked::convert() const{
             #ifndef MPI2
             1, // lower bound
             #endif
-              1		 //id
-            , 1		 //master
+              1		 //stepIdentifier
             #ifndef MPI2
             , 1 // upper bound
             #endif
@@ -694,23 +620,17 @@ peano4::parallel::TreeEntry peano4::parallel::TreeEntryPacked::convert() const{
          int       currentAddress = -1;
          #ifndef MPI2
          currentAddress++;
-         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntryPacked[0]))), &disp[currentAddress]);
+         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyStartTraversalMessagePacked[0]))), &disp[currentAddress]);
          #endif
          currentAddress++;
          #ifdef MPI2
-         MPI_Get_address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntryPacked[0]._persistentRecords._id))), 		&disp[currentAddress] );
+         MPI_Get_address( const_cast<void*>(static_cast<const void*>(&(dummyStartTraversalMessagePacked[0]._persistentRecords._stepIdentifier))), 		&disp[currentAddress] );
          #else
-         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntryPacked[0]._persistentRecords._id))), 		&disp[currentAddress] );
-         #endif
-         currentAddress++;
-         #ifdef MPI2
-         MPI_Get_address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntryPacked[0]._persistentRecords._master))), 		&disp[currentAddress] );
-         #else
-         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntryPacked[0]._persistentRecords._master))), 		&disp[currentAddress] );
+         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyStartTraversalMessagePacked[0]._persistentRecords._stepIdentifier))), 		&disp[currentAddress] );
          #endif
          #ifndef MPI2
          currentAddress++;
-         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntryPacked[1]))), &disp[currentAddress]);
+         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyStartTraversalMessagePacked[1]))), &disp[currentAddress]);
          #endif
          for (int i=1; i<Attributes; i++) {
          
@@ -718,9 +638,9 @@ peano4::parallel::TreeEntry peano4::parallel::TreeEntryPacked::convert() const{
          }
          MPI_Aint base;
          #ifdef MPI2
-         MPI_Get_address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntryPacked[0]))), &base);
+         MPI_Get_address( const_cast<void*>(static_cast<const void*>(&(dummyStartTraversalMessagePacked[0]))), &base);
          #else
-         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntryPacked[0]))), &base);
+         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyStartTraversalMessagePacked[0]))), &base);
          #endif
          for (int i=0; i<Attributes; i++) {
          
@@ -731,30 +651,29 @@ peano4::parallel::TreeEntry peano4::parallel::TreeEntryPacked::convert() const{
          MPI_Datatype tmpType; 
          MPI_Type_create_struct( Attributes, blocklen, disp, subtypes, &tmpType );
          MPI_Aint typeExtent; 
-         MPI_Get_address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntryPacked[1]))), &typeExtent);
+         MPI_Get_address( const_cast<void*>(static_cast<const void*>(&(dummyStartTraversalMessagePacked[1]))), &typeExtent);
          typeExtent = MPI_Aint_diff(typeExtent, base);
-         MPI_Type_create_resized( tmpType, 0, typeExtent, &TreeEntryPacked::Datatype );
-         MPI_Type_commit( &TreeEntryPacked::Datatype );
+         MPI_Type_create_resized( tmpType, 0, typeExtent, &StartTraversalMessagePacked::Datatype );
+         MPI_Type_commit( &StartTraversalMessagePacked::Datatype );
          #else
-         MPI_Type_struct( Attributes, blocklen, disp, subtypes, &TreeEntryPacked::Datatype);
-         MPI_Type_commit( &TreeEntryPacked::Datatype );
+         MPI_Type_struct( Attributes, blocklen, disp, subtypes, &StartTraversalMessagePacked::Datatype);
+         MPI_Type_commit( &StartTraversalMessagePacked::Datatype );
          #endif
          
       }
       {
-         TreeEntryPacked dummyTreeEntryPacked[16];
+         StartTraversalMessagePacked dummyStartTraversalMessagePacked[16];
          
          #ifdef MPI2
-         const int Attributes = 2;
+         const int Attributes = 1;
          #else
-         const int Attributes = 2+2;
+         const int Attributes = 1+2;
          #endif
          MPI_Datatype subtypes[Attributes] = {
             #ifndef MPI2
               MPI_LB,
             #endif
-              MPI_INT		 //id
-            , MPI_INT		 //master
+              MPI_INT		 //stepIdentifier
             #ifndef MPI2
             , MPI_UB
             #endif
@@ -765,8 +684,7 @@ peano4::parallel::TreeEntry peano4::parallel::TreeEntryPacked::convert() const{
             #ifndef MPI2
             1, // lower bound
             #endif
-              1		 //id
-            , 1		 //master
+              1		 //stepIdentifier
             #ifndef MPI2
             , 1 // upper bound
             #endif
@@ -777,23 +695,17 @@ peano4::parallel::TreeEntry peano4::parallel::TreeEntryPacked::convert() const{
          int       currentAddress = -1;
          #ifndef MPI2
          currentAddress++;
-         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntryPacked[0]))), &disp[currentAddress]);
+         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyStartTraversalMessagePacked[0]))), &disp[currentAddress]);
          #endif
          currentAddress++;
          #ifdef MPI2
-         MPI_Get_address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntryPacked[0]._persistentRecords._id))), 		&disp[currentAddress] );
+         MPI_Get_address( const_cast<void*>(static_cast<const void*>(&(dummyStartTraversalMessagePacked[0]._persistentRecords._stepIdentifier))), 		&disp[currentAddress] );
          #else
-         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntryPacked[0]._persistentRecords._id))), 		&disp[currentAddress] );
-         #endif
-         currentAddress++;
-         #ifdef MPI2
-         MPI_Get_address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntryPacked[0]._persistentRecords._master))), 		&disp[currentAddress] );
-         #else
-         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntryPacked[0]._persistentRecords._master))), 		&disp[currentAddress] );
+         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyStartTraversalMessagePacked[0]._persistentRecords._stepIdentifier))), 		&disp[currentAddress] );
          #endif
          #ifndef MPI2
          currentAddress++;
-         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntryPacked[1]))), &disp[currentAddress]);
+         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyStartTraversalMessagePacked[1]))), &disp[currentAddress]);
          #endif
          for (int i=1; i<Attributes; i++) {
          
@@ -801,9 +713,9 @@ peano4::parallel::TreeEntry peano4::parallel::TreeEntryPacked::convert() const{
          }
          MPI_Aint base;
          #ifdef MPI2
-         MPI_Get_address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntryPacked[0]))), &base);
+         MPI_Get_address( const_cast<void*>(static_cast<const void*>(&(dummyStartTraversalMessagePacked[0]))), &base);
          #else
-         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntryPacked[0]))), &base);
+         MPI_Address( const_cast<void*>(static_cast<const void*>(&(dummyStartTraversalMessagePacked[0]))), &base);
          #endif
          for (int i=0; i<Attributes; i++) {
          
@@ -814,13 +726,13 @@ peano4::parallel::TreeEntry peano4::parallel::TreeEntryPacked::convert() const{
          MPI_Datatype tmpType; 
          MPI_Type_create_struct( Attributes, blocklen, disp, subtypes, &tmpType );
          MPI_Aint typeExtent; 
-         MPI_Get_address( const_cast<void*>(static_cast<const void*>(&(dummyTreeEntryPacked[1]))), &typeExtent);
+         MPI_Get_address( const_cast<void*>(static_cast<const void*>(&(dummyStartTraversalMessagePacked[1]))), &typeExtent);
          typeExtent = MPI_Aint_diff(typeExtent, base);
-         MPI_Type_create_resized( tmpType, 0, typeExtent, &TreeEntryPacked::FullDatatype );
-         MPI_Type_commit( &TreeEntryPacked::FullDatatype );
+         MPI_Type_create_resized( tmpType, 0, typeExtent, &StartTraversalMessagePacked::FullDatatype );
+         MPI_Type_commit( &StartTraversalMessagePacked::FullDatatype );
          #else
-         MPI_Type_struct( Attributes, blocklen, disp, subtypes, &TreeEntryPacked::FullDatatype);
-         MPI_Type_commit( &TreeEntryPacked::FullDatatype );
+         MPI_Type_struct( Attributes, blocklen, disp, subtypes, &StartTraversalMessagePacked::FullDatatype);
+         MPI_Type_commit( &StartTraversalMessagePacked::FullDatatype );
          #endif
          
       }
@@ -828,13 +740,13 @@ peano4::parallel::TreeEntry peano4::parallel::TreeEntryPacked::convert() const{
    }
    
    
-   void peano4::parallel::TreeEntryPacked::shutdownDatatype() {
-      MPI_Type_free( &TreeEntryPacked::Datatype );
-      MPI_Type_free( &TreeEntryPacked::FullDatatype );
+   void peano4::parallel::StartTraversalMessagePacked::shutdownDatatype() {
+      MPI_Type_free( &StartTraversalMessagePacked::Datatype );
+      MPI_Type_free( &StartTraversalMessagePacked::FullDatatype );
       
    }
    
-   void peano4::parallel::TreeEntryPacked::send(int destination, int tag, bool exchangeOnlyAttributesMarkedWithParallelise, ExchangeMode mode) {
+   void peano4::parallel::StartTraversalMessagePacked::send(int destination, int tag, bool exchangeOnlyAttributesMarkedWithParallelise, ExchangeMode mode) {
       // ============================= 
 // start injected snippet/aspect 
 // ============================= 
@@ -844,7 +756,7 @@ switch (mode) {
       const int result = MPI_Send(this, 1, exchangeOnlyAttributesMarkedWithParallelise ? Datatype : FullDatatype, destination, tag, tarch::mpi::Rank::getInstance().getCommunicator()); 
        if  (result!=MPI_SUCCESS) { 
          std::ostringstream msg; 
-         msg << "was not able to send message peano4::parallel::TreeEntryPacked " 
+         msg << "was not able to send message peano4::parallel::StartTraversalMessagePacked " 
              << toString() 
              << " to node " << destination 
              << ": " << tarch::mpi::MPIReturnValueToString(result); 
@@ -867,7 +779,7 @@ switch (mode) {
        ); 
        if  (result!=MPI_SUCCESS) {  
          std::ostringstream msg;  
-         msg << "was not able to send message peano4::parallel::TreeEntryPacked "  
+         msg << "was not able to send message peano4::parallel::StartTraversalMessagePacked "  
              << toString() 
              << " to node " << destination 
              << ": " << tarch::mpi::MPIReturnValueToString(result);  
@@ -880,7 +792,7 @@ switch (mode) {
          result = MPI_Test( sendRequestHandle, &flag, MPI_STATUS_IGNORE ); 
          if (result!=MPI_SUCCESS) { 
            std::ostringstream msg; 
-           msg << "testing for finished send task for peano4::parallel::TreeEntryPacked " 
+           msg << "testing for finished send task for peano4::parallel::StartTraversalMessagePacked " 
                << toString() 
                << " sent to node " << destination 
                << " failed: " << tarch::mpi::MPIReturnValueToString(result); 
@@ -892,7 +804,7 @@ switch (mode) {
            (!triggeredTimeoutWarning) 
          ) { 
            tarch::mpi::Rank::getInstance().writeTimeOutWarning( 
-             "peano4::parallel::TreeEntryPacked", 
+             "peano4::parallel::StartTraversalMessagePacked", 
              "send(int)", destination,tag,1 
            ); 
            triggeredTimeoutWarning = true; 
@@ -902,7 +814,7 @@ switch (mode) {
            (clock()>timeOutShutdown) 
          ) { 
            tarch::mpi::Rank::getInstance().triggerDeadlockTimeOut( 
-             "peano4::parallel::TreeEntryPacked", 
+             "peano4::parallel::StartTraversalMessagePacked", 
              "send(int)", destination,tag,1 
            ); 
          } 
@@ -924,7 +836,7 @@ switch (mode) {
    
    
    
-   void peano4::parallel::TreeEntryPacked::receive(int source, int tag, bool exchangeOnlyAttributesMarkedWithParallelise, ExchangeMode mode) {
+   void peano4::parallel::StartTraversalMessagePacked::receive(int source, int tag, bool exchangeOnlyAttributesMarkedWithParallelise, ExchangeMode mode) {
       // ============================= 
 // start injected snippet/aspect 
 // ============================= 
@@ -935,7 +847,7 @@ switch (mode) {
       const int   result = MPI_Recv(this, 1, exchangeOnlyAttributesMarkedWithParallelise ? Datatype : FullDatatype, source, tag, tarch::mpi::Rank::getInstance().getCommunicator(), source==MPI_ANY_SOURCE ? &status : MPI_STATUS_IGNORE ); 
       if ( result != MPI_SUCCESS ) { 
         std::ostringstream msg; 
-        msg << "failed to start to receive peano4::parallel::TreeEntryPacked from node " 
+        msg << "failed to start to receive peano4::parallel::StartTraversalMessagePacked from node " 
             << source << ": " << tarch::mpi::MPIReturnValueToString(result); 
         _log.error( "receive(int)", msg.str() ); 
       } 
@@ -955,7 +867,7 @@ switch (mode) {
       ); 
       if ( result != MPI_SUCCESS ) { 
         std::ostringstream msg; 
-        msg << "failed to start to receive peano4::parallel::TreeEntryPacked from node " 
+        msg << "failed to start to receive peano4::parallel::StartTraversalMessagePacked from node " 
              << source << ": " << tarch::mpi::MPIReturnValueToString(result); 
         _log.error( "receive(int)", msg.str() ); 
       } 
@@ -969,7 +881,7 @@ switch (mode) {
           (!triggeredTimeoutWarning) 
         ) { 
           tarch::mpi::Rank::getInstance().writeTimeOutWarning( 
-            "peano4::parallel::TreeEntryPacked", 
+            "peano4::parallel::StartTraversalMessagePacked", 
             "receive(int)", source,tag,1 
           ); 
           triggeredTimeoutWarning = true; 
@@ -979,7 +891,7 @@ switch (mode) {
           (clock()>timeOutShutdown) 
         ) { 
           tarch::mpi::Rank::getInstance().triggerDeadlockTimeOut( 
-            "peano4::parallel::TreeEntryPacked", 
+            "peano4::parallel::StartTraversalMessagePacked", 
             "receive(int)", source,tag,1 
           ); 
         } 
@@ -987,7 +899,7 @@ switch (mode) {
         result = MPI_Test( sendRequestHandle, &flag, source==MPI_ANY_SOURCE ? &status : MPI_STATUS_IGNORE ); 
         if (result!=MPI_SUCCESS) { 
           std::ostringstream msg; 
-          msg << "testing for finished receive task for peano4::parallel::TreeEntryPacked failed: " 
+          msg << "testing for finished receive task for peano4::parallel::StartTraversalMessagePacked failed: " 
               << tarch::mpi::MPIReturnValueToString(result); 
           _log.error("receive(int)", msg.str() ); 
         } 
@@ -1003,7 +915,7 @@ switch (mode) {
       int result = MPI_Iprobe(source, tag, tarch::mpi::Rank::getInstance().getCommunicator(), &flag, MPI_STATUS_IGNORE ); 
        if (result!=MPI_SUCCESS) { 
         std::ostringstream msg; 
-        msg << "testing for finished receive task for peano4::parallel::TreeEntryPacked failed: " 
+        msg << "testing for finished receive task for peano4::parallel::StartTraversalMessagePacked failed: " 
             << tarch::mpi::MPIReturnValueToString(result); 
         _log.error("receive(int)", msg.str() ); 
       } 
@@ -1016,7 +928,7 @@ switch (mode) {
           (!triggeredTimeoutWarning) 
         ) { 
           tarch::mpi::Rank::getInstance().writeTimeOutWarning( 
-            "peano4::parallel::TreeEntryPacked", 
+            "peano4::parallel::StartTraversalMessagePacked", 
             "receive(int)", source,tag,1 
           ); 
           triggeredTimeoutWarning = true; 
@@ -1026,7 +938,7 @@ switch (mode) {
           (clock()>timeOutShutdown) 
         ) { 
           tarch::mpi::Rank::getInstance().triggerDeadlockTimeOut( 
-            "peano4::parallel::TreeEntryPacked", 
+            "peano4::parallel::StartTraversalMessagePacked", 
             "receive(int)", source,tag,1 
           ); 
         } 
@@ -1034,7 +946,7 @@ switch (mode) {
         result = MPI_Iprobe(source, tag, tarch::mpi::Rank::getInstance().getCommunicator(), &flag, MPI_STATUS_IGNORE ); 
          if (result!=MPI_SUCCESS) { 
           std::ostringstream msg; 
-          msg << "testing for finished receive task for peano4::parallel::TreeEntryPacked failed: " 
+          msg << "testing for finished receive task for peano4::parallel::StartTraversalMessagePacked failed: " 
               << tarch::mpi::MPIReturnValueToString(result); 
           _log.error("receive(int)", msg.str() ); 
         } 
@@ -1042,7 +954,7 @@ switch (mode) {
       result = MPI_Recv(this, 1, exchangeOnlyAttributesMarkedWithParallelise ? Datatype : FullDatatype, source, tag, tarch::mpi::Rank::getInstance().getCommunicator(), source==MPI_ANY_SOURCE ? &status : MPI_STATUS_IGNORE ); 
       if ( result != MPI_SUCCESS ) { 
         std::ostringstream msg; 
-        msg << "failed to start to receive peano4::parallel::TreeEntryPacked from node " 
+        msg << "failed to start to receive peano4::parallel::StartTraversalMessagePacked from node " 
             << source << ": " << tarch::mpi::MPIReturnValueToString(result); 
         _log.error( "receive(int)", msg.str() ); 
       } 
@@ -1059,7 +971,7 @@ switch (mode) {
    
    
    
-   bool peano4::parallel::TreeEntryPacked::isMessageInQueue(int tag, bool exchangeOnlyAttributesMarkedWithParallelise) {
+   bool peano4::parallel::StartTraversalMessagePacked::isMessageInQueue(int tag, bool exchangeOnlyAttributesMarkedWithParallelise) {
       MPI_Status status;
       int  flag        = 0;
       MPI_Iprobe(
@@ -1080,7 +992,7 @@ switch (mode) {
       
    }
    
-   int peano4::parallel::TreeEntryPacked::getSenderRank() const {
+   int peano4::parallel::StartTraversalMessagePacked::getSenderRank() const {
       assertion( _senderDestinationRank!=-1 );
       return _senderDestinationRank;
       

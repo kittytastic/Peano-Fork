@@ -1,8 +1,8 @@
-#ifndef _PEANO4_GRID_AUTOMATONSTATE_H
-#define _PEANO4_GRID_AUTOMATONSTATE_H
+#ifndef _PEANO4_GRID_GRIDTRAVERSALEVENT_H
+#define _PEANO4_GRID_GRIDTRAVERSALEVENT_H
 
-#include "config.h"
 #include "peano4/utils/Globals.h"
+#include "config.h"
 #ifdef Parallel
 	#include "tarch/mpi/Rank.h"
 #endif
@@ -15,8 +15,8 @@
 
 namespace peano4 {
    namespace grid {
-      class AutomatonState;
-      class AutomatonStatePacked;
+      class GridTraversalEvent;
+      class GridTraversalEventPacked;
    }
 }
 
@@ -28,21 +28,25 @@ namespace peano4 {
  *
  * 		   build date: 09-02-2014 14:40
  *
- * @date   18/01/2019 12:11
+ * @date   20/01/2019 11:10
  */
-class peano4::grid::AutomatonState { 
+class peano4::grid::GridTraversalEvent { 
    
    public:
       
-      typedef peano4::grid::AutomatonStatePacked Packed;
+      typedef peano4::grid::GridTraversalEventPacked Packed;
+      
+      enum RefinementControl {
+         Enter = 0, Leave = 1
+      };
       
       struct PersistentRecords {
-         int _level;
          tarch::la::Vector<Dimensions,double> _x;
          tarch::la::Vector<Dimensions,double> _h;
-         bool _inverted;
-         std::bitset<Dimensions> _evenFlags;
-         tarch::la::Vector<DimensionsTimesTwo,short int> _accessNumber;
+         bool _isRefined;
+         tarch::la::Vector<TwoPowerD,int> _vertexData;
+         tarch::la::Vector<TwoTimesD,int> _faceData;
+         int _cellData;
          /**
           * Generated
           */
@@ -51,17 +55,7 @@ class peano4::grid::AutomatonState {
          /**
           * Generated
           */
-         PersistentRecords(const int& level, const tarch::la::Vector<Dimensions,double>& x, const tarch::la::Vector<Dimensions,double>& h, const bool& inverted, const std::bitset<Dimensions>& evenFlags, const tarch::la::Vector<DimensionsTimesTwo,short int>& accessNumber);
-         
-         /**
-          * Generated
-          */
-          int getLevel() const ;
-         
-         /**
-          * Generated
-          */
-          void setLevel(const int& level) ;
+         PersistentRecords(const tarch::la::Vector<Dimensions,double>& x, const tarch::la::Vector<Dimensions,double>& h, const bool& isRefined, const tarch::la::Vector<TwoPowerD,int>& vertexData, const tarch::la::Vector<TwoTimesD,int>& faceData, const int& cellData);
          
           tarch::la::Vector<Dimensions,double> getX() const ;
          
@@ -74,20 +68,30 @@ class peano4::grid::AutomatonState {
          /**
           * Generated
           */
-          bool getInverted() const ;
+          bool getIsRefined() const ;
          
          /**
           * Generated
           */
-          void setInverted(const bool& inverted) ;
+          void setIsRefined(const bool& isRefined) ;
          
-          std::bitset<Dimensions> getEvenFlags() const ;
+          tarch::la::Vector<TwoPowerD,int> getVertexData() const ;
          
-          void setEvenFlags(const std::bitset<Dimensions>& evenFlags) ;
+          void setVertexData(const tarch::la::Vector<TwoPowerD,int>& vertexData) ;
          
-          tarch::la::Vector<DimensionsTimesTwo,short int> getAccessNumber() const ;
+          tarch::la::Vector<TwoTimesD,int> getFaceData() const ;
          
-          void setAccessNumber(const tarch::la::Vector<DimensionsTimesTwo,short int>& accessNumber) ;
+          void setFaceData(const tarch::la::Vector<TwoTimesD,int>& faceData) ;
+         
+         /**
+          * Generated
+          */
+          int getCellData() const ;
+         
+         /**
+          * Generated
+          */
+          void setCellData(const int& cellData) ;
          
          
       };
@@ -98,32 +102,22 @@ class peano4::grid::AutomatonState {
          /**
           * Generated
           */
-         AutomatonState();
+         GridTraversalEvent();
          
          /**
           * Generated
           */
-         AutomatonState(const PersistentRecords& persistentRecords);
+         GridTraversalEvent(const PersistentRecords& persistentRecords);
          
          /**
           * Generated
           */
-         AutomatonState(const int& level, const tarch::la::Vector<Dimensions,double>& x, const tarch::la::Vector<Dimensions,double>& h, const bool& inverted, const std::bitset<Dimensions>& evenFlags, const tarch::la::Vector<DimensionsTimesTwo,short int>& accessNumber);
+         GridTraversalEvent(const tarch::la::Vector<Dimensions,double>& x, const tarch::la::Vector<Dimensions,double>& h, const bool& isRefined, const tarch::la::Vector<TwoPowerD,int>& vertexData, const tarch::la::Vector<TwoTimesD,int>& faceData, const int& cellData);
          
          /**
           * Generated
           */
-         virtual ~AutomatonState();
-         
-         /**
-          * Generated
-          */
-          int getLevel() const ;
-         
-         /**
-          * Generated
-          */
-          void setLevel(const int& level) ;
+         virtual ~GridTraversalEvent();
          
           tarch::la::Vector<Dimensions,double> getX() const ;
          
@@ -144,30 +138,48 @@ class peano4::grid::AutomatonState {
          /**
           * Generated
           */
-          bool getInverted() const ;
+          bool getIsRefined() const ;
          
          /**
           * Generated
           */
-          void setInverted(const bool& inverted) ;
+          void setIsRefined(const bool& isRefined) ;
          
-          std::bitset<Dimensions> getEvenFlags() const ;
+          tarch::la::Vector<TwoPowerD,int> getVertexData() const ;
          
-          void setEvenFlags(const std::bitset<Dimensions>& evenFlags) ;
+          void setVertexData(const tarch::la::Vector<TwoPowerD,int>& vertexData) ;
          
-          bool getEvenFlags(int elementIndex) const ;
+          int getVertexData(int elementIndex) const ;
          
-          void setEvenFlags(int elementIndex, const bool& evenFlags) ;
+          void setVertexData(int elementIndex, const int& vertexData) ;
          
-          void flipEvenFlags(int elementIndex) ;
+          tarch::la::Vector<TwoTimesD,int> getFaceData() const ;
          
-          tarch::la::Vector<DimensionsTimesTwo,short int> getAccessNumber() const ;
+          void setFaceData(const tarch::la::Vector<TwoTimesD,int>& faceData) ;
          
-          void setAccessNumber(const tarch::la::Vector<DimensionsTimesTwo,short int>& accessNumber) ;
+          int getFaceData(int elementIndex) const ;
          
-          short int getAccessNumber(int elementIndex) const ;
+          void setFaceData(int elementIndex, const int& faceData) ;
          
-          void setAccessNumber(int elementIndex, const short int& accessNumber) ;
+         /**
+          * Generated
+          */
+          int getCellData() const ;
+         
+         /**
+          * Generated
+          */
+          void setCellData(const int& cellData) ;
+         
+         /**
+          * Generated
+          */
+         static std::string toString(const RefinementControl& param);
+         
+         /**
+          * Generated
+          */
+         static std::string getRefinementControlMapping();
          
          /**
           * Generated
@@ -184,7 +196,7 @@ class peano4::grid::AutomatonState {
          /**
           * Generated
           */
-         AutomatonStatePacked convert() const;
+         GridTraversalEventPacked convert() const;
          
          
       #ifdef Parallel
@@ -232,24 +244,32 @@ class peano4::grid::AutomatonState {
  *
  * 		   build date: 09-02-2014 14:40
  *
- * @date   18/01/2019 12:11
+ * @date   20/01/2019 11:10
  */
-class peano4::grid::AutomatonStatePacked { 
+class peano4::grid::GridTraversalEventPacked { 
    
    public:
       
+      typedef peano4::grid::GridTraversalEvent::RefinementControl RefinementControl;
+      
       struct PersistentRecords {
-         int _level;
          tarch::la::Vector<Dimensions,double> _x;
          tarch::la::Vector<Dimensions,double> _h;
-         tarch::la::Vector<DimensionsTimesTwo,short int> _accessNumber;
          
          /** mapping of records:
          || Member 	|| startbit 	|| length
-          |  inverted	| startbit 0	| #bits 1
-          |  evenFlags	| startbit 1	| #bits Dimensions
+          |  isRefined	| startbit 0	| #bits 1
+          |  faceData	| startbit 1	| #bits 18
+          |  cellData	| startbit 19	| #bits 1
           */
-         short int _packedRecords0;
+         long int _packedRecords0;
+         
+         
+         /** mapping of records:
+         || Member 	|| startbit 	|| length
+          |  vertexData	| startbit 0	| #bits 64
+          */
+         long int _packedRecords1;
          
          /**
           * Generated
@@ -259,17 +279,7 @@ class peano4::grid::AutomatonStatePacked {
          /**
           * Generated
           */
-         PersistentRecords(const int& level, const tarch::la::Vector<Dimensions,double>& x, const tarch::la::Vector<Dimensions,double>& h, const bool& inverted, const std::bitset<Dimensions>& evenFlags, const tarch::la::Vector<DimensionsTimesTwo,short int>& accessNumber);
-         
-         /**
-          * Generated
-          */
-          int getLevel() const ;
-         
-         /**
-          * Generated
-          */
-          void setLevel(const int& level) ;
+         PersistentRecords(const tarch::la::Vector<Dimensions,double>& x, const tarch::la::Vector<Dimensions,double>& h, const bool& isRefined, const tarch::la::Vector<TwoPowerD,int>& vertexData, const tarch::la::Vector<TwoTimesD,int>& faceData, const int& cellData);
          
           tarch::la::Vector<Dimensions,double> getX() const ;
          
@@ -282,20 +292,30 @@ class peano4::grid::AutomatonStatePacked {
          /**
           * Generated
           */
-          bool getInverted() const ;
+          bool getIsRefined() const ;
          
          /**
           * Generated
           */
-          void setInverted(const bool& inverted) ;
+          void setIsRefined(const bool& isRefined) ;
          
-          std::bitset<Dimensions> getEvenFlags() const ;
+          tarch::la::Vector<TwoPowerD,int> getVertexData() const ;
          
-          void setEvenFlags(const std::bitset<Dimensions>& evenFlags) ;
+          void setVertexData(const tarch::la::Vector<TwoPowerD,int>& vertexData) ;
          
-          tarch::la::Vector<DimensionsTimesTwo,short int> getAccessNumber() const ;
+          tarch::la::Vector<TwoTimesD,int> getFaceData() const ;
          
-          void setAccessNumber(const tarch::la::Vector<DimensionsTimesTwo,short int>& accessNumber) ;
+          void setFaceData(const tarch::la::Vector<TwoTimesD,int>& faceData) ;
+         
+         /**
+          * Generated
+          */
+          int getCellData() const ;
+         
+         /**
+          * Generated
+          */
+          void setCellData(const int& cellData) ;
          
          
       };
@@ -306,32 +326,22 @@ class peano4::grid::AutomatonStatePacked {
          /**
           * Generated
           */
-         AutomatonStatePacked();
+         GridTraversalEventPacked();
          
          /**
           * Generated
           */
-         AutomatonStatePacked(const PersistentRecords& persistentRecords);
+         GridTraversalEventPacked(const PersistentRecords& persistentRecords);
          
          /**
           * Generated
           */
-         AutomatonStatePacked(const int& level, const tarch::la::Vector<Dimensions,double>& x, const tarch::la::Vector<Dimensions,double>& h, const bool& inverted, const std::bitset<Dimensions>& evenFlags, const tarch::la::Vector<DimensionsTimesTwo,short int>& accessNumber);
+         GridTraversalEventPacked(const tarch::la::Vector<Dimensions,double>& x, const tarch::la::Vector<Dimensions,double>& h, const bool& isRefined, const tarch::la::Vector<TwoPowerD,int>& vertexData, const tarch::la::Vector<TwoTimesD,int>& faceData, const int& cellData);
          
          /**
           * Generated
           */
-         virtual ~AutomatonStatePacked();
-         
-         /**
-          * Generated
-          */
-          int getLevel() const ;
-         
-         /**
-          * Generated
-          */
-          void setLevel(const int& level) ;
+         virtual ~GridTraversalEventPacked();
          
           tarch::la::Vector<Dimensions,double> getX() const ;
          
@@ -352,30 +362,48 @@ class peano4::grid::AutomatonStatePacked {
          /**
           * Generated
           */
-          bool getInverted() const ;
+          bool getIsRefined() const ;
          
          /**
           * Generated
           */
-          void setInverted(const bool& inverted) ;
+          void setIsRefined(const bool& isRefined) ;
          
-          std::bitset<Dimensions> getEvenFlags() const ;
+          tarch::la::Vector<TwoPowerD,int> getVertexData() const ;
          
-          void setEvenFlags(const std::bitset<Dimensions>& evenFlags) ;
+          void setVertexData(const tarch::la::Vector<TwoPowerD,int>& vertexData) ;
          
-          bool getEvenFlags(int elementIndex) const ;
+          int getVertexData(int elementIndex) const ;
          
-          void setEvenFlags(int elementIndex, const bool& evenFlags) ;
+          void setVertexData(int elementIndex, const int& vertexData) ;
          
-          void flipEvenFlags(int elementIndex) ;
+          tarch::la::Vector<TwoTimesD,int> getFaceData() const ;
          
-          tarch::la::Vector<DimensionsTimesTwo,short int> getAccessNumber() const ;
+          void setFaceData(const tarch::la::Vector<TwoTimesD,int>& faceData) ;
          
-          void setAccessNumber(const tarch::la::Vector<DimensionsTimesTwo,short int>& accessNumber) ;
+          int getFaceData(int elementIndex) const ;
          
-          short int getAccessNumber(int elementIndex) const ;
+          void setFaceData(int elementIndex, const int& faceData) ;
          
-          void setAccessNumber(int elementIndex, const short int& accessNumber) ;
+         /**
+          * Generated
+          */
+          int getCellData() const ;
+         
+         /**
+          * Generated
+          */
+          void setCellData(const int& cellData) ;
+         
+         /**
+          * Generated
+          */
+         static std::string toString(const RefinementControl& param);
+         
+         /**
+          * Generated
+          */
+         static std::string getRefinementControlMapping();
          
          /**
           * Generated
@@ -392,7 +420,7 @@ class peano4::grid::AutomatonStatePacked {
          /**
           * Generated
           */
-         AutomatonState convert() const;
+         GridTraversalEvent convert() const;
          
          
       #ifdef Parallel
