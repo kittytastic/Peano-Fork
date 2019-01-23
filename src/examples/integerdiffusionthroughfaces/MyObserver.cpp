@@ -1,67 +1,52 @@
 #include "MyObserver.h"
 
 #include "peano4/grid/GridControlEvent.h"
+#include "peano4/grid/GridTraversalEvent.h"
+#include "peano4/grid/PeanoCurve.h"
 #include "peano4/parallel/Node.h"
 
 
-examples::grid::MyObserver::MyObserver(int spacetreeId, int counter):
-  #if PeanoDebug>0
-  TraversalVTKPlotter( "grid-construction", spacetreeId, counter ),
-  #endif
+tarch::logging::Log  examples::integerdiffusionthroughfaces::MyObserver::_log( "examples::integerdiffusionthroughfaces::MyObserver" );
+
+
+examples::integerdiffusionthroughfaces::MyObserver::MyObserver(int spacetreeId, int counter):
+  _spacetreeId(spacetreeId),
   _iterationCounter(counter)
   {
 }
 
 
-void examples::grid::MyObserver::beginTraversal() {
-  #if PeanoDebug>0
-  TraversalVTKPlotter::beginTraversal();
-  #endif
+void examples::integerdiffusionthroughfaces::MyObserver::beginTraversal() {
   _iterationCounter++;
 }
 
 
-void examples::grid::MyObserver::endTraversal() {
-  #if PeanoDebug>0
-  TraversalVTKPlotter::endTraversal();
-  #endif
+void examples::integerdiffusionthroughfaces::MyObserver::endTraversal() {
 }
 
 
-void examples::grid::MyObserver::enterCell(
+void examples::integerdiffusionthroughfaces::MyObserver::enterCell(
   const peano4::grid::GridTraversalEvent&  event
 ) {
-  #if PeanoDebug>0
-  TraversalVTKPlotter::enterCell(event);
-  #endif
+	// @todo event braucht skeleton marker
+  int inStackCell  = event.getCellData();
+  int outStackCell = peano4::grid::PeanoCurve::CallStack;
+  logInfo( "enterCell(...)", "cell: " << inStackCell << "->" << outStackCell );
 }
 
 
-void examples::grid::MyObserver::leaveCell(
+void examples::integerdiffusionthroughfaces::MyObserver::leaveCell(
   const peano4::grid::GridTraversalEvent&  event
 ) {
 }
 
 
-peano4::grid::TraversalObserver* examples::grid::MyObserver::clone(int spacetreeId) {
-  #if PeanoDebug>0
-  MyObserver* result = new MyObserver( spacetreeId, TraversalVTKPlotter::_counter );
-
-  if (_spacetreeId!=-1) {
-	assertionMsg( false, "clone() should not be called for particular spacetree plotter" );
-  }
-  else {
-    updateMetaFile(spacetreeId);
-  }
-
-  return result;
-  #else
+peano4::grid::TraversalObserver* examples::integerdiffusionthroughfaces::MyObserver::clone(int spacetreeId) {
   return new MyObserver( spacetreeId, _iterationCounter );
-  #endif
 }
 
 
-std::vector< peano4::grid::GridControlEvent > examples::grid::MyObserver::getGridControlEvents() {
+std::vector< peano4::grid::GridControlEvent > examples::integerdiffusionthroughfaces::MyObserver::getGridControlEvents() {
   std::vector< peano4::grid::GridControlEvent >  controlEvents;
   if (_iterationCounter<8) {
     peano4::grid::GridControlEvent newEvent;
