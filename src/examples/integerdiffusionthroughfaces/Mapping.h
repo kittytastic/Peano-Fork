@@ -1,20 +1,16 @@
 // This file is part of the Peano project. For conditions of distribution and
 // use, please see the copyright notice at www.peano-framework.org
-#ifndef _EXAMPLES_INTEGER_DIFFUSION_THROUGH_FACES_MYMAPPING_H_
-#define _EXAMPLES_INTEGER_DIFFUSION_THROUGH_FACES_MYMAPPING_H_
-
-
-#include "Mapping.h"
+#ifndef _EXAMPLES_INTEGER_DIFFUSION_THROUGH_FACES_MAPPING_H_
+#define _EXAMPLES_INTEGER_DIFFUSION_THROUGH_FACES_MAPPING_H_
 
 
 #include "peano4/utils/Globals.h"
 #include "tarch/la/Vector.h"
-#include "tarch/logging/Log.h"
 
 
 namespace examples {
   namespace integerdiffusionthroughfaces {
-    class MyMapping;
+    class Mapping;
   }
 }
 
@@ -26,82 +22,76 @@ namespace examples {
  * invocations of this interface. On the long run, I want to generate
  * these mappings. Well, at least the header.
  */
-class examples::integerdiffusionthroughfaces::MyMapping: public Mapping {
-  private:
-	static tarch::logging::Log   _log;
+class examples::integerdiffusionthroughfaces::Mapping {
   public:
+	virtual void beginTraversal() = 0;
+	virtual void endTraversal() = 0;
 
-	void beginTraversal() final;
-	void endTraversal() final;
-
-	void createPersistentFace(
+	virtual void createPersistentFace(
       const tarch::la::Vector<Dimensions,double>&  center,
       const tarch::la::Vector<Dimensions,double>&  h,
       int                                          normal,
 	  int&                                         data
-    ) override;
+    ) = 0;
 
-	void createHangingFace(
+	virtual void createHangingFace(
       const tarch::la::Vector<Dimensions,double>&  center,
       const tarch::la::Vector<Dimensions,double>&  h,
       int                                          normal,
 	  int&                                         data
-    ) override;
+    ) = 0;
 
-	void destroyPersistentFace(
+	virtual void destroyPersistentFace(
       const tarch::la::Vector<Dimensions,double>&  center,
       const tarch::la::Vector<Dimensions,double>&  h,
       int                                          normal,
 	  int&                                         data
-    ) override;
+    ) = 0;
 
-	void destroyHangingFace(
+	virtual void destroyHangingFace(
       const tarch::la::Vector<Dimensions,double>&  center,
       const tarch::la::Vector<Dimensions,double>&  h,
       int                                          normal,
 	  int&                                         data
-    ) override;
+    ) = 0;
 
-	void touchFaceFirstTime(
+	virtual void touchFaceFirstTime(
       const tarch::la::Vector<Dimensions,double>&  center,
       const tarch::la::Vector<Dimensions,double>&  h,
       int                                          normal,
 	  int&                                         data
-    ) override;
+    ) = 0;
 
-	void touchFaceLastTime(
+	virtual void touchFaceLastTime(
       const tarch::la::Vector<Dimensions,double>&  center,
       const tarch::la::Vector<Dimensions,double>&  h,
       int                                          normal,
 	  int&                                         data
-    ) override;
+    ) = 0;
 
-	void createCell(
+	virtual void createCell(
       const tarch::la::Vector<Dimensions,double>&  center,
       const tarch::la::Vector<Dimensions,double>&  h,
 	  int&                                         data
-    ) override;
+    ) = 0;
 
-	void destroyCell(
+	virtual void destroyCell(
       const tarch::la::Vector<Dimensions,double>&  center,
       const tarch::la::Vector<Dimensions,double>&  h,
 	  int&                                         data
-    ) override;
+    ) = 0;
 
-	/**
-	 * @todo Jetzt kommen aber die Enumeratoren rein hier fuer die Faces und Vertices
-	 */
-	void touchCellFirstTime(
+	virtual void touchCellFirstTime(
       const tarch::la::Vector<Dimensions,double>&  center,
       const tarch::la::Vector<Dimensions,double>&  h,
 	  int&                                         data
-    ) override;
+    ) = 0;
 
-	void touchCellLastTime(
+	virtual void touchCellLastTime(
       const tarch::la::Vector<Dimensions,double>&  center,
       const tarch::la::Vector<Dimensions,double>&  h,
 	  int&                                         data
-    ) override;
+    ) = 0;
 };
 
 #endif

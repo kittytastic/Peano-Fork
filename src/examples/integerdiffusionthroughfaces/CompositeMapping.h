@@ -1,35 +1,35 @@
 // This file is part of the Peano project. For conditions of distribution and
 // use, please see the copyright notice at www.peano-framework.org
-#ifndef _EXAMPLES_INTEGER_DIFFUSION_THROUGH_FACES_MYMAPPING_H_
-#define _EXAMPLES_INTEGER_DIFFUSION_THROUGH_FACES_MYMAPPING_H_
+#ifndef _EXAMPLES_INTEGER_DIFFUSION_THROUGH_FACES_COMPOSITE_MAPPING_H_
+#define _EXAMPLES_INTEGER_DIFFUSION_THROUGH_FACES_COMPOSITE_MAPPING_H_
 
 
 #include "Mapping.h"
 
 
-#include "peano4/utils/Globals.h"
-#include "tarch/la/Vector.h"
-#include "tarch/logging/Log.h"
+#include <vector>
 
 
 namespace examples {
   namespace integerdiffusionthroughfaces {
-    class MyMapping;
+    class CompositeMapping;
   }
 }
 
 
 /**
- * This is basically an abstract from the observer. The observer is
- * informed about actions of the automata inside the grid. It then
- * translates the observed activities into user data movements and
- * invocations of this interface. On the long run, I want to generate
- * these mappings. Well, at least the header.
+ * Allows us to combine multiple mappings.
  */
-class examples::integerdiffusionthroughfaces::MyMapping: public Mapping {
+class examples::integerdiffusionthroughfaces::CompositeMapping: public Mapping {
   private:
-	static tarch::logging::Log   _log;
+	std::vector<Mapping*> _mappings;
   public:
+	virtual ~CompositeMapping();
+
+	/**
+	 * Append a new mapping. Ownership goes over to the composite.
+	 */
+	void append( Mapping* mapping );
 
 	void beginTraversal() final;
 	void endTraversal() final;
@@ -39,69 +39,66 @@ class examples::integerdiffusionthroughfaces::MyMapping: public Mapping {
       const tarch::la::Vector<Dimensions,double>&  h,
       int                                          normal,
 	  int&                                         data
-    ) override;
+    ) final;
 
 	void createHangingFace(
       const tarch::la::Vector<Dimensions,double>&  center,
       const tarch::la::Vector<Dimensions,double>&  h,
       int                                          normal,
 	  int&                                         data
-    ) override;
+    ) final;
 
 	void destroyPersistentFace(
       const tarch::la::Vector<Dimensions,double>&  center,
       const tarch::la::Vector<Dimensions,double>&  h,
       int                                          normal,
 	  int&                                         data
-    ) override;
+    ) final;
 
 	void destroyHangingFace(
       const tarch::la::Vector<Dimensions,double>&  center,
       const tarch::la::Vector<Dimensions,double>&  h,
       int                                          normal,
 	  int&                                         data
-    ) override;
+    ) final;
 
 	void touchFaceFirstTime(
       const tarch::la::Vector<Dimensions,double>&  center,
       const tarch::la::Vector<Dimensions,double>&  h,
       int                                          normal,
 	  int&                                         data
-    ) override;
+    ) final;
 
 	void touchFaceLastTime(
       const tarch::la::Vector<Dimensions,double>&  center,
       const tarch::la::Vector<Dimensions,double>&  h,
       int                                          normal,
 	  int&                                         data
-    ) override;
+    ) final;
 
 	void createCell(
       const tarch::la::Vector<Dimensions,double>&  center,
       const tarch::la::Vector<Dimensions,double>&  h,
 	  int&                                         data
-    ) override;
+    ) final;
 
 	void destroyCell(
       const tarch::la::Vector<Dimensions,double>&  center,
       const tarch::la::Vector<Dimensions,double>&  h,
 	  int&                                         data
-    ) override;
+    ) final;
 
-	/**
-	 * @todo Jetzt kommen aber die Enumeratoren rein hier fuer die Faces und Vertices
-	 */
 	void touchCellFirstTime(
       const tarch::la::Vector<Dimensions,double>&  center,
       const tarch::la::Vector<Dimensions,double>&  h,
 	  int&                                         data
-    ) override;
+    ) final;
 
 	void touchCellLastTime(
       const tarch::la::Vector<Dimensions,double>&  center,
       const tarch::la::Vector<Dimensions,double>&  h,
 	  int&                                         data
-    ) override;
+    ) final;
 };
 
 #endif
