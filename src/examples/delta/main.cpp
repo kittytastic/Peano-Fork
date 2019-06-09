@@ -12,7 +12,7 @@
 #include "peano4/parallel/Node.h"
 
 
-tarch::logging::Log _log("examples::integerdiffusionthroughfaces");
+tarch::logging::Log _log("examples::delta");
 
 
 void runTests() {
@@ -41,10 +41,10 @@ void runExample() {
 #endif
   );
 
-  examples::integerdiffusionthroughfaces::MyObserver emptyObserver;
+  examples::delta::MyObserver emptyObserver;
 
   for (int i=0; i<40; i++) {
-	tarch::logging::CommandLineLogger::getInstance().closeOutputStreamAndReopenNewOne();
+    tarch::logging::CommandLineLogger::getInstance().closeOutputStreamAndReopenNewOne();
     peano4::parallel::SpacetreeSet::getInstance().traverse( emptyObserver );
 
     const int SplitEveryKIterations = 5;
