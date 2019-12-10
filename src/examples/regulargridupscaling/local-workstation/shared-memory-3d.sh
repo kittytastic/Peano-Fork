@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export d=2
+export d=3
 for flops in 1 100 10000 1000000
 do
  for h in 0.1 0.5 0.01 0.005 0.001
