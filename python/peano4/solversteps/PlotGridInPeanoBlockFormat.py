@@ -3,13 +3,12 @@
 from .Mapping import Mapping
 
 
-class UserMapping(Mapping):
+# @todo getter einfuehren, so dass man sieht was gen Observer geht und was net
+# @todo Konstanten fuer ops
+
+class PlotGridInPeanoBlockFormat(Mapping):
   def __init__(self):
     pass
-
-
-  def user_should_modify_template(self):
-    return True
 
 
   def get_constructor_body(self):
@@ -25,9 +24,7 @@ class UserMapping(Mapping):
 
 
   def get_mapping_name(self):
-    """
-     Returns a description (word) for the mapping which is also used as class name
-     for the generated type. As a consequence, the result should be one word (if 
-     possible) and uppercase. Also, every subclass should overwrite this routine.
-    """
-    return "UserCode"
+    return "PlotGridInPeanoBlockFormat"
+
+  def user_should_modify_template(self):
+    return False
