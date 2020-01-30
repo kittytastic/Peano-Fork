@@ -4,23 +4,22 @@ from peano4.solversteps.Mapping import Mapping
 
 
 
-class PlotGridInPeanoBlockFormat(Mapping):
-  def __init__(self,filename,cell_unknown):
+class PlotScalarNodalFieldInPeanoBlockFormat(Mapping):
+  def __init__(self,filename,vertex_unknown,getter):
     """
       Plot only the grid structure
       
-      filename       Name of the output file
-      cell_unknown   If you use cell unknowns, pass any unknown in. As we do not dump
-                     any semantic information about unknowns, it does not matter which 
-                     one you choose. If you don't have cell unknowns at all, pass in 
-                     None 
+      filename         Name of the output file
+      vertex_unknown   The object you have associated with a vertex and that you want to print
+      getter           Getter acting on the vertex. Could be something alike getU() for example.
+                       If there's no getter but you want to directly access the data, remove 
+                       any brackets from the passed string.
     """
     self.d = {}
-    self.d[ "FILENAME" ]     = filename
-    self.d[ "CELL_WRAPPER" ] = "Cell"
-    if cell_unknown!=None:
-      self.d[ "CELL_WRAPPER" ] += cell_unknown.name
-    
+    self.d[ "FILENAME" ]            = filename
+    self.d[ "VERTEX_UNKNOWN_NAME" ] = vertex_unknown.name
+    self.d[ "GETTER" ]              = getter
+        
 
   __Template_Constructor = """
   static int counter = 0;
@@ -39,7 +38,7 @@ class PlotGridInPeanoBlockFormat(Mapping):
     _writer = new tarch::plotter::griddata::blockstructured::PeanoTextPatchFileWriter(
       Dimensions,"{FILENAME}", not newFile
     );
-    _dataWriter = _writer->createCellDataWriter( "cell-marker", 1, 1 );
+    _dataWriter = _writer->createVertexDataWriter( "{VERTEX_UNKNOWN_NAME}", 2, 1 );
     _counter = counter;
     counter++;
   }}
@@ -86,14 +85,18 @@ class PlotGridInPeanoBlockFormat(Mapping):
   __Template_TouchCellFirstTime = """ 
   int vertexIndices[TwoPowerD];
 
-  int indices = _writer->plotPatch(
-    fineGrid{CELL_WRAPPER}.centre() - fineGrid{CELL_WRAPPER}.h() * 0.5,
-    fineGrid{CELL_WRAPPER}.h()
+  int patchIndex = _writer->plotPatch(
+    fineGridVertices{VERTEX_UNKNOWN_NAME}.x(0),
+    fineGridVertices{VERTEX_UNKNOWN_NAME}.h()
   );
 
   assertion( _dataWriter!=nullptr );
-  // @todo Use marker data here
- _dataWriter->plotCell(indices,1.0);
+  int vertexIndex  = _dataWriter->getFirstVertexWithinPatch(patchIndex);
+  dfor2(k)
+    auto data = fineGridVertices{VERTEX_UNKNOWN_NAME}(kScalar).{GETTER};
+    _dataWriter->plotVertex( vertexIndex, data );
+    vertexIndex++;
+  enddforx
 """
 
 
@@ -109,8 +112,8 @@ class PlotGridInPeanoBlockFormat(Mapping):
     int                _treeNumber;
     int                _counter;
 
-    tarch::plotter::griddata::blockstructured::PeanoTextPatchFileWriter*                  _writer;
-    tarch::plotter::griddata::blockstructured::PeanoTextPatchFileWriter::CellDataWriter*  _dataWriter;
+    tarch::plotter::griddata::blockstructured::PeanoTextPatchFileWriter*                    _writer;
+    tarch::plotter::griddata::blockstructured::PeanoTextPatchFileWriter::VertexDataWriter*  _dataWriter;
 """
 
 
@@ -120,4 +123,6 @@ class PlotGridInPeanoBlockFormat(Mapping):
 #include "tarch/multicore/BooleanSemaphore.h"
 #include "tarch/multicore/Lock.h"
 #include "tarch/mpi/Rank.h"
+
+#include "peano4/utils/Loop.h"
 """
