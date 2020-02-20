@@ -12,12 +12,20 @@
 #include "peano4/parallel/SpacetreeSet.h"
 
 #include "observers/DataRepository.h"
+#include "observers/PlotSolution.h"
+#include "observers/PlotMaterialParameter.h"
+#include "observers/CreateGrid.h"
+#include "observers/SetupScenario.h"
+#include "observers/ComputeResidualWithGeometricOperators.h"
+#include "observers/ComputeGlobalResidualAndError.h"
+#include "observers/JacobiUpdate.h"
+#include "observers/FusedSolverSteps.h"
 
 
 tarch::logging::Log _log("::");
 
 
-int main(int argc, char** argv) {{
+int main(int argc, char** argv) {
   const int ExitCodeSuccess         = 0;
   const int ExitCodeUnitTestsFailed = 1;
 
@@ -76,32 +84,71 @@ int main(int argc, char** argv) {{
                        .getTestCaseCollection()
                        .getNumberOfErrors();
 
-  if (unitTestsErrors != 0) {{
+  if (unitTestsErrors != 0) {
     logError("main()", "unit tests failed. Quit.");
     exit(ExitCodeUnitTestsFailed);
-  }}
+  }
   #endif
 
   peano4::parallel::SpacetreeSet::getInstance().init(
-    #if Dimensions==2
-    {{0.0, 0.0}},
-    {{1.0, 1.0}},
-    #else
-    {{0.0, 0.0, 0.0}},
-    {{1.0, 1.0, 1.0}},
-    #endif
-    0
+    examples::jacobi::actions::SetupScenario::getDomainOffset(),
+    examples::jacobi::actions::SetupScenario::getDomainSize()
   );
-  if (tarch::mpi::Rank::getInstance().isGlobalMaster() ) {{
-  }}
-  else {{
-    while (peano4::parallel::Node::getInstance().continueToRun()) {{
+
+  if (tarch::mpi::Rank::getInstance().isGlobalMaster() ) {
+    // Construct grid until we are told that it hasn't changed for 
+    // more than two iterations.
+    // ===========================================================
+    do {
+      examples::jacobi::observers::CreateGrid  observer;
+      peano4::parallel::SpacetreeSet::getInstance().traverse(observer);
+    }
+    while (peano4::parallel::SpacetreeSet::getInstance().getGridStatistics().getStationarySweeps()<2);
+
+    // Setup mesh and dump material parameter epsilon
+    // ===========================================================
+    {
+      examples::jacobi::observers::SetupScenario  setupScenario;
+      peano4::parallel::SpacetreeSet::getInstance().traverse(setupScenario);
+
+      examples::jacobi::observers::PlotMaterialParameter  plotMaterialParameter;
+      peano4::parallel::SpacetreeSet::getInstance().traverse(plotMaterialParameter);
+    }
+
+    // Solve problem
+    // ===========================================================
+    const int MaxIterations = 40;
+
+    for (int i=0; i<MaxIterations; i++)
+    {
+      #ifdef FuseSolverSteps
+      examples::jacobi::observers::FusedSolverSteps observer;
+      peano4::parallel::SpacetreeSet::getInstance().traverse(observer);
+      #else
+      examples::jacobi::observers::ComputeResidualWithGeometricOperators  computeResidual;
+      peano4::parallel::SpacetreeSet::getInstance().traverse(computeResidual);
+      examples::jacobi::observers::JacobiUpdate  jacobiUpdate;
+      peano4::parallel::SpacetreeSet::getInstance().traverse(jacobiUpdate);
+      examples::jacobi::observers::ComputeGlobalResidualAndError computeGlobalResidualAndError;
+      peano4::parallel::SpacetreeSet::getInstance().traverse(computeGlobalResidualAndError);
+      #endif
+    }
+
+    // Plot output
+    // ===========================================================
+    {
+      examples::jacobi::observers::PlotSolution  observer;
+      peano4::parallel::SpacetreeSet::getInstance().traverse(observer);
+    }
+  }
+  else {
+    while (peano4::parallel::Node::getInstance().continueToRun()) {
       logDebug( "runParallel(...)", "trigger a new sweep with step " << peano4::parallel::Node::getInstance().getCurrentProgramStep() );
-    }}
-  }}
+    }
+  }
 
   peano4::shutdownSharedMemoryEnvironment();
   peano4::shutdownParallelEnvironment();
 
   return ExitCodeSuccess;
-}}
+}
