@@ -1,4 +1,4 @@
-#include "{MAIN_NAME}.h"
+#include "finitevolumes-main.h"
 #include "Constants.h"
 
 #include "tarch/logging/Log.h"
@@ -11,6 +11,7 @@
 
 #include "observers/DataRepository.h"
 #include "observers/StepRepository.h"
+#include "observers/CreateGrid.h"
 
 #include "peano4/UnitTests.h"
 #include "tarch/UnitTests.h"
@@ -19,7 +20,47 @@
 tarch::logging::Log _log("::");
 
 
-int main(int argc, char** argv) {{
+
+/**
+ * @return continues to run
+ */
+bool selectNextAlgorithmicStep() {
+  static int counter = 0;
+
+  if (
+    counter==0
+	and
+	peano4::parallel::SpacetreeSet::getInstance().getGridStatistics().getStationarySweeps()<5
+  ) {
+    peano4::parallel::Node::getInstance().setNextProgramStep(
+      examples::finitevolumes::observers::StepRepository::toProgramStep(
+        examples::finitevolumes::observers::StepRepository::Steps::CreateGrid
+	  )
+    );
+  }
+  else {
+    counter++;
+  }
+
+  return counter < 1;
+}
+
+
+void step() {
+  int stepIdentifier = peano4::parallel::Node::getInstance().getCurrentProgramStep();
+  switch ( examples::finitevolumes::observers::StepRepository::toStepEnum(stepIdentifier) ) {
+    case examples::finitevolumes::observers::StepRepository::Steps::CreateGrid:
+      {
+        examples::finitevolumes::observers::CreateGrid  observer;
+	    peano4::parallel::SpacetreeSet::getInstance().traverse(observer);
+	  }
+	  break;
+  }
+}
+
+
+
+int main(int argc, char** argv) {
   const int ExitCodeSuccess         = 0;
   const int ExitCodeUnitTestsFailed = 1;
 
@@ -77,49 +118,52 @@ int main(int argc, char** argv) {{
   peano4::initParallelEnvironment(&argc,&argv);
   peano4::fillLookupTables();
   
-  {FULL_NAMESPACE}::observers::DataRepository::initDatatypes();
+  examples::finitevolumes::observers::DataRepository::initDatatypes();
 
 
   #if PeanoDebug>=2
   tarch::tests::TestCase* peanoCoreTests = peano4::getUnitTests();
   peanoCoreTests->run();
-  if (peanoCoreTests->getNumberOfErrors() != 0) {{
+  if (peanoCoreTests->getNumberOfErrors() != 0) {
     logError("main()", "Peano4 core unit tests failed. Quit.");
     exit(ExitCodeUnitTestsFailed);
-  }}
+  }
   delete peanoCoreTests;
 
   tarch::tests::TestCase* peanoTarchTests = tarch::getUnitTests();
   peanoTarchTests->run();
-  if (peanoTarchTests->getNumberOfErrors() != 0) {{
+  if (peanoTarchTests->getNumberOfErrors() != 0) {
     logError("main()", "technical architecture (tarch) unit tests failed. Quit.");
     exit(ExitCodeUnitTestsFailed);
-  }}
+  }
   delete peanoTarchTests;
  
   #endif
 
   peano4::parallel::SpacetreeSet::getInstance().init(
     #if Dimensions==2
-    {{0.0, 0.0}},
-    {{1.0, 1.0}},
+    {0.0, 0.0},
+    {1.0, 1.0},
     #else
-    {{0.0, 0.0, 0.0}},
-    {{1.0, 1.0, 1.0}},
+    {0.0, 0.0, 0.0},
+    {1.0, 1.0, 1.0},
     #endif
     0
   );
-  if (tarch::mpi::Rank::getInstance().isGlobalMaster() ) {{
-  }}
-  else {{
-    while (peano4::parallel::Node::getInstance().continueToRun()) {{
-      logDebug( "runParallel(...)", "trigger a new sweep with step " << peano4::parallel::Node::getInstance().getCurrentProgramStep() );
-    }}
-  }}
+  if (tarch::mpi::Rank::getInstance().isGlobalMaster() ) {
+    while ( selectNextAlgorithmicStep() ) {
+      step();
+    }
+  }
+  else {
+    while (peano4::parallel::Node::getInstance().continueToRun()) {
+      step();
+    }
+  }
 
-  {FULL_NAMESPACE}::observers::DataRepository::shutdownDatatypes();
+  examples::finitevolumes::observers::DataRepository::shutdownDatatypes();
 
   peano4::shutdownParallelEnvironment();
 
   return ExitCodeSuccess;
-}}
+}
