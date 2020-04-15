@@ -1,8 +1,8 @@
-#include "Euler.h"
+#include "ParallelEuler.h"
 
 
 
-::exahype2::RefinementCommand examples::exahype2::finitevolumes::Euler::refinementCriterion(
+::exahype2::RefinementCommand examples::exahype2::finitevolumes::ParallelEuler::refinementCriterion(
   double Q[5],
   const tarch::la::Vector<Dimensions,double>&  x,
   const tarch::la::Vector<Dimensions,double>&  h,
@@ -15,7 +15,7 @@
 }
 
 
-void examples::exahype2::finitevolumes::Euler::adjustSolution(
+void examples::exahype2::finitevolumes::ParallelEuler::adjustSolution(
   double Q[5],
   const tarch::la::Vector<Dimensions,double>&  x,
   const tarch::la::Vector<Dimensions,double>&  h,
@@ -37,7 +37,7 @@ void examples::exahype2::finitevolumes::Euler::adjustSolution(
 
 
 
-void examples::exahype2::finitevolumes::Euler::eigenvalues(
+void examples::exahype2::finitevolumes::ParallelEuler::eigenvalues(
   double                                       Q[5],
   const tarch::la::Vector<Dimensions,double>&  faceCentre,
   const tarch::la::Vector<Dimensions,double>&  volumeH,
@@ -73,7 +73,7 @@ void examples::exahype2::finitevolumes::Euler::eigenvalues(
 }
 
 
-void examples::exahype2::finitevolumes::Euler::flux(
+void examples::exahype2::finitevolumes::ParallelEuler::flux(
   double                                       Q[5],
   const tarch::la::Vector<Dimensions,double>&  faceCentre,
   const tarch::la::Vector<Dimensions,double>&  volumeH,
@@ -136,7 +136,7 @@ void examples::exahype2::finitevolumes::Euler::flux(
 }
 
 
-void examples::exahype2::finitevolumes::Euler::boundaryConditions(
+void examples::exahype2::finitevolumes::ParallelEuler::boundaryConditions(
   double                                       Qinside[5],
   double                                       Qoutside[5],
   const tarch::la::Vector<Dimensions,double>&  faceCentre,
@@ -151,3 +151,8 @@ void examples::exahype2::finitevolumes::Euler::boundaryConditions(
   Qoutside[4] = Qinside[4];
 }
 
+
+void examples::exahype2::finitevolumes::ParallelEuler::finishTimeStep() {
+  AbstractParallelEuler::finishTimeStep();
+  _loadBalancer.finishTimeStep();
+}
