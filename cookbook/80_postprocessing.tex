@@ -1,0 +1,315 @@
+\chapter{Postprocessing: The visualisation toolkit, IO and \Peano\
+scripts}
+\label{chapter:postprocessing}
+
+\section{Installing \Peano\ with VTK support}
+Installing VTK support can be challenging. 
+Here's some things you might want to consider/check:
+
+\begin{itemize}
+  \item To build the \Peano\ conversion/visualisation tools, you have to
+  translate the code with \texttt{--with-vtk}. If you don't
+  specify a path, then \Peano\ assumes that all VTK is installed 
+  within \texttt{/usr/include}\footnote{Recent Ubuntu
+  versions for example tend to place VTK in subdirectories of
+  \texttt{/usr/local/include}, while SUSE et al indeed place them directly
+  within \texttt{/usr/include}. In any case, you will have to select a
+  subdirectory from these folders, as VTK usually goes into separate subfolder (depending on their
+  version). If you have not installed VTK as stand-alone but as part of the
+  Paraview developer version, e.g., then you have to search for the VTK
+  directory within the Paraview folder. In any case, search for a
+  filte \texttt{vtkVersion.h}. It is the folder hosting this file that we are
+  searching for here.}.
+  \item We next have to know which VTK version you are using. VTK builds a
+  different set of libraries in each generation. \Peano\ has to know which
+  version you want to use to link against the right set of libraries. The
+  installation script will automatically try to detect your version, but the
+  detection is not very robust. If it is the wrong version, use the
+  \texttt{--with-vtk-version=x} switch to set the version manually. We currently
+  support \texttt{x} 7,8,9, i.e.~we are only interested in the major version of
+  your VTK installation. If you have version 8.90, it is the 8 we are interested
+  in.
+  \item Next, the script will search for the right libraries. By default, our
+  script assumes that the libraries are have a suffix with the major dot minor
+  number. So we assume that the VTK version 8.90 yields a library
+  \texttt{vtkIOCore-8.90}. This is the default. The script will try to find this
+  default library and give you some feedback (be careful: if it doesn't find
+  the library, it will still continue as you might want to change the pathes
+  later on). If your library naming convention is different---we've seen
+  systems dropping the version numbers or Paraview installations which append
+  something alike \texttt{pv8.90}---then specify your suffix manually through
+  \texttt{--with-vtk-suffix}. If your installation does not have a version suffix,
+  as is the case in Fedora, you should pass an empty string to this:
+  \texttt{--with-vtk-suffix=''}
+  \item If your compile passes through but fails in the linking state (object
+  not found), then you have to check if the VTK libraries are in the search
+  path. If they are not (very likely), then add them prior to the compile call:
+\begin{code}
+export LDFLAGS="-L/opt/vtk/lib64"
+\end{code}
+\end{itemize}
+
+
+%   \item If you configure with \texttt{--with-vtk}, but the makefile cannot find
+%   the headers, you have to add the correct search path\footnote.
+%   You can either set the
+% \begin{code}
+% export CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH:/usr/include/vtk
+% \end{code}
+%   or you set the corresponding environment variable prior to the configure
+%   script. I always recommend that latter route, as our Python API inherits all of the configure
+%   variables, i.e.~it will then know where to search for VTK:
+% \begin{code}
+% export CXXFLAGS=$CXXFLAGS:"-I/usr/local/include/vtk-8.90"
+% \end{code}
+%   The first setting btw stems from a Fedora system, the latter example from an
+%   Ubuntu installation, while OpenSUSE in our test farm got the includes
+%   automatically right.
+
+
+%  Depending on the version chosen, \Peano\ will try to link against a different
+%  set of library files.
+    
+% -with-vtk-version=
+
+
+  
+  
+  
+  
+%   Many VTK installations append the version number to the library, i.e.~they create a library \texttt{libvtkCommonCore-8.90.so} instead of
+%   \texttt{libvtkCommonCore.so} if you use VTK 8.9. 
+%   \Peano tries to detect this version number automatically but in case it fails,
+%   you can use the options \texttt{--with-vtk=<path>} and \texttt{--with-vtk-version=<MAJOR.MINORS>}
+%   to specify exactly the Peano version you want to use.
+%   If you are not sure, run \texttt{find / -name libvtk*.so} and see what it finds. 
+%   %After that, tell the
+%   %configuration explicitly which VTK extension to use:
+%   %\begin{code}
+%   %--with-vtk-version=8.90
+%   %\end{code}
+%   BTW: Not all Linux distributions install VTK with these extensions, so you
+%   have to check manually on your system.
+
+    
+\section{Tweaking your pictures}
+
+Peano's default VTK plotters project Peano's tree-based grid onto an
+unstructured mesh, as VTK does not support tree meshes.
+The underlying mechanism is straightforward:
+
+\begin{enumerate}
+  \item If a vertex is touched/read the first time, it is dumped as vertex of
+  the unstructured output mesh if it is not refined, i.e.~if no other vertex
+  does exist at the same location on a finer mesh level.
+  \item If a hanging vertex is created, we add a new vertex to the output dump
+  if this hanging vertex has not been written before. The plotters typically
+  maintain one big hash map to bookkeep which hanging vertices have already been
+  written.
+  \item If the tree traversal runs into an unrefined cell, this cell is made a
+  cell of the unstructured output mesh.
+\end{enumerate}
+
+
+The block format/the conversion tools in contrast generate all the points
+multiple times.
+If you have to cells sharing a vertex, the vertex is dumped twice.
+For patch-based problems, this is okish, as the number of vertices that are
+shared is way smaller than the total number of vertices in the domain (vertices
+within a patch are not dumped multiple times).
+As a consequence of the redundant vertex dumps, isosurfaces, e.g., might not
+work.
+If you need them, it is reasonable to project/map the actual data onto a regular
+mesh first.
+
+
+If your PDE has $m$ quantities, Peano's block format dumps them into a vector of
+cardinality $m$ per vertex or cell, respectively. 
+Most visualisation filters/tools however require data to be either scalar or 
+vector data. 
+In Paraview, use the calculator filter to extract only some quantities from the 
+data dump.
+Alternatively, you can ask the convert tool to extract only some data into the
+vtu output.
+
+\noindent
+Please note that most visualisation codes (such as Paraview) do interpolate
+bi-/tri-linearly within the cells. 
+If a cell's face is adjacent to cells on finer levels, hanging vertices on the
+face exist.
+If they do not hold the linearly interpolated value, you will discover
+visualisation artifacts.
+
+\begin{remark}
+  For smooth output pictures of meshes with adaptivity, you have to 
+  \begin{itemize}
+    \item set the plotted properties on hanging vertices due to $d$-linear
+    interpolation, and
+    \item you have to add the plotter mapping after you have invoked the mapping
+    that does initialise the hanging vertices.
+  \end{itemize}
+\end{remark}
+
+
+\noindent
+Please note that the dumped unstructured mesh is a non-conformal mesh. 
+Algorithms such as isosurface identification thus might yield invalid
+results---it depends on your visualisation algorithms.
+
+
+% \section{Using \Peano's Python front-end to interactively visualise data}
+% 
+% I've tested a couple of Python options how to visualise 3d data produced by 
+% \Peano\ directly from the Python API. 
+% None of them really did appeal to me or had support for Python 3 (cmp.~Mayavi2).
+% The only think that seems to work is to use Paraview as a server, and to connect from your
+% Python \Peano\ terminal to this server.
+% \Peano's Python API offers some tools to do so.
+% 
+% 
+% \begin{remark}
+%  If you build Paraview yourself, you have to enable its Python support. If you
+%  use a prepackaged Paraview, you will have to ensure that it includes the
+%  developer and Python parts. For Ubuntu, e.g., we need three packages in total:
+%  \texttt{paraview}, \texttt{paraview-python} and \texttt{paraview-dev}.
+% \end{remark}
+% 
+% The tools wrap around recommendations/examples from
+% \url{https://www.paraview.org/Wiki/ParaView/Python_Scripting}.
+% Before launching any
+% \Peano\ script, fire up your Paraview server
+% \begin{code}
+% > pvserver
+% Waiting for client...
+% Connection URL: cs://YourMachine:11111
+% Accepting connection(s): YourMachine:11111
+% \end{code}
+% 
+% \noindent
+% and take note of the connection details, i.e.~URL. 
+% 
+% 
+% \begin{code}
+% 
+% \end{code}
+% 
+% 
+% \url{https://www.paraview.org/Wiki/ParaView_and_Python}
+% 
+% 
+% #
+% # Test
+% #
+% 
+% from paraview.simple import *
+% 
+% reader = vtkXMLUnstructuredDataWriter( "solutionParallelEuler-0-ParallelEulerQ-domain-decomposition-fine-grid.vtu")
+% 
+% #cone = Cone()
+% #cone.Resolution = 32
+% #cone.Center = [1, 2, 3]
+% GetActiveSource()
+% Shrink()
+% SetActiveSource(cone)
+% shrinkFilter = Shrink(cone)
+% shrinkFilter.UpdatePipeline()
+% Show(shrinkFilter)
+% Render()
+% input()
+% 
+% 
+% 
+% 
+% #
+% # Der Teil funktioniert noch net so richtig ;-(
+% # ---------------------------------------------
+% 
+% #servermanager.Connect( "Bad" )
+% #print( str(GetActiveSource()) )
+% #cone = Cone()
+% #print( str(GetActiveSource()) )
+% #SetActiveSource(cone)  # Braucht man wohl net
+% #
+% #print( str(GetActiveSource()) )
+% #
+% #Show()
+% #Render()
+% 
+% #cone = Cone()
+% #cone.Resolution = 32
+% #cone.Center = [1, 2, 3]
+% #GetActiveSource()
+% #Shrink()
+% #SetActiveSource(cone)
+% 
+% #shrinkFilter = Shrink(cone)
+% #shrinkFilter.UpdatePipeline()
+% #Show(shrinkFilter)
+% #Render()
+% #input()
+% 
+% #Delete(cone)
+% 
+% 
+% #
+% # Es gibt ne Datei servermanager.py, die Bespiele enthaelt. Die geht bei mir aber auch net.
+% #
+% #connection  = servermanager.Connect( "Bad", 11111 )
+% #filters.AppendDatasets()
+% #render_view = CreateRenderView()#
+% 
+% #input()
+% 
+
+\section{Useful scripts}
+
+For many of \Peano's features, I offer Python/matplotlib postprocessing scripts
+to translate the terminal output into graphs.
+These scripts can be a reasonable starting point for more sophisticated graphs
+(in papers, e.g.).
+
+
+\paragraph{Load balancing toolbox.}
+%
+%
+%
+In the \texttt{loadbalancing} toolbox, you find a script \linebreak
+\texttt{plot-load-distribution.py} which yields 
+plots over the data distribution.
+
+\begin{center}
+  \includegraphics[width=0.7\textwidth]{80_postprocessing/shared-memory.pdf}
+\end{center}
+
+\noindent
+The script works for shared and distributed memory and gives you a scatter plot
+over the load distribution.
+Above, you see an (outdated) screenshot of the type of plots---the up-to-date
+version should have a legend that is easier to digest.
+
+
+\paragraph{\ExaHyPE\ postprocessing.}
+%
+%
+%
+\ExaHyPE\ has a tailored postprocessing module in its Python API. It yields
+graphs alike the one below.
+The likely most interesting feature is that it works on archives of data dumps
+and thus keeps the disk space usage (and disk accesses) down.
+
+
+\begin{center}
+  \includegraphics[width=0.7\textwidth]{80_postprocessing/distributed-memory-single-experiment.pdf}
+\end{center}
+
+\noindent
+There's a couple of parameters to pass to this script to control what exactly is
+presented:
+
+\begin{itemize}
+  \item Are you interested in both the grid construction and the solution time?
+  \item Do you want the script to take the whole simulation time into account or
+  only the last time step?
+  \item \ldots
+\end{itemize}
+
