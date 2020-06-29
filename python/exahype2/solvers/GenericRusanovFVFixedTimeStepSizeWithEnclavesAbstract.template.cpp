@@ -30,11 +30,6 @@ double {% for item in NAMESPACE -%}{{ item }}::{%- endfor %}{{CLASSNAME}}::getMa
 }
 
 
-bool {% for item in NAMESPACE -%}{{ item }}::{%- endfor %}{{CLASSNAME}}::mayUpdateLoadBalancing() {
-  return true;
-}
-
-
 void {% for item in NAMESPACE -%}{{ item }}::{%- endfor %}{{CLASSNAME}}::startGridConstructionStep() {
 }
 
@@ -58,12 +53,28 @@ void {% for item in NAMESPACE -%}{{ item }}::{%- endfor %}{{CLASSNAME}}::startTi
   double globalMinTimeStepSize,
   double globalMaxTimeStepSize
 ) {
-  _solverState = SolverState::TimeStep;
+  if (
+    _solverState == SolverState::GridInitialisation
+  ) {
+    _solverState = SolverState::PrimaryAfterGridInitialisation;
+  }
+  else if (
+    _solverState == SolverState::Primary
+    or
+    _solverState == SolverState::PrimaryAfterGridInitialisation
+  ) {
+    _solverState = SolverState::Secondary;
+  }
+  else {
+    _solverState = SolverState::Primary;
+  }
 }
 
 
 void {% for item in NAMESPACE -%}{{ item }}::{%- endfor %}{{CLASSNAME}}::finishTimeStep() {
-  _timeStamp += {{TIME_STEP_SIZE}};
+  if ( _solverState == SolverState::Secondary ) {
+    _timeStamp += {{TIME_STEP_SIZE}};
+  }
 }
 
 
@@ -73,7 +84,12 @@ void {% for item in NAMESPACE -%}{{ item }}::{%- endfor %}{{CLASSNAME}}::startPl
   double globalMinTimeStepSize,
   double globalMaxTimeStepSize
 ) {
-  _solverState = SolverState::Plotting;
+  if ( _solverState == SolverState::GridInitialisation ) {
+    _solverState = SolverState::PlottingInitialCondition;
+  }
+  else {
+    _solverState = SolverState::Plotting;
+  }
 }
 
 
@@ -87,12 +103,55 @@ std::string {% for item in NAMESPACE -%}{{ item }}::{%- endfor %}{{CLASSNAME}}::
       return "grid-construction";
     case SolverState::GridInitialisation:
       return "grid-initialisation";
-    case SolverState::TimeStep:
-      return "time-step";
+    case SolverState::Primary:
+      return "primary";
+    case SolverState::Secondary:
+      return "secondary";
+    case SolverState::PlottingInitialCondition:
+      return "plotting-initial-condition";
+    case SolverState::PrimaryAfterGridInitialisation:
+      return "primary-after-grid-initialisation";
     case SolverState::Plotting:
       return "plotting";
   }
   return "<undef>";
+}
+
+
+bool {% for item in NAMESPACE -%}{{ item }}::{%- endfor %}{{CLASSNAME}}::isPrimary() const {
+  return _solverState==SolverState::Primary
+      or _solverState==SolverState::PrimaryAfterGridInitialisation;
+}
+
+
+bool {% for item in NAMESPACE -%}{{ item }}::{%- endfor %}{{CLASSNAME}}::isSecondary() const {
+  return _solverState==SolverState::Secondary;
+}
+
+
+
+bool {% for item in NAMESPACE -%}{{ item }}::{%- endfor %}{{CLASSNAME}}::isGridInitialisation() const {
+  return _solverState==SolverState::GridInitialisation;
+}
+
+
+bool {% for item in NAMESPACE -%}{{ item }}::{%- endfor %}{{CLASSNAME}}::sendOutBoundaryData() const {
+  return _solverState==SolverState::GridInitialisation
+      or _solverState==SolverState::Primary
+      or _solverState==SolverState::PrimaryAfterGridInitialisation;
+}
+
+
+bool {% for item in NAMESPACE -%}{{ item }}::{%- endfor %}{{CLASSNAME}}::receiveAndMergeBoundaryData() const {
+  return _solverState==SolverState::Secondary
+      or _solverState==SolverState::PlottingInitialCondition
+      or _solverState==SolverState::PrimaryAfterGridInitialisation;
+}
+
+
+// @todo wieder raus!
+bool {% for item in NAMESPACE -%}{{ item }}::{%- endfor %}{{CLASSNAME}}::mayUpdateLoadBalancing() {
+  return _solverState!=SolverState::Primary and _solverState!=SolverState::Secondary;
 }
 
 

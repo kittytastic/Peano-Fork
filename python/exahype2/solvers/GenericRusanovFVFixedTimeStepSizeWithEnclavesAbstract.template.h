@@ -39,7 +39,10 @@ class {% for item in NAMESPACE -%}{{ item }}::{%- endfor %}{{CLASSNAME}} {
     enum class SolverState {
       GridConstruction,
       GridInitialisation,
-      TimeStep,
+      Primary,
+      Secondary,
+      PlottingInitialCondition,
+      PrimaryAfterGridInitialisation,
       Plotting
     };
 
@@ -49,10 +52,19 @@ class {% for item in NAMESPACE -%}{{ item }}::{%- endfor %}{{CLASSNAME}} {
   public:
     {{CLASSNAME}}();
 
+    bool sendOutBoundaryData() const;
+    bool receiveAndMergeBoundaryData() const;
+
+    bool isPrimary() const;
+    bool isSecondary() const;
+    bool isGridInitialisation() const;
+
     double getMinTimeStamp() const;
     double getMaxTimeStamp() const;
     double getMinTimeStepSize() const;
     double getMaxTimeStepSize() const;
+
+    virtual bool mayUpdateLoadBalancing();
 
     /**
      * @param Q Vector of unknowns
@@ -113,8 +125,6 @@ class {% for item in NAMESPACE -%}{{ item }}::{%- endfor %}{{CLASSNAME}} {
 
     virtual void startGridInitialisationStep();
     virtual void finishGridInitialisationStep();
-
-    virtual bool mayUpdateLoadBalancing();
 
     /**
      * If you hook into this routine, ensure the abstract base class
