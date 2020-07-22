@@ -1,7 +1,7 @@
 // This file is part of the ExaHyPE2 project. For conditions of distribution and
 // use, please see the copyright notice at www.peano-framework.org
-#ifndef _EXAHYPE2_ENCLAVE_TASK_H_
-#define _EXAHYPE2_ENCLAVE_TASK_H_
+#ifndef _EXAHYPE2_ENCLAVE_GPU_TASK_H_
+#define _EXAHYPE2_ENCLAVE_GPU_TASK_H_
 
 
 #include "peano4/datamanagement/CellMarker.h"
@@ -12,7 +12,7 @@
 
 
 namespace exahype2 {
-  class EnclaveTask;
+  class EnclaveGPUTask;
   class EnclaveBookkeeping;
 }
 
@@ -37,7 +37,7 @@ namespace exahype2 {
  * task object into the enclave bookkeeping. I can only store the created output
  * memory, but will loose all of my task-specific data.
  */
-class exahype2::EnclaveTask: public tarch::multicore::Task {
+class exahype2::EnclaveGPUTask: public tarch::multicore::Task {
   private:
     friend class EnclaveBookkeeping;
 
@@ -52,17 +52,17 @@ class exahype2::EnclaveTask: public tarch::multicore::Task {
 
   public:
     /**
-     * Create plain enclave task.
+     * I expect taskNumber of
      */
-    EnclaveTask(
+    EnclaveGPUTask(
       const ::peano4::datamanagement::CellMarker&    marker,
       double*                                        inputValues,
       int                                            numberOfResultValues,
       std::function< void(double* input, double* output, const ::peano4::datamanagement::CellMarker& marker) >                        functor
     );
 
-    EnclaveTask(const EnclaveTask& other) = delete;
-    EnclaveTask(const EnclaveTask&& other) = delete;
+    EnclaveGPUTask(const EnclaveGPUTask& other) = delete;
+    EnclaveGPUTask(const EnclaveGPUTask&& other) = delete;
 
     /**
      * Every task grabs a unique task number. You will want to memorise this

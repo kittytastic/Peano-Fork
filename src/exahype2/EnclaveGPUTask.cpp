@@ -1,12 +1,12 @@
-#include "EnclaveTask.h"
+#include "EnclaveGPUTask.h"
 #include "EnclaveBookkeeping.h"
 
 
 
-tarch::logging::Log  exahype2::EnclaveTask::_log( "exahype2::EnclaveTask" );
+tarch::logging::Log  exahype2::EnclaveGPUTask::_log( "exahype2::EnclaveGPUTask" );
 
 
-exahype2::EnclaveTask::EnclaveTask(
+exahype2::EnclaveGPUTask::EnclaveGPUTask(
   const ::peano4::datamanagement::CellMarker&    marker,
   double*                                        inputValues,
   int                                            numberOfResultValues,
@@ -19,17 +19,17 @@ exahype2::EnclaveTask::EnclaveTask(
   _numberOfResultValues(numberOfResultValues),
   _functor(functor),
   _taskNumber(EnclaveBookkeeping::getInstance().reserveTaskNumber()) {
-  logTraceIn( "EnclaveTask(...)" );
-  logTraceOut( "EnclaveTask(...)" );
+  logTraceIn( "EnclaveGPUTask(...)" );
+  logTraceOut( "EnclaveGPUTask(...)" );
 }
 
 
-int exahype2::EnclaveTask::getTaskNumber() const {
+int exahype2::EnclaveGPUTask::getTaskNumber() const {
   return _taskNumber;
 }
 
 
-bool exahype2::EnclaveTask::run() {
+bool exahype2::EnclaveGPUTask::run() {
   logTraceIn( "run()" );
   _outputValues = new double[_numberOfResultValues];
   _functor(_inputValues,_outputValues,_marker);
@@ -41,7 +41,7 @@ bool exahype2::EnclaveTask::run() {
 }
 
 
-void exahype2::EnclaveTask::prefetch() {
+void exahype2::EnclaveGPUTask::prefetch() {
   logTraceIn( "prefetch()" );
   logTraceOut( "prefetch()" );
 }
