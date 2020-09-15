@@ -1,7 +1,9 @@
 #!/bin/bash
-#SBATCH -t 00:10:00
+#SBATCH -t 04:00:00
+#SBATCH --exclusive
 #SBATCH -p par7.q
-#SBATCH -N 1
+#SBATCH -N 10
+#SBATCH --array=1,5,7,9,95%1
 #SBATCH --ntasks-per-node=1
 #SBATCH --mail-type=END
 #SBATCH --mail-user=tobias.weinzierl@durham.ac.uk
@@ -18,18 +20,18 @@ module load gcc/9.3.0
 export PYTHONPATH=../../../python
 
 
-rm peano4-*
+ratio=0.$SLURM_ARRAY_TASK_ID
 
-
-for SLURM_ARRAY_TASK_ID in 1 5 7 9 95
+for myH in 0.01 0.005 0.001 0.0005 
 do
-  ratio=0.$SLURM_ARRAY_TASK_ID
-
-  for myH in 0.05 0.01 0.005 0.001 0.0005
-  do
+  if [ ! -f "peano4-$myH-$ratio" ]
+  then
     rm *-main.*
     python3 example-scripts/finitevolumes-with-ExaHyPE2-benchmark.py --load-balancing-quality=$ratio --h=$myH
     mv peano4 ./peano4-$myH-$ratio
-  done
+  fi
+  mpirun ./peano4-$myH-$ratio --threads $SLURM_CPUS_ON_NODE --timeout 365  > Hamilton-$SLURM_NTASKS-nodes-load-balancing-quality-$ratio-h-$myH.out
 done
+
+
 
