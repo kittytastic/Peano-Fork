@@ -45,10 +45,41 @@ class {% for item in NAMESPACE -%}{{ item }}::{%- endfor %}{{CLASSNAME}}: public
 
     {{CLASSNAME}}();
 
-    double getMinTimeStamp() const final;
-    double getMaxTimeStamp() const final;
-    double getMinTimeStepSize() const final;
-    double getMaxTimeStepSize() const final;
+    virtual double getMinTimeStamp() const = 0;
+    virtual double getMaxTimeStamp() const = 0;
+    virtual double getMinTimeStepSize() const = 0;
+    virtual double getMaxTimeStepSize() const = 0;
+
+    virtual void startGridConstructionStep() = 0;
+    virtual void finishGridConstructionStep() = 0;
+
+    virtual void startGridInitialisationStep() = 0;
+    virtual void finishGridInitialisationStep() = 0;
+
+    virtual void startTimeStep(
+      double globalMinTimeStamp,
+      double globalMaxTimeStamp,
+      double globalMinTimeStepSize,
+      double globalMaxTimeStepSize
+    ) = 0;
+    virtual void finishTimeStep() = 0;
+
+    virtual void startPlottingStep(
+      double globalMinTimeStamp,
+      double globalMaxTimeStamp,
+      double globalMinTimeStepSize,
+      double globalMaxTimeStepSize
+    ) = 0;
+    virtual void finishPlottingStep() = 0;
+
+    double getMaxMeshSize() const = 0;
+    double getMinMeshSize() const = 0;
+
+
+    double getMinTimeStamp() const;
+    double getMaxTimeStamp() const;
+    double getMinTimeStepSize() const;
+    double getMaxTimeStepSize() const;
 
     /**
      * @param Q Vector of unknowns
@@ -59,7 +90,7 @@ class {% for item in NAMESPACE -%}{{ item }}::{%- endfor %}{{CLASSNAME}}: public
       const tarch::la::Vector<Dimensions,double>&  volumeCentre,
       const tarch::la::Vector<Dimensions,double>&  volumeH,
       double                                       t
-    ) {% if REFINEMENT_CRITERION_IMPLEMENTATION=="<user-defined>" %}= 0{% else %} final {% endif %};
+    ) {% if REFINEMENT_CRITERION_IMPLEMENTATION=="<user-defined>" %}= 0{% endif %};
 
     /**
      * Feel free to change the solution in the particular finite volume.
@@ -72,7 +103,7 @@ class {% for item in NAMESPACE -%}{{ item }}::{%- endfor %}{{CLASSNAME}}: public
       const tarch::la::Vector<Dimensions,double>&  volumeCentre,
       const tarch::la::Vector<Dimensions,double>&  volumeH,
       double                                       t
-    ) {% if INITIAL_CONDITIONS_IMPLEMENTATION=="<user-defined>" %}= 0{% else %} final {% endif %};
+    ) {% if INITIAL_CONDITIONS_IMPLEMENTATION=="<user-defined>" %}= 0{% endif %};
 
     /**
      * Determine max eigenvalue over Jacobian in a given point with solution values
@@ -84,7 +115,7 @@ class {% for item in NAMESPACE -%}{{ item }}::{%- endfor %}{{CLASSNAME}}: public
       const tarch::la::Vector<Dimensions,double>&  volumeH,
       double                                       t,
       int                                          normal
-    ) {% if EIGENVALUES_IMPLEMENTATION=="<user-defined>" %}= 0{% else %} final{% endif %};
+    ) {% if EIGENVALUES_IMPLEMENTATION=="<user-defined>" %}= 0{% endif %};
 
     /**
      * Apply boundary conditions. You can overwrite both the inside and
@@ -99,66 +130,40 @@ class {% for item in NAMESPACE -%}{{ item }}::{%- endfor %}{{CLASSNAME}}: public
       const tarch::la::Vector<Dimensions,double>&  volumeH,
       double                                       t,
       int                                          normal
-    ) {% if BOUNDARY_CONDITIONS_IMPLEMENTATION=="<user-defined>" %}= 0{% else %} final{% endif %};
+    ) {% if BOUNDARY_CONDITIONS_IMPLEMENTATION=="<user-defined>" %}= 0{% endif %};
 
 
-    /**
-     * If you hook into this routine, ensure the abstract base class
-     * operation is still invoked.
-     */
-    void startGridConstructionStep() override;
+    virtual void startGridConstructionStep();
+    virtual void finishGridConstructionStep();
 
-    /**
-     * If you hook into this routine, ensure the abstract base class
-     * operation is still invoked.
-     */
-    void finishGridConstructionStep() override;
+    virtual void startGridInitialisationStep();
+    virtual void finishGridInitialisationStep();
 
     /**
      * If you hook into this routine, ensure the abstract base class
      * operation is still invoked.
      */
-    void startGridInitialisationStep() override;
-
-    /**
-     * If you hook into this routine, ensure the abstract base class
-     * operation is still invoked.
-     */
-    void finishGridInitialisationStep() override;
-
-    /**
-     * If you hook into this routine, ensure the abstract base class
-     * operation is still invoked.
-     */
-    void startTimeStep(
+    virtual void startTimeStep(
       double globalMinTimeStamp,
       double globalMaxTimeStamp,
       double globalMinTimeStepSize,
       double globalMaxTimeStepSize
-    ) override;
+    );
 
     /**
      * If you hook into this routine, ensure the abstract base class
      * operation is still invoked.
      */
-    void finishTimeStep() override;
+    virtual void finishTimeStep();
 
-    /**
-     * If you hook into this routine, ensure the abstract base class
-     * operation is still invoked.
-     */
-    void startPlottingStep(
+    virtual void startPlottingStep(
       double globalMinTimeStamp,
       double globalMaxTimeStamp,
       double globalMinTimeStepSize,
       double globalMaxTimeStepSize
-    ) override;
+    );
 
-    /**
-     * If you hook into this routine, ensure the abstract base class
-     * operation is still invoked.
-     */
-    void finishPlottingStep() override;
+    virtual void finishPlottingStep();
 
     {% if FLUX_IMPLEMENTATION!="<none>" %}
    virtual void flux(
@@ -168,7 +173,7 @@ class {% for item in NAMESPACE -%}{{ item }}::{%- endfor %}{{CLASSNAME}}: public
      double                                       t,
      int                                          normal,
      double                                       F[{{NUMBER_OF_UNKNOWNS}}]
-    ) {% if FLUX_IMPLEMENTATION=="<user-defined>" %}=0{% else %} final {% endif %};
+    ) {% if FLUX_IMPLEMENTATION=="<user-defined>" %}=0{% endif %};
      {% endif %}
      {% if NCP_IMPLEMENTATION!="<none>" %}
     virtual void nonconservativeProduct(
@@ -182,8 +187,8 @@ class {% for item in NAMESPACE -%}{{ item }}::{%- endfor %}{{CLASSNAME}}: public
     ) {% if NCP_IMPLEMENTATION=="<user-defined>" %}=0{% endif %};
      {% endif %}
 
-    double getMaxMeshSize() const final;
-    double getMinMeshSize() const final;
+    double getMaxMeshSize() const;
+    double getMinMeshSize() const;
   protected:
     const int  _NumberOfFiniteVolumesPerAxisPerPatch;
 
