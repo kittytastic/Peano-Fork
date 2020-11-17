@@ -1,4 +1,4 @@
-#include "tarch/logging/ITACLogger.h"
+#include "tarch/logging/ScorePLogger.h"
 
 #include "tarch/Assertions.h"
 
@@ -15,36 +15,36 @@
 
 #include "../config.h"
 
-#ifdef UseITAC
-#include <VT.h>
+#ifdef UseScoreP
+#include <scorep/SCOREP_User.h>
 #endif
 
 
-tarch::logging::Log tarch::logging::ITACLogger::_log( "tarch::logging::ITACLogger" );
+tarch::logging::Log tarch::logging::ScorePLogger::_log( "tarch::logging::ScorePLogger" );
 
 
-tarch::logging::ITACLogger  tarch::logging::ITACLogger::_singleton;
+tarch::logging::ScorePLogger  tarch::logging::ScorePLogger::_singleton;
 
 
-tarch::logging::ITACLogger::ITACLogger() {
+tarch::logging::ScorePLogger::ScorePLogger() {
 }
 
 
-tarch::logging::ITACLogger& tarch::logging::ITACLogger::getInstance() {
+tarch::logging::ScorePLogger& tarch::logging::ScorePLogger::getInstance() {
   return _singleton;
 }
 
 
-tarch::logging::ITACLogger::~ITACLogger() {
+tarch::logging::ScorePLogger::~ScorePLogger() {
   close();
 }
 
 
-void tarch::logging::ITACLogger::indent( bool indent, const std::string& trace, const std::string& message ) {
+void tarch::logging::ScorePLogger::indent( bool indent, const std::string& trace, const std::string& message ) {
 }
 
 
-std::string tarch::logging::ITACLogger::getTimeStampHumanReadable( long int timestampNanoseconds ) const {
+std::string tarch::logging::ScorePLogger::getTimeStampHumanReadable( long int timestampNanoseconds ) const {
   long int timestampSeconds = timestampNanoseconds / 1000 / 1000 / 1000;
   const int HourScaling = 60 * 60;
   long int hours = timestampSeconds / HourScaling;
@@ -74,7 +74,7 @@ std::string tarch::logging::ITACLogger::getTimeStampHumanReadable( long int time
 }
 
 
-std::string tarch::logging::ITACLogger::constructMessageString(
+std::string tarch::logging::ScorePLogger::constructMessageString(
   std::string          messageType,
   long int timestampNanoseconds, int rank, int threadId, const std::string& trace, const std::string& message
 ) {
@@ -89,7 +89,7 @@ std::string tarch::logging::ITACLogger::constructMessageString(
 }
 
 
-void tarch::logging::ITACLogger::debug(long int timestampNanoseconds, int rank, int threadId, const std::string& trace, const std::string& message) {
+void tarch::logging::ScorePLogger::debug(long int timestampNanoseconds, int rank, int threadId, const std::string& trace, const std::string& message) {
   #if !defined(PeanoDebug) || PeanoDebug<1
   assertion(false);
   #endif
@@ -104,7 +104,7 @@ void tarch::logging::ITACLogger::debug(long int timestampNanoseconds, int rank, 
 }
 
 
-void tarch::logging::ITACLogger::info(long int timestampNanoseconds, int rank, int threadId, const std::string& trace, const std::string& message) {
+void tarch::logging::ScorePLogger::info(long int timestampNanoseconds, int rank, int threadId, const std::string& trace, const std::string& message) {
   std::string outputMessage = constructMessageString(
     LogFilter::FilterListEntry::TargetInfo,
     timestampNanoseconds, rank, threadId, trace, message
@@ -115,7 +115,7 @@ void tarch::logging::ITACLogger::info(long int timestampNanoseconds, int rank, i
 }
 
 
-void tarch::logging::ITACLogger::warning(long int timestampNanoseconds, int rank, int threadId, const std::string& trace, const std::string& message) {
+void tarch::logging::ScorePLogger::warning(long int timestampNanoseconds, int rank, int threadId, const std::string& trace, const std::string& message) {
   std::string outputMessage = constructMessageString(
     "warning",
     timestampNanoseconds, rank, threadId, trace, message
@@ -127,7 +127,7 @@ void tarch::logging::ITACLogger::warning(long int timestampNanoseconds, int rank
 }
 
 
-void tarch::logging::ITACLogger::error(long int timestampNanoseconds, int rank, int threadId, const std::string& trace, const std::string& message) {
+void tarch::logging::ScorePLogger::error(long int timestampNanoseconds, int rank, int threadId, const std::string& trace, const std::string& message) {
   std::string outputMessage = constructMessageString(
      "error",
     timestampNanoseconds, rank, threadId, trace, message
@@ -142,29 +142,27 @@ void tarch::logging::ITACLogger::error(long int timestampNanoseconds, int rank, 
 }
 
 
-void tarch::logging::ITACLogger::traceIn(long int timestampNanoseconds, int rank, int threadId, const std::string& trace, const std::string& message) {
+void tarch::logging::ScorePLogger::traceIn(long int timestampNanoseconds, int rank, int threadId, const std::string& trace, const std::string& message) {
   #ifdef UseITAC
   tarch::multicore::Lock lock(_semaphore);
 
-  if (_itacHandles.count(trace)==0) {
-    int newHandle;
-    VT_funcdef( trace , VT_NOCLASS, &newHandle );
-	  _itaceHandles.insert( std::pair<std::string, int>(trace,newHandle) );
+  if (_scorePHandles.count(trace)==0) {
+    _scorePHandles.insert( std::pair<std::string, int>(trace,SCOREP_USER_INVALID_REGION) );
   }
 
-  VT_begin(_itaceHandles[trace].c_str());
+  SCOREP_USER_REGION_ENTER(_scorePHandles[trace]);
   #endif
 }
 
 
-void tarch::logging::ITACLogger::traceOut(long int timestampNanoseconds, int rank, int threadId, const std::string& trace, const std::string& message) {
+void tarch::logging::ScorePLogger::traceOut(long int timestampNanoseconds, int rank, int threadId, const std::string& trace, const std::string& message) {
   #ifdef UseITAC
-  VT_end(_itaceHandles[trace].c_str());
+  SCOREP_USER_REGION_LEAVE(_scorePHandles[trace]);
   #endif
 }
 
 
-void tarch::logging::ITACLogger::close() {
+void tarch::logging::ScorePLogger::close() {
   std::cout.flush();
   std::cerr.flush();
 }
