@@ -4,8 +4,7 @@ import os
 
 import peano4
 import peano4.datamodel
-import peano4.output.TemplatedHeaderFile
-import peano4.output.TemplatedHeaderImplementationFilePair
+
 import peano4.output.Jinja2TemplatedHeaderFile
 import peano4.output.Jinja2TemplatedHeaderImplementationFilePair
 
@@ -16,224 +15,75 @@ import jinja2
 from abc import abstractmethod
 
 
-class FV(object):
-  """ 
-    An abstract finite volume solver step sizes that works on patch-based
-    AMR with a halo layer of one.
+from enum import IntEnum
+
+
+class Polynomials(IntEnum):
+  """
   
-    We use two overlaps in this case: the standard one and one we call new. In the
-    time stepping, we use the new one to project our data to. Then we roll it over
-    at the end of the iteration. This way, we ensure that the one from the previous
-    iteration is not overwritten by some adjacent cell halfway through the 
-    computation.
+   Superclass has to be IntEnum, as I use this one within Jinja2 templates
+   where I struggled to compare against enum variants. I however can always
+   compare against integers.
+  
+  """
+  Gauss_Legendre = 0,
+  Gauss_Lobatto = 1
+  
+
+
+class ADERDG(object):
+  """ 
+    An abstract ADER-DG solver
+
+    Our ADER-DG solver hijacks the patch-based data structures. Topologically,
+    this makes sense, as the Cartesian mesh is just distorted - depending on 
+    whether you use Gauss-Lobatto or Gauss-Legendre nodes. A big semantic 
+    difference can be found for the overlaps: We use an overlap of two but the 
+    layer closer to the actual patch hosts a nodal representation of the 
+    solution. The outer ghost layer holds a nodel representation of the solution
+    gradient along the boundary.
+    
+    Further to the width of the overlaps, our face data always is space-time.
+    For a global time stepping, this is not required, as we can directly apply
+    the space-time integral. For all other routines, it is essential.
+    
+    We use two overlaps: one with gradient and solution, and one with the 
+    outcome of the Riemann solve.
   
   
     Parallelisation:
-    
+
+    @todo Has to be updated
+        
     I do equip both Q and NewQ with proper merge routines. However, all merge guards
     are unset by default. If you need some data exchange, you have to activate
     them manually.
   
   
     Attributes:
-  
+
+    @todo Has to be updated
+      
     The guard variables are used within the templates and switch them on/off. By 
     default, they all are true, i.e. the actions are triggered in every grid 
     traversal an action in theory could be active.
   
-    
-    _guard_copy_new_face_data_into_face_data: C++ string describing a predicate
-      This is a predicate, i.e. identifies in C code when to trigger 
-      the underlying activity.
-      The routine triggers the roll-over, i.e. the actual commit of 
-      a new time step. It is the final operation per face per grid
-      sweep. 
-      
-
-    _guard_handle_boundary: string
-      This is a predicate, i.e. identifies in C code when to trigger 
-      the underlying activity.
-      Updates the boundary. By definition, boundary cells in the domain
-      are skeleton cells. Furthermore, the initialiation/setting of 
-      boundary conditions only has to happen once per time step. We 
-      hence trigger this routine for skeletons in the primary sweeps.
-
-    _guard_project_patch_onto_faces: string
-      This is a predicate, i.e. identifies in C code when to trigger 
-      the underlying activity.
-      This routine guards the mapping of an updated cell content onto a
-      cell's faces. The destination in QNew, i.e. is not "seen" by 
-      others unless the faces' new data are committed. Therefore, I 
-      trigger this routine in the primary sweep for skeleton cells and
-      in the secondary  sweep for enclave cells. The primary calls 
-      ensure that data are mapped onto the faces before faces are 
-      exchanged with neighbour partitions.
-      
-    _guard_handle_cell: string
-      This is a predicate, i.e. identifies in C code when to trigger 
-      the underlying activity.
-      Actual FV kernel invocation.
-      
-    _patch_overlap.generator.send_condition: string
-      This is a predicate, i.e. identifies in C code when to trigger 
-      the underlying activity.
-      Send out the faces in the grid initialisation. There's no need to 
-      send out data in other iterations, as all data exchange is 
-      realised through the QNew field. This is different to the plain
-      FV realisation, where data exchange happens through Q: The enclave
-      tasking exchanges QNew and then rolls data over from QNew into Q.
-      The plain FV scheme rolls over QNew into Q and then exchanges the
-      data.
-    
-    _patch_overlap.generator: string
-      See documentation of _patch_overlap.generator.send_condition.
-      
-    _patch_overlap.generator.merge_method_definition: string
-      The merge routines are set to the standard patch conditions for
-      both NewQ and Q. However, they are all by default disabled, as 
-      different solvers exchange either Q or NewQ. You have to enable
-      them explicitly if you need a boundary merger.
-
-    _guard_AMR: string
-      This is a predicate, i.e. identifies in C code when to trigger 
-      the underlying activity.
-      AMR is active throughout the grid construction. After that, it is
-      only available for skeleton cells.
-    
-    _patch_overlap_new.generator.send_condition: string
-      This is a predicate, i.e. identifies in C code when to trigger 
-      the underlying activity.
-      See discussion of _patch_overlap.generator.send_condition for 
-      details. As we effectively disable the data exchange for Q and
-      instead ask for data exchange of QNew, we have to add merge 
-      operations to QNew.
-      
-    _patch_overlap_new.generator.receive_and_merge_condition: string
-      See _patch_overlap_new.generator.send_condition.
-      
-    _patch_overlap_new.generator.merge_method_definition: string
-      See _patch_overlap_new.generator.send_condition.
   
     plot_description: string
       The description I use when I plot. By default, it is empty, but 
       some solvers add a string here that explains which entry of the 
       tuple represents which data.   
   
-  
   """
-  
-  TemplateAMR = """
-  { 
-    ::exahype2::RefinementCommand refinementCriterion = ::exahype2::getDefaultRefinementCommand();
-
-    if (tarch::la::max( marker.h() ) > {{SOLVER_INSTANCE}}.getMaxMeshSize() ) {
-      refinementCriterion = ::exahype2::RefinementCommand::Refine;
-    } 
-    else {
-      int index = 0;
-      dfor( volume, {{NUMBER_OF_VOLUMES_PER_AXIS}} ) {
-        refinementCriterion = refinementCriterion and {{SOLVER_INSTANCE}}.refinementCriterion(
-          fineGridCell{{UNKNOWN_IDENTIFIER}}.value + index,
-          ::exahype2::getVolumeCentre( marker.x(), marker.h(), {{NUMBER_OF_VOLUMES_PER_AXIS}}, volume), 
-          ::exahype2::getVolumeSize( marker.h(), {{NUMBER_OF_VOLUMES_PER_AXIS}} ),
-          {{SOLVER_INSTANCE}}.getMinTimeStamp()
-        );
-        index += {{NUMBER_OF_UNKNOWNS}} + {{NUMBER_OF_AUXILIARY_VARIABLES}};
-      }
-     
-      if (refinementCriterion==::exahype2::RefinementCommand::Refine and tarch::la::max( marker.h() ) < {{SOLVER_INSTANCE}}.getMinMeshSize() ) {
-        refinementCriterion = ::exahype2::RefinementCommand::Keep;
-      } 
-      else if (refinementCriterion==::exahype2::RefinementCommand::Coarsen and 3.0* tarch::la::max( marker.h() ) > {{SOLVER_INSTANCE}}.getMaxMeshSize() ) {
-        refinementCriterion = ::exahype2::RefinementCommand::Keep;
-      } 
-    }
-    
-    _localRefinementControl.addCommand( marker.x(), marker.h(), refinementCriterion, {{IS_GRID_CREATION}} );
-  } 
-"""
-     
-  
-  TemplateHandleBoundary = """
-    logDebug( "touchFaceFirstTime(...)", "label=" << fineGridFaceLabel.toString() );
-    ::exahype2::fv::applyBoundaryConditions(
-      [&](
-        double                                       Qinside[],
-        double                                       Qoutside[],
-        const tarch::la::Vector<Dimensions,double>&  faceCentre,
-        const tarch::la::Vector<Dimensions,double>&  volumeH,
-        double                                       t,
-        double                                       dt,
-        int                                          normal
-      ) -> void {
-        {{SOLVER_INSTANCE}}.boundaryConditions( Qinside, Qoutside, faceCentre, volumeH, t, normal );
-      },
-      marker.x(),
-      marker.h(),
-      {{SOLVER_INSTANCE}}.getMinTimeStamp(),
-      {{TIME_STEP_SIZE}},
-      {{NUMBER_OF_VOLUMES_PER_AXIS}},
-      {{NUMBER_OF_UNKNOWNS}}+{{NUMBER_OF_AUXILIARY_VARIABLES}},
-      marker.getSelectedFaceNumber(),
-      fineGridFace{{UNKNOWN_IDENTIFIER}}.value
-    );
-"""
-  
-  
-  TemplateAdjustCell = """
-  { 
-    int index = 0;
-    dfor( volume, {{NUMBER_OF_VOLUMES_PER_AXIS}} ) {
-      {{SOLVER_INSTANCE}}.adjustSolution(
-        fineGridCell{{UNKNOWN_IDENTIFIER}}.value + index,
-        ::exahype2::getVolumeCentre( marker.x(), marker.h(), {{NUMBER_OF_VOLUMES_PER_AXIS}}, volume), 
-        ::exahype2::getVolumeSize( marker.h(), {{NUMBER_OF_VOLUMES_PER_AXIS}} ),
-        {{SOLVER_INSTANCE}}.getMinTimeStamp()
-      );
-      index += {{NUMBER_OF_UNKNOWNS}} + {{NUMBER_OF_AUXILIARY_VARIABLES}};
-    }
-  } 
-"""
-  
-  
-  """
-  
-    This is the straightforward implementation.
-    
-  """
-  CellUpdateImplementation_NestedLoop = """
-    #if Dimensions==2
-    ::exahype2::fv::applySplit1DRiemannToPatch_Overlap1AoS2d
-    #else
-    ::exahype2::fv::applySplit1DRiemannToPatch_Overlap1AoS3d
-    #endif
-  """
-
-
-  CellUpdateImplementation_SplitLoop = """
-    #if Dimensions==2
-    ::exahype2::fv::applySplit1DRiemannToPatch_Overlap1AoS2d_SplitLoop
-    #else
-    ::exahype2::fv::applySplit1DRiemannToPatch_Overlap1AoS3d_SplitLoop
-    #endif
-  """
-  
-      
-  def __init__(self, name, patch_size, overlap, unknowns, auxiliary_variables, min_h, max_h, plot_grid_properties):
+  def __init__(self, name, order, unknowns, auxiliary_variables, polynomials, min_h, max_h, plot_grid_properties):
     """
   name: string
      A unique name for the solver. This one will be used for all generated 
      classes. Also the C++ object instance later on will incorporate this 
      name.
      
-  patch_size: int
-     Size of the patch in one dimension. All stuff here's dimension-generic.
-     
-  overlap: int
-     That's the size of the halo layer which is half of the overlap with a 
-     neighbour. A value of 1 means that a patch_size x patch_size patch in 
-     2d is surrounded by one additional cell layer. The overlap has to be 
-     bigger or equal to one. It has to be smaller or equal to patch_size.
+  order: int
+     Order of the chosen polynomials.
      
   unknowns: int
      Number of unknowns per Finite Volume voxel.
@@ -244,6 +94,9 @@ class FV(object):
      work with AoS. But the solver has to be able to distinguish them, as 
      only the unknowns are subject to a hyperbolic formulation.
      
+  polynomials: Polynomials
+     Type of polynomials used within the cell.
+  
   min_h: double
   
   max_h: double
@@ -253,13 +106,13 @@ class FV(object):
      (such as enclave status flags), too.
  
     """
-    self._name              = name
-    self._patch             = peano4.datamodel.Patch( (patch_size,patch_size,patch_size),    unknowns+auxiliary_variables, self._unknown_identifier() )
-    self._patch_overlap     = peano4.datamodel.Patch( (2,patch_size,patch_size), unknowns+auxiliary_variables, self._unknown_identifier() )
-    self._patch_overlap_new = peano4.datamodel.Patch( (2,patch_size,patch_size), unknowns+auxiliary_variables, self._unknown_identifier() + "New" )
+    self._name                    = name
+    self._patch                   = peano4.datamodel.Patch( (order+1,order+1,order+1),     unknowns+auxiliary_variables, self._unknown_identifier() )
+    self._spacetime_patch_overlap = peano4.datamodel.Patch( (2*(order+1),order+1,order+1), unknowns+auxiliary_variables, self._unknown_identifier() )
+    self._Riemann_result          = peano4.datamodel.Patch( 2,order+1,order+1),            unknowns+auxiliary_variables, self._unknown_identifier() )
     
-    self._patch_overlap.generator.merge_method_definition     = peano4.toolbox.blockstructured.get_face_overlap_merge_implementation(self._patch_overlap)
-    self._patch_overlap_new.generator.merge_method_definition = peano4.toolbox.blockstructured.get_face_overlap_merge_implementation(self._patch_overlap)
+    #self._patch_overlap.generator.merge_method_definition     = peano4.toolbox.blockstructured.get_face_overlap_merge_implementation(self._patch_overlap)
+    #self._patch_overlap_new.generator.merge_method_definition = peano4.toolbox.blockstructured.get_face_overlap_merge_implementation(self._patch_overlap)
     
     self._patch_overlap.generator.includes     += """
 #include "peano4/utils/Loop.h"
@@ -291,10 +144,9 @@ class FV(object):
     if min_h>max_h:
        print( "Error: min_h (" + str(min_h) + ") is bigger than max_h (" + str(max_h) + ")" )
 
-    self._template_adjust_cell     = jinja2.Template(self.TemplateAdjustCell)
-    self._template_AMR             = jinja2.Template(self.TemplateAMR)
-    self._template_handle_boundary = jinja2.Template(self.TemplateHandleBoundary)
-    
+    self._template_adjust_cell     = jinja2.Template( "" )
+    self._template_AMR             = jinja2.Template( "" )
+    self._template_handle_boundary = jinja2.Template( "" )
     self._template_update_cell     = jinja2.Template( "" )
 
     self._reconstructed_array_memory_location=peano4.toolbox.blockstructured.ReconstructedArrayMemoryLocation.CallStack
@@ -545,9 +397,6 @@ class FV(object):
   def _init_dictionary_with_default_parameters(self,d):
     """
     
-      This one is called by all algorithmic steps before I invoke 
-      add_entries_to_text_replacement_dictionary().
-      
     """
     d["NUMBER_OF_VOLUMES_PER_AXIS"]     = self._patch.dim[0]
     d["HALO_SIZE"]                      = int(self._patch_overlap.dim[0]/2)
@@ -559,14 +408,12 @@ class FV(object):
         
     if self._patch_overlap.dim[0]/2!=1:
       print( "ERROR: Finite Volume solver currently supports only a halo size of 1")
-      
     d[ "ASSERTION_WITH_1_ARGUMENTS" ] = "nonCriticalAssertion1"
     d[ "ASSERTION_WITH_2_ARGUMENTS" ] = "nonCriticalAssertion2"
     d[ "ASSERTION_WITH_3_ARGUMENTS" ] = "nonCriticalAssertion3"
     d[ "ASSERTION_WITH_4_ARGUMENTS" ] = "nonCriticalAssertion4"
     d[ "ASSERTION_WITH_5_ARGUMENTS" ] = "nonCriticalAssertion5"
     d[ "ASSERTION_WITH_6_ARGUMENTS" ] = "nonCriticalAssertion6"
-
     d[ "MAX_H"] = self._min_h
     d[ "MIN_H"] = self._max_h
-   
+ 
