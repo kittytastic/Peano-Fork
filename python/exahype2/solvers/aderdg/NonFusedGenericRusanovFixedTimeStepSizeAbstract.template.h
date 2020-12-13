@@ -38,7 +38,9 @@ class {{NAMESPACE | join("::")}}::{{CLASSNAME}}: public ::exahype2::Solver {
     enum class SolverState {
       GridConstruction,
       GridInitialisation,
-      TimeStep,
+      Prediction,
+      RiemannProblemSolve,
+      Correction,
       Plotting
     };
 
@@ -72,8 +74,8 @@ class {{NAMESPACE | join("::")}}::{{CLASSNAME}}: public ::exahype2::Solver {
       double * __restrict__ F // F[{{NUMBER_OF_UNKNOWNS}}]
     ) {% if FLUX_IMPLEMENTATION=="<user-defined>" %}=0{% else %} final {% endif %};
     {% endif %}
-     
-     
+
+
     {% if NCP_IMPLEMENTATION!="<none>" %}
     virtual void nonconservativeProduct(
       double * __restrict__ Q, // Q[{{NUMBER_OF_UNKNOWNS}}+{{NUMBER_OF_AUXILIARY_VARIABLES}}],

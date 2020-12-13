@@ -3,7 +3,7 @@
 
 
 {{NAMESPACE | join("::")}}::{{CLASSNAME}}::{{CLASSNAME}}():
-  _NumberOfFiniteVolumesPerAxisPerPatch( {{NUMBER_OF_VOLUMES_PER_AXIS}} ),
+  _order( {{ORDER}} ),
   _timeStamp(0.0),
   _solverState(SolverState::GridConstruction),
   _maxH({{MAX_H}}),
@@ -13,7 +13,6 @@
 
 
 void {{NAMESPACE | join("::")}}::{{CLASSNAME}}::startGridConstructionStep() {
-  assertion( _solverState == SolverState::GridConstruction );
 }
 
 
@@ -22,14 +21,14 @@ void {{NAMESPACE | join("::")}}::{{CLASSNAME}}::finishGridConstructionStep() {
 
 
 void {{NAMESPACE | join("::")}}::{{CLASSNAME}}::startGridInitialisationStep() {
-  assertion( _solverState == SolverState::GridConstruction );
   _solverState = SolverState::GridInitialisation;
-  logDebug( "startGridInitialisationStep(...)", "new state is " << toString(_solverState) );
 }
 
 
 void {{NAMESPACE | join("::")}}::{{CLASSNAME}}::finishGridInitialisationStep() {
+  _solverState = SolverState::Prediction;
 }
+
 
 
 void {{NAMESPACE | join("::")}}::{{CLASSNAME}}::startTimeStep(
@@ -38,29 +37,30 @@ void {{NAMESPACE | join("::")}}::{{CLASSNAME}}::startTimeStep(
   double globalMinTimeStepSize,
   double globalMaxTimeStepSize
 ) {
-  if (
-    _solverState == SolverState::GridInitialisation
-  ) {
-    _solverState = SolverState::PrimaryAfterGridInitialisation;
-  }
-  else if (
-    _solverState == SolverState::Primary
-    or
-    _solverState == SolverState::PrimaryAfterGridInitialisation
-  ) {
-    _solverState = SolverState::Secondary;
-  }
-  else {
-    _solverState = SolverState::Primary;
-  }
-
-  logDebug( "startTimeStep(...)", "new state is " << toString(_solverState) );
 }
 
 
 void {{NAMESPACE | join("::")}}::{{CLASSNAME}}::finishTimeStep() {
-  if ( _solverState == SolverState::Secondary ) {
-    _timeStamp += {{TIME_STEP_SIZE}};
+  switch ( _solverState ) {
+    case SolverState::GridConstruction:
+      assertion(false);
+      break;
+    case SolverState::GridInitialisation:
+      _solverState = SolverState::Prediction;
+      break;
+    case SolverState::Prediction:
+      _solverState = SolverState::RiemannProblemSolve;
+      break;
+    case SolverState::RiemannProblemSolve:
+      _solverState = SolverState::Correction;
+      break;
+    case SolverState::Correction:
+      _solverState = SolverState::Prediction;
+      _timeStamp += {{TIME_STEP_SIZE}};
+      break;
+    case SolverState::Plotting:
+      assertion(false);
+      break;
   }
 }
 
@@ -71,16 +71,12 @@ void {{NAMESPACE | join("::")}}::{{CLASSNAME}}::startPlottingStep(
   double globalMinTimeStepSize,
   double globalMaxTimeStepSize
 ) {
-  if ( _solverState == SolverState::GridInitialisation ) {
-    _solverState = SolverState::PlottingInitialCondition;
-  }
-  else {
-    _solverState = SolverState::Plotting;
-  }
+  _solverState = SolverState::Plotting;
 }
 
 
 void {{NAMESPACE | join("::")}}::{{CLASSNAME}}::finishPlottingStep() {
+  _solverState = SolverState::Prediction;
 }
 
 
@@ -90,14 +86,12 @@ std::string {{NAMESPACE | join("::")}}::{{CLASSNAME}}::toString(SolverState stat
       return "grid-construction";
     case SolverState::GridInitialisation:
       return "grid-initialisation";
-    case SolverState::Primary:
-      return "primary";
-    case SolverState::Secondary:
-      return "secondary";
-    case SolverState::PlottingInitialCondition:
-      return "plotting-initial-condition";
-    case SolverState::PrimaryAfterGridInitialisation:
-      return "primary-after-grid-initialisation";
+    case SolverState::Prediction:
+      return "prediction";
+    case SolverState::RiemannProblemSolve:
+      return "Riemann-problem-solve";
+    case SolverState::Correction:
+      return "correction";
     case SolverState::Plotting:
       return "plotting";
   }
