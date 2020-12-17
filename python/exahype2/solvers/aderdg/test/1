@@ -227,11 +227,11 @@ class LagrangeBasis():
          result.append(tmp1)
       return result 
 
-  def quadrature_points(self,render=True):
-    return self._render_tensor_1(self._quadrature_points) if render else self._quadrature_points
+  def quadrature_points(self):
+    return self._render_tensor_1(self._quadrature_points)
   
-  def quadrature_weights(self,render=True):
-    return self._render_tensor_1(self._quadrature_weights) if render else self._quadrature_weights
+  def quadrature_weights(self):
+    return self._render_tensor_1(self._quadrature_weights)
    
   def _init_dictionary_with_default_parameters(self,d):
     """
