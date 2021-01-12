@@ -32,7 +32,7 @@ class Polynomials(IntEnum):
   Gauss_Lobatto = 1
   
   
-class AbstractADERDGActionSet( ActionSet ):
+class AbstractDGActionSet( ActionSet ):
   def __init__(self,solver):
     """
    
@@ -58,7 +58,7 @@ class AbstractADERDGActionSet( ActionSet ):
 """ + self._solver._get_default_includes() + self._solver.get_user_includes() 
 
 
-class AMR(AbstractADERDGActionSet):
+class AMR(AbstractDGActionSet):
   TemplateAMR = """
   if (not marker.isRefined()) { 
     ::exahype2::RefinementCommand refinementCriterion = ::exahype2::getDefaultRefinementCommand();
@@ -96,7 +96,7 @@ class AMR(AbstractADERDGActionSet):
 
 
   def __init__(self,solver):
-    AbstractADERDGActionSet.__init__(self, solver)
+    AbstractDGActionSet.__init__(self, solver)
 
   
   def get_body_of_operation(self,operation_name):
@@ -131,7 +131,7 @@ class AMR(AbstractADERDGActionSet):
 
 
 
-class AdjustCell(AbstractADERDGActionSet):
+class AdjustCell(AbstractDGActionSet):
   TemplateAdjustCell = """
   if (not marker.isRefined()) { 
     int index = 0;
@@ -152,7 +152,7 @@ class AdjustCell(AbstractADERDGActionSet):
 
   
   def __init__(self,solver):
-    AbstractADERDGActionSet.__init__(self, solver)
+    AbstractDGActionSet.__init__(self, solver)
 
   
   def get_body_of_operation(self,operation_name):
@@ -166,9 +166,9 @@ class AdjustCell(AbstractADERDGActionSet):
     return result
 
 
-class ADERDG(object):
+class DG(object):
   """ 
-    An abstract ADER-DG solver
+    An abstract DG solver
 
     Our ADER-DG solver hijacks the patch-based data structures. Topologically,
     this makes sense, as the Cartesian mesh is just distorted - depending on 
