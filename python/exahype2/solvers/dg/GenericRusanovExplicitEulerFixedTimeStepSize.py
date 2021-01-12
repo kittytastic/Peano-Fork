@@ -1,7 +1,7 @@
 # This file is part of the ExaHyPE2 project. For conditions of distribution and 
 # use, please see the copyright notice at www.peano-framework.org
-from .ADERDG   import ADERDG
-from .ADERDG   import AbstractADERDGActionSet
+from .DG       import DG
+from .DG       import AbstractDGActionSet
 from .PDETerms import PDETerms
 
 from peano4.solversteps.ActionSet import ActionSet
@@ -12,7 +12,7 @@ import exahype2
 import jinja2
 
 
-class ApplyRiemannSolveToFaces(AbstractADERDGActionSet):
+class ApplyRiemannSolveToFaces(AbstractDGActionSet):
   TemplateRiemannSolve = jinja2.Template( """
     if ({{SOLVER_INSTANCE}}.getSolverState()=={{SOLVER_NAME}}::SolverState::RiemannProblemSolve) {
       // @todo Have to think about this one
@@ -51,7 +51,7 @@ class ApplyRiemannSolveToFaces(AbstractADERDGActionSet):
   """)
 
   def __init__(self,solver):
-    AbstractADERDGActionSet.__init__(self,solver)
+    AbstractDGActionSet.__init__(self,solver)
   
   
   def get_body_of_operation(self,operation_name):
@@ -65,7 +65,7 @@ class ApplyRiemannSolveToFaces(AbstractADERDGActionSet):
     return result
 
 
-class UpdateCell(AbstractADERDGActionSet):
+class UpdateCell(AbstractDGActionSet):
   TemplateUpdateCell = jinja2.Template( """
     switch ({{SOLVER_INSTANCE}}.getSolverState() ) {
       case {{SOLVER_NAME}}::SolverState::GridConstruction:
@@ -218,7 +218,7 @@ class UpdateCell(AbstractADERDGActionSet):
   """)    
   
   def __init__(self,solver):
-    AbstractADERDGActionSet.__init__(self,solver)
+    AbstractDGActionSet.__init__(self,solver)
     
     
   def get_body_of_operation(self,operation_name):
@@ -233,14 +233,14 @@ class UpdateCell(AbstractADERDGActionSet):
 
 
   def get_includes(self):
-    return AbstractADERDGActionSet.get_includes(self) + """
+    return AbstractDGActionSet.get_includes(self) + """
 #include "exahype2/aderdg/PredictorAoS.h"
 #include "exahype2/aderdg/CorrectorAoS.h"
 """
 
 
 
-class NonFusedGenericRusanovFixedTimeStepSize( ADERDG ):
+class GenericRusanovExplicitEulerFixedTimeStepSize( DG ):
   """
   
     Probably the simplest ADER-DG solver implementation you could think off. 
@@ -258,7 +258,7 @@ class NonFusedGenericRusanovFixedTimeStepSize( ADERDG ):
       Instantiate ADER-DG in a non-fused variant
 
     """
-    ADERDG.__init__(self, name, order, unknowns, auxiliary_variables, polynomials, min_h, max_h, plot_grid_properties)
+    DG.__init__(self, name, order, unknowns, auxiliary_variables, polynomials, min_h, max_h, plot_grid_properties)
 
     #self._face_flux_along_normal = peano4.datamodel.Patch( (2*(order+1),order+1,order+1), unknowns+auxiliary_variables, self._unknown_identifier() + "FluxExtrapolation" )
 
@@ -355,16 +355,16 @@ class NonFusedGenericRusanovFixedTimeStepSize( ADERDG ):
 
 
   def add_to_Peano4_datamodel( self, datamodel ):
-    ADERDG.add_to_Peano4_datamodel( self, datamodel )
+    DG.add_to_Peano4_datamodel( self, datamodel )
     #datamodel.add_face(self._face_flux_along_normal)
 
 
 
   def add_use_data_statements_to_Peano4_solver_step(self, step):
-    ADERDG.add_use_data_statements_to_Peano4_solver_step( self, step )
+    DG.add_use_data_statements_to_Peano4_solver_step( self, step )
     #step.use_face(self._face_flux_along_normal)
 
 
   def add_actions_to_perform_time_step(self, step):
-    ADERDG.add_actions_to_perform_time_step( self, step )
+    DG.add_actions_to_perform_time_step( self, step )
     step.add_action_set( ApplyRiemannSolveToFaces(self) )

@@ -38,9 +38,14 @@ class {{NAMESPACE | join("::")}}::{{CLASSNAME}}: public ::exahype2::Solver {
     enum class SolverState {
       GridConstruction,
       GridInitialisation,
-      Prediction,
-      RiemannProblemSolve,
-      Correction,
+      /**
+       * Compute the volume and boundary integral
+       */
+      VolumeAndBoundaryIntegral,
+      /**
+       * Add the outcome of the volume and boundary integral
+       */
+      TimeStep,
       Plotting
     };
 
@@ -108,7 +113,7 @@ class {{NAMESPACE | join("::")}}::{{CLASSNAME}}: public ::exahype2::Solver {
     {% endif %}
 
 
-    {% include "../dg/AbstractSolverFixedTimeStepSize.template.h" %}
+    {% include "AbstractSolverFixedTimeStepSize.template.h" %}
 };
 
 
