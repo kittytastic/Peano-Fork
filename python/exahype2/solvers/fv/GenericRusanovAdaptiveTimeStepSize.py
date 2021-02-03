@@ -111,14 +111,37 @@ class UpdateCell(ReconstructPatchAndApplyFunctor):
       },
       marker.x(),
       marker.h(),
-      {{TIME_STAMP}},
-      {{TIME_STEP_SIZE}},
+      repositories::{{SOLVER_INSTANCE}}.getMinTimeStamp(),
+      repositories::{{SOLVER_INSTANCE}}.getMinTimeStepSize(),
       {{NUMBER_OF_VOLUMES_PER_AXIS}},
       {{NUMBER_OF_UNKNOWNS}},
       {{NUMBER_OF_AUXILIARY_VARIABLES}},
       reconstructedPatch,
       originalPatch
     );
+
+    double maxEigvenvalue = ::exahype2::fv::maxEigenvalue_AoS(
+      [] (
+        const double * __restrict__                  Q,
+        const tarch::la::Vector<Dimensions,double>&  faceCentre,
+        const tarch::la::Vector<Dimensions,double>&  volumeH,
+        double                                       t,
+        double                                       dt,
+        int                                          normal
+      ) -> double {
+        return repositories::{{SOLVER_INSTANCE}}.maxEigenvalue( Q, faceCentre, volumeH, t, normal);
+      },
+      marker.x(),
+      marker.h(),
+      repositories::{{SOLVER_INSTANCE}}.getMinTimeStamp(),
+      repositories::{{SOLVER_INSTANCE}}.getMinTimeStepSize(),
+      {{NUMBER_OF_VOLUMES_PER_AXIS}},
+      {{NUMBER_OF_UNKNOWNS}},
+      {{NUMBER_OF_AUXILIARY_VARIABLES}},
+      originalPatch
+    );
+    
+    repositories::{{SOLVER_INSTANCE}}.setMaximumEigenvalue( maxEigvenvalue );
   """ 
 
 
@@ -148,7 +171,7 @@ class UpdateCell(ReconstructPatchAndApplyFunctor):
 
 
 
-class GenericRusanovFixedTimeStepSize( FV ):
+class GenericRusanovAdaptiveTimeStepSize( FV ):
   """
   
     Probably the simplest solver you could think off. There's a few
@@ -162,15 +185,13 @@ class GenericRusanovFixedTimeStepSize( FV ):
   """
     
 
-  def __init__(self, name, patch_size, unknowns, auxiliary_variables, min_h, max_h, time_step_size, flux=PDETerms.User_Defined_Implementation, ncp=None, plot_grid_properties=False):
+  def __init__(self, name, patch_size, unknowns, auxiliary_variables, min_h, max_h, flux=PDETerms.User_Defined_Implementation, ncp=None, plot_grid_properties=False, time_step_relaxation=0.1):
     """
 
       Instantiate a generic FV scheme with an overlap of 1.
 
     """
     FV.__init__(self, name, patch_size, 1, unknowns, auxiliary_variables, min_h, max_h, plot_grid_properties)
-
-    self._time_step_size = time_step_size
 
     self._flux_implementation                 = PDETerms.None_Implementation
     self._ncp_implementation                  = PDETerms.None_Implementation
@@ -179,6 +200,8 @@ class GenericRusanovFixedTimeStepSize( FV ):
     self._refinement_criterion_implementation = PDETerms.Empty_Implementation
     self._initial_conditions_implementation   = PDETerms.User_Defined_Implementation
     self._source_term_implementation          = PDETerms.Empty_Implementation
+
+    self._time_step_relaxation = time_step_relaxation
 
     self._patch_overlap.generator.store_persistent_condition   = self._store_face_data_default_predicate()
     self._patch_overlap.generator.load_persistent_condition    = self._load_face_data_default_predicate()
@@ -251,9 +274,7 @@ class GenericRusanovFixedTimeStepSize( FV ):
         in/out argument
     
     """
-    d[ "TIME_STEP_SIZE" ]               = self._time_step_size
-    d[ "TIME_STAMP" ]                   = "repositories::"+d[ "SOLVER_INSTANCE" ] + ".getMinTimeStamp()"
-    
+    d[ "TIME_STEP_RELAXATION" ]               = self._time_step_relaxation
     d[ "FLUX_IMPLEMENTATION"]                 = self._flux_implementation
     d[ "NCP_IMPLEMENTATION"]                  = self._ncp_implementation
     d[ "EIGENVALUES_IMPLEMENTATION"]          = self._eigenvalues_implementation
@@ -261,4 +282,6 @@ class GenericRusanovFixedTimeStepSize( FV ):
     d[ "REFINEMENT_CRITERION_IMPLEMENTATION"] = self._refinement_criterion_implementation
     d[ "INITIAL_CONDITIONS_IMPLEMENTATION"]   = self._initial_conditions_implementation
     d[ "SOURCE_TERM_IMPLEMENTATION"]          = self._source_term_implementation
+    d[ "TIME_STEP_SIZE" ]                     = "repositories::"+d[ "SOLVER_INSTANCE" ] + ".getMinTimeStepSize()"
+    d[ "TIME_STAMP" ]                         = "repositories::"+d[ "SOLVER_INSTANCE" ] + ".getMinTimeStamp()"
 
