@@ -4,7 +4,7 @@
  Finite Volume solver in Peano4. The code relies on snippets from ExaHyPE2.
  However, it relies only on ExaHyPE's C/FORTRAN compute kernels, i.e. the
  sophisticated build environment of this H2020 project is not used. The
- solver simulates the simple Euler equations.
+ solver simulates the simple linear advection equations.
 
 """
 
@@ -33,7 +33,7 @@ modes = {
   "debug":   peano4.output.CompileMode.Debug,
 }
 
-parser = argparse.ArgumentParser(description='ExaHyPE 2 - Euler benchmarking script')
+parser = argparse.ArgumentParser(description='ExaHyPE 2 - Advection benchmarking script')
 parser.add_argument("--load-balancing-quality", dest="load_balancing_quality", type=float, default=0.9, help="Load balancing quality (something between 0 and 1; 1 is optimal)" )
 parser.add_argument("--h",               dest="h",              type=float, required=True, help="Mesh size" )
 parser.add_argument("--j",               dest="j",              type=int, default=4, help="Parallel builds" )
@@ -62,22 +62,22 @@ if args.out is not None and os.path.exists(args.out) and not args.force:
     print("Not overwriting existing output file name {}. Use --f to force it.".format(args.out))
     sys.exit(1)
 
-print("\nConfiguring {}D Euler problem with h={} and {} timesteps. Buildmode is {}, nbuilds={}.\n".format(args.dim, args.h, args.timesteps, args.mode, args.j))
+print("\nConfiguring {}D Advection problem with h={} and {} timesteps. Buildmode is {}, nbuilds={}.\n".format(args.dim, args.h, args.timesteps, args.mode, args.j))
 print("Executable: {}".format(args.out))
 
 #
 # Create a project and configure it to end up in a subnamespace (and thus
 # subdirectory). 
 #
-project = exahype2.Project( ["examples", "exahype2", "euler"], "aderdg", ".", executable=args.out )
+project = exahype2.Project( ["examples", "exahype2", "advection"], "aderdg", ".", executable=args.out )
 
 
 #
 # Add the Finite Volumes solver
 #
 order          = 3
-unknowns       = 5
-time_step_size = 0.0001
+unknowns       = 4
+time_step_size = 0.00001
 min_h          = args.h
 max_h          = args.h
 
@@ -103,11 +103,11 @@ if args.GPU:
 else:
   print( "Have to introduce enclaves again" )
   thesolver = exahype2.solvers.aderdg.NonFusedGenericRusanovFixedTimeStepSize(
-    "ADERDGEuler", order, unknowns, 0, #auxiliary_variables
+    "ADERDGAdvection", order, unknowns, 0, #auxiliary_variables
     exahype2.solvers.aderdg.Polynomials.Gauss_Legendre, 
     min_h, max_h, time_step_size
   )
-  thesolver.set_plot_description( "0: Density, (1,2,3): Velocities, 4: Energy")
+  thesolver.set_plot_description( "0: Density, (1,2,3): Velocities")
 
 project.add_solver( thesolver )
 
@@ -134,4 +134,4 @@ peano4_project = project.generate_Peano4_project()
 peano4_project.output.makefile.parse_configure_script_outcome( args.configuredir )
 peano4_project.build(make_clean_first=True, number_of_parallel_builds=args.j)
 print("Done. Executable is: {}".format(args.out))
-print( "Convert any output via pvpython ~/git/Peano/python/peano4/visualisation/render.py solution-ADERDGEuler.peano-patch-file")
+print( "Convert any output via pvpython ~/git/Peano/python/peano4/visualisation/render.py solution-ADERDGAdvection.peano-patch-file")

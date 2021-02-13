@@ -1,30 +1,10 @@
-#include "LOH1.h"
-
-#include <algorithm>
-#include <iomanip>
-
-tarch::logging::Log   examples::exahype2::loh1::LOH1::_log( "examples::exahype2::loh1::LOH1" );
+#include "ADERDGLOH1.h"
+#include "exahype2/RefinementControl.h"
 
 
-// TODO: No point sources supported
-//void examples::exahype2::loh1::LOH1::prescribeLOH1InitialData(
-//    const tarch::la::Vector<Dimensions,double>&  x,
-//		double Q[]
-//) {
-//    // initial conditions
-//   constexpr idx_rho = 9; 
-//   if( x[1] < 1.0) {
-//      Q[s.rho+0] = 2.6;
-//      Q[s.cp] = 4.0;
-//      Q[s.cs] = 2.0;
-//    }else{
-//      Q[s.rho+0] = 2.7;
-//      Q[s.cp] = 6.0;
-//      Q[s.cs] = 3.464;
-//    }
-//}
+tarch::logging::Log   examples::exahype2::loh1::ADERDGLOH1::_log( "examples::exahype2::loh1::ADERDGLOH1" );
 
-void examples::exahype2::loh1::LOH1::prescribeGaussianWave(
+void examples::exahype2::loh1::ADERDGLOH1::prescribeGaussianWave(
   const tarch::la::Vector<Dimensions,double>&  x,
   double Q[]
 ) {
@@ -35,7 +15,7 @@ void examples::exahype2::loh1::LOH1::prescribeGaussianWave(
   center_curve[2] = 2.0;
 
   // 1.0 is the parameter from the setup, but we need at least one voxel
-  bool layerWidth = std::max( getMinMeshSize() / _NumberOfFiniteVolumesPerAxisPerPatch, 1.0 );
+  bool layerWidth = std::max( getMinMeshSize() / (2*Order+1), 1.0 ); // TODO guess
 
   bool upperLayer = x(2) <= layerWidth;
   
@@ -66,16 +46,12 @@ void examples::exahype2::loh1::LOH1::prescribeGaussianWave(
   }
 }
 
-
-
-void examples::exahype2::loh1::LOH1::adjustSolution(
-  double * __restrict__                        Q, // [13]
-  const tarch::la::Vector<Dimensions,double>&  x,
-  const tarch::la::Vector<Dimensions,double>&  h,
-  double                                       t,
-  double                                       dt
+void examples::exahype2::loh1::ADERDGLOH1::adjustSolution(
+  double * __restrict__                       Q,
+  const tarch::la::Vector<Dimensions,double>& x,
+  double                                      t
 ) {
-  logTraceInWith3Arguments( "adjustSolution(...)", x, h, t );
+  logTraceInWith2Arguments( "adjustSolution(...)", x, t );
   if (tarch::la::equals(t,0.0) ) {
     prescribeGaussianWave(x,Q);
   }
@@ -86,49 +62,16 @@ void examples::exahype2::loh1::LOH1::adjustSolution(
 }
 
 
-double examples::exahype2::loh1::LOH1::maxEigenvalue(
-  const double* __restrict__                   Q, // [13]
-  const tarch::la::Vector<Dimensions,double>&  faceCentre,
-  const tarch::la::Vector<Dimensions,double>&  volumeH,
-  double                                       t,
-  int                                          normal
+
+
+void examples::exahype2::loh1::ADERDGLOH1::boundaryConditions(
+  const double * __restrict__                 Qinside, // Qinside[9+4]
+  double * __restrict__                       Qoutside, // Qoutside[9+4]
+  const tarch::la::Vector<Dimensions,double>& x,
+  double                                      t,
+  int                                         normal
 ) {
-  double cp = Q[s.cp];
-  double cs = Q[s.cs];
-  
-/*
-  lambda[0] = -cp;
-  lambda[1] =  cp;
-  lambda[2] = -cs;
-  lambda[3] =  cp;   I think this is a bug!
-  lambda[4] = 0.0;
-  lambda[5] = 0.0;
-  lambda[6] = 0.0;
-  lambda[7] = 0.0;
-  lambda[8] = 0.0;
-  lambda[9] = 0.0;
-*/
-
-  double result = 0.0;
-  result = std::max( result, -cp );
-  result = std::max( result,  cp );
-  result = std::max( result, -cs );
-  result = std::max( result,  cs );
-  return result;
-}
-
-
-void examples::exahype2::loh1::LOH1::boundaryConditions(
-  const double * __restrict__                  Qinside,
-  double * __restrict__                        Qoutside,
-  const tarch::la::Vector<Dimensions,double>&  faceCentre,
-  const tarch::la::Vector<Dimensions,double>&  volumeH,
-  double                                       t,
-  int                                          normal
-) {
-  logTraceInWith4Arguments( "boundaryConditions(...)", faceCentre, volumeH, t, normal );
-  std::fill_n(Qoutside, 13, 0);
-
+  logTraceInWith3Arguments( "boundaryConditions(...)", x, t, normal );
   #ifdef Asserts
   if(!std::isfinite(1.0/Qinside[s.rho])){
     std::cout << "FV: rho_inv not finite in boundary values" << std::endl;
@@ -141,6 +84,8 @@ void examples::exahype2::loh1::LOH1::boundaryConditions(
   assertion2(std::isfinite(1.0/Qinside[s.rho]),
          "rho_i is not finite",Qinside[s.rho]);
 
+  std::fill_n(Qoutside, 13, 0);
+
   Qoutside[ s.alpha ] = Qinside[ s.alpha ];
   Qoutside[ s.rho ]   = Qinside[ s.rho ];
   Qoutside[ s.cp  ]   = Qinside[ s.cp  ];
@@ -151,18 +96,34 @@ void examples::exahype2::loh1::LOH1::boundaryConditions(
   logTraceOut( "boundaryConditions(...)" );
 }
 
+double examples::exahype2::loh1::ADERDGLOH1::maxEigenvalue(
+  const double * __restrict__ Q, // Q[9+4],
+  const tarch::la::Vector<Dimensions,double>& x,
+  double                                      t,
+  int                                         normal
+)  {
+  logTraceInWith2Arguments( "maxEigenvalue(...)", x, t );
+  double cp = Q[s.cp];
+  double cs = Q[s.cs];
 
-void examples::exahype2::loh1::LOH1::nonconservativeProduct(
+  double result = 0.0;
+  result = std::max( result, std::abs(cp) );
+  result = std::max( result, std::abs(cs) );
+  logTraceOut( "maxEigenvalue(...)" );
+  return result;
+}
+
+
+void examples::exahype2::loh1::ADERDGLOH1::nonconservativeProduct(
   const double * __restrict__                  Q, // [9+4],
   const double * __restrict__                  deltaQ, // [9+4],
-  const tarch::la::Vector<Dimensions,double>&  faceCentre,
-  const tarch::la::Vector<Dimensions,double>&  volumeH,
+  const tarch::la::Vector<Dimensions,double>&  x,
   double                                       t,
   int                                          normal,
-  double * __restrict__ BgradQ // BgradQ[13] -> noe, nur 9
-) {
+  double * __restrict__                        BgradQ // BgradQ[13]
+ ) {
   logTraceIn( "nonconservativeProduct(...)" );
- 
+
   double rho    = Q[s.rho];  
   double cp     = Q[s.cp];
   double cs     = Q[s.cs];
