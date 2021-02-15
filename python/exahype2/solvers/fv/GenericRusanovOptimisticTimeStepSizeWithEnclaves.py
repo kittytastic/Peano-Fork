@@ -430,7 +430,7 @@ class UpdateCellWithEnclaves(ReconstructPatchAndApplyFunctor):
 """ + self._solver._get_default_includes() + self._solver.get_user_includes() 
 
 
-class GenericRusanovAdaptiveTimeStepSizeWithEnclaves( FV ):
+class GenericRusanovOptimisticTimeStepSizeWithEnclaves( FV ):
   def __init__(self, name, patch_size, unknowns, auxiliary_variables, min_h, max_h, flux=PDETerms.User_Defined_Implementation, ncp=None, plot_grid_properties=False, time_step_relaxation=0.1):
     """
     
