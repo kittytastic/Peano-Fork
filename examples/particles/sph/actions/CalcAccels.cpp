@@ -1,32 +1,31 @@
-#include "CreateGrid.h"
-#include "globaldata/Particle.h"
+#include "CalcAccels.h"
+#include "../globaldata/Particle.h"
 #include "Constants.h"
-#include "peano4/utils/Loop.h"
 
 
-tarch::logging::Log peanosph::actions::CreateGrid::_log( "peanosph::actions::CreateGrid");
-
-
+tarch::logging::Log peanosph::actions::CalcAccels::_log( "peanosph::actions::CalcAccels");
 
 
 
-peanosph::actions::CreateGrid::CreateGrid(int treeNumber) {
+
+
+peanosph::actions::CalcAccels::CalcAccels(int treeNumber) {
 // @todo Please implement
 }
 
 
-peanosph::actions::CreateGrid::~CreateGrid() {
+peanosph::actions::CalcAccels::~CalcAccels() {
 // @todo Please implement
 }
 
 
-std::vector< peano4::grid::GridControlEvent > peanosph::actions::CreateGrid::getGridControlEvents() const {
+std::vector< peano4::grid::GridControlEvent > peanosph::actions::CalcAccels::getGridControlEvents() const {
 // @todo Please implement
 return std::vector< peano4::grid::GridControlEvent >();
 }
 
 
-void peanosph::actions::CreateGrid::beginTraversal(
+void peanosph::actions::CalcAccels::beginTraversal(
       ) {
 
 // Feel free to comment in and to add arguments if you want to trace them.
@@ -38,7 +37,7 @@ void peanosph::actions::CreateGrid::beginTraversal(
 }
 
 
-void peanosph::actions::CreateGrid::endTraversal(
+void peanosph::actions::CalcAccels::endTraversal(
       ) {
 
 // Feel free to comment in and to add arguments if you want to trace them.
@@ -50,71 +49,23 @@ void peanosph::actions::CreateGrid::endTraversal(
 }
 
 
-void peanosph::actions::CreateGrid::createPersistentVertex(
+void peanosph::actions::CalcAccels::createPersistentVertex(
     const peano4::datamanagement::VertexMarker& marker,
     peanosph::vertexdata::ParticleSet& fineGridVertexParticleSet,
     peano4::datamanagement::VertexEnumerator<peanosph::vertexdata::ParticleSet> coarseGridVerticesParticleSet,
     peanosph::celldata::ParticleSetCellStatistics& coarseGridCellParticleSetCellStatistics
 ) {
-  tarch::la::Vector<Dimensions,double>  debugX = marker.x();
-  tarch::la::Vector<Dimensions,double>  debugH = marker.h();
-  peanosph::globaldata::Particle::MoveState  moveState( peanosph::globaldata::Particle::MoveState::New );
 
-  if (debugH(0) > 0.13) { return; }
+// Feel free to comment in and to add arguments if you want to trace them.
+// Ensure the logTraceOut is activated, too, if you switch on traceIn.
+// logTraceIn( "createPersistentVertex()" );
+// @todo Please implement
+// logTraceOut( "createPersistentVertex()" );
 
-  const tarch::la::Vector<Dimensions,double> zero(0.0);
-  const tarch::la::Vector<Dimensions,double> domainOffset(peanosph::DOMAIN_OFFSET);
-  const tarch::la::Vector<Dimensions,double> domainSize(peanosph::DOMAIN_SIZE);
-  const tarch::la::Vector<Dimensions,double> explosionCentre(peanosph::EXPLOSION_CENTRE);
-
-  const double sigma = peanosph::SPIKE_RADIUS / 3;
-  const double backgroundU = 1e-5 / (peanosph::REST_DENSITY * (peanosph::GAMMA - 1));
-  const int particlesPerAxis = static_cast<int>(marker.h()(0) / peanosph::TARGET_PARTICLE_SIZE);
-
-  // Calculate actual particle size and mass
-  const double empty = marker.h()(0) - (particlesPerAxis * peanosph::TARGET_PARTICLE_SIZE);
-  const double particleSize = peanosph::TARGET_PARTICLE_SIZE + (empty / particlesPerAxis);
-  const double particleMass = peanosph::REST_DENSITY * std::pow(particleSize, Dimensions);
-
-  const tarch::la::Vector<Dimensions,double> offset = marker.x() - ((particlesPerAxis-1) * particleSize / 2.0);
-
-  dfor(k, particlesPerAxis) {
-    const tarch::la::Vector<Dimensions,double> x = offset + tarch::la::convertScalar<double>(k) * particleSize;
-    // const tarch::la::Vector<Dimensions,double> x = offset + tarch::la::convertScalar<double>(k) * (particleSize + gap);
-
-    if (tarch::la::allGreaterEquals(x, domainOffset) && tarch::la::allGreaterEquals((domainOffset+domainSize), x)) {
-      double u = backgroundU;
-      // Gaussian distribution of energy around explosion centre.
-      const tarch::la::Vector<Dimensions,double> offset = x - explosionCentre;
-      if (tarch::la::norm2(offset) < peanosph::SPIKE_RADIUS) {
-        u = peanosph::ENERGY_SPIKE * (1.0 / std::pow(std::sqrt(2*tarch::la::PI)*sigma, Dimensions)) * std::pow(tarch::la::E, -tarch::la::norm2(offset)*tarch::la::norm2(offset) / (2*sigma*sigma));
-      }
-
-      fineGridVertexParticleSet.push_back(
-          new peanosph::globaldata::Particle(
-            debugX,
-            debugH,
-            x,
-            moveState,
-            2*peanosph::INITIAL_H,
-            zero,
-            zero,
-            particleMass,
-            0,
-            0,
-            u,
-            0,
-            peanosph::INITIAL_H,
-            peanosph::globaldata::Particle::Step::calcDensity,
-            x
-          )
-      );
-    }
-  }
 }
 
 
-void peanosph::actions::CreateGrid::destroyPersistentVertex(
+void peanosph::actions::CalcAccels::destroyPersistentVertex(
     const peano4::datamanagement::VertexMarker& marker,
     peanosph::vertexdata::ParticleSet& fineGridVertexParticleSet,
     peano4::datamanagement::VertexEnumerator<peanosph::vertexdata::ParticleSet> coarseGridVerticesParticleSet,
@@ -130,7 +81,7 @@ void peanosph::actions::CreateGrid::destroyPersistentVertex(
 }
 
 
-void peanosph::actions::CreateGrid::createHangingVertex(
+void peanosph::actions::CalcAccels::createHangingVertex(
     const peano4::datamanagement::VertexMarker& marker,
     peanosph::vertexdata::ParticleSet& fineGridVertexParticleSet,
     peano4::datamanagement::VertexEnumerator<peanosph::vertexdata::ParticleSet> coarseGridVerticesParticleSet,
@@ -146,7 +97,7 @@ void peanosph::actions::CreateGrid::createHangingVertex(
 }
 
 
-void peanosph::actions::CreateGrid::destroyHangingVertex(
+void peanosph::actions::CalcAccels::destroyHangingVertex(
     const peano4::datamanagement::VertexMarker& marker,
     peanosph::vertexdata::ParticleSet& fineGridVertexParticleSet,
     peano4::datamanagement::VertexEnumerator<peanosph::vertexdata::ParticleSet> coarseGridVerticesParticleSet,
@@ -162,7 +113,7 @@ void peanosph::actions::CreateGrid::destroyHangingVertex(
 }
 
 
-void peanosph::actions::CreateGrid::touchVertexFirstTime(
+void peanosph::actions::CalcAccels::touchVertexFirstTime(
     const peano4::datamanagement::VertexMarker& marker,
     peanosph::vertexdata::ParticleSet& fineGridVertexParticleSet,
     peano4::datamanagement::VertexEnumerator<peanosph::vertexdata::ParticleSet> coarseGridVerticesParticleSet,
@@ -178,23 +129,42 @@ void peanosph::actions::CreateGrid::touchVertexFirstTime(
 }
 
 
-void peanosph::actions::CreateGrid::touchVertexLastTime(
+void peanosph::actions::CalcAccels::touchVertexLastTime(
     const peano4::datamanagement::VertexMarker& marker,
     peanosph::vertexdata::ParticleSet& fineGridVertexParticleSet,
     peano4::datamanagement::VertexEnumerator<peanosph::vertexdata::ParticleSet> coarseGridVerticesParticleSet,
     peanosph::celldata::ParticleSetCellStatistics& coarseGridCellParticleSetCellStatistics
 ) {
 
-// Feel free to comment in and to add arguments if you want to trace them.
-// Ensure the logTraceOut is activated, too, if you switch on traceIn.
-// logTraceIn( "touchVertexLastTime()" );
-// @todo Please implement
-// logTraceOut( "touchVertexLastTime()" );
+  const tarch::la::Vector<Dimensions,double> domainOffset(peanosph::DOMAIN_OFFSET);
+  const tarch::la::Vector<Dimensions,double> domainSize(peanosph::DOMAIN_SIZE);
+  const double timeStepSize = 0.00001;
+
+  for (auto& p: fineGridVertexParticleSet) {
+    if (p->getStep() ==  peanosph::globaldata::Particle::Step::move) {
+      p->setStep(peanosph::globaldata::Particle::Step::calcDensity);
+
+      // Semi-implicit Euler time integration
+      p->setV( p->getV() + timeStepSize * p->getA() );
+      p->setNewX( p->getX() + timeStepSize * p->getV() ); // Store new position for start of next traversal
+
+      assertion2( std::isfinite(p->getV()(0)), p->toString(), marker.toString() );
+      assertion2( std::isfinite(p->getX()(0)), p->toString(), marker.toString() );
+
+      // Update energy per mass
+      const double newU = p->getU() + timeStepSize * p->getUDash();
+      if (newU < 0.0) {
+        p->setU(0.0);
+      } else {
+        p->setU(newU);
+      }
+    }
+  }
 
 }
 
 
-void peanosph::actions::CreateGrid::touchCellFirstTime(
+void peanosph::actions::CalcAccels::touchCellFirstTime(
     const peano4::datamanagement::CellMarker& marker,
     peano4::datamanagement::VertexEnumerator<peanosph::vertexdata::ParticleSet> fineGridVerticesParticleSet,
     peanosph::celldata::ParticleSetCellStatistics& fineGridCellParticleSetCellStatistics,
@@ -210,13 +180,14 @@ void peanosph::actions::CreateGrid::touchCellFirstTime(
 }
 
 
-void peanosph::actions::CreateGrid::touchCellLastTime(
+void peanosph::actions::CalcAccels::touchCellLastTime(
     const peano4::datamanagement::CellMarker& marker,
     peano4::datamanagement::VertexEnumerator<peanosph::vertexdata::ParticleSet> fineGridVerticesParticleSet,
     peanosph::celldata::ParticleSetCellStatistics& fineGridCellParticleSetCellStatistics,
     peano4::datamanagement::VertexEnumerator<peanosph::vertexdata::ParticleSet> coarseGridVerticesParticleSet,
     peanosph::celldata::ParticleSetCellStatistics& coarseGridCellParticleSetCellStatistics
 ) {
+
 // Feel free to comment in and to add arguments if you want to trace them.
 // Ensure the logTraceOut is activated, too, if you switch on traceIn.
 // logTraceIn( "touchCellLastTime()" );
@@ -226,14 +197,14 @@ void peanosph::actions::CreateGrid::touchCellLastTime(
 }
 
 
-
-void peanosph::actions::CreateGrid::createCell(
+void peanosph::actions::CalcAccels::createCell(
     const peano4::datamanagement::CellMarker& marker,
     peano4::datamanagement::VertexEnumerator<peanosph::vertexdata::ParticleSet> fineGridVerticesParticleSet,
     peanosph::celldata::ParticleSetCellStatistics& fineGridCellParticleSetCellStatistics,
     peano4::datamanagement::VertexEnumerator<peanosph::vertexdata::ParticleSet> coarseGridVerticesParticleSet,
     peanosph::celldata::ParticleSetCellStatistics& coarseGridCellParticleSetCellStatistics
 ) {
+
 // Feel free to comment in and to add arguments if you want to trace them.
 // Ensure the logTraceOut is activated, too, if you switch on traceIn.
 // logTraceIn( "touchCellLastTime()" );
@@ -243,14 +214,14 @@ void peanosph::actions::CreateGrid::createCell(
 }
 
 
-
-void peanosph::actions::CreateGrid::destroyCell(
+void peanosph::actions::CalcAccels::destroyCell(
     const peano4::datamanagement::CellMarker& marker,
     peano4::datamanagement::VertexEnumerator<peanosph::vertexdata::ParticleSet> fineGridVerticesParticleSet,
     peanosph::celldata::ParticleSetCellStatistics& fineGridCellParticleSetCellStatistics,
     peano4::datamanagement::VertexEnumerator<peanosph::vertexdata::ParticleSet> coarseGridVerticesParticleSet,
     peanosph::celldata::ParticleSetCellStatistics& coarseGridCellParticleSetCellStatistics
 ) {
+
 // Feel free to comment in and to add arguments if you want to trace them.
 // Ensure the logTraceOut is activated, too, if you switch on traceIn.
 // logTraceIn( "touchCellLastTime()" );
