@@ -8,8 +8,6 @@
 #ifndef __EXAHYPE_USER_PDE__
 #define __EXAHYPE_USER_PDE__
 
-
-
 // Fortran functions:
 extern "C" {
 void adjustedsolutionvalues_(const double* const x,const double* w,const double* t,const double* dt,double* Q);
@@ -36,5 +34,6 @@ void enforceccz4constraints_(const double* const Q);
 
 
 }/* extern "C" */
+
 
 #endif /* __EXAHYPE_USER_PDE__ */
