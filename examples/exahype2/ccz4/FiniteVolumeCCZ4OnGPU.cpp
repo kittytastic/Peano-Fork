@@ -1,4 +1,4 @@
-#include "FiniteVolumeCCZ4.h"
+#include "FiniteVolumeCCZ4OnGPU.h"
 #include "exahype2/RefinementControl.h"
 
 
@@ -17,12 +17,10 @@
 #include <string.h>
 
 
-
-tarch::logging::Log   examples::exahype2::ccz4::FiniteVolumeCCZ4::_log( "examples::exahype2::ccz4::FiniteVolumeCCZ4" );
-
+tarch::logging::Log   examples::exahype2::ccz4::FiniteVolumeCCZ4OnGPU::_log( "examples::exahype2::ccz4::FiniteVolumeCCZ4OnGPU" );
 
 
-examples::exahype2::ccz4::FiniteVolumeCCZ4::FiniteVolumeCCZ4() {
+examples::exahype2::ccz4::FiniteVolumeCCZ4OnGPU::FiniteVolumeCCZ4OnGPU() {
   if ( Scenario=="gaugewave-c++" || Scenario=="linearwave-c++" ) {
     const char* name = "GaugeWave";
     int length = strlen(name);
@@ -34,7 +32,7 @@ examples::exahype2::ccz4::FiniteVolumeCCZ4::FiniteVolumeCCZ4() {
 }
 
 
-void examples::exahype2::ccz4::FiniteVolumeCCZ4::adjustSolution(
+void examples::exahype2::ccz4::FiniteVolumeCCZ4OnGPU::adjustSolution(
   double * __restrict__ Q,
   const tarch::la::Vector<Dimensions,double>&  volumeX,
   const tarch::la::Vector<Dimensions,double>&  volumeH,
@@ -68,13 +66,18 @@ void examples::exahype2::ccz4::FiniteVolumeCCZ4::adjustSolution(
 }
 
 
-void examples::exahype2::ccz4::FiniteVolumeCCZ4::sourceTerm(
-  const double * __restrict__                  Q, // Q[59+0]
+
+
+#if defined(OpenMPGPUOffloading)
+#pragma omp declare target
+#endif
+void examples::exahype2::ccz4::FiniteVolumeCCZ4OnGPU::sourceTerm(
+  const double * __restrict__ Q, // Q[59+0],
   const tarch::la::Vector<Dimensions,double>&  volumeX,
   const tarch::la::Vector<Dimensions,double>&  volumeH,
   double                                       t,
   double                                       dt,
-  double * __restrict__                        S  // S[59
+  double * __restrict__ S // Q[59+0],
 ) {
   logTraceInWith4Arguments( "sourceTerm(...)", volumeX, volumeH, t, dt );
   for(int i=0; i<NumberOfUnknowns; i++){
@@ -89,34 +92,23 @@ void examples::exahype2::ccz4::FiniteVolumeCCZ4::sourceTerm(
   }
   logTraceOut( "sourceTerm(...)" );
 }
+#if defined(OpenMPGPUOffloading)
+#pragma omp end declare target
+#endif
 
 
 
-void examples::exahype2::ccz4::FiniteVolumeCCZ4::boundaryConditions(
-  const double * __restrict__                  Qinside, // Qinside[59+0]
-  double * __restrict__                        Qoutside, // Qoutside[59+0]
-  const tarch::la::Vector<Dimensions,double>&  faceCentre,
-  const tarch::la::Vector<Dimensions,double>&  volumeH,
-  double                                       t,
-  int                                          normal
-) {
-  logTraceInWith4Arguments( "boundaryConditions(...)", faceCentre, volumeH, t, normal );
-  for(int i=0; i<NumberOfUnknowns+NumberOfAuxiliaryVariables; i++) {
-    assertion4( Qinside[i]==Qinside[i], x, t, normal, i );
-    Qoutside[i]=Qinside[i];
-  }
-  logTraceOut( "boundaryConditions(...)" );
-}
 
-
-double examples::exahype2::ccz4::FiniteVolumeCCZ4::maxEigenvalue(
+#if defined(OpenMPGPUOffloading)
+#pragma omp declare target
+#endif
+double examples::exahype2::ccz4::FiniteVolumeCCZ4OnGPU::maxEigenvalue(
   const double * __restrict__ Q, // Q[59+0],
   const tarch::la::Vector<Dimensions,double>&  faceCentre,
   const tarch::la::Vector<Dimensions,double>&  volumeH,
   double                                       t,
   int                                          normal
-)
-{
+) {
 #if defined(CCZ4EINSTEIN)
   const double qmin = std::min({Q[0],Q[3],Q[5]});
   const double alpha = std::max({1.0, std::exp(Q[16])}) * std::max({1.0, std::exp(Q[54])}) / std::sqrt(qmin);
@@ -157,9 +149,38 @@ double examples::exahype2::ccz4::FiniteVolumeCCZ4::maxEigenvalue(
   //printf("%f vs %f diff: %f alpha: %f tempA: %f\n\n", result, result2, result-result2, alpha, tempA/alpha);
   //return result;
 }
+#if defined(OpenMPGPUOffloading)
+#pragma omp end declare target
+#endif
 
 
-void examples::exahype2::ccz4::FiniteVolumeCCZ4::nonconservativeProduct(
+
+
+void examples::exahype2::ccz4::FiniteVolumeCCZ4OnGPU::boundaryConditions(
+  const double * __restrict__                  Qinside, // Qinside[59+0]
+  double * __restrict__                        Qoutside, // Qoutside[59+0]
+  const tarch::la::Vector<Dimensions,double>&  faceCentre,
+  const tarch::la::Vector<Dimensions,double>&  volumeH,
+  double                                       t,
+  int                                          normal
+) {
+  logTraceInWith4Arguments( "boundaryConditions(...)", faceCentre, volumeH, t, normal );
+  for(int i=0; i<NumberOfUnknowns+NumberOfAuxiliaryVariables; i++) {
+    assertion4( Qinside[i]==Qinside[i], x, t, normal, i );
+    Qoutside[i]=Qinside[i];
+  }
+  logTraceOut( "boundaryConditions(...)" );
+}
+
+
+
+
+
+
+#if defined(OpenMPGPUOffloading)
+#pragma omp declare target
+#endif
+void examples::exahype2::ccz4::FiniteVolumeCCZ4OnGPU::nonconservativeProduct(
   const double * __restrict__ Q, // Q[59+0],
   const double * __restrict__             deltaQ, // [59+0]
   const tarch::la::Vector<Dimensions,double>&  faceCentre,
@@ -167,7 +188,7 @@ void examples::exahype2::ccz4::FiniteVolumeCCZ4::nonconservativeProduct(
   double                                       t,
   int                                          normal,
   double * __restrict__ BgradQ // BgradQ[59]
-)  {
+) {
 #if !defined(OpenMPGPUOffloading)
   logTraceInWith4Arguments( "nonconservativeProduct(...)", faceCentre, volumeH, t, normal );
   assertion( normal>=0 );
@@ -192,3 +213,6 @@ void examples::exahype2::ccz4::FiniteVolumeCCZ4::nonconservativeProduct(
   logTraceOut( "nonconservativeProduct(...)" );
 #endif
 }
+#if defined(OpenMPGPUOffloading)
+#pragma omp end declare target
+#endif
