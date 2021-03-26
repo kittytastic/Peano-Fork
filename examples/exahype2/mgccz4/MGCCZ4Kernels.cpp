@@ -1,6 +1,6 @@
 
 #include "tarch/multicore/multicore.h"
-#include "CCZ4Kernels.h"
+#include "MGCCZ4Kernels.h"
 
 #include "Constants.h"
 
@@ -13,7 +13,7 @@
 #if defined(OpenMPGPUOffloading)
 #pragma omp declare target
 #endif
-void examples::exahype2::ccz4::enforceCCZ4constraints(double * luh)
+void examples::exahype2::mgccz4::enforceMGCCZ4constraints(double * luh)
 {
     double g_cov[3][3] = { {luh[0], luh[1], luh[2]}, {luh[1], luh[3], luh[4]}, {luh[2], luh[4], luh[5]} };
     const double det = luh[0]*luh[3]*luh[5] - luh[0]*luh[4]*luh[4] - luh[1]*luh[1]*luh[5] + 2*luh[1]*luh[2]*luh[4] -luh[2]*luh[2]*luh[3];
@@ -109,27 +109,27 @@ void examples::exahype2::ccz4::enforceCCZ4constraints(double * luh)
 #if defined(OpenMPGPUOffloading)
 #pragma omp declare target
 #endif
-void examples::exahype2::ccz4::source(double* S, const double* const Q,
-      const int CCZ4LapseType,
-      const double CCZ4ds,
-      const double CCZ4c,
-      const double CCZ4e,
-      const double CCZ4f,
-      const double CCZ4bs,
-      const double CCZ4sk,
-      const double CCZ4xi,
-      const double CCZ4itau,
-      const double CCZ4eta,
-      const double CCZ4k1,
-      const double CCZ4k2,
-      const double CCZ4k3
+void examples::exahype2::mgccz4::source(double* S, const double* const Q,
+      const int MGCCZ4LapseType,
+      const double MGCCZ4ds,
+      const double MGCCZ4c,
+      const double MGCCZ4e,
+      const double MGCCZ4f,
+      const double MGCCZ4bs,
+      const double MGCCZ4sk,
+      const double MGCCZ4xi,
+      const double MGCCZ4itau,
+      const double MGCCZ4eta,
+      const double MGCCZ4k1,
+      const double MGCCZ4k2,
+      const double MGCCZ4k3
       )
 {
     const double alpha = std::exp(std::fmax(-20., std::fmin(20.,Q[16])));
     //printf("alpha %f\n",alpha);
     double fa  = 1.0;
     double faa = 0.0;
-    if (CCZ4LapseType==1)
+    if (MGCCZ4LapseType==1)
     {
       fa  =  2./alpha;
       faa = -fa/alpha;
@@ -207,7 +207,7 @@ void examples::exahype2::ccz4::source(double* S, const double* const Q,
 
     double Z[3] = {0,0,0}; // Matrix vector multiplications
     for (int i=0;i<3;i++)
-    for (int j=0;j<3;j++) Z[i] += 0.5*CCZ4ds*( g_cov[i][j]* (Ghat[j] - Gtilde[j]));
+    for (int j=0;j<3;j++) Z[i] += 0.5*MGCCZ4ds*( g_cov[i][j]* (Ghat[j] - Gtilde[j]));
     double Zup[3] = {0,0,0};
     for (int i=0;i<3;i++)
     for (int j=0;j<3;j++) Zup[i] += phi2 * g_contr[i][j] * Z[j];
@@ -254,7 +254,7 @@ void examples::exahype2::ccz4::source(double* S, const double* const Q,
     double dZSrc[3][3] = {0,0,0,0,0,0,0,0,0};
     for (int j = 0; j < 3; j++)
     for (int i = 0; i < 3; i++)
-    for (int k = 0; k < 3; k++) dZSrc[k][i] += CCZ4ds*(DD[k][i][j]*(Ghat[j]-Gtilde[j]) - 0.5*g_cov[i][j]*dGtildeSrc[k][j]);
+    for (int k = 0; k < 3; k++) dZSrc[k][i] += MGCCZ4ds*(DD[k][i][j]*(Ghat[j]-Gtilde[j]) - 0.5*g_cov[i][j]*dGtildeSrc[k][j]);
 
     double nablaZSrc[3][3] = {0,0,0,0,0,0,0,0,0};
     for (int j = 0; j < 3; j++)
@@ -303,7 +303,7 @@ void examples::exahype2::ccz4::source(double* S, const double* const Q,
 
     double dtgamma[3][3];
     for (int i = 0; i < 3; i++)
-    for (int j = 0; j < 3; j++) dtgamma[i][j] = -2.0 * alpha * Aex[i][j] - CCZ4itau*(det -1.0)*g_cov[i][j];
+    for (int j = 0; j < 3; j++) dtgamma[i][j] = -2.0 * alpha * Aex[i][j] - MGCCZ4itau*(det -1.0)*g_cov[i][j];
 
     const double BB[3][3] = {
         {Q[26], Q[27], Q[28]}, {Q[29], Q[30], Q[31]}, {Q[32], Q[33], Q[34]}
@@ -325,10 +325,10 @@ void examples::exahype2::ccz4::source(double* S, const double* const Q,
 
     const double traceK = Q[53];
 
-    //! Main variables of the CCZ4 system
+    //! Main variables of the MGCCZ4 system
     double dtK[3][3];
     for (int i = 0; i < 3; i++)
-    for (int j = 0; j < 3; j++) dtK[i][j] = phi2*SecondOrderTermsSrc[i][j] + alpha*Aex[i][j]*(traceK-2.*Theta) - 2.*alpha*Atemp[i][j] - CCZ4itau*g_cov[i][j]*traceA;
+    for (int j = 0; j < 3; j++) dtK[i][j] = phi2*SecondOrderTermsSrc[i][j] + alpha*Aex[i][j]*(traceK-2.*Theta) - 2.*alpha*Atemp[i][j] - MGCCZ4itau*g_cov[i][j]*traceA;
 
     for (int j = 0; j < 3; j++)
     for (int i = 0; i < 3; i++)
@@ -336,9 +336,9 @@ void examples::exahype2::ccz4::source(double* S, const double* const Q,
 
     const double K0 = Q[58];
 
-    double dtTraceK = -nablanablaalphaSrc + alpha*(RPlusTwoNablaZSrc + traceK*traceK - 2.0*CCZ4c*Theta*traceK) -3.0*alpha*CCZ4k1*(1.+CCZ4k2)*Theta;
+    double dtTraceK = -nablanablaalphaSrc + alpha*(RPlusTwoNablaZSrc + traceK*traceK - 2.0*MGCCZ4c*Theta*traceK) -3.0*alpha*MGCCZ4k1*(1.+MGCCZ4k2)*Theta;
     double dtphi = beta[0]*PP[0] + beta[1]*PP[1] + beta[2]*PP[2] + 1./3.*(alpha*traceK-traceB);
-    double dtalpha = -alpha*fa*(traceK-K0-2.*CCZ4c*Theta)+beta[0]*AA[0]+beta[1]*AA[1]+beta[2]*AA[2];
+    double dtalpha = -alpha*fa*(traceK-K0-2.*MGCCZ4c*Theta)+beta[0]*AA[0]+beta[1]*AA[1]+beta[2]*AA[2];
 
 
     double Aupdown = 0;
@@ -348,7 +348,7 @@ void examples::exahype2::ccz4::source(double* S, const double* const Q,
 
     double sumzupaa = 0.0;
     for (int i = 0; i < 3; i++) sumzupaa += Zup[i]*AA[i];
-    const double dtTheta = 0.5*alpha*CCZ4e*CCZ4e*(RPlusTwoNablaZSrc - Aupdown + 2./3.*traceK*traceK) - alpha*(CCZ4c*Theta*traceK + sumzupaa + CCZ4k1*(2.+CCZ4k2)*Theta);  // Baojiu
+    const double dtTheta = 0.5*alpha*MGCCZ4e*MGCCZ4e*(RPlusTwoNablaZSrc - Aupdown + 2./3.*traceK*traceK) - alpha*(MGCCZ4c*Theta*traceK + sumzupaa + MGCCZ4k1*(2.+MGCCZ4k2)*Theta);  // Baojiu
 
 
     double dtGhat[3] = {0,0,0};
@@ -364,10 +364,10 @@ void examples::exahype2::ccz4::source(double* S, const double* const Q,
           temp5 += Gtilde[m]*BB[m][i];
           for (int n = 0; n < 3; n++) temp6  += Christoffel_tilde[m][n][i]*Aup[m][n];
         }
-        dtGhat[i] += 2.*alpha*(temp6 - 3.*temp1 + temp2 - temp3 - CCZ4k1*temp4) - temp5 + 2./3.*Gtilde[i]*traceB;
+        dtGhat[i] += 2.*alpha*(temp6 - 3.*temp1 + temp2 - temp3 - MGCCZ4k1*temp4) - temp5 + 2./3.*Gtilde[i]*traceB;
 
         for (int l = 0; l < 3; l++)
-        for (int k = 0; k < 3; k++) dtGhat[i] += 2.*CCZ4k3*(2./3.*g_contr[i][l]*Z[l]*BB[k][k] - g_contr[l][k]*Z[l]*BB[k][i]);
+        for (int k = 0; k < 3; k++) dtGhat[i] += 2.*MGCCZ4k3*(2./3.*g_contr[i][l]*Z[l]*BB[k][k] - g_contr[l][k]*Z[l]*BB[k][i]);
     }
 
     double ov[3];
@@ -381,24 +381,24 @@ void examples::exahype2::ccz4::source(double* S, const double* const Q,
 
     // matrix vector multiplication in a loop and add result to existing vector
     for (int i = 0; i < 3; i++)
-    for (int j = 0; j < 3; j++) dtGhat[i] += CCZ4sk*g_contr[i][j]*ov[j];
+    for (int j = 0; j < 3; j++) dtGhat[i] += MGCCZ4sk*g_contr[i][j]*ov[j];
 
     const double myb[3] = {Q[20], Q[21], Q[22]};
 
     double dtbb[3];
-    for (int i = 0; i < 3; i++) dtbb[i] = CCZ4sk*(CCZ4xi*dtGhat[i] - CCZ4eta*myb[i]);
+    for (int i = 0; i < 3; i++) dtbb[i] = MGCCZ4sk*(MGCCZ4xi*dtGhat[i] - MGCCZ4eta*myb[i]);
 
     double dtbeta[3];
-    for (int i = 0; i < 3; i++) dtbeta[i] = CCZ4f*myb[i];
-    for (int i = 0; i < 3; i++) dtbeta[i] += CCZ4bs*(beta[0]*BB[0][i] + beta[1]*BB[1][i] + beta[2]*BB[2][i]);
-    for (int i = 0; i < 3; i++) dtbeta[i] *= CCZ4sk;
+    for (int i = 0; i < 3; i++) dtbeta[i] = MGCCZ4f*myb[i];
+    for (int i = 0; i < 3; i++) dtbeta[i] += MGCCZ4bs*(beta[0]*BB[0][i] + beta[1]*BB[1][i] + beta[2]*BB[2][i]);
+    for (int i = 0; i < 3; i++) dtbeta[i] *= MGCCZ4sk;
 
 
     // Auxiliary variables
     double dtA[3] ={0,0,0};
     for (int i = 0; i < 3; i++)
     {
-      dtA[i] = -alpha*AA[i]*(fa+alpha*faa)*(traceK - K0 - 2.*CCZ4c*Theta);
+      dtA[i] = -alpha*AA[i]*(fa+alpha*faa)*(traceK - K0 - 2.*MGCCZ4c*Theta);
       for (int j = 0; j < 3; j++) dtA[i] += BB[i][j]*AA[j];
     }
 
@@ -407,13 +407,13 @@ void examples::exahype2::ccz4::source(double* S, const double* const Q,
       double temp = 0;
       for (int i = 0; i < 3; i++)
       for (int j = 0; j < 3; j++) temp+= dgup[k][i][j]*Aex[i][j];
-      dtA[k] += -CCZ4sk*alpha*fa*temp;
+      dtA[k] += -MGCCZ4sk*alpha*fa*temp;
     }
 
     double dtB[3][3] ={0,0,0,0,0,0,0,0,0};
     for (int i = 0; i < 3; i++)
     for (int j = 0; j < 3; j++)
-    for (int u = 0; u < 3; u++) dtB[i][j] += CCZ4sk*(BB[i][u] * BB[u][j]);
+    for (int u = 0; u < 3; u++) dtB[i][j] += MGCCZ4sk*(BB[i][u] * BB[u][j]);
 
     double dtD[3][3][3] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
     for (int m = 0; m < 3; m++)
@@ -439,7 +439,7 @@ void examples::exahype2::ccz4::source(double* S, const double* const Q,
       double temp=0;
       for (int i = 0; i < 3; i++)
       for (int j = 0; j < 3; j++) temp += dgup[k][i][j]*Aex[i][j];
-      dtP[k] += 1./3.*alpha*(AA[k]*traceK + CCZ4sk*temp);
+      dtP[k] += 1./3.*alpha*(AA[k]*traceK + MGCCZ4sk*temp);
     }
 
 
@@ -501,16 +501,16 @@ void examples::exahype2::ccz4::source(double* S, const double* const Q,
 #if defined(OpenMPGPUOffloading)
 #pragma omp declare target
 #endif
-void examples::exahype2::ccz4::ncp(double* BgradQ, const double* const Q, const double* const gradQSerialised, const int normal,
-      const int CCZ4LapseType,
-      const double CCZ4ds,
-      const double CCZ4c,
-      const double CCZ4e,
-      const double CCZ4f,
-      const double CCZ4bs,
-      const double CCZ4sk,
-      const double CCZ4xi,
-      const double CCZ4mu
+void examples::exahype2::mgccz4::ncp(double* BgradQ, const double* const Q, const double* const gradQSerialised, const int normal,
+      const int MGCCZ4LapseType,
+      const double MGCCZ4ds,
+      const double MGCCZ4c,
+      const double MGCCZ4e,
+      const double MGCCZ4f,
+      const double MGCCZ4bs,
+      const double MGCCZ4sk,
+      const double MGCCZ4xi,
+      const double MGCCZ4mu
       )
 {
     const double alpha = std::exp(std::fmax(-20., std::fmin(20.,Q[16])));
@@ -518,15 +518,15 @@ void examples::exahype2::ccz4::ncp(double* BgradQ, const double* const Q, const 
     const double alpha2 = alpha*alpha;
     double fa  = 1.0;
     double faa = 0.0;
-    if (CCZ4LapseType==1)
+    if (MGCCZ4LapseType==1)
     {
       fa  =  2./alpha;
       faa = -fa/alpha;
     }
 
-    constexpr int nVar(59);
+    constexpr int nVar(64);
 
-    double gradQin[59][3] ={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+    double gradQin[64][3]={0}; //={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
     // De-serialise input data and fill static array
     // FIXME the use of 2D arrays can be avoided: all terms not in the normal are 0
@@ -706,7 +706,7 @@ void examples::exahype2::ccz4::ncp(double* BgradQ, const double* const Q, const 
     double dZNCP[3][3] = {0,0,0,0,0,0,0,0,0};
     for (int j = 0; j < 3; j++)
     for (int i = 0; i < 3; i++)
-    for (int k = 0; k < 3; k++) dZNCP[k][i] += CCZ4ds*0.5*g_cov[i][j]*(dGhat[k][j]-dGtildeNCP[k][j]);
+    for (int k = 0; k < 3; k++) dZNCP[k][i] += MGCCZ4ds*0.5*g_cov[i][j]*(dGhat[k][j]-dGtildeNCP[k][j]);
 
 
     double RicciPlusNablaZNCP[3][3];
@@ -756,7 +756,7 @@ void examples::exahype2::ccz4::ncp(double* BgradQ, const double* const Q, const 
     };
     //! Now assemble all this terrible stuff...
     //!
-    //! Main variables of the CCZ4 system
+    //! Main variables of the MGCCZ4 system
     double dtK[3][3];
     for (int i = 0; i < 3; i++)
     for (int j = 0; j < 3; j++)  dtK[i][j] = phi2*SecondOrderTermsNCP[i][j] + beta[0] * dAex[0][i][j] + beta[1] * dAex[1][i][j] + beta[2] * dAex[2][i][j]; // extrinsic curvature
@@ -776,7 +776,7 @@ void examples::exahype2::ccz4::ncp(double* BgradQ, const double* const Q, const 
     for (int j = 0; j < 3; j++) Aupdown += Aex[i][j]*Aup[i][j];
 
     const double dTheta[3] = {gradQin[12][0],gradQin[12][1],gradQin[12][2]};
-    const double dtTheta = 0.5*alpha*CCZ4e*CCZ4e*( RPlusTwoNablaZNCP ) + beta[0]*dTheta[0] + beta[1]*dTheta[1] + beta[2]*dTheta[2]; // *** original cleaning ***
+    const double dtTheta = 0.5*alpha*MGCCZ4e*MGCCZ4e*( RPlusTwoNablaZNCP ) + beta[0]*dTheta[0] + beta[1]*dTheta[1] + beta[2]*dTheta[2]; // *** original cleaning ***
 
     double divAupNCP[3] = {0,0,0};
 
@@ -788,13 +788,13 @@ void examples::exahype2::ccz4::ncp(double* BgradQ, const double* const Q, const 
 
     const double dBB[3][3][3] = {
         {
-            {CCZ4sk*gradQin[26][0],CCZ4sk*gradQin[27][0],CCZ4sk*gradQin[28][0]}, {CCZ4sk*gradQin[29][0],CCZ4sk*gradQin[30][0],CCZ4sk*gradQin[31][0]}, {CCZ4sk*gradQin[32][0],CCZ4sk*gradQin[33][0],CCZ4sk*gradQin[34][0]}
+            {MGCCZ4sk*gradQin[26][0],MGCCZ4sk*gradQin[27][0],MGCCZ4sk*gradQin[28][0]}, {MGCCZ4sk*gradQin[29][0],MGCCZ4sk*gradQin[30][0],MGCCZ4sk*gradQin[31][0]}, {MGCCZ4sk*gradQin[32][0],MGCCZ4sk*gradQin[33][0],MGCCZ4sk*gradQin[34][0]}
         },
         {
-            {CCZ4sk*gradQin[26][1],CCZ4sk*gradQin[27][1],CCZ4sk*gradQin[28][1]}, {CCZ4sk*gradQin[29][1],CCZ4sk*gradQin[30][1],CCZ4sk*gradQin[31][1]}, {CCZ4sk*gradQin[32][1],CCZ4sk*gradQin[33][1],CCZ4sk*gradQin[34][1]}
+            {MGCCZ4sk*gradQin[26][1],MGCCZ4sk*gradQin[27][1],MGCCZ4sk*gradQin[28][1]}, {MGCCZ4sk*gradQin[29][1],MGCCZ4sk*gradQin[30][1],MGCCZ4sk*gradQin[31][1]}, {MGCCZ4sk*gradQin[32][1],MGCCZ4sk*gradQin[33][1],MGCCZ4sk*gradQin[34][1]}
         },
         {
-            {CCZ4sk*gradQin[26][2],CCZ4sk*gradQin[27][2],CCZ4sk*gradQin[28][2]}, {CCZ4sk*gradQin[29][2],CCZ4sk*gradQin[30][2],CCZ4sk*gradQin[31][2]}, {CCZ4sk*gradQin[32][2],CCZ4sk*gradQin[33][2],CCZ4sk*gradQin[34][2]}
+            {MGCCZ4sk*gradQin[26][2],MGCCZ4sk*gradQin[27][2],MGCCZ4sk*gradQin[28][2]}, {MGCCZ4sk*gradQin[29][2],MGCCZ4sk*gradQin[30][2],MGCCZ4sk*gradQin[31][2]}, {MGCCZ4sk*gradQin[32][2],MGCCZ4sk*gradQin[33][2],MGCCZ4sk*gradQin[34][2]}
         }
     };
 
@@ -821,13 +821,13 @@ void examples::exahype2::ccz4::ncp(double* BgradQ, const double* const Q, const 
         ov[k] = 2*alpha*temp;
     }
     for (int i = 0; i < 3; i++)
-    for (int j = 0; j < 3; j++) dtGhat[i] += CCZ4sk*g_contr[i][j]*ov[j];
+    for (int j = 0; j < 3; j++) dtGhat[i] += MGCCZ4sk*g_contr[i][j]*ov[j];
 
     double dtbb[3];
     for (int i = 0; i < 3; i++)
     {
-        dtbb[i] = CCZ4xi*dtGhat[i] + CCZ4bs * ( beta[0]*gradQin[20+i][0] + beta[1]*gradQin[20+i][1] + beta[2]*gradQin[20+i][2] - beta[0]*gradQin[13+i][0] - beta[1]*gradQin[13+i][1] - beta[2]*gradQin[13+i][2]);
-        dtbb[i] *= CCZ4sk;
+        dtbb[i] = MGCCZ4xi*dtGhat[i] + MGCCZ4bs * ( beta[0]*gradQin[20+i][0] + beta[1]*gradQin[20+i][1] + beta[2]*gradQin[20+i][2] - beta[0]*gradQin[13+i][0] - beta[1]*gradQin[13+i][1] - beta[2]*gradQin[13+i][2]);
+        dtbb[i] *= MGCCZ4sk;
     }
 
     // Auxiliary variables
@@ -835,7 +835,7 @@ void examples::exahype2::ccz4::ncp(double* BgradQ, const double* const Q, const 
     double dK0[3] = {0,0,0};
     for (int i = 0; i < 3; i++)
     {
-        dtA[i] = -alpha*fa*(dtraceK[i] - dK0[i] - CCZ4c*2*dTheta[i]) + beta[0]*dAA[0][i] + beta[1]*dAA[1][i] + beta[2]*dAA[2][i];
+        dtA[i] = -alpha*fa*(dtraceK[i] - dK0[i] - MGCCZ4c*2*dTheta[i]) + beta[0]*dAA[0][i] + beta[1]*dAA[1][i] + beta[2]*dAA[2][i];
     }
     /*if ((dtA[1]+dtA[2])!=0 && dtA[2]>1e-9) {printf("cpp dtA[1]=%g, dtA[2]=%g\n",dtA[1],dtA[2]);
     printf("cpp dtheta[1]=%g, dtheta[2]=%g \n",dTheta[1],dTheta[2]);
@@ -847,13 +847,13 @@ void examples::exahype2::ccz4::ncp(double* BgradQ, const double* const Q, const 
         double temp=0;
         for (int i = 0; i < 3; i++)
         for (int j = 0; j < 3; j++) temp += g_contr[i][j]*dAex[k][i][j]; // TODO we computed this quantity  few lines earlier alrady
-        dtA[k] -= CCZ4sk*alpha*fa*temp;
+        dtA[k] -= MGCCZ4sk*alpha*fa*temp;
     }
 
     double dtB[3][3] = {
-        {CCZ4f*gradQin[20][0],CCZ4f*gradQin[21][0],CCZ4f*gradQin[22][0]},
-        {CCZ4f*gradQin[20][1],CCZ4f*gradQin[21][1],CCZ4f*gradQin[22][1]},
-        {CCZ4f*gradQin[20][2],CCZ4f*gradQin[21][2],CCZ4f*gradQin[22][2]}
+        {MGCCZ4f*gradQin[20][0],MGCCZ4f*gradQin[21][0],MGCCZ4f*gradQin[22][0]},
+        {MGCCZ4f*gradQin[20][1],MGCCZ4f*gradQin[21][1],MGCCZ4f*gradQin[22][1]},
+        {MGCCZ4f*gradQin[20][2],MGCCZ4f*gradQin[21][2],MGCCZ4f*gradQin[22][2]}
     };
 
 
@@ -861,17 +861,17 @@ void examples::exahype2::ccz4::ncp(double* BgradQ, const double* const Q, const 
     for (int k = 0; k < 3; k++)
     for (int j = 0; j < 3; j++)
     {
-        dtB[k][i] += CCZ4mu*alpha2 * g_contr[i][j]*( dPP[k][j] - dPP[j][k]);
+        dtB[k][i] += MGCCZ4mu*alpha2 * g_contr[i][j]*( dPP[k][j] - dPP[j][k]);
         for (int n = 0; n < 3; n++)
-        for (int l = 0; l < 3; l++) dtB[k][i] -= CCZ4mu*alpha2 * g_contr[i][j]*g_contr[n][l]*( dDD[k][l][j][n] - dDD[l][k][j][n]);
+        for (int l = 0; l < 3; l++) dtB[k][i] -= MGCCZ4mu*alpha2 * g_contr[i][j]*g_contr[n][l]*( dDD[k][l][j][n] - dDD[l][k][j][n]);
     }
 
     for (int i = 0; i < 3; i++)
-    for (int j = 0; j < 3; j++) dtB[i][j] += CCZ4bs*(beta[0]*dBB[0][i][j] + beta[1]*dBB[1][i][j] + beta[2]*dBB[2][i][j]);
+    for (int j = 0; j < 3; j++) dtB[i][j] += MGCCZ4bs*(beta[0]*dBB[0][i][j] + beta[1]*dBB[1][i][j] + beta[2]*dBB[2][i][j]);
 
     // NOTE 0 value param
     for (int i = 0; i < 3; i++)
-    for (int j = 0; j < 3; j++) dtB[i][j] *= CCZ4sk;
+    for (int j = 0; j < 3; j++) dtB[i][j] *= MGCCZ4sk;
 
     double dtD[3][3][3];
     for (int i = 0; i < 3; i++)
@@ -899,7 +899,7 @@ void examples::exahype2::ccz4::ncp(double* BgradQ, const double* const Q, const 
         double temp=0;
         for (int m = 0; m < 3; m++)
         for (int n = 0; n < 3; n++) temp += g_contr[m][n]*dAex[k][m][n];
-        dtP[k] += 1./3*alpha*(dtraceK[k] + CCZ4sk*temp);
+        dtP[k] += 1./3*alpha*(dtraceK[k] + MGCCZ4sk*temp);
         for (int i = 0; i < 3; i++) dtP[k] -= 1./6*(dBB[k][i][i] + dBB[i][k][i]);
     }
 
@@ -926,7 +926,7 @@ void examples::exahype2::ccz4::ncp(double* BgradQ, const double* const Q, const 
     for (int i = 0; i < 3; i++) BgradQ[17+i] = -dtbeta[i];
     for (int i = 0; i < 3; i++) BgradQ[20+i] = -dtbb[i];
     for (int i = 0; i < 3; i++) BgradQ[23+i] = -dtA[i];
-    BgradQ[26] = -dtB[0][0]; // note: thes are all 0 for default CCZ4sk=0
+    BgradQ[26] = -dtB[0][0]; // note: thes are all 0 for default MGCCZ4sk=0
     BgradQ[27] = -dtB[1][0];
     BgradQ[28] = -dtB[2][0];
     BgradQ[29] = -dtB[0][1];
@@ -969,10 +969,10 @@ void examples::exahype2::ccz4::ncp(double* BgradQ, const double* const Q, const 
 #if defined(OpenMPGPUOffloading)
 #pragma omp declare target
 #endif
-void examples::exahype2::ccz4::admconstraints(double* constraints, const double* const Q, const double* const gradQSerialised)
+void examples::exahype2::mgccz4::admconstraints(double* constraints, const double* const Q, const double* const gradQSerialised)
 {
-    constexpr int nVar(59);
-    double gradQin[59][3] ={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+    constexpr int nVar(64);
+    double gradQin[64][3]={0};
 
     // De-serialise input data and fill static array
     for (int normal=0; normal<3; normal++)

@@ -1,26 +1,26 @@
 //
-// ExaHyPE2 CCZ4 implementation
+// ExaHyPE2 MGCCZ4 implementation
 //
-#ifndef _examples_exahype2_ccz4_CCZ4_Kernels_H_
-#define _examples_exahype2_ccz4_CCZ4_Kernels_H_
+#ifndef _examples_exahype2_mgccz4_MGCCZ4_Kernels_H_
+#define _examples_exahype2_mgccz4_MGCCZ4_Kernels_H_
 
 
 namespace examples {
   namespace exahype2 {
-    namespace ccz4 {
+    namespace mgccz4 {
       #if defined(OpenMPGPUOffloading)
       #pragma omp declare target
       #endif
       void ncp(double* BgradQ, const double* const Q, const double* const gradQSerialised, const int normal,
-        const int CCZ4LapseType,
-        const double CCZ4ds,
-        const double CCZ4c,
-        const double CCZ4e,
-        const double CCZ4f,
-        const double CCZ4bs,
-        const double CCZ4sk,
-        const double CCZ4xi,
-        const double CCZ4mu);
+        const int MGCCZ4LapseType,
+        const double MGCCZ4ds,
+        const double MGCCZ4c,
+        const double MGCCZ4e,
+        const double MGCCZ4f,
+        const double MGCCZ4bs,
+        const double MGCCZ4sk,
+        const double MGCCZ4xi,
+        const double MGCCZ4mu);
       #if defined(OpenMPGPUOffloading)
       #pragma omp end declare target
       #endif
@@ -29,19 +29,19 @@ namespace examples {
       #pragma omp declare target
       #endif
       void source(double* S, const double* const Q,
-        const int CCZ4LapseType,
-        const double CCZ4ds,
-        const double CCZ4c,
-        const double CCZ4e,
-        const double CCZ4f,
-        const double CCZ4bs,
-        const double CCZ4sk,
-        const double CCZ4xi,
-        const double CCZ4itau,
-        const double CCZ4eta,
-        const double CCZ4k1,
-        const double CCZ4k2,
-        const double CCZ4k3);
+        const int MGCCZ4LapseType,
+        const double MGCCZ4ds,
+        const double MGCCZ4c,
+        const double MGCCZ4e,
+        const double MGCCZ4f,
+        const double MGCCZ4bs,
+        const double MGCCZ4sk,
+        const double MGCCZ4xi,
+        const double MGCCZ4itau,
+        const double MGCCZ4eta,
+        const double MGCCZ4k1,
+        const double MGCCZ4k2,
+        const double MGCCZ4k3);
       #if defined(OpenMPGPUOffloading)
       #pragma omp end declare target
       #endif
@@ -65,7 +65,7 @@ namespace examples {
       #if defined(OpenMPGPUOffloading)
       #pragma omp declare target
       #endif
-      void enforceCCZ4constraints(double * luh);
+      void enforceMGCCZ4constraints(double * luh);
       #if defined(OpenMPGPUOffloading)
       #pragma omp end declare target
       #endif
