@@ -47,49 +47,35 @@
  *
  * @author ExaHyPE's code generator written by Holger Schulz and Tobias Weinzierl 
  */
-class {{NAMESPACE | join("::")}}::{{CLASSNAME}}: public ::exahype2::EnclaveTask {
+class {{NAMESPACE | join("::")}}::{{CLASSNAME}}: public ::exahype2::EnclaveTask
 #ifdef UseSmartMPI
 , public smartmpi::Task
 #endif
+{
   private:
     static tarch::logging::Log  _log;
     /**
      * This is a class attribute holding a unique integer per enclave task type.
      */
-    static int                  _optimisticTaskId;
-    
-    /**
-     * We have to work with a copy of the patch data, as the patch data's
-     * location might change later
-     */
-    static double* copyPatchData( double* __restrict__ patchData);
-    
+    static int                  _enclaveTaskTypeId;
+
+
     #ifdef UseSmartMPI
     int          _remoteTaskId;
     #endif
   public:
-    /**
-     * @param patchData This is the real patch data, i.e. NxNxN. No outer halo or so.
-     */
+    static void applyKernelToCell(
+      const ::peano4::datamanagement::CellMarker& marker, 
+      double                                      t,
+      double* __restrict__                        reconstructedPatch, 
+      double* __restrict__                        targetPatch
+    );
+    
+    
     {{CLASSNAME}}(
       const ::peano4::datamanagement::CellMarker& marker, 
       double                                      t,
-      double                                      dt,
-      double                                      predictedTimeStepSize,
-      double* __restrict__                        patchData
-    );
-    
-    static void mergeTaskOutcomeIntoPatch(
-      int taskNumber,
       double* __restrict__                        reconstructedPatch
-    );
-
-    static void applyKernelToCellBoundary(
-      const ::peano4::datamanagement::CellMarker& marker, 
-      double                                      t,
-      double                                      dt,
-      double* __restrict__                        reconstructedPatch,
-      double* __restrict__                        patchData
     );
 
     bool isSmartMPITask() const override;

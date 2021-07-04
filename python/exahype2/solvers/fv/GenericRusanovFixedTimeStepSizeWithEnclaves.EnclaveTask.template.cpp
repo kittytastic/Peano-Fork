@@ -14,12 +14,10 @@
 #include "tarch/mpi/DoubleMessage.h"
 #include "tarch/mpi/IntegerMessage.h"
 
-#include <algorithm>
-
 
 tarch::logging::Log                {{NAMESPACE | join("::")}}::{{CLASSNAME}}::_log( "{{NAMESPACE | join("::")}}::{{CLASSNAME}}" );
 #if defined(UseSmartMPI)
-int                                {{NAMESPACE | join("::")}}::{{CLASSNAME}}::_optimisticTaskId(
+int                                {{NAMESPACE | join("::")}}::{{CLASSNAME}}::_enclaveTaskTypeId(
   tarch::multicore::registerSmartMPITask(
     peano4::parallel::Tasks::getTaskType("{{NAMESPACE | join("::")}}::{{CLASSNAME}}"),
     [](smartmpi::ReceiverCallType type, int rank, int tag, MPI_Comm communicator) -> smartmpi::Task* {
@@ -33,44 +31,159 @@ int                                {{NAMESPACE | join("::")}}::{{CLASSNAME}}::_o
   )
 );
 #else
-int                                {{NAMESPACE | join("::")}}::{{CLASSNAME}}::_optimisticTaskId(
+int                                {{NAMESPACE | join("::")}}::{{CLASSNAME}}::_enclaveTaskTypeId(
   peano4::parallel::Tasks::getTaskType("{{NAMESPACE | join("::")}}::{{CLASSNAME}}")
 );
 #endif
 
 
-double* {{NAMESPACE | join("::")}}::{{CLASSNAME}}::copyPatchData( double* __restrict__ patchData) {
-  #if Dimensions==2
-  constexpr int Number = {{NUMBER_OF_DOUBLE_VALUES_IN_PATCH_2D}};
-  #else
-  constexpr int Number = {{NUMBER_OF_DOUBLE_VALUES_IN_PATCH_3D}};
-  #endif
-
-  double* result = tarch::allocateMemory(Number,tarch::MemoryLocation::Heap );
-  std::copy_n(patchData, Number, result);
-  return result;
+void {{NAMESPACE | join("::")}}::{{CLASSNAME}}::applyKernelToCell(
+  const ::peano4::datamanagement::CellMarker& marker,
+  double                                      t,
+  double* __restrict__                        reconstructedPatch,
+  double* __restrict__                        targetPatch
+) {
+    {{PREPROCESS_RECONSTRUCTED_PATCH}}
+  
+    ::exahype2::fv::copyPatch(
+      reconstructedPatch,
+      targetPatch,
+      {{NUMBER_OF_UNKNOWNS}},
+      {{NUMBER_OF_AUXILIARY_VARIABLES}},
+      {{NUMBER_OF_VOLUMES_PER_AXIS}},
+      1 // halo size
+    );
+  
+    {% if USE_SPLIT_LOOP %}
+    #if Dimensions==2
+    ::exahype2::fv::applySplit1DRiemannToPatch_Overlap1AoS2d_SplitLoop(
+    #else
+    ::exahype2::fv::applySplit1DRiemannToPatch_Overlap1AoS3d_SplitLoop(
+    #endif
+    {% else %}
+    #if Dimensions==2
+    ::exahype2::fv::applySplit1DRiemannToPatch_Overlap1AoS2d(
+    #else
+    ::exahype2::fv::applySplit1DRiemannToPatch_Overlap1AoS3d(
+    #endif
+    {% endif %}
+      [&](
+        const double* __restrict__                   QL,
+        const double* __restrict__                   QR,
+        const tarch::la::Vector<Dimensions,double>&  x,
+        double                                       dx,
+        double                                       t,
+        double                                       dt,
+        int                                          normal,
+        double                                       FL[],
+        double                                       FR[]
+      ) -> void {
+        ::exahype2::fv::splitRusanov1d(
+          [] (
+           const double * __restrict__ Q,
+           const tarch::la::Vector<Dimensions,double>&  faceCentre,
+           const tarch::la::Vector<Dimensions,double>&  volumeH,
+           double                                       t,
+           double                                       dt,
+           int                                          normal,
+           double * __restrict__                        F
+          ) -> void {
+            {% if FLUX_IMPLEMENTATION=="<none>" %}
+            for (int i=0; i<{{NUMBER_OF_UNKNOWNS}}; i++) F[i] = 0.0;
+            {% else %}
+            repositories::{{SOLVER_INSTANCE}}.flux( Q, faceCentre, volumeH, t, normal, F );
+            {% endif %}
+          },
+          [] (
+            const double* __restrict__                   Q,
+            const double * __restrict__                  deltaQ,
+            const tarch::la::Vector<Dimensions,double>&  faceCentre,
+            const tarch::la::Vector<Dimensions,double>&  volumeH,
+            double                                       t,
+            double                                       dt,
+            int                                          normal,
+            double                                       BgradQ[]
+          ) -> void {
+            {% if NCP_IMPLEMENTATION!="<none>" %}
+            repositories::{{SOLVER_INSTANCE}}.nonconservativeProduct( Q, deltaQ, faceCentre, volumeH, t, normal, BgradQ );
+            {% endif %}
+          },
+          [] (
+            const double* __restrict__                   Q,
+            const tarch::la::Vector<Dimensions,double>&  faceCentre,
+            const tarch::la::Vector<Dimensions,double>&  volumeH,
+            double                                       t,
+            double                                       dt,
+            int                                          normal
+          ) -> double {
+            return repositories::{{SOLVER_INSTANCE}}.maxEigenvalue( Q, faceCentre, volumeH, t, normal);
+          },
+          QL, QR, x, dx, t, dt, normal,
+          {{NUMBER_OF_UNKNOWNS}},
+          {{NUMBER_OF_AUXILIARY_VARIABLES}},
+          FL,FR,
+          {% if FLUX_IMPLEMENTATION=="<none>" %}
+          true,
+          {% else %}
+          false,
+          {% endif %}
+          {% if NCP_IMPLEMENTATION=="<none>" %}
+          true
+          {% else %}
+          false
+          {% endif %}
+        );
+      },
+      [&](
+        const double * __restrict__                  Q,
+        const tarch::la::Vector<Dimensions,double>&  x,
+        double                                       dx,
+        double                                       t,
+        double                                       dt,
+        double * __restrict__                        S
+      ) -> void {
+        repositories::{{SOLVER_INSTANCE}}.sourceTerm(
+          Q,
+          x, dx, t, dt, 
+          S
+        );
+      },
+      marker.x(),
+      marker.h(),
+      t,
+      {{TIME_STEP_SIZE}},
+      {{NUMBER_OF_VOLUMES_PER_AXIS}},
+      {{NUMBER_OF_UNKNOWNS}},
+      {{NUMBER_OF_AUXILIARY_VARIABLES}},
+      reconstructedPatch,
+      targetPatch
+    );
+    
+    {{FREE_SKELETON_MEMORY}}
+    {{POSTPROCESS_UPDATED_PATCH}}
 }
+
+
+
 
 
 {{NAMESPACE | join("::")}}::{{CLASSNAME}}::{{CLASSNAME}}(
   const ::peano4::datamanagement::CellMarker& marker,
   double                                      t,
-  double                                      dt,
-  double                                      predictedTimeStepSize,
-  double* __restrict__                        patchData
+  double* __restrict__                        reconstructedPatch
 ):
   ::exahype2::EnclaveTask(
-    _optimisticTaskId,
+    _enclaveTaskTypeId,
     marker,
-    t+dt,
-    predictedTimeStepSize,
-    copyPatchData( patchData ),
+    t,
+    {{TIME_STEP_SIZE}},
+    reconstructedPatch,
     #if Dimensions==2
+    {{NUMBER_OF_DOUBLE_VALUES_IN_PATCH_PLUS_HALO_2D}},
     {{NUMBER_OF_DOUBLE_VALUES_IN_PATCH_2D}},
-    {{NUMBER_OF_INNER_DOUBLE_VALUES_IN_PATCH_2D}},
     #else
+    {{NUMBER_OF_DOUBLE_VALUES_IN_PATCH_PLUS_HALO_3D}},
     {{NUMBER_OF_DOUBLE_VALUES_IN_PATCH_3D}},
-    {{NUMBER_OF_INNER_DOUBLE_VALUES_IN_PATCH_3D}},
     #endif
     [&](double* reconstructedPatch, double* targetPatch, const ::peano4::datamanagement::CellMarker& marker, double t, double dt) -> void {
           {{PREPROCESS_RECONSTRUCTED_PATCH}}
@@ -80,7 +193,7 @@ double* {{NAMESPACE | join("::")}}::{{CLASSNAME}}::copyPatchData( double* __rest
             targetPatch,
             {{NUMBER_OF_UNKNOWNS}},
             {{NUMBER_OF_AUXILIARY_VARIABLES}},
-            {{NUMBER_OF_VOLUMES_PER_AXIS}}-2,
+            {{NUMBER_OF_VOLUMES_PER_AXIS}},
             1 // halo size
           );
 
@@ -182,7 +295,7 @@ double* {{NAMESPACE | join("::")}}::{{CLASSNAME}}::copyPatchData( double* __rest
             marker.h(),
             t,
             dt,
-            {{NUMBER_OF_VOLUMES_PER_AXIS}}-2,
+            {{NUMBER_OF_VOLUMES_PER_AXIS}},
             {{NUMBER_OF_UNKNOWNS}},
             {{NUMBER_OF_AUXILIARY_VARIABLES}},
             reconstructedPatch,
@@ -190,214 +303,12 @@ double* {{NAMESPACE | join("::")}}::{{CLASSNAME}}::copyPatchData( double* __rest
           );
 
           {{POSTPROCESS_UPDATED_PATCH}}
-
-          double maxEigenvalue = ::exahype2::fv::maxEigenvalue_AoS(
-            [] (
-              const double * __restrict__                  Q,
-              const tarch::la::Vector<Dimensions,double>&  faceCentre,
-              const tarch::la::Vector<Dimensions,double>&  volumeH,
-              double                                       t,
-              double                                       dt,
-              int                                          normal
-            ) -> double {
-              return repositories::{{SOLVER_INSTANCE}}.maxEigenvalue( Q, faceCentre, volumeH, t, normal);
-            },
-            marker.x(),
-            marker.h(),
-            t,
-            dt,
-            {{NUMBER_OF_VOLUMES_PER_AXIS}}-2,
-            {{NUMBER_OF_UNKNOWNS}},
-            {{NUMBER_OF_AUXILIARY_VARIABLES}},
-            targetPatch
-          );
-
-          repositories::{{SOLVER_INSTANCE}}.setMaximumEigenvalue( maxEigenvalue );
         }
   )
   #ifdef UseSmartMPI
-  , smartmpi::Task(_optimisticTaskId)
+  , smartmpi::Task(_enclaveTaskTypeId)
   #endif
-{
-  logDebug( "{{CLASSNAME}}(...)", "spawn optimistic task for " << marker.toString() << " with t=" << (t+dt) << ", dt=" << predictedTimeStepSize );
-}
-
-
-
-void {{NAMESPACE | join("::")}}::{{CLASSNAME}}::mergeTaskOutcomeIntoPatch(
-  int                    taskNumber,
-  double* __restrict__   patch
-) {
-  std::pair<int, double*> optimisticTaskOutcome = ::exahype2::EnclaveBookkeeping::getInstance().waitForTaskToTerminateAndReturnResult(taskNumber);
-
-  #if Dimensions==2
-  assertionEquals( optimisticTaskOutcome.first, {{NUMBER_OF_INNER_DOUBLE_VALUES_IN_PATCH_2D}} );
-  #else
-  assertionEquals( optimisticTaskOutcome.first, {{NUMBER_OF_INNER_DOUBLE_VALUES_IN_PATCH_3D}} );
-  #endif
-
-  ::exahype2::fv::insertPatch(
-    optimisticTaskOutcome.second,
-    patch,
-    {{NUMBER_OF_UNKNOWNS}},
-    {{NUMBER_OF_AUXILIARY_VARIABLES}},
-    {{NUMBER_OF_VOLUMES_PER_AXIS}},
-    1
-  );
-
-  tarch::freeMemory( optimisticTaskOutcome.second, tarch::MemoryLocation::Heap );
-}
-
-
-void {{NAMESPACE | join("::")}}::{{CLASSNAME}}::applyKernelToCellBoundary(
-  const ::peano4::datamanagement::CellMarker& marker,
-  double                                      t,
-  double                                      dt,
-  double* __restrict__                        reconstructedPatch,
-  double* __restrict__                        patchData
-) {
-  logDebug( "applyKernelToCellBoundary(...)", "update boundary of cell " << marker.toString() << " with t=" << t << ", dt=" << dt );
-
-  {% if PREPROCESS_RECONSTRUCTED_PATCH!="" %}
-  assertionMsg(false, "optimistic time stepping does not support pre- and postprocessing" );
-  {% endif %}
-
-  auto maskOutInnerVolumes = [&](const tarch::la::Vector<Dimensions, int>& i) -> bool {
-    return tarch::la::oneEquals( i, 0 ) or tarch::la::oneEquals( i, {{NUMBER_OF_VOLUMES_PER_AXIS}}-1 );
-  };
-
-  ::exahype2::fv::copyPatch(
-    reconstructedPatch,
-    patchData,
-    {{NUMBER_OF_UNKNOWNS}},
-    {{NUMBER_OF_AUXILIARY_VARIABLES}},
-    {{NUMBER_OF_VOLUMES_PER_AXIS}},
-    1,
-    maskOutInnerVolumes
-  );
-
-  ::exahype2::fv::applySplit1DRiemannToPatch_Overlap1AoS(
-    [&](
-      const double* __restrict__                   QL,
-      const double* __restrict__                   QR,
-      const tarch::la::Vector<Dimensions,double>&  x,
-      double                                       dx,
-      double                                       t,
-      double                                       dt,
-      int                                          normal,
-      double                                       FL[],
-      double                                       FR[]
-    ) -> void {
-    ::exahype2::fv::splitRusanov1d(
-      [] (
-       const double * __restrict__ Q,
-       const tarch::la::Vector<Dimensions,double>&  faceCentre,
-       const tarch::la::Vector<Dimensions,double>&  volumeH,
-       double                                       t,
-       double                                       dt,
-       int                                          normal,
-       double * __restrict__                        F
-      ) -> void {
-        {% if FLUX_IMPLEMENTATION=="<none>" %}
-        for (int i=0; i<{{NUMBER_OF_UNKNOWNS}}; i++) F[i] = 0.0;
-        {% else %}
-        repositories::{{SOLVER_INSTANCE}}.flux( Q, faceCentre, volumeH, t, normal, F );
-        {% endif %}
-      },
-      [] (
-        const double* __restrict__                   Q,
-        const double * __restrict__                  deltaQ,
-        const tarch::la::Vector<Dimensions,double>&  faceCentre,
-        const tarch::la::Vector<Dimensions,double>&  volumeH,
-        double                                       t,
-        double                                       dt,
-        int                                          normal,
-        double                                       BgradQ[]
-      ) -> void {
-        {% if NCP_IMPLEMENTATION!="<none>" %}
-        repositories::{{SOLVER_INSTANCE}}.nonconservativeProduct( Q, deltaQ, faceCentre, volumeH, t, normal, BgradQ );
-        {% endif %}
-      },
-      [] (
-        const double* __restrict__                   Q,
-        const tarch::la::Vector<Dimensions,double>&  faceCentre,
-        const tarch::la::Vector<Dimensions,double>&  volumeH,
-        double                                       t,
-        double                                       dt,
-        int                                          normal
-      ) -> double {
-        return repositories::{{SOLVER_INSTANCE}}.maxEigenvalue( Q, faceCentre, volumeH, t, normal);
-      },
-      QL, QR, x, dx, t, dt, normal,
-      {{NUMBER_OF_UNKNOWNS}},
-      {{NUMBER_OF_AUXILIARY_VARIABLES}},
-      FL,FR,
-      {% if FLUX_IMPLEMENTATION=="<none>" %}
-      true,
-      {% else %}
-      false,
-      {% endif %}
-      {% if NCP_IMPLEMENTATION=="<none>" %}
-      true
-      {% else %}
-      false
-      {% endif %}
-    );
-    },
-  [&](
-    const double * __restrict__                  Q,
-    const tarch::la::Vector<Dimensions,double>&  x,
-    double                                       dx,
-    double                                       t,
-    double                                       dt,
-    double * __restrict__                        S
-  ) -> void {
-    repositories::{{SOLVER_INSTANCE}}.sourceTerm(
-      Q,
-      x, dx, t, dt,
-      S
-    );
-  },
-    marker.x(),
-    marker.h(),
-    t,
-    dt,
-    {{NUMBER_OF_VOLUMES_PER_AXIS}},
-    {{NUMBER_OF_UNKNOWNS}},
-    {{NUMBER_OF_AUXILIARY_VARIABLES}},
-    reconstructedPatch,
-    patchData,
-    maskOutInnerVolumes
-  );
-
-  double maxEigenvalue = ::exahype2::fv::maxEigenvalue_AoS(
-    [] (
-      const double* __restrict__                   Q,
-      const tarch::la::Vector<Dimensions,double>&  faceCentre,
-      const tarch::la::Vector<Dimensions,double>&  volumeH,
-      double                                       t,
-      double                                       dt,
-      int                                          normal
-    ) -> double {
-      return repositories::{{SOLVER_INSTANCE}}.maxEigenvalue( Q, faceCentre, volumeH, t, normal);
-    },
-    marker.x(),
-    marker.h(),
-    t,
-    dt,
-    {{NUMBER_OF_VOLUMES_PER_AXIS}},
-    {{NUMBER_OF_UNKNOWNS}},
-    {{NUMBER_OF_AUXILIARY_VARIABLES}},
-    patchData,
-    maskOutInnerVolumes
-  );
-
-  repositories::{{SOLVER_INSTANCE}}.setMaximumEigenvalue( maxEigenvalue );
-
-  {% if POSTPROCESS_UPDATED_PATCH!="" %}
-  assertionMsg(false, "optimistic time stepping does not support pre- and postprocessing" );
-  {% endif %}
-}
+{}
 
 
 bool {{NAMESPACE | join("::")}}::{{CLASSNAME}}::isSmartMPITask() const {
@@ -417,19 +328,17 @@ void {{NAMESPACE | join("::")}}::{{CLASSNAME}}::runLocally() {
 
 void {{NAMESPACE | join("::")}}::{{CLASSNAME}}::moveTask(int rank, int tag, MPI_Comm communicator) {
   ::tarch::mpi::DoubleMessage  tMessage(_t);
-  ::tarch::mpi::DoubleMessage  dtMessage(_dt);
   ::tarch::mpi::IntegerMessage taskIdMessage(getTaskId());
 
   ::peano4::datamanagement::CellMarker::send( _marker, rank, tag, communicator );
   ::tarch::mpi::DoubleMessage::send( tMessage, rank, tag, communicator );
-  ::tarch::mpi::DoubleMessage::send( dtMessage, rank, tag, communicator );
   ::tarch::mpi::IntegerMessage::send( taskIdMessage, rank, tag, communicator );
 
   MPI_Send( _inputValues, _numberOfInputValues, MPI_DOUBLE, rank, tag, communicator );
 
   logInfo(
     "moveTask(...)",
-    "sent (" << _marker.toString() << "," << tMessage.toString() << "," << dtMessage.toString() << "," << _numberOfInputValues <<
+    "sent (" << _marker.toString() << "," << tMessage.toString() << "," << _numberOfInputValues <<
     "," << taskIdMessage.toString() << ") to rank " << rank <<
     " via tag " << tag
   );
@@ -446,19 +355,17 @@ smartmpi::Task* {{NAMESPACE | join("::")}}::{{CLASSNAME}}::receiveTask(int rank,
     #endif
 
   ::tarch::mpi::DoubleMessage tMessage;
-  ::tarch::mpi::DoubleMessage dtMessage;
   ::tarch::mpi::IntegerMessage taskIdMessage;
   ::peano4::datamanagement::CellMarker markerMessage(dummyEvent);
   double* inputValues = tarch::allocateMemory( NumberOfInputValues, tarch::MemoryLocation::Heap );
 
   ::peano4::datamanagement::CellMarker::receive( markerMessage, rank, tag, communicator );
   ::tarch::mpi::DoubleMessage::receive( tMessage, rank, tag, communicator );
-  ::tarch::mpi::DoubleMessage::receive( dtMessage, rank, tag, communicator );
   ::tarch::mpi::IntegerMessage::receive( taskIdMessage, rank, tag, communicator );
 
   logInfo(
     "receiveTask(...)",
-    "received (" << markerMessage.toString() << "," << tMessage.toString() << "," << dtMessage.toString() << "," << taskIdMessage.toString() << ") from rank " << rank <<
+    "received (" << markerMessage.toString() << "," << tMessage.toString() << "," << taskIdMessage.toString() << ") from rank " << rank <<
     " via tag " << tag << " and will now receive " << NumberOfInputValues << " doubles"
   );
 
@@ -471,7 +378,6 @@ smartmpi::Task* {{NAMESPACE | join("::")}}::{{CLASSNAME}}::receiveTask(int rank,
   {{CLASSNAME}}* result = new {{CLASSNAME}}(
     markerMessage,
     tMessage.getValue(),
-    dtMessage.getValue(),
     inputValues
   );
   result->_remoteTaskId = taskIdMessage.getValue();
@@ -491,19 +397,17 @@ void {{NAMESPACE | join("::")}}::{{CLASSNAME}}::runLocallyAndSendTaskOutputToRan
   );
 
   ::tarch::mpi::DoubleMessage  tMessage(_t);
-  ::tarch::mpi::DoubleMessage  dtMessage(_dt);
   ::tarch::mpi::IntegerMessage taskIdMessage(_remoteTaskId);
 
   ::peano4::datamanagement::CellMarker::send( _marker, rank, tag, communicator );
   ::tarch::mpi::DoubleMessage::send( tMessage, rank, tag, communicator );
-  ::tarch::mpi::DoubleMessage::send( dtMessage, rank, tag, communicator );
   ::tarch::mpi::IntegerMessage::send( taskIdMessage, rank, tag, communicator );
 
   MPI_Send( _outputValues, _numberOfResultValues, MPI_DOUBLE, rank, tag, communicator );
 
   logInfo(
     "moveTask(...)",
-    "sent (" << _marker.toString() << "," << tMessage.toString() << "," << dtMessage.toString() << "," << _numberOfResultValues <<
+    "sent (" << _marker.toString() << "," << tMessage.toString() << "," << _numberOfResultValues <<
     "," << taskIdMessage.toString() << ") to rank " << rank <<
     " via tag " << tag
   );
@@ -523,19 +427,17 @@ smartmpi::Task* {{NAMESPACE | join("::")}}::{{CLASSNAME}}::receiveOutcome(int ra
     #endif
 
   ::tarch::mpi::DoubleMessage tMessage;
-  ::tarch::mpi::DoubleMessage dtMessage;
   ::tarch::mpi::IntegerMessage taskIdMessage;
   ::peano4::datamanagement::CellMarker markerMessage(dummyEvent);
   double* outputValues = tarch::allocateMemory( NumberOfResultValues, tarch::MemoryLocation::Heap );
 
   ::peano4::datamanagement::CellMarker::receive( markerMessage, rank, tag, communicator );
   ::tarch::mpi::DoubleMessage::receive( tMessage, rank, tag, communicator );
-  ::tarch::mpi::DoubleMessage::receive( dtMessage, rank, tag, communicator );
   ::tarch::mpi::IntegerMessage::receive( taskIdMessage, rank, tag, communicator );
 
   logInfo(
     "receiveOutcome(...)",
-    "received (" << markerMessage.toString() << "," << tMessage.toString() << "," << dtMessage.toString() << "," << taskIdMessage.toString() << ") from rank " << rank <<
+    "received (" << markerMessage.toString() << "," << tMessage.toString() << "," << taskIdMessage.toString() << ") from rank " << rank <<
     " via tag " << tag << " and will now receive " << NumberOfResultValues << " doubles"
   );
 
