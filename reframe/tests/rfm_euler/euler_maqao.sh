@@ -24,12 +24,12 @@ esac
 
 
 ${REFRAME_ROOT:=~}/reframe/bin/reframe \
+    --skip-sanity-check \
     --max-retries=0 \
     --exec-policy async \
     --stage $STAGE_DIR \
     --purge-env \
     -C $config \
-    -c euler.py \
     -c euler_maqao.py \
     -r \
     -v \
@@ -37,5 +37,6 @@ ${REFRAME_ROOT:=~}/reframe/bin/reframe \
     -n \
     'Euler' \
     --output $OUTPUT_DIR \
-    --report-file=euler.log
+    --report-file=euler_maqao.log
+
 

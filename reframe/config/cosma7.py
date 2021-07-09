@@ -1,9 +1,9 @@
 site_configuration = {
     'systems': [
         {
-            'name': 'dine',
-            'descr': 'DINE',
-            'hostnames': ['b101.pri.cosma7.alces.network', 'login8a.pri.cosma7.alces.network'],
+            'name': 'cosma7',
+            'descr': 'cosma7',
+            'hostnames': ['login7b.pri.cosma7.alces.network', 'login7a.pri.cosma7.alces.network', 'login7c.pri.cosma7.alces.network'],
             'modules_system': 'tmod4',
             'partitions': [
                 {
@@ -11,7 +11,7 @@ site_configuration = {
                     'descr': 'login nodes',
                     'scheduler': 'local',
                     'launcher': 'local',
-                    'environs': ['amd'],
+                    'environs': ['intel'],
                     'max_jobs': 100,
                 },
                 {
@@ -19,17 +19,8 @@ site_configuration = {
                     'descr': 'parallel jobs',
                     'scheduler': 'slurm',
                     'launcher': 'mpirun',
-                    'access': ['-p bluefield1', '-A durham'],
-                    'environs': ['amd'],
-                    'max_jobs': 100,
-                },
-                {
-                    'name': 'local_launcher_profiler_jobs',
-                    'descr': 'local launcher for maqao jobs',
-                    'scheduler': 'slurm',
-                    'launcher': 'local',
-                    'access': ['-p bluefield1', '-A durham'],
-                    'environs': ['amd'],
+                    'access': ['-p cosma7', '-A durham'],
+                    'environs': ['intel'],
                     'max_jobs': 100,
                 },
             ]
@@ -39,13 +30,12 @@ site_configuration = {
         {
             'modules': ['gnu_comp/9.3.0',
                         'python/3.6.5',
-                        'openmpi/4.0.3',
-                        'maqao/2.14.1'],
-             'name': 'amd',
+                        'openmpi/4.0.3'],
+             'name': 'intel',
              'cc': '',
              'cxx': 'g++',
              'ftn': '',
-             'target_systems': ['dine'],
+             'target_systems': ['cosma7'],
              'variables': [
                  ['PYTHONPATH','../../../python'],
                  ['OMP_NUM_THREADS','4'],
