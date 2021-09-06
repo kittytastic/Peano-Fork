@@ -1,7 +1,7 @@
 # This file is part of the ExaHyPE2 project. For conditions of distribution and 
 # use, please see the copyright notice at www.peano-framework.org
-from exahype2.solvers.fv.SingleSweep import SingleSweep
-from exahype2.solvers.fv.PDETerms    import PDETerms
+from exahype2.solvers.fv.EnclaveTasking import EnclaveTasking
+from exahype2.solvers.fv.PDETerms       import PDETerms
 
 import jinja2
 
@@ -20,16 +20,17 @@ from .kernels import create_abstract_solver_user_definitions_for_adaptive_time_s
 from .kernels import create_constructor_implementation_for_adaptive_time_stepping
 
 
-class GlobalAdaptiveTimeStep( SingleSweep ):
+class GlobalAdaptiveTimeStepWithEnclaveTasking( EnclaveTasking ):
   def __init__(self, 
     name, patch_size, unknowns, auxiliary_variables, min_h, max_h, time_step_relaxation,
     flux=PDETerms.User_Defined_Implementation, 
     ncp=None, 
     eigenvalues=PDETerms.User_Defined_Implementation, 
     boundary_conditions=None,refinement_criterion=None,initial_conditions=None,source_term=None,
-    plot_grid_properties=False
+    plot_grid_properties=False,
+    use_gpu=False
   ):
-    super(GlobalAdaptiveTimeStep,self).__init__(name, patch_size, unknowns, auxiliary_variables, min_h, max_h, plot_grid_properties) 
+    super(GlobalAdaptiveTimeStepWithEnclaveTasking,self).__init__(name, patch_size, unknowns, auxiliary_variables, min_h, max_h, plot_grid_properties, use_gpu) 
     
     self._time_step_relaxation = time_step_relaxation
 
@@ -38,8 +39,12 @@ class GlobalAdaptiveTimeStep( SingleSweep ):
     self._eigenvalues_implementation          = PDETerms.None_Implementation
     self._source_term_implementation          = PDETerms.None_Implementation
     
-    self._preprocess_reconstructed_patch      = create_preprocess_reconstructed_patch_throughout_sweep_kernel_for_adaptive_time_stepping()
-    self._postprocess_updated_patch           = create_postprocess_updated_patch_for_adaptive_time_stepping()
+    self._preprocess_reconstructed_patch_throughout_sweep = create_preprocess_reconstructed_patch_throughout_sweep_kernel_for_adaptive_time_stepping()
+    self._postprocess_updated_patch_throughout_sweep      = """
+  const double cellTimeStamp    = fineGridCellEulerCellLabel.getTimeStamp();
+  const double cellTimeStepSize = fineGridCellEulerCellLabel.getTimeStepSize();
+  double*       targetPatch     = fineGridCellEulerQ.value;
+""" +    create_postprocess_updated_patch_for_adaptive_time_stepping()
     self.set_implementation(flux=flux, 
       ncp=ncp, 
       eigenvalues=eigenvalues, 
@@ -84,8 +89,12 @@ class GlobalAdaptiveTimeStep( SingleSweep ):
     self._abstract_solver_user_declarations += create_abstract_solver_user_declarations_for_adaptive_time_stepping()
     self._abstract_solver_user_definitions  += create_abstract_solver_user_definitions_for_adaptive_time_stepping()
     
-    self._start_time_step_implementation          = create_start_time_step_implementation_for_adaptive_time_stepping()
-    self._finish_time_step_implementation         = create_finish_time_step_implementation_for_adaptive_time_stepping(self._time_step_relaxation)
+    self._start_time_step_implementation           = create_start_time_step_implementation_for_adaptive_time_stepping()
+    self._finish_time_step_implementation          = """
+if (_solverState==SolverState::Secondary) {
+""" +    create_finish_time_step_implementation_for_adaptive_time_stepping(self._time_step_relaxation) + """
+}
+"""
     
-    SingleSweep.set_implementation(self, boundary_conditions, refinement_criterion, initial_conditions, memory_location, use_split_loop)
+    super(GlobalAdaptiveTimeStepWithEnclaveTasking,self).set_implementation(boundary_conditions, refinement_criterion, initial_conditions, memory_location, use_split_loop)
 
