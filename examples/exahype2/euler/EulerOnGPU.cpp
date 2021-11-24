@@ -1,32 +1,10 @@
-#include "Euler.h"
+#include "EulerOnGPU.h"
 #include "exahype2/RefinementControl.h"
-
 #include "Constants.h"
 #include "exahype2/NonCriticalAssertions.h"
 
 
-/*
-
-    double minValues[] =
-        {0.01,-std::numeric_limits<double>::max(),-1e-8,-1e-8,-std::numeric_limits<double>::max()};
-
-    double maxValues[] =
-        {1.0, std::numeric_limits<double>::max(),  1e-8, 1e-8, std::numeric_limits<double>::max()};
-
-    ::exahype2::fv::validatePatch(
-        reconstructedPatch,
-        5,
-        0,
-        4,
-        1, // halo
-        std::string(__FILE__) + "(" + std::to_string(__LINE__) + "): " + marker.toString(),
-        false, minValues, maxValues
-    ); // previous time step has to be valid
-
-*/
-
-
-tarch::logging::Log   examples::exahype2::euler::Euler::_log( "examples::exahype2::euler::Euler" );
+tarch::logging::Log   examples::exahype2::euler::EulerOnGPU::_log( "examples::exahype2::euler::EulerOnGPU" );
 
 
 
@@ -45,10 +23,9 @@ Scenario scenario = Scenario::BreakingDamWithDynamicAMR;
 //Scenario scenario = Scenario::BreakingDam;
 
 
-
-::exahype2::RefinementCommand examples::exahype2::euler::Euler::refinementCriterion(
-  const double * __restrict__ Q, // Q[5+0],
-  const tarch::la::Vector<Dimensions,double>&  volumeCentre,
+::exahype2::RefinementCommand examples::exahype2::euler::EulerOnGPU::refinementCriterion(
+  const double * __restrict__ Q, // Q[5+0]
+  const tarch::la::Vector<Dimensions,double>&  volumeX,
   const tarch::la::Vector<Dimensions,double>&  volumeH,
   double                                       t
 ) {
@@ -62,7 +39,7 @@ Scenario scenario = Scenario::BreakingDamWithDynamicAMR;
         // you never invoke erase.
         if ( tarch::la::equals(t,0.0) ) {
           tarch::la::Vector<Dimensions,double> circleCentre = {0.5,0.3};
-          bool isInTheCentre = ( tarch::la::norm2( volumeCentre-circleCentre ) < 0.05 );
+          bool isInTheCentre = ( tarch::la::norm2( volumeX-circleCentre ) < 0.05 );
           if (isInTheCentre)
             result = ::exahype2::RefinementCommand::Refine;
         }
@@ -73,7 +50,7 @@ Scenario scenario = Scenario::BreakingDamWithDynamicAMR;
         // Same as for static AMR. This is the initial pattern
         if ( tarch::la::equals(t,0.0) ) {
           tarch::la::Vector<Dimensions,double> circleCentre = {0.5,0.3};
-          bool isInTheCentre = ( tarch::la::norm2( volumeCentre-circleCentre ) < 0.05 );
+          bool isInTheCentre = ( tarch::la::norm2( volumeX-circleCentre ) < 0.05 );
           if (isInTheCentre)
             result = ::exahype2::RefinementCommand::Refine;
         }
@@ -94,14 +71,14 @@ Scenario scenario = Scenario::BreakingDamWithDynamicAMR;
       break;
     case Scenario::BreakingDam:
       {
-        if ( volumeCentre(0)<0.5 ) {
+        if ( volumeX(0)<0.5 ) {
           result = ::exahype2::RefinementCommand::Refine;
         }
       }
       break;
     case Scenario::BreakingDamWithDynamicAMR:
       {
-        if ( tarch::la::equals(t,0.0) and tarch::la::equals(volumeCentre(0),1.0/3.0) ) {
+        if ( tarch::la::equals(t,0.0) and tarch::la::equals(volumeX(0),1.0/3.0) ) {
           result = ::exahype2::RefinementCommand::Refine;
         }
         else if (t>0.0 and Q[4]>0.4) {
@@ -115,9 +92,9 @@ Scenario scenario = Scenario::BreakingDamWithDynamicAMR;
     case Scenario::BreakingDamResolutionStudies:
       {
         if (
-          volumeCentre(1)>0.5-0.5*volumeH(1)*NumberOfFiniteVolumesPerAxisPerPatch
+          volumeX(1)>0.5-0.5*volumeH(1)*NumberOfFiniteVolumesPerAxisPerPatch
           and
-          volumeCentre(1)<0.5+0.5*volumeH(1)*NumberOfFiniteVolumesPerAxisPerPatch
+          volumeX(1)<0.5+0.5*volumeH(1)*NumberOfFiniteVolumesPerAxisPerPatch
         ) {
           result = ::exahype2::RefinementCommand::Refine;
         }
@@ -129,11 +106,11 @@ Scenario scenario = Scenario::BreakingDamWithDynamicAMR;
 }
 
 
-void examples::exahype2::euler::Euler::initialCondition(
+void examples::exahype2::euler::EulerOnGPU::initialCondition(
   double * __restrict__ Q,
-  const tarch::la::Vector<Dimensions,double>&  volumeCentre,
+  const tarch::la::Vector<Dimensions,double>&  volumeX,
   const tarch::la::Vector<Dimensions,double>&  volumeH,
-  bool                                         gridIsConstructed
+  bool                                         gridIsConstructred
 ) {
   switch (scenario) {
     case Scenario::PointExplosion:
@@ -149,7 +126,7 @@ void examples::exahype2::euler::Euler::initialCondition(
         #endif
 
         // initial conditions
-        bool isInTheCentre = ( tarch::la::norm2( volumeCentre-circleCentre ) < 0.05 );
+        bool isInTheCentre = ( tarch::la::norm2( volumeX-circleCentre ) < 0.05 );
         Q[0] = 0.1;  // rho
         Q[1] = 0;    // velocities
         Q[2] = 0;
@@ -166,107 +143,16 @@ void examples::exahype2::euler::Euler::initialCondition(
         Q[1] = 0;    // velocities
         Q[2] = 0;
         Q[3] = 0;
-        Q[4] = volumeCentre(0)<0.5 ? 1.0 : 0.0; // inner energy
+        Q[4] = volumeX(0)<0.5 ? 1.0 : 0.0; // inner energy
       }
       break;
   }
 }
 
 
-double examples::exahype2::euler::Euler::maxEigenvalue(
-  const double * __restrict__ Q, // Q[5+0],
-  const tarch::la::Vector<Dimensions,double>&  faceCentre,
-  const tarch::la::Vector<Dimensions,double>&  volumeH,
-  double                                       t,
-  int                                          normal
-) {
-  assertion(normal>=0);
-  assertion(normal<Dimensions);
-  //assertion( Q[0]>0.0 );
-
-  if (Q[0]<=0.0 or Q[0]!=Q[0]) {
-    ::exahype2::triggerNonCriticalAssertion( __FILE__, __LINE__, "Q[0]>0", "density negative" );
-    assertion(false);
-  }
-
-  constexpr double gamma = 1.4;
-  const double irho = 1./Q[0];
-  #if Dimensions==3
-  const double p = (gamma-1) * (Q[4] - 0.5*irho*(Q[1]*Q[1]+Q[2]*Q[2]+Q[3]*Q[3]));
-  #else
-  const double p = (gamma-1) * (Q[4] - 0.5*irho*(Q[1]*Q[1]+Q[2]*Q[2]));
-  #endif
-
-  nonCriticalAssertion9( p>=0.0, Q[0], Q[1], Q[2], Q[3], Q[4], faceCentre, volumeH, t, normal );
-  const double c   = std::sqrt(gamma * p * irho);
-
-  const double u_n = Q[normal + 1] * irho;
-  double result = std::max( std::abs(u_n - c), std::abs(u_n + c) );
-  nonCriticalAssertion14( result>=0.0, result, p, u_n, irho, c, Q[0], Q[1], Q[2], Q[3], Q[4], faceCentre, volumeH, t, normal );
-  return result;
-}
-
-
-void examples::exahype2::euler::Euler::flux(
- const double * __restrict__ Q, // Q[5+0],
- const tarch::la::Vector<Dimensions,double>&  faceCentre,
- const tarch::la::Vector<Dimensions,double>&  volumeH,
- double                                       t,
- int                                          normal,
- double * __restrict__ F // F[5]
-)
-{
-  logTraceInWith4Arguments( "flux(...)", faceCentre, volumeH, t, normal );
-  assertion4( normal>=0, faceCentre, volumeH, t, normal );
-  assertion4( normal<Dimensions, faceCentre, volumeH, t, normal);
-  nonCriticalAssertion9( Q[0]==Q[0], Q[0], Q[1], Q[2], Q[3], Q[4], faceCentre, volumeH, t, normal );
-  nonCriticalAssertion9( Q[1]==Q[1], Q[0], Q[1], Q[2], Q[3], Q[4], faceCentre, volumeH, t, normal );
-  nonCriticalAssertion9( Q[2]==Q[2], Q[0], Q[1], Q[2], Q[3], Q[4], faceCentre, volumeH, t, normal );
-  nonCriticalAssertion9( Q[3]==Q[3], Q[0], Q[1], Q[2], Q[3], Q[4], faceCentre, volumeH, t, normal );
-  nonCriticalAssertion9( Q[4]==Q[4], Q[0], Q[1], Q[2], Q[3], Q[4], faceCentre, volumeH, t, normal );
-
-  if (Q[0]<=1e-12  or Q[0]!=Q[0]) {
-    std::ostringstream msg;
-    msg << "density is negative"
-        << ".faceCentre=" << faceCentre
-        << ",volumeH=" << volumeH
-        << ",normal=" << normal
-        << ",Q[0]=" << Q[0];
-    ::exahype2::triggerNonCriticalAssertion( __FILE__, __LINE__, "Q[0]>0", msg.str() );
-    assertion(false);
-    exit(-1);
-  }
-
-  constexpr double gamma = 1.4;
-  const double irho = 1./Q[0];
-  #if Dimensions==3
-  const double p = (gamma-1) * (Q[4] - 0.5*irho*(Q[1]*Q[1]+Q[2]*Q[2]+Q[3]*Q[3]));
-  #else
-  const double p = (gamma-1) * (Q[4] - 0.5*irho*(Q[1]*Q[1]+Q[2]*Q[2]));
-  #endif
-
-  nonCriticalAssertion( F[0]==F[0] );
-  nonCriticalAssertion( F[1]==F[1] );
-  nonCriticalAssertion( F[2]==F[2] );
-  nonCriticalAssertion( F[3]==F[3] );
-  nonCriticalAssertion( F[4]==F[4] );
-
-  const double coeff = irho*Q[normal+1];
-  F[0] = coeff*Q[0];
-  F[1] = coeff*Q[1];
-  F[2] = coeff*Q[2];
-  F[3] = coeff*Q[3];
-  F[4] = coeff*Q[4];
-  F[normal+1] += p;
-  F[4]        += coeff*p;
-
-  logTraceOutWith4Arguments( "flux(...)", faceCentre, volumeH, t, normal );
-}
-
-
-void examples::exahype2::euler::Euler::boundaryConditions(
-  const double * __restrict__                  Qinside,    // Qinside[5+0]
-  double * __restrict__                        Qoutside,   // Qoutside[5+0]
+void examples::exahype2::euler::EulerOnGPU::boundaryConditions(
+  const double * __restrict__                  Qinside, // Qinside[5+0]
+  double * __restrict__                        Qoutside, // Qoutside[5+0]
   const tarch::la::Vector<Dimensions,double>&  faceCentre,
   const tarch::la::Vector<Dimensions,double>&  volumeH,
   double                                       t,
@@ -290,4 +176,125 @@ void examples::exahype2::euler::Euler::boundaryConditions(
 
   logTraceOut( "boundaryConditions(...)" );
 }
+
+
+double ::examples::exahype2::euler::EulerOnGPU::maxEigenvalue(
+  const double * __restrict__ Q, // Q[5+0],
+  const tarch::la::Vector<Dimensions,double>&  faceCentre,
+  const tarch::la::Vector<Dimensions,double>&  volumeH,
+  double                                       t,
+  int                                          normal
+)  {
+  logTraceInWith4Arguments( "maxEigenvalue(...)", faceCentre, volumeH, t, normal );
+  double result = maxEigenvalue( Q, faceCentre, volumeH, t, normal, Offloadable::Yes );
+  logTraceOutWith1Argument( "maxEigenvalue(...)", result );
+  return result;
+}
+
+
+void ::examples::exahype2::euler::EulerOnGPU::flux(
+  const double * __restrict__ Q, // Q[5+0],
+  const tarch::la::Vector<Dimensions,double>&  faceCentre,
+  const tarch::la::Vector<Dimensions,double>&  volumeH,
+  double                                       t,
+  int                                          normal,
+  double * __restrict__ F // F[5]
+)  {
+  logTraceInWith4Arguments( "flux(...)", faceCentre, volumeH, t, normal );
+  flux( Q, faceCentre, volumeH, t, normal, F, Offloadable::Yes );
+  logTraceOut( "flux(...)" );
+}
+
+
+
+    #if defined(OpenMPGPUOffloading)
+    #pragma omp declare target
+    #endif
+/**
+ * The big difference between the normal Euler and the GPU version is
+ * that the PDE terms are stateless (static). So we have always two
+ * versions of the PDE terms: one with state and one without.
+ *
+ * To avoid code duplication, we let the non-static versions of the terms
+ * call the static ones. In our case, they do the same. But in principle,
+ * you can have different ones if something "weird"/special happens along
+ * resolution boundaries, e.g., or in certain subdomains.
+ *
+ * Now, our static flux function and eigenvalue function does not differ
+ * from the non-static one of the standard Euler. It only lacks some
+ * logging and assertions, as these features are not available on the GPU.
+ */
+double ::examples::exahype2::euler::EulerOnGPU::maxEigenvalue(
+  const double * __restrict__ Q, // Q[5+0],
+  const tarch::la::Vector<Dimensions,double>&  faceCentre,
+  const tarch::la::Vector<Dimensions,double>&  volumeH,
+  double                                       t,
+  int                                          normal,
+  Offloadable
+)  {
+  constexpr double gamma = 1.4;
+  const double irho = 1./Q[0];
+  #if Dimensions==3
+  const double p = (gamma-1) * (Q[4] - 0.5*irho*(Q[1]*Q[1]+Q[2]*Q[2]+Q[3]*Q[3]));
+  #else
+  const double p = (gamma-1) * (Q[4] - 0.5*irho*(Q[1]*Q[1]+Q[2]*Q[2]));
+  #endif
+
+  const double u_n = Q[normal + 1] * irho;
+  const double c   = std::sqrt(gamma * p * irho);
+
+  double result = std::max( std::abs(u_n - c), std::abs(u_n + c) );
+  return result;
+}
+    #if defined(OpenMPGPUOffloading)
+    #pragma omp end declare target
+    #endif
+
+
+
+
+    #if defined(OpenMPGPUOffloading)
+    #pragma omp declare target
+    #endif
+void ::examples::exahype2::euler::EulerOnGPU::flux(
+  const double * __restrict__ Q, // Q[5+0],
+  const tarch::la::Vector<Dimensions,double>&  faceCentre,
+  const tarch::la::Vector<Dimensions,double>&  volumeH,
+  double                                       t,
+  int                                          normal,
+  double * __restrict__ F,
+  Offloadable
+)  {
+  constexpr double gamma = 1.4;
+  const double irho = 1./Q[0];
+  #if Dimensions==3
+  const double p = (gamma-1) * (Q[4] - 0.5*irho*(Q[1]*Q[1]+Q[2]*Q[2]+Q[3]*Q[3]));
+  #else
+  const double p = (gamma-1) * (Q[4] - 0.5*irho*(Q[1]*Q[1]+Q[2]*Q[2]));
+  #endif
+
+  nonCriticalAssertion( F[0]==F[0] );
+  nonCriticalAssertion( F[1]==F[1] );
+  nonCriticalAssertion( F[2]==F[2] );
+  nonCriticalAssertion( F[3]==F[3] );
+  nonCriticalAssertion( F[4]==F[4] );
+
+  const double coeff = irho*Q[normal+1];
+  F[0] = coeff*Q[0];
+  F[1] = coeff*Q[1];
+  F[2] = coeff*Q[2];
+  F[3] = coeff*Q[3];
+  F[4] = coeff*Q[4];
+  F[normal+1] += p;
+  F[4]        += coeff*p;
+}
+    #if defined(OpenMPGPUOffloading)
+    #pragma omp end declare target
+    #endif
+
+
+
+
+
+
 
