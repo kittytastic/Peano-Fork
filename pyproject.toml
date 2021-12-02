@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "python"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+
+[tool.poetry.dependencies]
+python=">=3.7,<3.11"
+exahype2 = {path = "./poetry/exahype2", develop = true}
+peano4 = {path = "./poetry/peano4", develop = true}
+dastgen2 = {path = "./poetry/dastgen2", develop = true}
+scripts = {path = "./poetry/scripts", develop = true}
+
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+tf-output = "scripts.scripts:main"
