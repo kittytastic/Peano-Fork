@@ -14,3 +14,35 @@ src/unittests/UnitTests3d
 !.gitlab-ci.yml
 
 /cookbook/
+
+# Libtool artifacts
+*Makefile
+*Makefile.in
+aclocal.m4
+ar-lib
+autom4te.cache
+compile
+config.guess
+config.h.in
+config.sub
+configure
+depcomp
+install-sh
+ltmain.sh
+m4/libtool.m4
+m4/lt~obsolete.m4
+missing
+src/config.h.in
+test-driver
+
+# Configure artifacts
+config.h
+config.log
+config.status
+libtool
+src/config.h
+src/stamp-h1
+stamp-h2
+
+# Bindir workaround
+bindir/*
