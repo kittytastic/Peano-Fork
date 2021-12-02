@@ -43,6 +43,3 @@ libtool
 src/config.h
 src/stamp-h1
 stamp-h2
-
-# Bindir workaround
-bindir/*
