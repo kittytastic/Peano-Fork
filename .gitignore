@@ -46,3 +46,6 @@ stamp-h2
 
 # Bindir workaround
 bindir/*
+
+# Poetry
+poetry.lock
