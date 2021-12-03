@@ -1,2 +1,6 @@
 !*Makefile
 base_2d_euler/Euler2D
+
+*readme.*.md
+
+*.pvd
