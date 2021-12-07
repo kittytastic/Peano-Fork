@@ -26,7 +26,7 @@ namespace base_2d_euler{
   constexpr auto PlotterPrecision = 5;
   const std::bitset<2> PeriodicBC = 0;
   const std::string BuildInformation = "python3  euler2D.py";
-  const std::string ConfigureInformation = "$ ./configure --enable-exahype --enable-blockstructured --enable-loadbalancing --bindir=/home/jack/dis/newPeano/Peano/bindir";
+  const std::string ConfigureInformation = "$ ./configure --enable-exahype --enable-blockstructured --enable-loadbalancing --bindir=/home/jack/dis/Peano/bindir";
 
 }
 }

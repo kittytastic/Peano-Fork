@@ -5,12 +5,12 @@
 .PHONY: all solver clean
 
 
-CXX = g++
+CXX = icpx
 FC  = gfortran
 DIMENSIONS = 2
 
 
-CXXFLAGS += -I. -I../..//src -std=c++17 -DDimensions=2 -DPeanoDebug=0
+CXXFLAGS += -I. -I../..//src -std=c++17 -O3 -qopenmp -g3 -DDimensions=2 -DPeanoDebug=0
 LDFLAGS  += -L/home/jack/dis/newPeano/Peano/src  -L/home/jack/dis/newPeano/Peano/src/toolbox/loadbalancing  -L/home/jack/dis/newPeano/Peano/src/toolbox/blockstructured  -L/home/jack/dis/newPeano/Peano/src/exahype2  
 LIBS +=  -L../..//src -lExaHyPE2Core2d          -lToolboxBlockstructured2d          -lToolboxLoadBalancing2d          -lPeano4Core2d         -lTarch
 
