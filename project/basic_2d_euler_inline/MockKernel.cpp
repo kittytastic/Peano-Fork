@@ -27,8 +27,9 @@ void exahype2::fv::ck::compliedKernel (
     tarch::la::Vector<2, double> volumeH = exahype2::fv::ck::getVolumeSize(
       patchSize, numberOfVolumesPerAxisInPatch); // Calc h for h/w
 
-    double * numericalFluxL = ::tarch::allocateMemory(unknowns, tarch::MemoryLocation::Heap);
-    double * numericalFluxR = ::tarch::allocateMemory(unknowns, tarch::MemoryLocation::Heap);
+
+    double numericalFluxL[unknowns]; 
+    double numericalFluxR[unknowns]; 
 
     // --------------- Source -------------------
     for (int x = 0; x < numberOfVolumesPerAxisInPatch; x++)
@@ -52,6 +53,7 @@ void exahype2::fv::ck::compliedKernel (
         Qout[voxelInImage * (unknowns + auxiliaryVariables) + unknown] += dt * numericalFluxL[unknown];
         }
     }
+    return;
 
     // ------------- Flux 1 ---------------------
     // Left - Right
@@ -125,8 +127,6 @@ void exahype2::fv::ck::compliedKernel (
         }
   }
   
-  ::tarch::freeMemory(numericalFluxL, tarch::MemoryLocation::Heap);
-  ::tarch::freeMemory(numericalFluxR, tarch::MemoryLocation::Heap);
   logTraceOut( "applySplit1DRiemannToPatch_Overlap1AoS2d(...)" );
 }
     
@@ -147,10 +147,8 @@ void exahype2::fv::ck::splitRusanov1d(
   assertion(normal<Dimensions);
 
     
-    double * fluxFL;
-    double * fluxFR;
-    fluxFL   = ::tarch::allocateMemory(unknowns, tarch::MemoryLocation::Heap);
-    fluxFR   = ::tarch::allocateMemory(unknowns, tarch::MemoryLocation::Heap);
+    double fluxFL[unknowns];
+    double fluxFR[unknowns];
     for (int i=0;i<unknowns;i++) fluxFL[i]=0;
     for (int i=0;i<unknowns;i++) fluxFR[i]=0;
 
@@ -175,8 +173,6 @@ void exahype2::fv::ck::splitRusanov1d(
         FR[unknown] = new_flux; 
     }
 
-    ::tarch::freeMemory(fluxFL,   tarch::MemoryLocation::Heap);
-    ::tarch::freeMemory(fluxFR,   tarch::MemoryLocation::Heap);  
 };
 
 void exahype2::fv::ck::flux(
