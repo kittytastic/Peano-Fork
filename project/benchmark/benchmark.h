@@ -9,15 +9,10 @@
 #include <string>
 #include <cassert>
 
-void do_smth(){
-    int b =0;
-    for(int i =0; i<10000000; i++){
-        b++;
-    }
-    return;
-}
 
 
+namespace benchmark{
+namespace core{
 std::pair<double, double> calc_mean_std(std::vector<long long> v){
 
     double sum = std::accumulate(v.begin(), v.end(), 0.0);
@@ -91,7 +86,14 @@ int by_time(std::function<void()> func, double target_dur_s , std::vector<long l
 
     return done_trials;
 }
-
+}
+/**
+ * @brief Benchmark the runtime of a function.
+ * 
+ * @param func The function to be benchmark 
+ * @param trials [Optional] The number of trials 
+ * @param target_dur_s [Optional] The target test duration (in s)
+ */
 void benchmark(std::function<void()> func, std::optional<int> trials, std::optional<double> target_dur_s){
     
     if(!trials.has_value() && !target_dur_s.has_value()){
@@ -106,15 +108,15 @@ void benchmark(std::function<void()> func, std::optional<int> trials, std::optio
 
     auto g1 = std::chrono::high_resolution_clock::now();
     if (trials.has_value()){
-        done_trials = by_trials(func, trials.value(), observed_run_times);
+        done_trials = core::by_trials(func, trials.value(), observed_run_times);
     }else if(target_dur_s.has_value()){
-        done_trials = by_time(func, target_dur_s.value(), observed_run_times);
+        done_trials = core::by_time(func, target_dur_s.value(), observed_run_times);
     }
 
     auto g2 = std::chrono::high_resolution_clock::now();
     assert(done_trials==observed_run_times.size());
 
-    auto m_a_s = calc_mean_std(observed_run_times);
+    auto m_a_s = core::calc_mean_std(observed_run_times);
     double mean = m_a_s.first/1000;
     double std = m_a_s.second/1000;
     long long global_run_time = std::chrono::duration_cast<std::chrono::nanoseconds>(g2 - g1).count();
@@ -123,14 +125,9 @@ void benchmark(std::function<void()> func, std::optional<int> trials, std::optio
     const int lfw = 20;
     const int rfw = 10;
     std::cout << std::setw(lfw) << std::left << "Trials:" << std::setw(rfw) << std::right << done_trials << std::endl; 
-    std::cout << std::setw(lfw) << std::left<< "Total run time:"<< std::setw(rfw) << std::right<<smart_print_time(global_run_time)<< std::endl;
-    std::cout << std::setw(lfw) << std::left<< "Mean run time:"<< std::setw(rfw) << std::right << smart_print_time((long long)mean) << std::endl;
-    std::cout << std::setw(lfw) << std::left<< "STD:"<< std::setw(rfw) << std::right << smart_print_time((long long)std)<< std::endl;
+    std::cout << std::setw(lfw) << std::left<< "Total run time:"<< std::setw(rfw) << std::right<<core::smart_print_time(global_run_time)<< std::endl;
+    std::cout << std::setw(lfw) << std::left<< "Mean run time:"<< std::setw(rfw) << std::right << core::smart_print_time((long long)mean) << std::endl;
+    std::cout << std::setw(lfw) << std::left<< "STD:"<< std::setw(rfw) << std::right << core::smart_print_time((long long)std)<< std::endl;
+}
 }
 
-
-
-int main(){
-    benchmark(do_smth, std::nullopt, 6);   
-    return 0;    
-}
