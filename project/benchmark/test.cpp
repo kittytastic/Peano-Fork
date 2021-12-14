@@ -9,6 +9,6 @@ void do_smth(){
 }
 
 int main(){
-    benchmark::benchmark(do_smth, std::nullopt, 6);   
+    benchmark::benchmark(do_smth, benchmark::NONE, 6);   
     return 0;    
 }

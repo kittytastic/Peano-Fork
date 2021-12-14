@@ -129,5 +129,7 @@ void benchmark(std::function<void()> func, std::optional<int> trials, std::optio
     std::cout << std::setw(lfw) << std::left<< "Mean run time:"<< std::setw(rfw) << std::right << core::smart_print_time((long long)mean) << std::endl;
     std::cout << std::setw(lfw) << std::left<< "STD:"<< std::setw(rfw) << std::right << core::smart_print_time((long long)std)<< std::endl;
 }
+
+const auto NONE = std::nullopt;
 }
 
