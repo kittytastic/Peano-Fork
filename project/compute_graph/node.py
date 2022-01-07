@@ -13,6 +13,9 @@ class PortDoesntExist(Exception):
 class BadEvalArgs(Exception):
     pass
 
+class InvalidGraph(Exception):
+    pass
+
 NodePort = Tuple['Node', int]
 OutPort = NewType('OutPort', NodePort)
 InPort = NewType('InPort', NodePort)
@@ -30,7 +33,13 @@ class Node(ABC):
 
     def visualize(self, dot:graphviz.Digraph)->None:
         raise MethodNotImplemented(f"Parent class: {self.__class__.__name__}")
-
+ 
+    def eval(self, input:List[Any])->List[Any]:
+        raise MethodNotImplemented(f"Parent class: {self.__class__.__name__}")
+    
+    def validate(self)->bool:
+        raise MethodNotImplemented(f"Parent class: {self.__class__.__name__}")
+    
     def __hash__(self) -> int:
         return self.id
 
@@ -70,16 +79,18 @@ class Graph(Node):
         self._edges[key] = value
 
     
-    def visualize(self, dot: graphviz.Digraph):
-        all_nodes:set[Node] = set(self.input_interface)
-        all_nodes = all_nodes.union(self.output_interface)
-        all_nodes = all_nodes.union(set([n for n,_ in self._edges.keys()]))
+    def _get_sub_nodes(self)->Set[Node]:
+        sub_nodes:set[Node] = set(self.input_interface)
+        sub_nodes = sub_nodes.union(self.output_interface)
+        sub_nodes = sub_nodes.union(set([n for n,_ in self._edges.keys()]))
         for nps in self._edges.values():
-            print(nps)
-            all_nodes = all_nodes.union([n for n,_ in nps])
+            sub_nodes = sub_nodes.union([n for n,_ in nps])
 
+        return sub_nodes
 
-        print(all_nodes)
+    def visualize(self, dot: graphviz.Digraph):
+        all_nodes = self._get_sub_nodes()
+
         for node in all_nodes:
             node.visualize(dot)
 
@@ -88,6 +99,36 @@ class Graph(Node):
             for to_node,_ in to_ports:
                 dot.edge(str(from_node.id), str(to_node.id)) # type:ignore 
 
+    def validate(self) -> bool:
+        sub_nodes = self._get_sub_nodes()
+        require_full_input = sub_nodes - set(self.input_interface)
+
+        ports_to_fullfill:Set[InPort] = set()
+        for n in require_full_input:
+            ports_to_fullfill.update([InPort((n, i)) for i in range(n.num_inputs)])
+
+        ports_already_filled:Set[InPort] = set()
+        errors:List[str] = []
+
+        for set_op in self._edges.values():
+            for in_port in set_op:
+                if in_port in ports_already_filled:
+                    errors.append(f"Port: {in_port} has already been used")
+
+
+                if in_port not in ports_to_fullfill:
+                    errors.append(f"Port: {in_port} filled in graph, but isn't in graph")
+                 
+
+                ports_to_fullfill.discard(in_port)
+                ports_already_filled.add(in_port)
+
+        
+        if len(ports_to_fullfill)!=0:
+            first_missing_ports:List[InPort] = list(ports_to_fullfill)[:min(len(ports_to_fullfill), 3)]
+            errors.append(f"{len(ports_to_fullfill)} Unfilled ports: {','.join([str(p) for p in first_missing_ports])}")
+
+        return errors
 
     def add_edge(self, from_node:NodePort, to_node:NodePort):
         from_node = OutPort(from_node)
@@ -118,7 +159,19 @@ class Add(Node):
     def __repr__(self):
         return f"Add-{super().__repr__()}"
         
+class Subtract(Node):
+    def __init__(self,):
+        super().__init__(2, 1)
 
+    def eval(self, input: List[Any])->List[Any]:
+        assert_valid_eval(2, len(input))
+        return input[0]-input[1]
+    
+    def visualize(self, dot: graphviz.Digraph):
+        dot.node(str(self.id), f"-") # type:ignore
+
+    def __repr__(self):
+        return f"Sub-{super().__repr__()}"
 
 def assert_valid_eval(required_inputs:int, seen_inputs:int):
     if required_inputs!=seen_inputs:
@@ -178,11 +231,19 @@ def Euler2D_X()->Graph:
 
 if __name__=="__main__":
     g=Graph(2,3)
-    add = Add(3)
+    add = Add(2)
+    sub = Subtract()
     g.add_edge(g.get_internal_input(0), g.get_internal_output(0))
-    g.add_edge(g.get_internal_input(1), g.get_internal_output(2))
+    
     g.add_edge(g.get_internal_input(0), (add,0))
-    g.add_edge(g.get_internal_input(1), (add,1))
-    g.add_edge((add,0), g.get_internal_output(1))
+    g.add_edge(g.get_internal_input(1), (add,0))
+    #g.add_edge(g.get_internal_input(1), (add,1))
+    #g.add_edge((add,0), g.get_internal_output(1))
+    
+    g.add_edge(g.get_internal_input(0), (sub,0))
+    g.add_edge(g.get_internal_input(1), (sub,1))
+    g.add_edge((sub,0), g.get_internal_output(2))
+    e_msg = '\n'.join([e for e in g.validate()])
+    print(f"Errors:\n{e_msg}")
     #g = Euler2D_X()
     visualize_graph(g)
