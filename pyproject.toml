@@ -11,6 +11,7 @@ peano4 = {path = "./poetry/peano4", develop = true}
 dastgen2 = {path = "./poetry/dastgen2", develop = true}
 scripts = {path = "./poetry/scripts", develop = true}
 sympy = "^1.9"
+graphviz = "^0.19.1"
 
 
 [tool.poetry.dev-dependencies]
