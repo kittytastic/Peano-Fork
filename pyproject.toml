@@ -10,6 +10,7 @@ exahype2 = {path = "./poetry/exahype2", develop = true}
 peano4 = {path = "./poetry/peano4", develop = true}
 dastgen2 = {path = "./poetry/dastgen2", develop = true}
 scripts = {path = "./poetry/scripts", develop = true}
+sympy = "^1.9"
 
 
 [tool.poetry.dev-dependencies]
