@@ -1,4 +1,4 @@
-from typing import Dict, Optional, Set
+from typing import Any, Dict, List, NewType, Optional, Set, Tuple
 import graphviz # type: ignore
 from abc import ABC
 import os
@@ -7,16 +7,28 @@ import os
 class MethodNotImplemented(Exception):
     pass
 
-GraphEdges = Dict['Node', Set['Node']]
+class PortDoesntExist(Exception):
+    pass
+
+class BadEvalArgs(Exception):
+    pass
+
+NodePort = Tuple['Node', int]
+OutPort = NewType('OutPort', NodePort)
+InPort = NewType('InPort', NodePort)
+GraphEdges = Dict[OutPort, Set[InPort]]
 
 class Node(ABC):
     next_global_id = 0
 
-    def __init__(self):
+    def __init__(self, num_inputs:int, num_outputs:int):
         self.id = Node.next_global_id
         Node.next_global_id +=1
+        
+        self.num_inputs = num_inputs
+        self.num_outputs = num_outputs        
 
-    def visualize_node(self, dot:graphviz.Digraph)->None:
+    def visualize(self, dot:graphviz.Digraph)->None:
         raise MethodNotImplemented(f"Parent class: {self.__class__.__name__}")
 
     def __hash__(self) -> int:
@@ -28,78 +40,103 @@ class Node(ABC):
     def __repr__(self) -> str:
         return f"Node_{self.id}"
 
-class PlaceHolderNode(Node):
-    def __init__(self, name:str):
-        super().__init__()
-        self.name = name
-
-    def visualize_node(self, dot: graphviz.Digraph):
-        dot.node(str(self.id), f"{self.name}") # type:ignore
-
-    def __repr__(self):
-        return f"{super().__repr__()}-PH-{self.name}"
-
-
-class GraphInput(Node):
-    def __init__(self, g: 'Graph', idx:int):
-        super().__init__()
-        self.parent_g = g
-        self.idx = idx
-
-    def visualize_node(self, dot: graphviz.Digraph):
-        dot.node(str(self.id), f"Gin_{self.idx}") # type:ignore
-
-    def __repr__(self):
-        return f"{super().__repr__()}-Gin_{self.idx}"
-
-class GraphOutput(Node):
-    def __init__(self, g: 'Graph', idx:int):
-        super().__init__()
-        self.parent_g = g
-        self.idx = idx
+class PassThroughNode(Node):
+    def __init__(self):
+        super().__init__(1, 1)
     
-    def visualize_node(self, dot: graphviz.Digraph):
-        dot.node(str(self.id), f"Gout_{self.idx}") # type:ignore
+    def visualize(self, dot: graphviz.Digraph):
+        dot.node(str(self.id), f"{self.id}") # type:ignore
 
     def __repr__(self):
-        return f"{super().__repr__()}-Gout_{self.idx}"
+        return f"PT-{super().__repr__()}"
 
-class Graph():
+class Graph(Node):
     def __init__(self, inputs: int, outputs: int):
-        self.inputs = [GraphInput(self, i) for i in range(inputs)]
-        self.outputs = [GraphOutput(self, i) for i in range(outputs)]
+        super().__init__(inputs, outputs)
         self._edges: GraphEdges = {}
+        self.input_interface = [PassThroughNode() for _ in range(inputs)]
+        self.output_interface = [PassThroughNode() for _ in range(outputs)]
 
-    def __getitem__(self, key:Node)->Set[Node]:
+    def get_internal_input(self, idx:int)->OutPort:
+        return OutPort((self.input_interface[idx], 0))
+
+    def get_internal_output(self, idx:int)->InPort:
+        return InPort((self.output_interface[idx], 0))
+
+    def __getitem__(self, key:OutPort)->Set[InPort]:
         return self._edges[key]
 
-    def __setitem__(self, key:Node, value:Set['Node']):
+    def __setitem__(self, key:OutPort, value:Set[InPort]):
         self._edges[key] = value
 
+    
     def visualize(self, dot: graphviz.Digraph):
-        all_nodes = set(self._edges.keys())
-        for n in self._edges.values():
-            print(n)
-            all_nodes = all_nodes.union(n)
+        all_nodes:set[Node] = set(self.input_interface)
+        all_nodes = all_nodes.union(self.output_interface)
+        all_nodes = all_nodes.union(set([n for n,_ in self._edges.keys()]))
+        for nps in self._edges.values():
+            print(nps)
+            all_nodes = all_nodes.union([n for n,_ in nps])
+
 
         print(all_nodes)
         for node in all_nodes:
-            node.visualize_node(dot)
+            node.visualize(dot)
 
-        for from_node, to_nodes in self._edges.items():
-            for to_node in to_nodes:
+        for from_port, to_ports in self._edges.items():
+            from_node, _ = from_port 
+            for to_node,_ in to_ports:
                 dot.edge(str(from_node.id), str(to_node.id)) # type:ignore 
 
-    def add_edge(self, from_node:Node, to_node:Node):
+
+    def add_edge(self, from_node:NodePort, to_node:NodePort):
+        from_node = OutPort(from_node)
+        to_node = InPort(to_node)
+        assert_out_port_exists(from_node)
+        assert_in_port_exists(to_node)
+
         if from_node in self._edges:
             self._edges[from_node].add(to_node)
         else:
             self._edges[from_node]={to_node}
 
+    def __repr__(self) -> str:
+        return f"Graph-{self.id}"
 
+
+class Add(Node):
+    def __init__(self, num_inputs: int):
+        super().__init__(num_inputs, 1)
+
+    def eval(self, input: List[Any])->List[Any]:
+        assert_valid_eval(self.num_inputs, len(input))
+        return [sum(input)]
+    
+    def visualize(self, dot: graphviz.Digraph):
+        dot.node(str(self.id), f"+") # type:ignore
+
+    def __repr__(self):
+        return f"Add-{super().__repr__()}"
+        
+
+
+def assert_valid_eval(required_inputs:int, seen_inputs:int):
+    if required_inputs!=seen_inputs:
+        raise BadEvalArgs()
+
+def assert_in_port_exists(node_port:InPort):
+    node, port = node_port
+    if port>=node.num_inputs or port<0:
+        raise PortDoesntExist(f"Input port {port} for node {node}")
+
+
+def assert_out_port_exists(node_port:OutPort):
+    node, port = node_port
+    if port>=node.num_outputs or port<0:
+        raise PortDoesntExist(f"Output port {port} for node {node}")
 
 def visualize_graph(g: Graph, out_path:str="Artifacts", out_file_name:str="tmp"):
-    dot = graphviz.Digraph(comment='The Round Table')
+    dot = graphviz.Digraph()
     g.visualize(dot)
 
     dot_file_name = os.path.join(out_path, f"{out_file_name}.dot")
@@ -109,6 +146,7 @@ def visualize_graph(g: Graph, out_path:str="Artifacts", out_file_name:str="tmp")
     dot.render(dot_file_name) #type:ignore
 
 
+'''
 def Euler2D_X()->Graph:
     g = Graph(4,4)
     p = PlaceHolderNode("p")
@@ -136,7 +174,15 @@ def Euler2D_X()->Graph:
 
     g.add_edge(g.inputs[3], g.outputs[3])
     return g
+'''
 
 if __name__=="__main__":
-    g = Euler2D_X()
+    g=Graph(2,3)
+    add = Add(3)
+    g.add_edge(g.get_internal_input(0), g.get_internal_output(0))
+    g.add_edge(g.get_internal_input(1), g.get_internal_output(2))
+    g.add_edge(g.get_internal_input(0), (add,0))
+    g.add_edge(g.get_internal_input(1), (add,1))
+    g.add_edge((add,0), g.get_internal_output(1))
+    #g = Euler2D_X()
     visualize_graph(g)
