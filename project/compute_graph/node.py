@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional, Set
+from typing import Dict, Optional, Set
 import graphviz # type: ignore
 from abc import ABC
 import os
@@ -12,11 +12,9 @@ GraphEdges = Dict['Node', Set['Node']]
 class Node(ABC):
     next_global_id = 0
 
-    def __init__(self, in_degree: Optional[int], out_degree: Optional[int]):
+    def __init__(self):
         self.id = Node.next_global_id
         Node.next_global_id +=1
-        self.in_degree = in_degree
-        self.out_degree = out_degree
 
     def visualize_node(self, dot:graphviz.Digraph)->None:
         raise MethodNotImplemented(f"Parent class: {self.__class__.__name__}")
@@ -30,11 +28,21 @@ class Node(ABC):
     def __repr__(self) -> str:
         return f"Node_{self.id}"
 
+class PlaceHolderNode(Node):
+    def __init__(self, name:str):
+        super().__init__()
+        self.name = name
+
+    def visualize_node(self, dot: graphviz.Digraph):
+        dot.node(str(self.id), f"{self.name}") # type:ignore
+
+    def __repr__(self):
+        return f"{super().__repr__()}-PH-{self.name}"
 
 
 class GraphInput(Node):
     def __init__(self, g: 'Graph', idx:int):
-        super().__init__(None, None)
+        super().__init__()
         self.parent_g = g
         self.idx = idx
 
@@ -46,7 +54,7 @@ class GraphInput(Node):
 
 class GraphOutput(Node):
     def __init__(self, g: 'Graph', idx:int):
-        super().__init__(None, None)
+        super().__init__()
         self.parent_g = g
         self.idx = idx
     
@@ -90,9 +98,6 @@ class Graph():
 
 
 
-
-
-
 def visualize_graph(g: Graph, out_path:str="Artifacts", out_file_name:str="tmp"):
     dot = graphviz.Digraph(comment='The Round Table')
     g.visualize(dot)
@@ -101,13 +106,37 @@ def visualize_graph(g: Graph, out_path:str="Artifacts", out_file_name:str="tmp")
     with open(dot_file_name, "w+") as f:
         f.write(dot.source)
 
-    dot.render(dot_file_name)
+    dot.render(dot_file_name) #type:ignore
+
+
+def Euler2D_X()->Graph:
+    g = Graph(4,4)
+    p = PlaceHolderNode("p")
+    irho = PlaceHolderNode("irho")
+    g.add_edge(g.inputs[0], p)
+    g.add_edge(g.inputs[1], p)
+    g.add_edge(g.inputs[2], p)
+    g.add_edge(g.inputs[3], p)
+
+    g.add_edge(g.inputs[0], irho)
+    
+    g.add_edge(irho, g.outputs[1])
+    g.add_edge(irho, g.outputs[2])
+    g.add_edge(irho, g.outputs[3])
+
+    g.add_edge(p, g.outputs[2])
+    g.add_edge(p, g.outputs[3])
+
+    g.add_edge(g.inputs[1], g.outputs[1])
+
+    g.add_edge(g.inputs[2], g.outputs[0])
+    g.add_edge(g.inputs[2], g.outputs[1])
+    g.add_edge(g.inputs[2], g.outputs[2])
+    g.add_edge(g.inputs[2], g.outputs[3])
+
+    g.add_edge(g.inputs[3], g.outputs[3])
+    return g
 
 if __name__=="__main__":
-    g = Graph(2,3)
-    g.add_edge(g.inputs[0], g.outputs[0])
-    g.add_edge(g.inputs[0], g.outputs[1])
-    g.add_edge(g.inputs[1], g.outputs[1])
-    g.add_edge(g.inputs[1], g.outputs[2])
-
+    g = Euler2D_X()
     visualize_graph(g)
