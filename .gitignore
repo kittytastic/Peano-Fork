@@ -49,3 +49,13 @@ bindir/*
 
 # Poetry
 poetry.lock
+
+# Latex
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+*.xdv
+*.pdf
