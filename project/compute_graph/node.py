@@ -10,8 +10,10 @@ class MethodNotImplemented(Exception):
 class PortDoesntExist(Exception):
     pass
 
-class BadEvalArgs(Exception):
+class BadEval(Exception):
     pass
+
+
 
 class InvalidGraph(Exception):
     pass
@@ -20,6 +22,18 @@ NodePort = Tuple['Node', int]
 OutPort = NewType('OutPort', NodePort)
 InPort = NewType('InPort', NodePort)
 GraphEdges = Dict[OutPort, Set[InPort]]
+
+
+def assert_in_port_exists(node_port:InPort):
+    node, port = node_port
+    if port>=node.num_inputs or port<0:
+        raise PortDoesntExist(f"Input port {port} for node {node}")
+
+
+def assert_out_port_exists(node_port:OutPort):
+    node, port = node_port
+    if port>=node.num_outputs or port<0:
+        raise PortDoesntExist(f"Output port {port} for node {node}")
 
 class Node(ABC):
     next_global_id = 0
@@ -34,7 +48,18 @@ class Node(ABC):
     def visualize(self, dot:graphviz.Digraph)->None:
         raise MethodNotImplemented(f"Parent class: {self.__class__.__name__}")
  
-    def eval(self, input:List[Any])->List[Any]:
+    def eval(self, input_data:List[Any])->List[Any]:
+        if len(input_data)!= self.num_inputs:
+            raise BadEval(f"Node {str(self)} was given a bad number of eval inputs, expected: {self.num_inputs} but received: {len(input_data)}")
+
+        outputs = self._eval(input_data)
+
+        if len(outputs)!=self.num_outputs:
+            raise BadEval(f"Node {str(self)} produced a bad number of outputs, expected: {self.num_outputs} but received: {len(outputs)}")
+
+        return outputs
+    
+    def _eval(self, inputs:List[Any])->List[Any]:
         raise MethodNotImplemented(f"Parent class: {self.__class__.__name__}")
     
     def validate(self)->bool:
@@ -50,21 +75,28 @@ class Node(ABC):
         return f"Node_{self.id}"
 
 class PassThroughNode(Node):
-    def __init__(self):
+    def __init__(self, name:Optional[str] = None):
+        self.name = name
         super().__init__(1, 1)
     
     def visualize(self, dot: graphviz.Digraph):
-        dot.node(str(self.id), f"{self.id}") # type:ignore
+        dot.node(str(self.id), f"{str(self)}") # type:ignore
+    
+    def _eval(self, inputs: List[Any])->List[Any]:
+        return [inputs[0]]
 
     def __repr__(self):
-        return f"PT-{super().__repr__()}"
+        if self.name:
+            return f"{self.name}"
+        else:
+            return f"PT-{super().__repr__()}"
 
 class Graph(Node):
     def __init__(self, inputs: int, outputs: int):
         super().__init__(inputs, outputs)
         self._edges: GraphEdges = {}
-        self.input_interface = [PassThroughNode() for _ in range(inputs)]
-        self.output_interface = [PassThroughNode() for _ in range(outputs)]
+        self.input_interface = [PassThroughNode(name=f"input{_}") for _ in range(inputs)]
+        self.output_interface = [PassThroughNode(name=f"output{_}") for _ in range(outputs)]
 
     def get_internal_input(self, idx:int)->OutPort:
         return OutPort((self.input_interface[idx], 0))
@@ -128,6 +160,8 @@ class Graph(Node):
             first_missing_ports:List[InPort] = list(ports_to_fullfill)[:min(len(ports_to_fullfill), 3)]
             errors.append(f"{len(ports_to_fullfill)} Unfilled ports: {','.join([str(p) for p in first_missing_ports])}")
 
+        # TODO check for cycles
+
         return errors
 
     def add_edge(self, from_node:NodePort, to_node:NodePort):
@@ -144,14 +178,57 @@ class Graph(Node):
     def __repr__(self) -> str:
         return f"Graph-{self.id}"
 
+    def _eval(self, inputs: List[Any])->List[Any]:
+
+        sub_nodes = self._get_sub_nodes()
+        node_requirements:Dict[Node, Set[int]] = {n: set(range(n.num_inputs)) for n in sub_nodes if n not in self.input_interface} 
+        port_input_data:Dict[InPort, Any] = {InPort((self.input_interface[i], 0)):inputs[i] for i in range(self.num_inputs)}
+        port_output_data:Dict[OutPort, Any] = {}
+        ready_nodes:Set[Node] =  set(self.input_interface)
+        complete_nodes: Set[Node] = set()
+
+        while len(ready_nodes)>0:
+            next_node = next(iter(ready_nodes))
+            ready_nodes.remove(next_node)
+            complete_nodes.add(next_node)
+            print("New iteration")
+            print(f"Next node {next_node}")
+
+            # compute node
+            input_data = [port_input_data[InPort((next_node, i))] for i in range(next_node.num_inputs)]
+            output = next_node.eval(input_data)
+
+            # update port output
+            for idx, data in enumerate(output):
+                op = OutPort((next_node, idx))
+                port_output_data[op] = data
+
+                if op in self._edges:    
+                    for dependent_port in self._edges[op]:
+                        port_input_data[dependent_port] = data
+
+                        d_node, d_port = dependent_port
+                        node_requirements[d_node].remove(d_port)
+
+            
+            # update any satisfied nodes
+            newly_satisfied_nodes = [n for n,v in node_requirements.items() if len(v)==0]
+            for nsn in newly_satisfied_nodes:
+                del node_requirements[nsn]
+
+            ready_nodes.update(newly_satisfied_nodes)
+
+        return [port_output_data[OutPort((on,0))] for on in self.output_interface]
+
+            
+
 
 class Add(Node):
     def __init__(self, num_inputs: int):
         super().__init__(num_inputs, 1)
 
-    def eval(self, input: List[Any])->List[Any]:
-        assert_valid_eval(self.num_inputs, len(input))
-        return [sum(input)]
+    def _eval(self, inputs: List[Any])->List[Any]:
+        return [sum(inputs)]
     
     def visualize(self, dot: graphviz.Digraph):
         dot.node(str(self.id), f"+") # type:ignore
@@ -163,9 +240,8 @@ class Subtract(Node):
     def __init__(self,):
         super().__init__(2, 1)
 
-    def eval(self, input: List[Any])->List[Any]:
-        assert_valid_eval(2, len(input))
-        return input[0]-input[1]
+    def _eval(self, inputs: List[Any])->List[Any]:
+        return [inputs[0]-inputs[1]]
     
     def visualize(self, dot: graphviz.Digraph):
         dot.node(str(self.id), f"-") # type:ignore
@@ -173,20 +249,7 @@ class Subtract(Node):
     def __repr__(self):
         return f"Sub-{super().__repr__()}"
 
-def assert_valid_eval(required_inputs:int, seen_inputs:int):
-    if required_inputs!=seen_inputs:
-        raise BadEvalArgs()
 
-def assert_in_port_exists(node_port:InPort):
-    node, port = node_port
-    if port>=node.num_inputs or port<0:
-        raise PortDoesntExist(f"Input port {port} for node {node}")
-
-
-def assert_out_port_exists(node_port:OutPort):
-    node, port = node_port
-    if port>=node.num_outputs or port<0:
-        raise PortDoesntExist(f"Output port {port} for node {node}")
 
 def visualize_graph(g: Graph, out_path:str="Artifacts", out_file_name:str="tmp"):
     dot = graphviz.Digraph()
@@ -197,6 +260,8 @@ def visualize_graph(g: Graph, out_path:str="Artifacts", out_file_name:str="tmp")
         f.write(dot.source)
 
     dot.render(dot_file_name) #type:ignore
+
+
 
 
 '''
@@ -236,9 +301,8 @@ if __name__=="__main__":
     g.add_edge(g.get_internal_input(0), g.get_internal_output(0))
     
     g.add_edge(g.get_internal_input(0), (add,0))
-    g.add_edge(g.get_internal_input(1), (add,0))
-    #g.add_edge(g.get_internal_input(1), (add,1))
-    #g.add_edge((add,0), g.get_internal_output(1))
+    g.add_edge(g.get_internal_input(1), (add,1))
+    g.add_edge((add,0), g.get_internal_output(1))
     
     g.add_edge(g.get_internal_input(0), (sub,0))
     g.add_edge(g.get_internal_input(1), (sub,1))
@@ -247,3 +311,6 @@ if __name__=="__main__":
     print(f"Errors:\n{e_msg}")
     #g = Euler2D_X()
     visualize_graph(g)
+
+    outputs = g.eval([1,2])
+    print(f"Output: {outputs}")
