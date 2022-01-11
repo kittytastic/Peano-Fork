@@ -6,11 +6,11 @@ from local_types import GraphViz
 from primative_nodes import PassThroughNode
 
 class Graph(Node):
-    def __init__(self, inputs: int, outputs: int):
-        super().__init__(inputs, outputs)
+    def __init__(self, inputs: int, outputs: int, friendly_name:Optional[str]=None):
+        super().__init__(inputs, outputs, friendly_name=friendly_name, type_name="Graph")
         self._edges: GraphEdges = {}
-        self.input_interface = [PassThroughNode(name=f"input{_}") for _ in range(inputs)]
-        self.output_interface = [PassThroughNode(name=f"output{_}") for _ in range(outputs)]
+        self.input_interface = [PassThroughNode(friendly_name=f"input{_}") for _ in range(inputs)]
+        self.output_interface = [PassThroughNode(friendly_name=f"output{_}") for _ in range(outputs)]
 
     def get_internal_input(self, idx:int)->OutPort:
         return OutPort((self.input_interface[idx], 0))
@@ -89,8 +89,6 @@ class Graph(Node):
         else:
             self._edges[from_node]={to_node}
 
-    def __repr__(self) -> str:
-        return f"Graph-{self.id}"
 
     def _eval(self, inputs: List[Any])->List[Any]:
 

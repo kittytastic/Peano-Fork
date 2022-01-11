@@ -2,21 +2,18 @@ from node import *
 from local_types import GraphViz
 
 class Add(Node):
-    def __init__(self, num_inputs: int):
-        super().__init__(num_inputs, 1)
+    def __init__(self, num_inputs: int, friendly_name:Optional[str]=None):
+        super().__init__(num_inputs, 1, type_name="Add", friendly_name=friendly_name)
 
     def _eval(self, inputs: List[Any])->List[Any]:
         return [sum(inputs)]
     
     def visualize(self, dot: GraphViz):
         dot.node(str(self.id), f"+") # type:ignore
-
-    def __repr__(self):
-        return f"Add-{super().__repr__()}"
         
 class Subtract(Node):
-    def __init__(self,):
-        super().__init__(2, 1)
+    def __init__(self,  friendly_name:Optional[str]=None):
+        super().__init__(2, 1, type_name="Sub", friendly_name=friendly_name)
 
     def _eval(self, inputs: List[Any])->List[Any]:
         return [inputs[0]-inputs[1]]
@@ -24,12 +21,10 @@ class Subtract(Node):
     def visualize(self, dot: GraphViz):
         dot.node(str(self.id), f"-") # type:ignore
 
-    def __repr__(self):
-        return f"Sub-{super().__repr__()}"
 
 class Multiply(Node):
-    def __init__(self, num_inputs:int):
-        super().__init__(num_inputs, 1)
+    def __init__(self, num_inputs:int, friendly_name:Optional[str]=None):
+        super().__init__(num_inputs, 1, type_name="Mul", friendly_name=friendly_name)
 
     def _eval(self, inputs: List[Any])->List[Any]:
         total = 1
@@ -40,6 +35,4 @@ class Multiply(Node):
     def visualize(self, dot: GraphViz):
         dot.node(str(self.id), f"*") # type:ignore
 
-    def __repr__(self):
-        return f"Sub-{super().__repr__()}"
 

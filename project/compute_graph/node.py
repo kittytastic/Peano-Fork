@@ -1,5 +1,5 @@
 
-from typing import Any, Dict, List, NewType, Set, Tuple
+from typing import Any, Dict, List, NewType, Optional, Set, Tuple
 from abc import ABC
 from errors import *
 from local_types import GraphViz
@@ -12,12 +12,14 @@ GraphEdges = Dict[OutPort, Set[InPort]]
 class Node(ABC):
     next_global_id = 0
 
-    def __init__(self, num_inputs:int, num_outputs:int):
+    def __init__(self, num_inputs:int, num_outputs:int, type_name:str="unknown", friendly_name:Optional[str]=None):
         self.id = Node.next_global_id
         Node.next_global_id +=1
         
         self.num_inputs = num_inputs
-        self.num_outputs = num_outputs        
+        self.num_outputs = num_outputs
+        self.type_name = type_name
+        self.friendly_name = friendly_name     
 
     def visualize(self, dot:GraphViz)->None:
         raise MethodNotImplemented(f"Parent class: {self.__class__.__name__}")
@@ -46,4 +48,5 @@ class Node(ABC):
         return self.__repr__() 
     
     def __repr__(self) -> str:
-        return f"Node_{self.id}"
+        raw_name = f"<{self.type_name}-{self.id}-node>"
+        return f"<{self.friendly_name} ({raw_name})>" if self.friendly_name else f"{raw_name}"

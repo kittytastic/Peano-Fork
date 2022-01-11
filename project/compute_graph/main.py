@@ -4,7 +4,7 @@ from ops import *
 def Euler2D_X()->Graph:
     g = Graph(4,4)
     p = Multiply(4)
-    irho = PassThroughNode(name="irho")
+    irho = PassThroughNode(friendly_name="irho")
 
     mul1 = Multiply(3)
     mul2 = Multiply(3)
@@ -73,5 +73,5 @@ if __name__=="__main__":
     print(f"Errors:\n{e_msg}")
     visualize_graph(g)
 
-    #outputs = g.eval([1,2])
-    #print(f"Output: {outputs}")
+    outputs = g.eval([1,2,3,4])
+    print(f"Output: {outputs}")
