@@ -2,7 +2,7 @@
 from typing import Any, Dict, List, NewType, Optional, Set, Tuple
 from abc import ABC
 from errors import *
-from local_types import GraphViz
+from local_types import ErrorMessage, GraphViz
 
 NodePort = Tuple['Node', int]
 OutPort = NewType('OutPort', NodePort)
@@ -38,7 +38,7 @@ class Node(ABC):
     def _eval(self, inputs:List[Any])->List[Any]:
         raise MethodNotImplemented(f"Parent class: {self.__class__.__name__}")
     
-    def validate(self)->bool:
+    def validate(self)->List[ErrorMessage]:
         raise MethodNotImplemented(f"Parent class: {self.__class__.__name__}")
     
     def __hash__(self) -> int:

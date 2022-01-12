@@ -45,7 +45,7 @@ class Graph(Node):
             for to_node,_ in to_ports:
                 dot.edge(str(from_node.id), str(to_node.id)) # type:ignore 
 
-    def validate(self) -> bool:
+    def validate(self) -> List[ErrorMessage]:
         sub_nodes = self._get_sub_nodes()
         require_full_input = sub_nodes - set(self.input_interface)
 
