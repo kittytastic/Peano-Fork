@@ -1,6 +1,6 @@
 
 from typing import Any, Dict, List, NewType, Optional, Set, Tuple
-from abc import ABC
+from abc import ABC, abstractmethod
 from errors import *
 from local_types import ErrorMessage, GraphViz
 
@@ -21,9 +21,17 @@ class Node(ABC):
         self.type_name = type_name
         self.friendly_name = friendly_name     
 
+    @abstractmethod
     def visualize(self, dot:GraphViz)->None:
-        raise MethodNotImplemented(f"Parent class: {self.__class__.__name__}")
- 
+        pass
+   
+    @abstractmethod
+    def _eval(self, inputs:List[Any])->List[Any]:
+        pass
+
+    def validate(self)->List[ErrorMessage]:
+        return [] 
+
     def eval(self, input_data:List[Any])->List[Any]:
         if len(input_data)!= self.num_inputs:
             raise BadEval(f"Node {str(self)} was given a bad number of eval inputs, expected: {self.num_inputs} but received: {len(input_data)}")
@@ -35,11 +43,6 @@ class Node(ABC):
 
         return outputs
     
-    def _eval(self, inputs:List[Any])->List[Any]:
-        raise MethodNotImplemented(f"Parent class: {self.__class__.__name__}")
-    
-    def validate(self)->List[ErrorMessage]:
-        raise MethodNotImplemented(f"Parent class: {self.__class__.__name__}")
     
     def __hash__(self) -> int:
         return self.id
