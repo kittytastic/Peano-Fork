@@ -9,6 +9,14 @@ from abc import ABC, abstractmethod
 
 class AST_Transformer(ABC):
     @abstractmethod
+    def visit_PortLink(self, node: Any)->Any:
+        pass
+    
+    @abstractmethod
+    def visit_Compound(self, node: Any)->Any:
+        pass
+    
+    @abstractmethod
     def visit_Assign(self, node: Any)->Any:
         pass
     

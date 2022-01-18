@@ -3,6 +3,7 @@ from typing import Any, Dict, List, NewType, Optional, Set, Tuple
 from abc import ABC, abstractmethod
 from errors import *
 from local_types import ErrorMessage, GraphViz
+from compute_graph.AST.ast_node_base import AST_Node
 
 NodePort = Tuple['Node', int]
 OutPort = NewType('OutPort', NodePort)
@@ -42,6 +43,10 @@ class Node(ABC):
             raise BadEval(f"Node {str(self)} produced a bad number of outputs, expected: {self.num_outputs} but received: {len(outputs)}")
 
         return outputs
+
+    @abstractmethod 
+    def ast_visit(self)->AST_Node:
+        pass
     
     
     def __hash__(self) -> int:

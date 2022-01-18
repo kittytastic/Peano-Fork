@@ -4,6 +4,7 @@ from node import *
 from helpers import assert_in_port_exists,  assert_out_port_exists
 from local_types import GraphViz
 from primative_nodes import PassThroughNode
+from AST.ast_nodes_g import AST_Compound
 
 class Graph(Node):
     def __init__(self, inputs: int, outputs: int, friendly_name:Optional[str]=None):
@@ -131,6 +132,9 @@ class Graph(Node):
             ready_nodes.update(newly_satisfied_nodes)
 
         return [port_output_data[OutPort((on,0))] for on in self.output_interface]
+
+    def ast_visit(self) -> AST_Node:
+        return AST_Compound([n.ast_visit() for n in self._get_sub_nodes()])
 
 def visualize_graph(g: Graph, out_path:str="Artifacts", out_file_name:str="tmp"):
     dot = graphviz.Digraph()

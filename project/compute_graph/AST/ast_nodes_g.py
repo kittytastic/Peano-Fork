@@ -5,69 +5,79 @@
 #########################################################
 
 from typing import Any, List #type: ignore
-from ast_node_base import AST_Node
+from compute_graph.AST.ast_node_base import AST_Node
 
 Expr = AST_Node
 
 
-class Assign(AST_Node):
+class AST_PortLink(AST_Node):
+    def __init__(self, idx: int):
+        self.idx = idx
+        
+
+class AST_Compound(AST_Node):
+    def __init__(self, block_items:List[Expr]):
+        self.block_items = block_items
+        
+
+class AST_Assign(AST_Node):
     def __init__(self, lvalue:Expr, rvalue:Expr):
         self.lvalue = lvalue
         self.rvalue = rvalue
         
 
-class Add(AST_Node):
+class AST_Add(AST_Node):
     def __init__(self, lvalue:Expr, rvalue:Expr):
         self.lvalue = lvalue
         self.rvalue = rvalue
         
 
-class Sub(AST_Node):
+class AST_Sub(AST_Node):
     def __init__(self, lvalue:Expr, rvalue:Expr):
         self.lvalue = lvalue
         self.rvalue = rvalue
         
 
-class Mul(AST_Node):
+class AST_Mul(AST_Node):
     def __init__(self, lvalue:Expr, rvalue:Expr):
         self.lvalue = lvalue
         self.rvalue = rvalue
         
 
-class SIMD_Add(AST_Node):
+class AST_SIMD_Add(AST_Node):
     def __init__(self, l_addr: int, r_addr: int, vector_length:int):
         self.l_addr = l_addr
         self.r_addr = r_addr
         self.vector_length = vector_length
         
 
-class SIMD_Sub(AST_Node):
+class AST_SIMD_Sub(AST_Node):
     def __init__(self, l_addr: int, r_addr: int, vector_length:int):
         self.l_addr = l_addr
         self.r_addr = r_addr
         self.vector_length = vector_length
         
 
-class SIMD_Mul(AST_Node):
+class AST_SIMD_Mul(AST_Node):
     def __init__(self, l_addr: int, r_addr: int, vector_length:int):
         self.l_addr = l_addr
         self.r_addr = r_addr
         self.vector_length = vector_length
         
 
-class SIMD_FMA(AST_Node):
+class AST_SIMD_FMA(AST_Node):
     def __init__(self, l_addr: int, r_addr: int, vector_length:int):
         self.l_addr = l_addr
         self.r_addr = r_addr
         self.vector_length = vector_length
         
 
-class GetArray(AST_Node):
+class AST_GetArray(AST_Node):
     def __init__(self, addr:int):
         self.addr = addr
         
 
-class DecDoubleArray(AST_Node):
+class AST_DecDoubleArray(AST_Node):
     def __init__(self, size:int):
         self.size = size
         

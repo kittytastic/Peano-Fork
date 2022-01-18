@@ -86,12 +86,12 @@ AST_NODE_TEMPLATE =  """
 #########################################################
 
 from typing import Any, List #type: ignore
-from ast_node_base import AST_Node
+from compute_graph.AST.ast_node_base import AST_Node
 
 Expr = AST_Node
 
 {% for node in cfg_nodes%}
-class {{node[0]}}(AST_Node):
+class AST_{{node[0]}}(AST_Node):
     def __init__(self{%+ if node[1]|length>0 %}, {% endif %}
     {%-for attr in node[1]-%}{{attr[0]}}:{{attr[2]}}{%- if loop.last -%}{%- else -%}, {%endif%}{% endfor %}):
         {% for attr in node[1]-%}
@@ -117,7 +117,7 @@ class AST_Transformer(ABC):
     {% endfor %}
 """
 
-def build_ast(cfg_nodes: List[CFG_Name_Att], node_filename:str="ast_nodes.g.py", tf_filename:str="transformer.g.py"):
+def build_ast(cfg_nodes: List[CFG_Name_Att], node_filename:str="ast_nodes_g.py", tf_filename:str="transformer_g.py"):
 
     data = {
         "cfg_nodes": cfg_nodes,

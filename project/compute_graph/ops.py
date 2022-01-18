@@ -1,5 +1,6 @@
 from node import *
 from local_types import GraphViz
+from AST.ast_nodes_g import AST_Add, AST_Mul, AST_PortLink, AST_Sub
 
 class Add(Node):
     def __init__(self, num_inputs: int, friendly_name:Optional[str]=None):
@@ -10,6 +11,9 @@ class Add(Node):
     
     def visualize(self, dot: GraphViz):
         dot.node(str(self.id), f"+") # type:ignore
+    
+    def ast_visit(self) -> AST_Node:
+        return AST_Add(AST_PortLink(0), AST_PortLink(1))
         
 class Subtract(Node):
     def __init__(self,  friendly_name:Optional[str]=None):
@@ -20,7 +24,9 @@ class Subtract(Node):
     
     def visualize(self, dot: GraphViz):
         dot.node(str(self.id), f"-") # type:ignore
-
+    
+    def ast_visit(self) -> AST_Node:
+        return AST_Sub(AST_PortLink(0), AST_PortLink(1))
 
 class Multiply(Node):
     def __init__(self, num_inputs:int, friendly_name:Optional[str]=None):
@@ -34,5 +40,8 @@ class Multiply(Node):
     
     def visualize(self, dot: GraphViz):
         dot.node(str(self.id), f"*") # type:ignore
+
+    def ast_visit(self) -> AST_Node:
+        return AST_Mul(AST_PortLink(0), AST_PortLink(1))
 
 
