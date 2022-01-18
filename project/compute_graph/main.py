@@ -53,25 +53,30 @@ def Euler2D_X()->Graph:
 def basic_graph()->Graph:
     g=Graph(2,3)
     add = Add(2)
+    mul = Multiply(2)
     sub = Subtract()
-    g.add_edge(g.get_internal_input(0), g.get_internal_output(0))
+    
     
     g.add_edge(g.get_internal_input(0), (add,0))
     g.add_edge(g.get_internal_input(1), (add,1))
-    g.add_edge((add,0), g.get_internal_output(1))
+    g.add_edge((add,0), g.get_internal_output(0))
     
     g.add_edge(g.get_internal_input(0), (sub,0))
     g.add_edge(g.get_internal_input(1), (sub,1))
     g.add_edge((sub,0), g.get_internal_output(2))
 
+    g.add_edge((sub, 0), (mul,0))
+    g.add_edge((add, 0), (mul,1))
+    g.add_edge((mul, 0), g.get_internal_output(1))
+
     return g
 
 if __name__=="__main__":
 
-    g = Euler2D_X()    
+    g = basic_graph()    
     e_msg = '\n'.join([e for e in g.validate()])
     print(f"Errors:\n{e_msg}")
     visualize_graph(g)
 
-    outputs = g.eval([1,2,3,4])
+    outputs = g.eval([1,2])
     print(f"Output: {outputs}")
