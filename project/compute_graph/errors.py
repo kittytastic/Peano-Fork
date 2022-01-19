@@ -9,3 +9,6 @@ class BadEval(Exception):
 
 class InvalidGraph(Exception):
     pass
+
+class NotSupported(Exception):
+    pass

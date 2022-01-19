@@ -1,7 +1,6 @@
 from typing import Optional
 from node import *
 from local_types import GraphViz
-from AST.ast_nodes_g import AST_PortLink
 
 class PassThroughNode(Node):
     def __init__(self, friendly_name:Optional[str] = None, type_name:Optional[str]=None):
@@ -15,5 +14,5 @@ class PassThroughNode(Node):
     def _eval(self, inputs: List[Any])->List[Any]:
         return [inputs[0]]
     
-    def ast_visit(self) -> AST_Node:
-        return AST_PortLink(0)
+    def ast_visit(self, in_ports_ast: List[AST_Node]) -> List[AST_Node]:
+        return in_ports_ast

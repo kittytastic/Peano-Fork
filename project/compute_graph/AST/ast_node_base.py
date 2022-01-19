@@ -1,5 +1,5 @@
 import inspect
-from typing import Any, Optional
+from typing import Any
 
 _INDENT=" "
 
@@ -33,11 +33,8 @@ class AST_Node():
 
         return out_s
 
-
-
-
-
     def __str__(self):
-        attributes = inspect.getmembers(self, lambda a:not(inspect.isroutine(a)))
-        attributes = [a for a in attributes if not(a[0].startswith('__') and a[0].endswith('__'))]
         return self.pretty_string()
+
+    def __repr__(self) -> str:
+        return f"<{type(self).__name__}>"

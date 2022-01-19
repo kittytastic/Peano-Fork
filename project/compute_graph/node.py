@@ -45,7 +45,7 @@ class Node(ABC):
         return outputs
 
     @abstractmethod 
-    def ast_visit(self)->AST_Node:
+    def ast_visit(self, in_ports_ast:List[AST_Node])->List[AST_Node]:
         pass
     
     

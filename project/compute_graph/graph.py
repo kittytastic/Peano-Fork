@@ -4,7 +4,7 @@ from node import *
 from helpers import assert_in_port_exists,  assert_out_port_exists
 from local_types import GraphViz
 from primative_nodes import PassThroughNode
-from AST.ast_nodes_g import AST_Compound
+from errors import NotSupported
 
 class Graph(Node):
     def __init__(self, inputs: int, outputs: int, friendly_name:Optional[str]=None):
@@ -25,7 +25,9 @@ class Graph(Node):
     def __setitem__(self, key:OutPort, value:Set[InPort]):
         self._edges[key] = value
 
-    
+    def get_sub_nodes(self):
+        return self._get_sub_nodes()
+
     def _get_sub_nodes(self)->Set[Node]:
         sub_nodes:set[Node] = set(self.input_interface)
         sub_nodes = sub_nodes.union(self.output_interface)
@@ -133,8 +135,8 @@ class Graph(Node):
 
         return [port_output_data[OutPort((on,0))] for on in self.output_interface]
 
-    def ast_visit(self) -> AST_Node:
-        return AST_Compound([n.ast_visit() for n in self._get_sub_nodes()])
+    def ast_visit(self, in_ports_ast: List[AST_Node]) -> List[AST_Node]:
+        raise NotSupported() 
 
 def visualize_graph(g: Graph, out_path:str="Artifacts", out_file_name:str="tmp"):
     dot = graphviz.Digraph()

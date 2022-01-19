@@ -10,11 +10,6 @@ from compute_graph.AST.ast_node_base import AST_Node
 Expr = AST_Node
 
 
-class AST_PortLink(AST_Node):
-    def __init__(self, idx: int):
-        self.idx = idx
-        
-
 class AST_Compound(AST_Node):
     def __init__(self, block_items:List[Expr]):
         self.block_items = block_items
