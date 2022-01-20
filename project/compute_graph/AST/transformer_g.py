@@ -52,3 +52,11 @@ class AST_Transformer(ABC):
     def visit_DecDoubleArray(self, node: Any)->Any:
         pass
     
+    @abstractmethod
+    def visit_DecVariable(self, node: Any)->Any:
+        pass
+    
+    @abstractmethod
+    def visit_GetVariable(self, node: Any)->Any:
+        pass
+    

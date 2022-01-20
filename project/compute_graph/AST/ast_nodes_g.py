@@ -68,11 +68,23 @@ class AST_SIMD_FMA(AST_Node):
         
 
 class AST_GetArray(AST_Node):
-    def __init__(self, addr:int):
+    def __init__(self, id: str, addr:int):
+        self.id = id
         self.addr = addr
         
 
 class AST_DecDoubleArray(AST_Node):
-    def __init__(self, size:int):
+    def __init__(self, id:str, size:int):
+        self.id = id
         self.size = size
+        
+
+class AST_DecVariable(AST_Node):
+    def __init__(self, id: str):
+        self.id = id
+        
+
+class AST_GetVariable(AST_Node):
+    def __init__(self, id: str):
+        self.id = id
         

@@ -138,6 +138,11 @@ class Graph(Node):
     def ast_visit(self, in_ports_ast: List[AST_Node]) -> List[AST_Node]:
         raise NotSupported() 
 
+    def inverse_edges(self)->Dict[InPort, OutPort]:
+        inverse_edges = {ip: op for op, ips in self._edges.items() for ip in ips}
+        return inverse_edges
+
+
 def visualize_graph(g: Graph, out_path:str="Artifacts", out_file_name:str="tmp"):
     dot = graphviz.Digraph()
     g.visualize(dot)
