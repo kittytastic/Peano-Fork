@@ -2,8 +2,7 @@ from typing import List, Any, Optional
 
 from compute_graph.DAG.node import DAG_Node
 from compute_graph.local_types import GraphViz
-from compute_graph.AST.ast_node_base import AST_Node
-from compute_graph.AST.ast_nodes_g import AST_Add, AST_Mul, AST_Sub
+from compute_graph.AST import AST_Node, AST_Add, AST_Mul, AST_Sub
 
 class Add(DAG_Node):
     def __init__(self, num_inputs: int, friendly_name:Optional[str]=None):

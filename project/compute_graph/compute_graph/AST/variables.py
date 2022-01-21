@@ -1,7 +1,6 @@
 from typing import List, Optional
 from abc import ABC, abstractmethod
-from compute_graph.AST.ast_node_base import AST_Node
-from compute_graph.AST.ast_nodes_g import AST_Assign, AST_DecVariable, AST_GetVariable
+from compute_graph.AST import AST_Node, AST_Assign, AST_DecVariable, AST_GetVariable
 
 class Variable(ABC):
     references:List['VariableReference'] = []

@@ -1,12 +1,10 @@
 from typing import Dict, Optional, List, Set
 
-from compute_graph.AST.ast_nodes_g import AST_Function
-from compute_graph.AST.ast_node_base import AST_Node
-from compute_graph.AST.ast_nodes_g import AST_Compound
+from compute_graph.AST import AST_Function, AST_Node, AST_Compound
 from compute_graph.AST.variables import Variable, VariableReference
 from compute_graph.DAG.graph import Graph
 from compute_graph.DAG.node import InPort, DAG_Node, OutPort
-from compute_graph.DAG.primative_nodes import TerminalInput
+from compute_graph.DAG import TerminalInput
 
 
 class Kernel():

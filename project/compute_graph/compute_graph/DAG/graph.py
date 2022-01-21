@@ -6,8 +6,8 @@ from compute_graph.local_types import GraphViz, ErrorMessage
 from compute_graph.errors import NotSupported
 from compute_graph.DAG.node import DAG_Node, GraphEdges, InPort, OutPort, NodePort
 from compute_graph.DAG.helpers import assert_in_port_exists,  assert_out_port_exists
-from compute_graph.DAG.primative_nodes import InputPassThrough, PassThroughNode
-from compute_graph.AST.ast_node_base import AST_Node
+from compute_graph.DAG import InputPassThrough, PassThroughNode
+from compute_graph.AST import AST_Node
 
 class Graph(DAG_Node):
     def __init__(self, inputs: int, outputs: int, friendly_name:Optional[str]=None):
