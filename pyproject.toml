@@ -10,10 +10,6 @@ exahype2 = {path = "./poetry/exahype2", develop = true}
 peano4 = {path = "./poetry/peano4", develop = true}
 dastgen2 = {path = "./poetry/dastgen2", develop = true}
 scripts = {path = "./poetry/scripts", develop = true}
-compute_graph = {path = "./poetry/compute_graph", develop = true}
-sympy = "^1.9"
-graphviz = "^0.19.1"
-pycparser = "^2.21"
 
 
 [tool.poetry.dev-dependencies]
@@ -24,4 +20,3 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
 tf-output = "scripts.scripts:main"
-build-ast = "compute_graph.AST.build_ast:main"
