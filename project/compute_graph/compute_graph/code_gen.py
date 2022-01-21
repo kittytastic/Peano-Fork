@@ -1,15 +1,11 @@
-from compute_graph.AST.ast_nodes_g import AST_Compound
-from ops import Add, Multiply, Subtract
-from enum import Enum
-from typing import Any, Dict, List, Tuple
-from node import InPort, OutPort, Node
-from graph import Graph, visualize_graph
-from compute_graph.AST.ast_node_base import AST_Node
-from compute_graph.AST.variables import VariableReference
-from compute_graph.AST.ast_nodes_g import AST_Add, AST_GetArray
-from AST.variables import LocalVar
+from typing import Dict, List, Tuple
 
-from project.compute_graph.kernel import Kernel
+from compute_graph.ops import Add, Multiply, Subtract
+from compute_graph.node import OutPort, Node
+from compute_graph.graph import Graph, visualize_graph
+from compute_graph.AST.variables import VariableReference, LocalVar
+from compute_graph.kernel import Kernel
+
 
 
 def basic_graph()->Tuple[Graph, Dict[OutPort, VariableReference], List[Node]]:

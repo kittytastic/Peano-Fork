@@ -1,6 +1,6 @@
-from node import *
-from local_types import GraphViz
-from AST.ast_nodes_g import AST_Add, AST_Mul, AST_Sub
+from compute_graph.node import *
+from compute_graph.local_types import GraphViz
+from compute_graph.AST.ast_nodes_g import AST_Add, AST_Mul, AST_Sub
 
 class Add(Node):
     def __init__(self, num_inputs: int, friendly_name:Optional[str]=None):

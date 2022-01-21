@@ -1,6 +1,7 @@
 import unittest
-from build_ast import *
-from parameterized import parameterized
+from parameterized import parameterized #type:ignore
+
+from compute_graph.AST.build_ast import *
 
 class TestAttributeParsing(unittest.TestCase):
     @parameterized.expand([ # type:ignore

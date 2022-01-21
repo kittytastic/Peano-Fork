@@ -1,6 +1,6 @@
 from typing import Optional
-from node import *
-from local_types import GraphViz
+from compute_graph.node import *
+from compute_graph.local_types import GraphViz
 
 class PassThroughNode(Node):
     def __init__(self, friendly_name:Optional[str] = None, type_name:Optional[str]=None):

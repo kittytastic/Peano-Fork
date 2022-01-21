@@ -1,9 +1,10 @@
-from pycparser import parse_file, c_generator
+from typing import Any
+from pycparser import parse_file, c_generator # type:ignore
 
 def translate_to_c(filename:str):
     """ Simply use the c_generator module to emit a parsed AST.
     """
-    ast = parse_file(filename, use_cpp=True)
+    ast:Any = parse_file(filename, use_cpp=True)
     ast.show(showcoord=False)
 
     print()
@@ -12,7 +13,7 @@ def translate_to_c(filename:str):
     print()
     print()
     print("------ Generated ------")
-    generator = c_generator.CGenerator()
+    generator:Any = c_generator.CGenerator()
     print(generator.visit(ast))
 
 

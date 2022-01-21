@@ -1,5 +1,5 @@
-import inspect
 from typing import Any
+import inspect
 
 _INDENT=" "
 
@@ -8,7 +8,7 @@ class AST_Node():
         if isinstance(val, AST_Node):
             return f"\n{val.pretty_string(indent_level=indent_level+1)}"
         elif isinstance(val, list):
-            sub_str = [self.__pretty_print_val(indent_level+2, v) for v in val]
+            sub_str = [self.__pretty_print_val(indent_level+2, v) for v in val] # type: ignore
             return "\n".join(sub_str)
         else:
             return str(val)
