@@ -1,10 +1,10 @@
-from typing import Any, Dict, Optional, List, Set
-from compute_graph.AST.ast_node_base import AST_Node
-from compute_graph.AST.ast_nodes_g import AST_Compound
-from compute_graph.AST.variables import Variable, VariableReference
+from typing import Dict, Optional, List, Set
+from AST.ast_node_base import AST_Node
+from AST.ast_nodes_g import AST_Compound
+from AST.variables import Variable, VariableReference
 from graph import Graph
 from node import InPort, Node, OutPort
-from primative_nodes import InputPassThrough, TerminalInput
+from primative_nodes import TerminalInput
 
 
 class Kernel():
