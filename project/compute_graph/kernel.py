@@ -1,4 +1,6 @@
 from typing import Dict, Optional, List, Set
+
+from compute_graph.AST.ast_nodes_g import AST_Assign, AST_Function
 from AST.ast_node_base import AST_Node
 from AST.ast_nodes_g import AST_Compound
 from AST.variables import Variable, VariableReference
@@ -65,18 +67,38 @@ class Kernel():
 
         # Add input mappings
         inverse_edges = {**inverse_edges, **tin_edges}
-        memory_map = {**memory_map, **tin_mm}
+        full_memory_map = {**memory_map, **tin_mm}
 
         # Add output mappings
-        memory_map = {**memory_map, **self.dag_to_kernel_out_map}
-        return self._DAG_to_AST(inverse_edges, memory_map, traversal_order)
+        full_memory_map = {**full_memory_map, **self.dag_to_kernel_out_map}
+
+        var_def = self._var_definitions(memory_map)
+        body = self._DAG_to_AST(inverse_edges, full_memory_map, traversal_order)
+        tail = self._var_output_set(full_memory_map)
+        body_ast = AST_Compound(var_def+body+tail)
+        return AST_Function("kernel", [], body_ast) 
 
 
-    def _DAG_to_AST(self, inverse_edges:Dict[InPort, OutPort], memory_map: Dict[OutPort, VariableReference], traversal_order: List[Node])->AST_Node:
+    def _var_definitions(self, memory_map: Dict[OutPort, VariableReference])->List[AST_Node]:
         variables = set([vr.var for vr in memory_map.values()])
         
         dec_expr = [v.declare() for v in variables]
         dec_expr = [e for e in dec_expr if e is not None]
+
+        return dec_expr
+    
+    def _var_output_set(self, memory_map: Dict[OutPort, VariableReference])->List[AST_Node]:
+        assert(self.dag)
+        assert(self.dag_to_kernel_out_map)
+        out_ports = [OutPort((on, 0)) for on in self.dag.output_interface]
+        out_vars_refs = [self.dag_to_kernel_out_map[op] for op in out_ports]
+
+        out_expr = [vr.set(memory_map[p].ref()) for p, vr in zip(out_ports, out_vars_refs)]
+
+        return out_expr
+
+    def _DAG_to_AST(self, inverse_edges:Dict[InPort, OutPort], memory_map: Dict[OutPort, VariableReference], traversal_order: List[Node])->List[AST_Node]:
+        
 
         compute_expr:List[AST_Node] = []
         
@@ -92,6 +114,4 @@ class Kernel():
 
             compute_expr += out_port_set_ast
 
-        body_ast = dec_expr+compute_expr
-
-        return AST_Compound(body_ast)
+        return compute_expr 
