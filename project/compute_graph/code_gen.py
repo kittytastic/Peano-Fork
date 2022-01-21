@@ -9,33 +9,8 @@ from compute_graph.AST.variables import VariableReference
 from compute_graph.AST.ast_nodes_g import AST_Add, AST_GetArray
 from compute_graph.AST.variables import LocalVar
 
+from project.compute_graph.kernel import Kernel
 
-def _DAG_to_AST(compute_dag: Graph, memory_map: Dict[OutPort, VariableReference], traversal_order: List[Node])->AST_Node:
-    dag_nodes = compute_dag.get_sub_nodes()
-    print(f"DAG contains: {len(dag_nodes)} nodes")
-    variables = set([vr.var for vr in memory_map.values()])
-    inverse_edges = compute_dag.inverse_edges()
-    
-    
-    dec_expr = [v.declare() for v in variables if v.declare() is not None]
-
-    compute_expr:List[AST_Node] = []
-    
-    for n in traversal_order:
-        in_port_connections = [inverse_edges[InPort((n, p))] for p in range(n.num_inputs)]
-        in_port_var_ref = [memory_map[p] for p in in_port_connections]
-        in_port_ast = [pvr.ref() for pvr in in_port_var_ref]
-
-        node_ast = n.ast_visit(in_port_ast)
-
-        out_port_store_var_ref = [memory_map[OutPort((n, p))] for p in range(n.num_outputs)]
-        out_port_set_ast = [vr.set(ast) for vr, ast in zip(out_port_store_var_ref, node_ast)]
-
-        compute_expr += out_port_set_ast
-
-    body_ast = dec_expr+compute_expr
-
-    return AST_Compound(body_ast)
 
 def basic_graph()->Tuple[Graph, Dict[OutPort, VariableReference], List[Node]]:
     # Graph Nodes
@@ -88,6 +63,34 @@ def basic_graph()->Tuple[Graph, Dict[OutPort, VariableReference], List[Node]]:
 if __name__=="__main__":
     g, mm, to = basic_graph()
     visualize_graph(g)
+    
+    # Variables + References
+    v_i1 = LocalVar("in1")
+    v_i1_ref = v_i1.get_references()[0]
+    v_i2 = LocalVar("in2")
+    v_i2_ref = v_i2.get_references()[0]
+    
+    v_o1 = LocalVar("out1")
+    v_o1_ref = v_o1.get_references()[0]
+    v_o2 = LocalVar("out2")
+    v_o2_ref = v_o2.get_references()[0]
+    v_o3 = LocalVar("out3")
+    v_o3_ref = v_o3.get_references()[0]
+    
+    k = Kernel([v_i1, v_i2], [v_o1, v_o2, v_o3])
+    kernel_dag_map = {
+        v_i1_ref: g.get_external_input(0),
+        v_i2_ref: g.get_external_input(1)
+    }
+    dag_kernel_map = {
+        g.get_external_output(0): v_o1_ref,
+        g.get_external_output(1): v_o2_ref,
+        g.get_external_output(2): v_o3_ref,
+    }
 
+    k.set_DAG(g, kernel_dag_map, dag_kernel_map)
 
-    _DAG_to_AST(g, mm, to)
+    ast = k.ast_compile(mm, to)
+
+    print(ast)
+

@@ -60,3 +60,7 @@ class AST_Transformer(ABC):
     def visit_GetVariable(self, node: Any)->Any:
         pass
     
+    @abstractmethod
+    def visit_Function(self, node: Any)->Any:
+        pass
+    

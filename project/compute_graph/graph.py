@@ -3,21 +3,27 @@ import os.path
 from node import *
 from helpers import assert_in_port_exists,  assert_out_port_exists
 from local_types import GraphViz
-from primative_nodes import PassThroughNode
+from primative_nodes import InputPassThrough, PassThroughNode
 from errors import NotSupported
 
 class Graph(Node):
     def __init__(self, inputs: int, outputs: int, friendly_name:Optional[str]=None):
         super().__init__(inputs, outputs, friendly_name=friendly_name, type_name="Graph")
         self._edges: GraphEdges = {}
-        self.input_interface = [PassThroughNode(friendly_name=f"input{_}") for _ in range(inputs)]
+        self.input_interface = [InputPassThrough(i, friendly_name=f"input{i}") for i in range(inputs)]
         self.output_interface = [PassThroughNode(friendly_name=f"output{_}") for _ in range(outputs)]
 
     def get_internal_input(self, idx:int)->OutPort:
         return OutPort((self.input_interface[idx], 0))
+    
+    def get_external_input(self, idx:int)->InPort:
+        return InPort((self.input_interface[idx], 0))
 
     def get_internal_output(self, idx:int)->InPort:
         return InPort((self.output_interface[idx], 0))
+    
+    def get_external_output(self, idx:int)->OutPort:
+        return OutPort((self.output_interface[idx], 0))
 
     def __getitem__(self, key:OutPort)->Set[InPort]:
         return self._edges[key]

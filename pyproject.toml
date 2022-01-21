@@ -23,3 +23,4 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
 tf-output = "scripts.scripts:main"
+build-ast = "compute_graph.AST.build_ast:main"

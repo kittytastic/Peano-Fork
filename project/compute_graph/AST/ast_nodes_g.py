@@ -88,3 +88,10 @@ class AST_GetVariable(AST_Node):
     def __init__(self, id: str):
         self.id = id
         
+
+class AST_Function(AST_Node):
+    def __init__(self, id:str, args:List[ Expr], body: Expr):
+        self.id = id
+        self.args = args
+        self.body = body
+        

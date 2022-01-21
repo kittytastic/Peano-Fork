@@ -137,10 +137,13 @@ def build_ast(cfg_nodes: List[CFG_Name_Att], node_filename:str="ast_nodes_g.py",
     with open(tf_outpath, "w+") as f:
         f.write(tf_template.render(data))
 
-
+def main():
+    print("Building AST")
+    cfg_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "_ast.cfg") 
+    print(cfg_file)
+    in_l = list(parse_cfgfile(cfg_file))
+    build_ast(in_l)
 
 
 if __name__=="__main__":
-    print("Building AST")
-    in_l = list(parse_cfgfile("./_ast.cfg"))
-    build_ast(in_l)
+   main()
