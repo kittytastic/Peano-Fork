@@ -13,6 +13,7 @@ scripts = {path = "./poetry/scripts", develop = true}
 compute_graph = {path = "./poetry/compute_graph", develop = true}
 sympy = "^1.9"
 graphviz = "^0.19.1"
+pycparser = "^2.21"
 
 
 [tool.poetry.dev-dependencies]

@@ -17,5 +17,5 @@ def translate_to_c(filename:str):
 
 
 if __name__ == "__main__":
-    translate_to_c("./Artifacts/simple.c")
+    translate_to_c("./Artifacts/easiest.c")
     
