@@ -4,9 +4,9 @@ from compute_graph.AST.ast_nodes_g import AST_Function
 from compute_graph.AST.ast_node_base import AST_Node
 from compute_graph.AST.ast_nodes_g import AST_Compound
 from compute_graph.AST.variables import Variable, VariableReference
-from compute_graph.graph import Graph
-from compute_graph.node import InPort, Node, OutPort
-from compute_graph.primative_nodes import TerminalInput
+from compute_graph.DAG.graph import Graph
+from compute_graph.DAG.node import InPort, Node, OutPort
+from compute_graph.DAG.primative_nodes import TerminalInput
 
 
 class Kernel():

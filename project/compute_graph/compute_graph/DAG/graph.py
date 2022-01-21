@@ -1,10 +1,10 @@
 import graphviz #type: ignore
 import os.path
-from node import *
-from helpers import assert_in_port_exists,  assert_out_port_exists
-from local_types import GraphViz
-from primative_nodes import InputPassThrough, PassThroughNode
-from errors import NotSupported
+from compute_graph.DAG.node import *
+from compute_graph.DAG.helpers import assert_in_port_exists,  assert_out_port_exists
+from compute_graph.local_types import GraphViz, ErrorMessage
+from compute_graph.DAG.primative_nodes import InputPassThrough, PassThroughNode
+from compute_graph.errors import NotSupported
 
 class Graph(Node):
     def __init__(self, inputs: int, outputs: int, friendly_name:Optional[str]=None):

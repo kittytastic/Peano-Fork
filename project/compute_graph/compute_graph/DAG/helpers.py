@@ -1,4 +1,4 @@
-from compute_graph.node import *
+from compute_graph.DAG.node import *
 
 def assert_in_port_exists(node_port:InPort):
     node, port = node_port

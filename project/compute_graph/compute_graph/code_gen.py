@@ -1,8 +1,8 @@
 from typing import Dict, List, Tuple
 
-from compute_graph.ops import Add, Multiply, Subtract
-from compute_graph.node import OutPort, Node
-from compute_graph.graph import Graph, visualize_graph
+from compute_graph.DAG.ops import Add, Multiply, Subtract
+from compute_graph.DAG.node import OutPort, Node
+from compute_graph.DAG.graph import Graph, visualize_graph
 from compute_graph.AST.variables import VariableReference, LocalVar
 from compute_graph.kernel import Kernel
 

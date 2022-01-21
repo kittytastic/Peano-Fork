@@ -1,5 +1,5 @@
 from typing import Optional
-from compute_graph.node import *
+from compute_graph.DAG.node import *
 from compute_graph.local_types import GraphViz
 
 class PassThroughNode(Node):

@@ -1,5 +1,5 @@
-from compute_graph.graph import *
-from compute_graph.ops import *
+from compute_graph.DAG.graph import *
+from compute_graph.DAG.ops import *
 
 def Euler2D_X()->Graph:
     g = Graph(4,4)

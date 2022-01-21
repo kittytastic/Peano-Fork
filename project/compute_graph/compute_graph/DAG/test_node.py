@@ -1,5 +1,5 @@
-from compute_graph.node import *
 import unittest
+from compute_graph.DAG.node import *
 
 
 
