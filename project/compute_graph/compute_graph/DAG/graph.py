@@ -1,12 +1,15 @@
+from typing import Optional, Set, List, Any, Dict
 import graphviz #type: ignore
 import os.path
-from compute_graph.DAG.node import *
-from compute_graph.DAG.helpers import assert_in_port_exists,  assert_out_port_exists
-from compute_graph.local_types import GraphViz, ErrorMessage
-from compute_graph.DAG.primative_nodes import InputPassThrough, PassThroughNode
-from compute_graph.errors import NotSupported
 
-class Graph(Node):
+from compute_graph.local_types import GraphViz, ErrorMessage
+from compute_graph.errors import NotSupported
+from compute_graph.DAG.node import DAG_Node, GraphEdges, InPort, OutPort, NodePort
+from compute_graph.DAG.helpers import assert_in_port_exists,  assert_out_port_exists
+from compute_graph.DAG.primative_nodes import InputPassThrough, PassThroughNode
+from compute_graph.AST.ast_node_base import AST_Node
+
+class Graph(DAG_Node):
     def __init__(self, inputs: int, outputs: int, friendly_name:Optional[str]=None):
         super().__init__(inputs, outputs, friendly_name=friendly_name, type_name="Graph")
         self._edges: GraphEdges = {}
@@ -34,8 +37,8 @@ class Graph(Node):
     def get_sub_nodes(self):
         return self._get_sub_nodes()
 
-    def _get_sub_nodes(self)->Set[Node]:
-        sub_nodes:set[Node] = set(self.input_interface)
+    def _get_sub_nodes(self)->Set[DAG_Node]:
+        sub_nodes:set[DAG_Node] = set(self.input_interface)
         sub_nodes = sub_nodes.union(self.output_interface)
         sub_nodes = sub_nodes.union(set([n for n,_ in self._edges.keys()]))
         for nps in self._edges.values():
@@ -102,11 +105,11 @@ class Graph(Node):
     def _eval(self, inputs: List[Any])->List[Any]:
 
         sub_nodes = self._get_sub_nodes()
-        node_requirements:Dict[Node, Set[int]] = {n: set(range(n.num_inputs)) for n in sub_nodes if n not in self.input_interface} 
+        node_requirements:Dict[DAG_Node, Set[int]] = {n: set(range(n.num_inputs)) for n in sub_nodes if n not in self.input_interface} 
         port_input_data:Dict[InPort, Any] = {InPort((self.input_interface[i], 0)):inputs[i] for i in range(self.num_inputs)}
         port_output_data:Dict[OutPort, Any] = {}
-        ready_nodes:Set[Node] =  set(self.input_interface)
-        complete_nodes: Set[Node] = set()
+        ready_nodes:Set[DAG_Node] =  set(self.input_interface)
+        complete_nodes: Set[DAG_Node] = set()
 
         while len(ready_nodes)>0:
             next_node = next(iter(ready_nodes))

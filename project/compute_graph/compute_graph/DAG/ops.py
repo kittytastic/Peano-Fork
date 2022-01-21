@@ -1,11 +1,11 @@
 from typing import List, Any, Optional
 
-from compute_graph.DAG.node import Node
+from compute_graph.DAG.node import DAG_Node
 from compute_graph.local_types import GraphViz
 from compute_graph.AST.ast_node_base import AST_Node
 from compute_graph.AST.ast_nodes_g import AST_Add, AST_Mul, AST_Sub
 
-class Add(Node):
+class Add(DAG_Node):
     def __init__(self, num_inputs: int, friendly_name:Optional[str]=None):
         super().__init__(num_inputs, 1, type_name="Add", friendly_name=friendly_name)
 
@@ -18,7 +18,7 @@ class Add(Node):
     def ast_visit(self, in_ports_ast: List[AST_Node]) -> List[AST_Node]:
         return [AST_Add(in_ports_ast[0], in_ports_ast[1])]
         
-class Subtract(Node):
+class Subtract(DAG_Node):
     def __init__(self,  friendly_name:Optional[str]=None):
         super().__init__(2, 1, type_name="Sub", friendly_name=friendly_name)
 
@@ -31,7 +31,7 @@ class Subtract(Node):
     def ast_visit(self, in_ports_ast: List[AST_Node]) -> List[AST_Node]:
         return [AST_Sub(in_ports_ast[0], in_ports_ast[1])]
 
-class Multiply(Node):
+class Multiply(DAG_Node):
     def __init__(self, num_inputs:int, friendly_name:Optional[str]=None):
         super().__init__(num_inputs, 1, type_name="Mul", friendly_name=friendly_name)
 

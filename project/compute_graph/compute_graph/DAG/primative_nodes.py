@@ -2,7 +2,7 @@ from typing import Optional
 from compute_graph.DAG.node import *
 from compute_graph.local_types import GraphViz
 
-class PassThroughNode(Node):
+class PassThroughNode(DAG_Node):
     def __init__(self, friendly_name:Optional[str] = None, type_name:Optional[str]=None):
         type_name_req = "PT" if not type_name else type_name
         super().__init__(1, 1, friendly_name=friendly_name, type_name=type_name_req)
@@ -23,7 +23,7 @@ class InputPassThrough(PassThroughNode):
         super().__init__(friendly_name=friendly_name, type_name="input")
 
 
-class TerminalInput(Node):
+class TerminalInput(DAG_Node):
     def __init__(self):
         super().__init__(1, 1, type_name="terminal")
     

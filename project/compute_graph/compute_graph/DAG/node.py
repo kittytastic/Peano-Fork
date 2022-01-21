@@ -5,17 +5,17 @@ from compute_graph.errors import *
 from compute_graph.local_types import ErrorMessage, GraphViz
 from compute_graph.AST.ast_node_base import AST_Node
 
-NodePort = Tuple['Node', int]
+NodePort = Tuple['DAG_Node', int]
 OutPort = NewType('OutPort', NodePort)
 InPort = NewType('InPort', NodePort)
 GraphEdges = Dict[OutPort, Set[InPort]]
 
-class Node(ABC):
+class DAG_Node(ABC):
     next_global_id = 0
 
     def __init__(self, num_inputs:int, num_outputs:int, type_name:str="unknown", friendly_name:Optional[str]=None):
-        self.id = Node.next_global_id
-        Node.next_global_id +=1
+        self.id = DAG_Node.next_global_id
+        DAG_Node.next_global_id +=1
         
         self.num_inputs = num_inputs
         self.num_outputs = num_outputs

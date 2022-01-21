@@ -5,7 +5,7 @@ from compute_graph.AST.ast_node_base import AST_Node
 from compute_graph.AST.ast_nodes_g import AST_Compound
 from compute_graph.AST.variables import Variable, VariableReference
 from compute_graph.DAG.graph import Graph
-from compute_graph.DAG.node import InPort, Node, OutPort
+from compute_graph.DAG.node import InPort, DAG_Node, OutPort
 from compute_graph.DAG.primative_nodes import TerminalInput
 
 
@@ -53,7 +53,7 @@ class Kernel():
         self.kernel_to_dag_in_map = kernel_to_dag_in_map
         self.dag_to_kernel_out_map = dag_to_kernel_out_map
 
-    def ast_compile(self, memory_map: Dict[OutPort, VariableReference], traversal_order: List[Node]):
+    def ast_compile(self, memory_map: Dict[OutPort, VariableReference], traversal_order: List[DAG_Node]):
         assert(self.dag!=None)
         assert(self.dag_to_kernel_out_map!=None)
         assert(self.kernel_to_dag_in_map!=None)
@@ -97,7 +97,7 @@ class Kernel():
 
         return out_expr
 
-    def _DAG_to_AST(self, inverse_edges:Dict[InPort, OutPort], memory_map: Dict[OutPort, VariableReference], traversal_order: List[Node])->List[AST_Node]:
+    def _DAG_to_AST(self, inverse_edges:Dict[InPort, OutPort], memory_map: Dict[OutPort, VariableReference], traversal_order: List[DAG_Node])->List[AST_Node]:
         
 
         compute_expr:List[AST_Node] = []

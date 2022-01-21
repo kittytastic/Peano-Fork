@@ -1,14 +1,14 @@
 from typing import Dict, List, Tuple
 
 from compute_graph.DAG.ops import Add, Multiply, Subtract
-from compute_graph.DAG.node import OutPort, Node
+from compute_graph.DAG.node import OutPort, DAG_Node
 from compute_graph.DAG.graph import Graph, visualize_graph
 from compute_graph.AST.variables import VariableReference, LocalVar
 from compute_graph.kernel import Kernel
 
 
 
-def basic_graph()->Tuple[Graph, Dict[OutPort, VariableReference], List[Node]]:
+def basic_graph()->Tuple[Graph, Dict[OutPort, VariableReference], List[DAG_Node]]:
     # Graph Nodes
     g = Graph(2,3)
     add = Add(2)
@@ -51,7 +51,7 @@ def basic_graph()->Tuple[Graph, Dict[OutPort, VariableReference], List[Node]]:
     # Traversal order
     in_1, _ = g.get_internal_input(0)
     in_2, _ = g.get_internal_input(0)
-    to:List[Node] = [in_1, in_2, add, sub, mul]
+    to:List[DAG_Node] = [in_1, in_2, add, sub, mul]
 
     visualize_graph(g)
     
@@ -115,7 +115,7 @@ def most_basic():
     # Traversal order
     in_1, _ = g.get_internal_input(0)
     in_2, _ = g.get_internal_input(0)
-    to:List[Node] = [in_1, in_2, add]
+    to:List[DAG_Node] = [in_1, in_2, add]
 
     visualize_graph(g)
     

@@ -1,4 +1,8 @@
-from compute_graph.DAG.node import *
+from typing import List, Set
+
+from compute_graph.DAG.node import DAG_Node, GraphEdges, OutPort, InPort
+from compute_graph.local_types import ErrorMessage
+from compute_graph.errors import PortDoesntExist
 
 def assert_in_port_exists(node_port:InPort):
     node, port = node_port
@@ -13,7 +17,7 @@ def assert_out_port_exists(node_port:OutPort):
 
 
 
-def _check_if_acyclic_r(cur_node_port:OutPort, edges: GraphEdges, visited: Set[Node], call_stack: List[Node])->List[ErrorMessage]:
+def _check_if_acyclic_r(cur_node_port:OutPort, edges: GraphEdges, visited: Set[DAG_Node], call_stack: List[DAG_Node])->List[ErrorMessage]:
     cur_node, _ = cur_node_port
     cs_copy = list(call_stack)
     cs_copy.append(cur_node)
@@ -30,7 +34,7 @@ def _check_if_acyclic_r(cur_node_port:OutPort, edges: GraphEdges, visited: Set[N
         
     return errors
 
-def check_if_acyclic(start_nodes: Set[Node], edges: GraphEdges)->List[ErrorMessage]:
+def check_if_acyclic(start_nodes: Set[DAG_Node], edges: GraphEdges)->List[ErrorMessage]:
     start_ports: Set[OutPort] = set([OutPort((n, p)) for n in start_nodes for p in range(n.num_outputs)])
 
     errors:List[ErrorMessage]=[]
