@@ -1,6 +1,5 @@
 from typing import Optional, Set, List, Any, Dict
-import graphviz #type: ignore
-import os.path
+
 
 from compute_graph.local_types import GraphViz, ErrorMessage
 from compute_graph.errors import NotSupported
@@ -27,6 +26,9 @@ class Graph(DAG_Node):
     
     def get_external_output(self, idx:int)->OutPort:
         return OutPort((self.output_interface[idx], 0))
+
+    def get_edges(self)->GraphEdges:
+        return self._edges
 
     def __getitem__(self, key:OutPort)->Set[InPort]:
         return self._edges[key]
@@ -152,12 +154,3 @@ class Graph(DAG_Node):
         return inverse_edges
 
 
-def visualize_graph(g: Graph, out_path:str="Artifacts", out_file_name:str="tmp"):
-    dot = graphviz.Digraph()
-    g.visualize(dot)
-
-    dot_file_name = os.path.join(out_path, f"{out_file_name}.dot")
-    with open(dot_file_name, "w+") as f:
-        f.write(dot.source)
-
-    dot.render(dot_file_name) #type:ignore

@@ -1,6 +1,7 @@
 from compute_graph.DAG.dag_visitor import BasicDagVisitor
 from compute_graph.DAG.graph import *
 from compute_graph.DAG.ops import *
+from compute_graph.DAG.visualize import visualize_graph
 
 def Euler2D_X()->Graph:
     g = Graph(4,4)
@@ -80,7 +81,7 @@ if __name__=="__main__":
     print(s)
     #e_msg = '\n'.join([e for e in g.validate()])
     #print(f"Errors:\n{e_msg}")
-    #visualize_graph(g)
+    visualize_graph(g)
 
     #outputs = g.eval([1,2])
     #print(f"Output: {outputs}")
