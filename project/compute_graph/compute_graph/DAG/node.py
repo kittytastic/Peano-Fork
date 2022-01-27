@@ -3,7 +3,7 @@ from typing import Any, Dict, List, NewType, Optional, Set, Tuple
 from abc import ABC, abstractmethod
 
 from compute_graph.errors import *
-from compute_graph.local_types import ErrorMessage, GraphViz
+from compute_graph.local_types import ErrorMessage
 from compute_graph.AST import AST_Node
 
 NodePort = Tuple['DAG_Node', int]
@@ -23,10 +23,6 @@ class DAG_Node(ABC):
         self.type_name = type_name
         self.friendly_name = friendly_name     
 
-    @abstractmethod
-    def visualize(self, dot:GraphViz)->None:
-        pass
-   
     @abstractmethod
     def _eval(self, inputs:List[Any])->List[Any]:
         pass

@@ -1,7 +1,7 @@
 from typing import Optional, Set, List, Any, Dict
 
 
-from compute_graph.local_types import GraphViz, ErrorMessage
+from compute_graph.local_types import  ErrorMessage
 from compute_graph.errors import NotSupported
 from compute_graph.DAG.node import DAG_Node, GraphEdges, InPort, OutPort, NodePort
 from compute_graph.DAG.helpers import assert_in_port_exists,  assert_out_port_exists
@@ -47,17 +47,6 @@ class Graph(DAG_Node):
             sub_nodes = sub_nodes.union([n for n,_ in nps])
 
         return sub_nodes
-
-    def visualize(self, dot: GraphViz):
-        all_nodes = self._get_sub_nodes()
-
-        for node in all_nodes:
-            node.visualize(dot)
-
-        for from_port, to_ports in self._edges.items():
-            from_node, _ = from_port 
-            for to_node,_ in to_ports:
-                dot.edge(str(from_node.id), str(to_node.id)) # type:ignore 
 
     def validate(self) -> List[ErrorMessage]:
         sub_nodes = self._get_sub_nodes()
