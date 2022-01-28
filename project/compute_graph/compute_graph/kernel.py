@@ -5,6 +5,7 @@ from compute_graph.AST.variables import Variable, VariableReference
 from compute_graph.DAG.graph import Graph
 from compute_graph.DAG.node import InPort, DAG_Node, OutPort
 from compute_graph.DAG import TerminalInput
+from compute_graph.DAG.AST_tf import DAGToASTVisitor
 
 
 class Kernel():
@@ -96,6 +97,7 @@ class Kernel():
         return out_expr
 
     def _DAG_to_AST(self, inverse_edges:Dict[InPort, OutPort], memory_map: Dict[OutPort, VariableReference], traversal_order: List[DAG_Node])->List[AST_Node]:
+        visitor = DAGToASTVisitor()
         
 
         compute_expr:List[AST_Node] = []
@@ -105,7 +107,7 @@ class Kernel():
             in_port_var_ref = [memory_map[p] for p in in_port_connections] # inject mappings
             in_port_ast = [pvr.ref() for pvr in in_port_var_ref]
 
-            node_ast = n.ast_visit(in_port_ast)
+            node_ast = visitor.visit(n, in_port_ast)
 
             out_port_store_var_ref = [memory_map[OutPort((n, p))] for p in range(n.num_outputs)]
             out_port_set_ast = [vr.set(ast) for vr, ast in zip(out_port_store_var_ref, node_ast)]

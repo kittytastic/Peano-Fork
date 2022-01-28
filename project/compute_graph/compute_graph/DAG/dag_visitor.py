@@ -8,6 +8,7 @@ from compute_graph.DAG.primitive_node import InputPassThrough, PassThroughNode, 
 
 _NOT_IMPLEMENTED = "Visitor method not implemented"
 
+_S = TypeVar("_S")
 _T = TypeVar("_T")
 
 class DAG_Visitor(Generic[_T], ABC):
@@ -48,6 +49,47 @@ class DAG_Visitor(Generic[_T], ABC):
     
     @abstractmethod
     def visitInputPassThrough(self, node:InputPassThrough)->_T:
+        raise NotImplementedError(_NOT_IMPLEMENTED)
+
+
+class DAG_PropsVisitor(Generic[_T, _S], ABC):
+    def visit(self, node:DAG_Node, props: _S)->_T:
+        node_type = type(node).__name__
+        visit_func_name = f"visit{node_type}"
+
+        if not hasattr(self, visit_func_name):
+            raise Exception(f"No visitor function found for node type: {node_type}  (looking for function: {visit_func_name}")
+        
+        visit_func: Callable[[DAG_Node, _S], _T] = getattr(self, visit_func_name)
+        return visit_func(node, props)
+
+    @abstractmethod
+    def visitGraph(self, node:Graph, props: _S)->_T:
+        raise NotImplementedError(_NOT_IMPLEMENTED)
+    
+    # Ops
+    @abstractmethod
+    def visitAdd(self, node:Add, props: _S)->_T:
+        raise NotImplementedError(_NOT_IMPLEMENTED)
+    
+    @abstractmethod
+    def visitSubtract(self, node:Subtract, props:_S)->_T:
+        raise NotImplementedError(_NOT_IMPLEMENTED)
+    
+    @abstractmethod
+    def visitMultiply(self, node:Multiply, props: _S)->_T:
+        raise NotImplementedError(_NOT_IMPLEMENTED)
+    
+    @abstractmethod
+    def visitTerminalInput(self, node:TerminalInput, props:_S)->_T:
+        raise NotImplementedError(_NOT_IMPLEMENTED)
+    
+    @abstractmethod
+    def visitPassThroughNode(self, node:PassThroughNode, props:_S)->_T:
+        raise NotImplementedError(_NOT_IMPLEMENTED)
+    
+    @abstractmethod
+    def visitInputPassThrough(self, node:InputPassThrough, props:_S)->_T:
         raise NotImplementedError(_NOT_IMPLEMENTED)
 
 

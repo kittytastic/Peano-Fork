@@ -5,7 +5,7 @@ from compute_graph.local_types import  ErrorMessage
 from compute_graph.errors import NotSupported
 from compute_graph.DAG.node import DAG_Node, GraphEdges, InPort, OutPort, NodePort
 from compute_graph.DAG.helpers import assert_in_port_exists,  assert_out_port_exists
-from compute_graph.DAG import InputPassThrough, PassThroughNode
+from compute_graph.DAG.primitive_node import InputPassThrough, PassThroughNode
 from compute_graph.AST import AST_Node
 
 class Graph(DAG_Node):
