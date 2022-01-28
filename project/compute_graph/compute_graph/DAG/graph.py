@@ -135,8 +135,6 @@ class Graph(DAG_Node):
 
         return [port_output_data[OutPort((on,0))] for on in self.output_interface]
 
-    def ast_visit(self, in_ports_ast: List[AST_Node]) -> List[AST_Node]:
-        raise NotSupported() 
 
     def inverse_edges(self)->Dict[InPort, OutPort]:
         inverse_edges = {ip: op for op, ips in self._edges.items() for ip in ips}

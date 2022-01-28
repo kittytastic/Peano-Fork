@@ -9,8 +9,6 @@ class PassThroughNode(DAG_Node):
     def _eval(self, inputs: List[Any])->List[Any]:
         return [inputs[0]]
     
-    def ast_visit(self, in_ports_ast: List[AST_Node]) -> List[AST_Node]:
-        return in_ports_ast
 
 class InputPassThrough(PassThroughNode):
     def __init__(self, idx:int, friendly_name:Optional[str] = None):
@@ -25,5 +23,3 @@ class TerminalInput(DAG_Node):
     def _eval(self, inputs: List[Any])->List[Any]:
         raise Exception("Not implemented")
     
-    def ast_visit(self, in_ports_ast: List[AST_Node]) -> List[AST_Node]:
-        raise Exception("Not implemented")

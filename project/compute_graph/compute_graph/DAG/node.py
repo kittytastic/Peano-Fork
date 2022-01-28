@@ -4,7 +4,6 @@ from abc import ABC, abstractmethod
 
 from compute_graph.errors import *
 from compute_graph.local_types import ErrorMessage
-from compute_graph.AST import AST_Node
 
 NodePort = Tuple['DAG_Node', int]
 OutPort = NewType('OutPort', NodePort)
@@ -41,9 +40,6 @@ class DAG_Node(ABC):
 
         return outputs
 
-    @abstractmethod 
-    def ast_visit(self, in_ports_ast:List[AST_Node])->List[AST_Node]:
-        pass
     
     def __hash__(self) -> int:
         return self.id
