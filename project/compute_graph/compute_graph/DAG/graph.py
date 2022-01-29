@@ -2,11 +2,9 @@ from typing import Optional, Set, List, Any, Dict
 
 
 from compute_graph.local_types import  ErrorMessage
-from compute_graph.errors import NotSupported
 from compute_graph.DAG.node import DAG_Node, GraphEdges, InPort, OutPort, NodePort
 from compute_graph.DAG.helpers import assert_in_port_exists,  assert_out_port_exists
 from compute_graph.DAG.primitive_node import InputPassThrough, PassThroughNode
-from compute_graph.AST import AST_Node
 
 class Graph(DAG_Node):
     def __init__(self, inputs: int, outputs: int, friendly_name:Optional[str]=None):
@@ -134,6 +132,38 @@ class Graph(DAG_Node):
             ready_nodes.update(newly_satisfied_nodes)
 
         return [port_output_data[OutPort((on,0))] for on in self.output_interface]
+
+    def eval_order(self)->List[DAG_Node]:
+        sub_nodes = self._get_sub_nodes()
+        node_requirements:Dict[DAG_Node, Set[int]] = {n: set(range(n.num_inputs)) for n in sub_nodes if n not in self.input_interface} 
+        ready_nodes:Set[DAG_Node] =  set(self.input_interface)
+        complete_nodes: Set[DAG_Node] = set()
+
+        eval_order: List[DAG_Node] = []
+
+        while len(ready_nodes)>0:
+            next_node = next(iter(ready_nodes))
+            ready_nodes.remove(next_node)
+            complete_nodes.add(next_node)
+            eval_order.append(next_node)
+
+            # update port output
+            for idx in range(next_node.num_outputs):
+                op = OutPort((next_node, idx))
+                if op in self._edges:    
+                    for dependent_port in self._edges[op]:
+                        d_node, d_port = dependent_port
+                        node_requirements[d_node].remove(d_port)
+
+            
+            # update any satisfied nodes
+            newly_satisfied_nodes = [n for n,v in node_requirements.items() if len(v)==0]
+            for nsn in newly_satisfied_nodes:
+                del node_requirements[nsn]
+
+            ready_nodes.update(newly_satisfied_nodes)
+
+        return eval_order
 
 
     def inverse_edges(self)->Dict[InPort, OutPort]:

@@ -1,0 +1,80 @@
+from typing import List
+from enum import Enum
+
+class IR_DataTypes(Enum):
+    FP64 = 1
+
+class IR_Symbol():
+    pass
+
+class IR_Function(IR_Symbol):
+    def __init__(self, data_type:IR_DataTypes, in_var: List['IR_Variable'], out_var: List['IR_Variable'], body: List['IR_Assign']):
+        self.data_type = data_type
+        self.in_var = in_var
+        self.out_var = out_var
+        self.body = body
+    
+    def __str__(self):
+        in_var_str = ", ".join([str(iv) for iv in self.in_var])
+        out_var_str = ", ".join([str(iv) for iv in self.out_var])
+        body_str = "\n\t".join([str(b) for b in self.body])
+        out_str = f"define {self.data_type} ({in_var_str}) ({out_var_str}):\n\t{body_str}"
+        return out_str
+
+    
+
+class IR_Assign(IR_Symbol):
+    pass
+
+class IR_SingleAssign(IR_Assign):
+    def __init__(self, assign_var: 'IR_Variable', expr: 'IR_Symbol'):
+        self.assign_var = assign_var
+        self.expr = expr
+
+    def __str__(self) -> str:
+        return f"{self.assign_var} = {self.expr}"
+
+class IR_MultiAssign(IR_Assign):
+    def __init__(self, assign_vars: List['IR_Variable'], func: 'IR_CallFunction'):
+        self.assign_vars = assign_vars
+        self.func = func
+
+class IR_Add(IR_Symbol):
+    def __init__(self, lval: IR_Symbol, rval: IR_Symbol):
+        self.lval = lval
+        self.rval = rval
+    
+    def __str__(self):
+        return f"{self.lval} + {self.rval}"
+
+class IR_Sub(IR_Symbol):
+    def __init__(self, lval: IR_Symbol, rval: IR_Symbol):
+        self.lval = lval
+        self.rval = rval
+
+    def __str__(self):
+        return f"{self.lval} - {self.rval}"
+
+class IR_Mul(IR_Symbol):
+    def __init__(self, lval: IR_Symbol, rval: IR_Symbol):
+        self.lval = lval
+        self.rval = rval
+    
+    def __str__(self):
+        return f"{self.lval} * {self.rval}"
+
+class IR_Variable(IR_Symbol):
+    def __init__(self):
+        super().__init__()
+
+class IR_TempVariable(IR_Variable):
+    def __init__(self, tmp_class:str, id:int) -> None:
+        self.tmp_class = tmp_class
+        self.id = id
+
+    def __str__(self):
+        return f"%{self.tmp_class}{self.id}"
+
+class IR_CallFunction(IR_Symbol):
+    def __init__(self, args: List['IR_Variable']):
+        self.args = args

@@ -1,4 +1,4 @@
-from compute_graph.DAG.dag_visitor import BasicDagVisitor
+from compute_graph.DAG.IR_tf import DAGToIRVisitor
 from compute_graph.DAG.graph import *
 from compute_graph.DAG.ops import *
 from compute_graph.DAG.visualize import visualize_graph
@@ -76,12 +76,9 @@ def basic_graph()->Graph:
 if __name__=="__main__":
 
     g = basic_graph()    
-    v = BasicDagVisitor()
-    s=v.visit(g)
-    print(s)
-    #e_msg = '\n'.join([e for e in g.validate()])
-    #print(f"Errors:\n{e_msg}")
     visualize_graph(g)
 
-    #outputs = g.eval([1,2])
-    #print(f"Output: {outputs}")
+    v = DAGToIRVisitor()
+    func = v.visit(g, [])
+
+    print(func)
