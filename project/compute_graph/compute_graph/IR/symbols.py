@@ -1,11 +1,42 @@
 from typing import List
 from enum import Enum
+import inspect
 
 class IR_DataTypes(Enum):
     FP64 = 1
 
 class IR_Symbol():
-    pass
+    def __contains__(self, key:'IR_Symbol'):
+        # TODO wont work with literal attributes
+        if key == self:
+            return True
+
+        attributes = inspect.getmembers(self, lambda a:not(inspect.isroutine(a)))
+        attributes = [a for a in attributes if not(a[0].startswith('__') and a[0].endswith('__'))]
+        #child_is: List[bool] = [key == val for _, val in attributes if isinstance(val, IR_Symbol)] 
+        child_ins:List[bool] = [key in val for _, val in attributes if isinstance(val, IR_Symbol)] 
+
+        #print(attributes)
+        return any(child_ins)
+    
+    def replace(self, find:'IR_Symbol', replace: 'IR_Symbol')->int:
+        # TODO wont work with literal attributes
+        if find == self:
+            raise Exception("Cannot replace. The symbol yoy called replace on needs to be replaced")
+
+        attributes = inspect.getmembers(self, lambda a:not(inspect.isroutine(a)))
+        attributes = [a for a in attributes if not(a[0].startswith('__') and a[0].endswith('__'))]
+        child_symbol = [(k,v) for k, v in attributes if isinstance(v, IR_Symbol)]
+
+        replacement_count = 0
+        for k, s in child_symbol:
+            if s == find:
+                setattr(self, k, replace)
+                replacement_count +=1
+            else:
+                replacement_count += s.replace(find, replace)
+
+        return replacement_count
 
 class IR_Function(IR_Symbol):
     def __init__(self, data_type:IR_DataTypes, in_var: List['IR_Variable'], out_var: List['IR_Variable'], body: List['IR_Assign']):
@@ -74,6 +105,9 @@ class IR_TempVariable(IR_Variable):
 
     def __str__(self):
         return f"%{self.tmp_class}{self.id}"
+
+    def __repr__(self) -> str:
+        return self.__str__()
 
 class IR_CallFunction(IR_Symbol):
     def __init__(self, args: List['IR_Variable']):

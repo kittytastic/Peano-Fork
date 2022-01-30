@@ -2,6 +2,7 @@ from compute_graph.DAG.IR_tf import DAGToIRVisitor
 from compute_graph.DAG.graph import *
 from compute_graph.DAG.ops import *
 from compute_graph.DAG.visualize import visualize_graph
+from compute_graph.IR.misc import InlineInOut
 
 def Euler2D_X()->Graph:
     g = Graph(4,4)
@@ -82,3 +83,10 @@ if __name__=="__main__":
     func = v.visit(g, [])
 
     print(func)
+    print()
+
+    tf = InlineInOut()
+    func = tf.tf(func)
+
+    print(func)
+
