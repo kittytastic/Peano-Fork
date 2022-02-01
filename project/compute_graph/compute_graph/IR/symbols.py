@@ -1,23 +1,40 @@
-from typing import List
+from typing import List, Union, Tuple, Any, Optional
 from enum import Enum
 import inspect
+
 
 class IR_DataTypes(Enum):
     FP64 = 1
 
 class IR_Symbol():
-    def __contains__(self, key:'IR_Symbol'):
-        # TODO wont work with literal attributes
-        if key == self:
-            return True
-
+    def _get_all_attributes(self)->List[Tuple[str, Any]]:
         attributes = inspect.getmembers(self, lambda a:not(inspect.isroutine(a)))
         attributes = [a for a in attributes if not(a[0].startswith('__') and a[0].endswith('__'))]
-        #child_is: List[bool] = [key == val for _, val in attributes if isinstance(val, IR_Symbol)] 
-        child_ins:List[bool] = [key in val for _, val in attributes if isinstance(val, IR_Symbol)] 
+        return attributes
 
-        #print(attributes)
-        return any(child_ins)
+    def _is_list_of_symbol(self, in_list:List[Any])->Optional[List['IR_Symbol']]:
+        for i in in_list:
+            if not isinstance(i, IR_Symbol):
+                return None
+        
+        return in_list
+
+    def __contains__(self, key:Union['IR_Symbol', type]):
+        if inspect.isclass(key):
+            if isinstance(self, key):
+                return True
+        else:
+            if key == self:
+                return True
+        
+        attributes = self._get_all_attributes()
+        child_ins:List[bool] = [key in val for _, val in attributes if isinstance(val, IR_Symbol)]
+        
+        child_lists: List[List[Any]] = [val for _,val in attributes if isinstance(val, list)]
+        child_sym_lists:List[List['IR_Symbol']] = [l for l in child_lists if self._is_list_of_symbol(l)]
+        child_list_ins: List[bool] = [key in i for l in child_sym_lists for i in l]
+
+        return any(child_ins) or any(child_list_ins)
     
     def replace(self, find:'IR_Symbol', replace: 'IR_Symbol')->int:
         # TODO wont work with literal attributes
