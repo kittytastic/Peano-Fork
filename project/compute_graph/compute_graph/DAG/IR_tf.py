@@ -1,7 +1,7 @@
 from typing import List, Set, Dict
 from compute_graph.DAG.dag_visitor import DAG_Visitor, DAG_PropsVisitor
 from compute_graph.DAG.node import InPort, OutPort
-from compute_graph.IR.symbols import IR_Assign, IR_CallFunction, IR_DataTypes, IR_Function, IR_Symbol, IR_TempVariable, IR_Variable, IR_MultiAssign, IR_SingleAssign, IR_Add, IR_Mul, IR_Sub
+from compute_graph.IR.symbols import IR_Assign, IR_CallLooseFunction, IR_DataTypes, IR_LooseFunction, IR_Symbol, IR_TempVariable, IR_Variable, IR_MultiAssign, IR_SingleAssign, IR_Add, IR_Mul, IR_Sub
 from compute_graph.DAG import Graph, Add, Subtract, Multiply, TerminalInput, PassThroughNode, InputPassThrough
 
 class DAG_GatherSubgraphVisitor(DAG_Visitor[Set[Graph]]):
@@ -59,7 +59,7 @@ class DAGToIRVisitor(DAG_PropsVisitor[IR_Symbol, List[IR_Symbol]]):
 
 
             if isinstance(n, Graph):
-                body.append(IR_MultiAssign(node_out_vars, IR_CallFunction(node_in_vars)))
+                body.append(IR_MultiAssign(node_out_vars, IR_CallLooseFunction(node_in_vars)))
                 raise Exception("Nested graphs support not complete")
             else:
                 body.append(IR_SingleAssign(node_out_vars[0], self.visit(n, node_in_vars)))
@@ -78,7 +78,7 @@ class DAGToIRVisitor(DAG_PropsVisitor[IR_Symbol, List[IR_Symbol]]):
             body.append(IR_SingleAssign(out_vars[idx], var))
 
 
-        return IR_Function(IR_DataTypes.FP64, in_vars, out_vars,body)
+        return IR_LooseFunction(IR_DataTypes.VOID, in_vars, out_vars,body)
 
     def visitAdd(self, node:Add, props:List[IR_Symbol])->IR_Symbol:
         return IR_Add(props[0], props[1])

@@ -1,11 +1,11 @@
-from typing import Dict, Set, List
-from compute_graph.IR.symbols import IR_Function, IR_SingleAssign, IR_Symbol, IR_TempVariable, IR_Variable
+from typing import Dict, List
+from compute_graph.IR.symbols import IR_LooseFunction, IR_NoReturn, IR_SingleAssign, IR_Symbol, IR_TempVariable, IR_TightFunction, IR_Variable, IR_SingleVariable
 from compute_graph.IR.transform import IR_Transfrom
 
 
 class InlineInOut(IR_Transfrom):
     def tf(self, in_IR: IR_Symbol)->IR_Symbol:
-        working_ir = self.assert_and_cast_symbol_type(in_IR, IR_Function) 
+        working_ir = self.assert_and_cast_symbol_type(in_IR, IR_LooseFunction) 
         working_ir = self.inline_inputs(working_ir)
         print(working_ir)
         working_ir = self.inline_outputs(working_ir)
@@ -13,7 +13,7 @@ class InlineInOut(IR_Transfrom):
 
         return working_ir
 
-    def inline_inputs(self, working_ir: IR_Function)->IR_Function:
+    def inline_inputs(self, working_ir: IR_LooseFunction)->IR_LooseFunction:
         in_vars = working_ir.in_var
         invar_alias: Dict[IR_Variable, IR_Variable] = {}
         delete_lines:List[int] = []
@@ -35,7 +35,7 @@ class InlineInOut(IR_Transfrom):
         return working_ir
 
 
-    def inline_outputs(self, working_ir: IR_Function)->IR_Function:
+    def inline_outputs(self, working_ir: IR_LooseFunction)->IR_LooseFunction:
         out_vars = working_ir.out_var
         outvar_alias: Dict[IR_Variable, IR_Variable] = {}
         delete_lines:List[int] = []
@@ -56,4 +56,35 @@ class InlineInOut(IR_Transfrom):
             
         
         return working_ir
-    
+
+
+class ApplyCallStencil(IR_Transfrom):
+    def __init__(self, target_args: List[IR_Variable], in_map: List[IR_Variable], out_map: List[IR_Variable]):
+        self.target_args = target_args
+        self.in_map = in_map
+        self.out_map = out_map
+        super().__init__()
+
+    def tf(self, in_IR: IR_Symbol)->IR_Symbol:
+        working_ir = self.assert_and_cast_symbol_type(in_IR, IR_LooseFunction) 
+
+        for in_v, target_v in zip(working_ir.in_var, self.in_map):
+            working_ir.replace(in_v, target_v) 
+        
+        for out_v, target_v in zip(working_ir.out_var, self.out_map):
+            working_ir.replace(out_v, target_v)
+
+        out_ir = IR_TightFunction(working_ir.data_type, self.target_args, working_ir.body, IR_NoReturn())
+
+        return out_ir
+
+class RemoveAllTemp(IR_Transfrom):
+    def tf(self, in_IR: IR_Symbol)->IR_Symbol:
+        working_ir = self.assert_and_cast_symbol_type(in_IR, IR_TightFunction)
+        
+        temp_vars = working_ir.get_instances(IR_TempVariable)
+        new_vars = [IR_SingleVariable(f"{tv.tmp_class}{tv.id}", False) for tv in temp_vars]
+        for nv, tv in zip(new_vars, temp_vars):
+            working_ir.replace(tv, nv)
+        
+        return working_ir

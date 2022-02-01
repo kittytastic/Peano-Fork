@@ -1,9 +1,11 @@
-from typing import List, Union, Tuple, Any, Optional, cast
+from typing import List, TypeVar, Union, Tuple, Any, Optional, cast, Type, Set
 from enum import Enum
 import inspect
 
+_T = TypeVar("_T")
 
 class IR_DataTypes(Enum):
+    VOID = 0
     FP64 = 1
 
 class IR_Symbol():
@@ -67,8 +69,24 @@ class IR_Symbol():
 
 
         return replacement_count
+    
+    def get_instances(self, symbol_type: Type[_T])->Set[_T]:
+        if isinstance(self, symbol_type):
+            return set([self])
+        
+        attributes = self._get_all_attributes() 
+        child_symbols = [s for _, s in attributes if isinstance(s, IR_Symbol)]
+        child_lists:List[List['IR_Symbol']] = [l for _,l in attributes if self._is_list_of_symbol(l)]
 
-class IR_Function(IR_Symbol):
+        instances_from_syms = [s.get_instances(symbol_type) for s in child_symbols]
+        instances_from_list = [s.get_instances(symbol_type) for l in child_lists for s in l]
+
+        base_set: Set[_T] =  set()
+        base_set = base_set.union(*instances_from_syms)
+        base_set = base_set.union(*instances_from_list)
+        return base_set
+
+class IR_LooseFunction(IR_Symbol):
     def __init__(self, data_type:IR_DataTypes, in_var: List['IR_Variable'], out_var: List['IR_Variable'], body: List['IR_Assign']):
         self.data_type = data_type
         self.in_var = in_var
@@ -82,7 +100,27 @@ class IR_Function(IR_Symbol):
         out_str = f"define {self.data_type} ({in_var_str}) ({out_var_str}):\n\t{body_str}"
         return out_str
 
+class IR_TightFunction(IR_Symbol):
+    def __init__(self, data_type:IR_DataTypes, args: List['IR_Variable'], body: List['IR_Assign'], return_statement: 'IR_Return'):
+        self.data_type = data_type
+        self.args = args
+        self.body = body
+        self.return_statement = return_statement
     
+    def __str__(self):
+        arg_str = ", ".join([str(a) for a in self.args])
+        body_str = "\n\t".join([str(b) for b in self.body])
+        out_str = f"define {self.data_type} ({arg_str}):\n\t{body_str}\n\t{str(self.return_statement)}"
+        return out_str   
+
+class IR_Return(IR_Symbol): pass
+class IR_ReturnValue(IR_Return):
+    def __str__(self) -> str:
+        return "<return something>"
+
+class IR_NoReturn(IR_Return):
+    def __str__(self) -> str:
+        return "<return nothing>"
 
 class IR_Assign(IR_Symbol):
     pass
@@ -96,7 +134,7 @@ class IR_SingleAssign(IR_Assign):
         return f"{self.assign_var} = {self.expr}"
 
 class IR_MultiAssign(IR_Assign):
-    def __init__(self, assign_vars: List['IR_Variable'], func: 'IR_CallFunction'):
+    def __init__(self, assign_vars: List['IR_Variable'], func: 'IR_CallLooseFunction'):
         self.assign_vars = assign_vars
         self.func = func
 
@@ -127,6 +165,10 @@ class IR_Mul(IR_Symbol):
 class IR_Variable(IR_Symbol):
     def __init__(self):
         super().__init__()
+    
+    def __repr__(self) -> str:
+        return self.__str__()
+
 
 class IR_TempVariable(IR_Variable):
     def __init__(self, tmp_class:str, id:int) -> None:
@@ -139,6 +181,36 @@ class IR_TempVariable(IR_Variable):
     def __repr__(self) -> str:
         return self.__str__()
 
-class IR_CallFunction(IR_Symbol):
+class IR_SingleVariable(IR_Variable):
+    def __init__(self, name:str, is_ref:bool) -> None:
+        self.name = name
+        self.is_ref = is_ref
+
+    def __str__(self):
+        return f"#{self.name}"
+
+class IR_Array(IR_Variable):
+    def __init__(self, name:str, length:int) -> None:
+        self.length = length
+        self.name = name
+        self.refs = [IR_ArrayRef(self.name, i) for i in range(length)]
+
+    def get_ref(self, idx: int):
+        return self.refs[idx]
+
+    def __str__(self):
+        return f"#list({self.name})"
+
+
+class IR_ArrayRef(IR_Variable):
+    def __init__(self, parent_name:str, id:int) -> None:
+        self.parent_name = parent_name
+        self.id = id
+
+    def __str__(self):
+        return f"#{self.parent_name}[{self.id}]"
+
+
+class IR_CallLooseFunction(IR_Symbol):
     def __init__(self, args: List['IR_Variable']):
         self.args = args
