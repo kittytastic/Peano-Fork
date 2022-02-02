@@ -5,15 +5,16 @@ from compute_graph.IR.symbols import *
 from pycparser.c_ast import FileAST, FuncDef, ID, Decl, FuncDecl, TypeDecl, ParamList, IdentifierType, PtrDecl, Compound, Assignment, ID, ArrayRef, Constant, BinaryOp # type: ignore
 from pycparser import c_generator # type: ignore
 
-_NO_OP = ID("no_op") 
+from compute_graph.language_backend.backend_base import LanguageBackend # type: ignore
+
 C_DATA_TYPE_MAP = {IR_DataTypes.VOID: 'void', IR_DataTypes.FP64: 'double'}
 
 
-class CTF(IR_Visitor[Any]):
+_NO_OP = ID("no_op") 
+class IR_To_C_TF(IR_Visitor[Any]):
     def __init__(self, data_type_map: Dict[IR_DataTypes, str]):
         self.data_type_map = data_type_map
         
-
     def visit_IR_TightFunction(self, node:IR_TightFunction)->Any:
         function_name = "compute_kernel"
 
@@ -104,32 +105,37 @@ class CTF(IR_Visitor[Any]):
     def visit_IR_CallLooseFunction(self, node:IR_CallLooseFunction)->Any:
         raise Exception("Illegal Symbol")
 
-def inspect_ast_DEBUG(node:Any):
-    import inspect
-    attributes = inspect.getmembers(node, lambda a:not(inspect.isroutine(a)))
-    attributes = [a for a in attributes if not(a[0].startswith('__') and a[0].endswith('__'))]
 
-    print(f"INSPECTING: {type(node).__name__}")
-    for k,v in attributes:
-        print(f"{k}: {v.__repr__()}")
 
-def compile_as_c_DEBUG(sym: IR_Symbol):
-    ast_builder = CTF(C_DATA_TYPE_MAP)
-    inner = ast_builder.visit(sym)
-    return_ast = FileAST([inner])
+class C_Backend(LanguageBackend):
+    def code_gen(self, ir: IR_Symbol) -> str:
+        ast_builder = IR_To_C_TF(C_DATA_TYPE_MAP)
+        inner = ast_builder.visit(ir)
+        return_ast = FileAST([inner])
+        generator:Any = c_generator.CGenerator()
 
-    print()
-    print("-------- C AST --------")
-    return_ast.show(showcoord=False) # type:ignore
-    print("------ Generated ------")
-    generator:Any = c_generator.CGenerator()
-    print(generator.visit(return_ast))
+        code = generator.visit(return_ast)
+        return code
 
-def compile_as_c(sym: IR_Symbol)->str:
-    ast_builder = CTF(C_DATA_TYPE_MAP)
-    inner = ast_builder.visit(sym)
-    return_ast = FileAST([inner])
-    generator:Any = c_generator.CGenerator()
+    def DEBUG_code_gen(self, ir: IR_Symbol)-> str:
+        ast_builder = IR_To_C_TF(C_DATA_TYPE_MAP)
+        inner = ast_builder.visit(ir)
+        return_ast = FileAST([inner])
 
-    code = generator.visit(return_ast)
-    return code
+        print()
+        print("-------- C AST --------")
+        return_ast.show(showcoord=False) # type:ignore
+        print("------ Generated ------")
+        generator:Any = c_generator.CGenerator()
+        code = generator.visit(return_ast)
+
+        return code
+    
+    def DEBUG_inspect_ast(self, node:Any):
+        import inspect
+        attributes = inspect.getmembers(node, lambda a:not(inspect.isroutine(a)))
+        attributes = [a for a in attributes if not(a[0].startswith('__') and a[0].endswith('__'))]
+
+        print(f"INSPECTING: {type(node).__name__}")
+        for k,v in attributes:
+            print(f"{k}: {v.__repr__()}")

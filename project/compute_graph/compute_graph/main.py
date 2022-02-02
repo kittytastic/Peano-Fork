@@ -3,8 +3,8 @@ from compute_graph.DAG.graph import *
 from compute_graph.DAG.ops import *
 from compute_graph.DAG.visualize import visualize_graph
 from compute_graph.IR.misc import ApplyCallStencil, DefineAllVars, InlineInOut, RemoveAllTemp
-from compute_graph.IR.symbols import IR_Array, IR_SingleVariable
-from compute_graph.IR.c_tf import compile_as_c
+from compute_graph.IR.symbols import IR_Array, IR_SingleVariable, UniqueVariableName
+from compute_graph.language_backend.c import C_Backend
 
 def Euler2D_X()->Graph:
     g = Graph(4,4)
@@ -90,9 +90,9 @@ if __name__=="__main__":
     print()
     print(func)
 
-    in1 = IR_SingleVariable("input1", False)
-    in2 = IR_SingleVariable("input2", False)
-    out = IR_Array("out", 3)
+    in1 = IR_SingleVariable(UniqueVariableName("input1"), False)
+    in2 = IR_SingleVariable(UniqueVariableName("input2"), False)
+    out = IR_Array(UniqueVariableName("out"), 3)
     tf2 = ApplyCallStencil([in1, in2, out], [in1, in2], [out.get_ref(0), out.get_ref(1), out.get_ref(2)])
     func = tf2.tf(func)
     print()
@@ -108,7 +108,8 @@ if __name__=="__main__":
     print()
     print(func)
 
-    code = compile_as_c(func)
+    cbe = C_Backend()
+    code = cbe.code_gen(func)
     print()
     print(code)
 
