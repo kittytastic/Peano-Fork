@@ -1,23 +1,28 @@
 from typing import Any
 from compute_graph.IR.visitor import IR_Visitor
 from compute_graph.IR.symbols import *
+from compute_graph.code_gen_test import inspect_ast
 
-from pycparser.c_ast import FileAST, FuncDef, ID, Decl, FuncDecl, TypeDecl, ParamList, IdentifierType, PtrDecl # type: ignore
+from pycparser.c_ast import FileAST, FuncDef, ID, Decl, FuncDecl, TypeDecl, ParamList, IdentifierType, PtrDecl, Compound, Assignment, ID, ArrayRef, Constant # type: ignore
 from pycparser import c_generator # type: ignore
 
 NO_OP = ID("no_op") 
 
 class CTF(IR_Visitor[Any]):
     def visit_IR_TightFunction(self, node:IR_TightFunction)->Any:
-        #Body -> is compond statement
-        #decl -> Decl obj
-        #param_decls -> None
+        function_name = "compute_kernel"
+
+        # Head
         identifier_type = IdentifierType(names=['void'])
-        function_type = TypeDecl("FUNCTION_NAME", [], None, identifier_type)
+        function_type = TypeDecl(function_name, [], None, identifier_type)
         param_list = ParamList([self.visit(n) for n in node.args])
         func_decl = FuncDecl(param_list, function_type)
-        head = Decl("FUNCTION_NAME", [], [], [], [], func_decl, None, None)
-        return FuncDef(head, NO_OP, None)
+        head = Decl(function_name, [], [], [], [], func_decl, None, None)
+        
+        # Body
+        body_ast = [self.visit(l) for l in node.body]
+        body = Compound([n for n in body_ast if n is not None])
+        return FuncDef(head, None, body)
 
     def visit_IR_LooseFunction(self, node:IR_LooseFunction)->Any:
         raise Exception("Illegal Symbol")
@@ -26,28 +31,40 @@ class CTF(IR_Visitor[Any]):
         raise Exception("Not implemented")
 
     def visit_IR_NoReturn(self, node:IR_NoReturn)->Any:
-        raise Exception("Not implemented")
+        return None
 
     def visit_IR_SingleAssign(self, node:IR_SingleAssign)->Any:
-        raise Exception("Not implemented")
+        if isinstance(node.assign_var, IR_VarBodyDefine):
+            var = node.assign_var.var
+            assert(isinstance(var, IR_SingleVariable)) 
+            id_type = IdentifierType(names=["double"])
+            type_decl = TypeDecl(var.name, [], [], id_type)
+            rhs = self.visit(node.expr)
+            return Decl(var.name, [], [], [], [], type_decl, rhs, None)
+        elif isinstance(node.assign_var, IR_SingleVariable):
+            return Assignment("=", self.visit(node.assign_var), self.visit(node.expr))
+        elif isinstance(node.assign_var, IR_ArrayRef):
+            return Assignment("=", self.visit(node.assign_var), self.visit(node.expr))
+        else:
+            raise Exception("Not implemented")
 
     def visit_IR_MultiAssign(self, node:IR_MultiAssign)->Any:
         raise Exception("Not implemented")
 
     def visit_IR_Add(self, node:IR_Add)->Any:
-        raise Exception("Not implemented")
+        return NO_OP
 
     def visit_IR_Sub(self, node:IR_Sub)->Any:
-        raise Exception("Not implemented")
+        return NO_OP
 
     def visit_IR_Mul(self, node:IR_Mul)->Any:
-        raise Exception("Not implemented")
+        return NO_OP
 
     def visit_IR_TempVariable(self, node:IR_TempVariable)->Any:
         raise Exception("Illegal Symbol")
 
     def visit_IR_SingleVariable(self, node:IR_SingleVariable)->Any:
-        raise Exception("Not implemented")
+        return ID(node.name)
     
     def visit_IR_Array(self, node:IR_Array)->Any:
         raise Exception("Not implemented")
@@ -76,7 +93,8 @@ class CTF(IR_Visitor[Any]):
             raise Exception("Not Implemented")
 
     def visit_IR_ArrayRef(self, node:IR_ArrayRef)->Any:
-        raise Exception("Not implemented")
+        ss = Constant('int', str(node.id))
+        return ArrayRef(ID(node.parent_name), ss)
 
     def visit_IR_CallLooseFunction(self, node:IR_CallLooseFunction)->Any:
         raise Exception("Illegal Symbol")
@@ -93,5 +111,8 @@ def compile_as_c(sym: IR_Symbol):
     print("------ Generated ------")
     generator:Any = c_generator.CGenerator()
     print(generator.visit(return_ast))
+
+    #print()
+    #inspect_ast(return_ast)
 
     return return_ast

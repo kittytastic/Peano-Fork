@@ -19,13 +19,15 @@ def translate_to_c(filename:str):
 
     print()
     print()
-    inspect_ast(ast.ext[0].decl.type.args.params[0])
+    inspect_ast(ast.ext[0].body.block_items[6])
+    #inspect_ast(ast)
 
 
 def inspect_ast(node:Any):
     attributes = inspect.getmembers(node, lambda a:not(inspect.isroutine(a)))
     attributes = [a for a in attributes if not(a[0].startswith('__') and a[0].endswith('__'))]
 
+    print(f"INSPECTING: {type(node).__name__}")
     for k,v in attributes:
         print(f"{k}: {v.__repr__()}")
 
