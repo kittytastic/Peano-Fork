@@ -1,4 +1,4 @@
-from typing import List, TypeVar, Union, Tuple, Any, Optional, cast, Type, Set
+from typing import List, NewType, TypeVar, Union, Tuple, Any, Optional, cast, Type, Set
 from enum import Enum
 import inspect
 
@@ -162,9 +162,12 @@ class IR_Mul(IR_Symbol):
     def __str__(self):
         return f"{self.lval} * {self.rval}"
 
+UniqueVariableName = NewType("UniqueVariableName", str)
+
 class IR_Variable(IR_Symbol):
-    def __init__(self):
+    def __init__(self, name:UniqueVariableName):
         super().__init__()
+        self.name = name
     
     def __repr__(self) -> str:
         return self.__str__()

@@ -1,19 +1,24 @@
-from typing import Any
+from typing import Any, Dict
 from compute_graph.IR.visitor import IR_Visitor
 from compute_graph.IR.symbols import *
-from compute_graph.code_gen_test import inspect_ast
 
 from pycparser.c_ast import FileAST, FuncDef, ID, Decl, FuncDecl, TypeDecl, ParamList, IdentifierType, PtrDecl, Compound, Assignment, ID, ArrayRef, Constant, BinaryOp # type: ignore
 from pycparser import c_generator # type: ignore
 
-NO_OP = ID("no_op") 
+_NO_OP = ID("no_op") 
+C_DATA_TYPE_MAP = {IR_DataTypes.VOID: 'void', IR_DataTypes.FP64: 'double'}
+
 
 class CTF(IR_Visitor[Any]):
+    def __init__(self, data_type_map: Dict[IR_DataTypes, str]):
+        self.data_type_map = data_type_map
+        
+
     def visit_IR_TightFunction(self, node:IR_TightFunction)->Any:
         function_name = "compute_kernel"
 
         # Head
-        identifier_type = IdentifierType(names=['void'])
+        identifier_type = IdentifierType(names=[self.data_type_map[node.data_type]])
         function_type = TypeDecl(function_name, [], None, identifier_type)
         param_list = ParamList([self.visit(n) for n in node.args])
         func_decl = FuncDecl(param_list, function_type)
@@ -99,8 +104,16 @@ class CTF(IR_Visitor[Any]):
     def visit_IR_CallLooseFunction(self, node:IR_CallLooseFunction)->Any:
         raise Exception("Illegal Symbol")
 
+def inspect_ast_DEBUG(node:Any):
+    attributes = inspect.getmembers(node, lambda a:not(inspect.isroutine(a)))
+    attributes = [a for a in attributes if not(a[0].startswith('__') and a[0].endswith('__'))]
+
+    print(f"INSPECTING: {type(node).__name__}")
+    for k,v in attributes:
+        print(f"{k}: {v.__repr__()}")
+
 def compile_as_c_DEBUG(sym: IR_Symbol):
-    ast_builder = CTF()
+    ast_builder = CTF(C_DATA_TYPE_MAP)
     inner = ast_builder.visit(sym)
     return_ast = FileAST([inner])
 
@@ -112,7 +125,7 @@ def compile_as_c_DEBUG(sym: IR_Symbol):
     print(generator.visit(return_ast))
 
 def compile_as_c(sym: IR_Symbol)->str:
-    ast_builder = CTF()
+    ast_builder = CTF(C_DATA_TYPE_MAP)
     inner = ast_builder.visit(sym)
     return_ast = FileAST([inner])
     generator:Any = c_generator.CGenerator()
