@@ -108,5 +108,8 @@ if __name__=="__main__":
     print()
     print(func)
 
-    ast = compile_as_c(func)
+    code = compile_as_c(func)
+    print()
+    print(code)
+
     

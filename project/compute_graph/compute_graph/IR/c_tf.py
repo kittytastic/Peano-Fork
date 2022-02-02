@@ -3,7 +3,7 @@ from compute_graph.IR.visitor import IR_Visitor
 from compute_graph.IR.symbols import *
 from compute_graph.code_gen_test import inspect_ast
 
-from pycparser.c_ast import FileAST, FuncDef, ID, Decl, FuncDecl, TypeDecl, ParamList, IdentifierType, PtrDecl, Compound, Assignment, ID, ArrayRef, Constant # type: ignore
+from pycparser.c_ast import FileAST, FuncDef, ID, Decl, FuncDecl, TypeDecl, ParamList, IdentifierType, PtrDecl, Compound, Assignment, ID, ArrayRef, Constant, BinaryOp # type: ignore
 from pycparser import c_generator # type: ignore
 
 NO_OP = ID("no_op") 
@@ -52,13 +52,13 @@ class CTF(IR_Visitor[Any]):
         raise Exception("Not implemented")
 
     def visit_IR_Add(self, node:IR_Add)->Any:
-        return NO_OP
+        return BinaryOp("+", self.visit(node.lval), self.visit(node.rval))
 
     def visit_IR_Sub(self, node:IR_Sub)->Any:
-        return NO_OP
+        return BinaryOp("-", self.visit(node.lval), self.visit(node.rval))
 
     def visit_IR_Mul(self, node:IR_Mul)->Any:
-        return NO_OP
+        return BinaryOp("*", self.visit(node.lval), self.visit(node.rval))
 
     def visit_IR_TempVariable(self, node:IR_TempVariable)->Any:
         raise Exception("Illegal Symbol")
@@ -99,20 +99,23 @@ class CTF(IR_Visitor[Any]):
     def visit_IR_CallLooseFunction(self, node:IR_CallLooseFunction)->Any:
         raise Exception("Illegal Symbol")
 
-def compile_as_c(sym: IR_Symbol):
+def compile_as_c_DEBUG(sym: IR_Symbol):
     ast_builder = CTF()
     inner = ast_builder.visit(sym)
     return_ast = FileAST([inner])
 
-
     print()
     print("-------- C AST --------")
-    return_ast.show(showcoord=False)
+    return_ast.show(showcoord=False) # type:ignore
     print("------ Generated ------")
     generator:Any = c_generator.CGenerator()
     print(generator.visit(return_ast))
 
-    #print()
-    #inspect_ast(return_ast)
+def compile_as_c(sym: IR_Symbol)->str:
+    ast_builder = CTF()
+    inner = ast_builder.visit(sym)
+    return_ast = FileAST([inner])
+    generator:Any = c_generator.CGenerator()
 
-    return return_ast
+    code = generator.visit(return_ast)
+    return code
