@@ -83,7 +83,7 @@ class RemoveAllTemp(IR_Transfrom):
         working_ir = self.assert_and_cast_symbol_type(in_IR, IR_TightFunction)
         
         temp_vars = working_ir.get_instances(IR_TempVariable)
-        new_vars = [IR_SingleVariable(f"{tv.tmp_class}{tv.id}", False) for tv in temp_vars]
+        new_vars = [IR_SingleVariable(tv.name, False) for tv in temp_vars]
         for nv, tv in zip(new_vars, temp_vars):
             working_ir.replace(tv, nv)
         

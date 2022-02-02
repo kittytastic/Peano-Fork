@@ -174,28 +174,25 @@ class IR_Variable(IR_Symbol):
 
 
 class IR_TempVariable(IR_Variable):
-    def __init__(self, tmp_class:str, id:int) -> None:
-        self.tmp_class = tmp_class
-        self.id = id
-
+    def __init__(self, name:UniqueVariableName) -> None:
+        super().__init__(name)
+    
     def __str__(self):
-        return f"%{self.tmp_class}{self.id}"
+        return f"%{self.name}"
 
-    def __repr__(self) -> str:
-        return self.__str__()
 
 class IR_SingleVariable(IR_Variable):
-    def __init__(self, name:str, is_ref:bool) -> None:
-        self.name = name
+    def __init__(self, name:UniqueVariableName, is_ref:bool) -> None:
+        super().__init__(name)
         self.is_ref = is_ref
 
     def __str__(self):
         return f"#{self.name}"
 
 class IR_Array(IR_Variable):
-    def __init__(self, name:str, length:int) -> None:
+    def __init__(self, name:UniqueVariableName, length:int) -> None:
+        super().__init__(name)
         self.length = length
-        self.name = name
         self.refs = [IR_ArrayRef(self.name, i) for i in range(length)]
 
     def get_ref(self, idx: int):
@@ -203,6 +200,14 @@ class IR_Array(IR_Variable):
 
     def __str__(self):
         return f"#list({self.name})"
+
+class IR_ArrayRef(IR_Variable):
+    def __init__(self, name:UniqueVariableName, id:int) -> None:
+        super().__init__(name)
+        self.id = id
+
+    def __str__(self):
+        return f"#{self.name}[{self.id}]"
 
 class IR_VarBodyDefine(IR_Variable):
     def __init__(self, var: IR_Variable):
@@ -218,17 +223,6 @@ class IR_VarArgDefine(IR_Variable):
     def __str__(self):
         return f"new {str(self.var)}"
         
-
-
-class IR_ArrayRef(IR_Variable):
-    def __init__(self, parent_name:str, id:int) -> None:
-        self.parent_name = parent_name
-        self.id = id
-
-    def __str__(self):
-        return f"#{self.parent_name}[{self.id}]"
-
-
 class IR_CallLooseFunction(IR_Symbol):
     def __init__(self, args: List['IR_Variable']):
         self.args = args

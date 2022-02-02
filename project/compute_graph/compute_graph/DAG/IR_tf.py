@@ -1,7 +1,7 @@
 from typing import List, Set, Dict
 from compute_graph.DAG.dag_visitor import DAG_Visitor, DAG_PropsVisitor
 from compute_graph.DAG.node import InPort, OutPort
-from compute_graph.IR.symbols import IR_Assign, IR_CallLooseFunction, IR_DataTypes, IR_LooseFunction, IR_Symbol, IR_TempVariable, IR_Variable, IR_MultiAssign, IR_SingleAssign, IR_Add, IR_Mul, IR_Sub
+from compute_graph.IR.symbols import IR_Assign, IR_CallLooseFunction, IR_DataTypes, IR_LooseFunction, IR_Symbol, IR_TempVariable, IR_Variable, IR_MultiAssign, IR_SingleAssign, IR_Add, IR_Mul, IR_Sub, UniqueVariableName
 from compute_graph.DAG import Graph, Add, Subtract, Multiply, TerminalInput, PassThroughNode, InputPassThrough
 
 class DAG_GatherSubgraphVisitor(DAG_Visitor[Set[Graph]]):
@@ -37,7 +37,7 @@ class DAGToIRVisitor(DAG_PropsVisitor[IR_Symbol, List[IR_Symbol]]):
 
     def next_temp_var(self):
         self._temp_var_counter += 1
-        return IR_TempVariable("tmp", self._temp_var_counter)
+        return IR_TempVariable(UniqueVariableName(f"tmp{self._temp_var_counter}"))
 
     
     def visitGraph(self, node:Graph, props:List[IR_Symbol])->IR_Symbol:
@@ -45,8 +45,8 @@ class DAGToIRVisitor(DAG_PropsVisitor[IR_Symbol, List[IR_Symbol]]):
         eval_order = node.eval_order()
         print(eval_order)
 
-        in_vars:List[IR_Variable] = [IR_TempVariable("in", i) for i in range(node.num_inputs)]
-        out_vars:List[IR_Variable] = [IR_TempVariable("out", i) for i in range(node.num_outputs)]
+        in_vars:List[IR_Variable] = [IR_TempVariable(UniqueVariableName(f"in{i}")) for i in range(node.num_inputs)]
+        out_vars:List[IR_Variable] = [IR_TempVariable(UniqueVariableName(f"out{i}")) for i in range(node.num_outputs)]
         final_vars:Dict[int, IR_Variable] = {}            
 
         inport_vars:Dict[InPort, IR_Variable] = {InPort((in_node, 0)):in_vars[idx] for idx, in_node in enumerate(node.input_interface)}

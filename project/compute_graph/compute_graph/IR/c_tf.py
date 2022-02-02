@@ -99,7 +99,7 @@ class CTF(IR_Visitor[Any]):
 
     def visit_IR_ArrayRef(self, node:IR_ArrayRef)->Any:
         ss = Constant('int', str(node.id))
-        return ArrayRef(ID(node.parent_name), ss)
+        return ArrayRef(ID(node.name), ss)
 
     def visit_IR_CallLooseFunction(self, node:IR_CallLooseFunction)->Any:
         raise Exception("Illegal Symbol")
