@@ -4,6 +4,7 @@ from compute_graph.DAG.ops import *
 from compute_graph.DAG.visualize import visualize_graph
 from compute_graph.IR.misc import ApplyCallStencil, DefineAllVars, InlineInOut, RemoveAllTemp
 from compute_graph.IR.symbols import IR_Array, IR_SingleVariable
+from compute_graph.IR.c_tf import compile_as_c
 
 def Euler2D_X()->Graph:
     g = Graph(4,4)
@@ -106,3 +107,6 @@ if __name__=="__main__":
     func = tf4.tf(func)
     print()
     print(func)
+
+    ast = compile_as_c(func)
+    
