@@ -43,7 +43,6 @@ class DAGToIRVisitor(DAG_PropsVisitor[IR_Symbol, List[IR_Symbol]]):
     def visitGraph(self, node:Graph, props:List[IR_Symbol])->IR_Symbol:
         edges = node.get_edges()
         eval_order = node.eval_order()
-        print(eval_order)
 
         in_vars:List[IR_Variable] = [IR_TempVariable(UniqueVariableName(f"in{i}")) for i in range(node.num_inputs)]
         out_vars:List[IR_Variable] = [IR_TempVariable(UniqueVariableName(f"out{i}")) for i in range(node.num_outputs)]
@@ -78,7 +77,7 @@ class DAGToIRVisitor(DAG_PropsVisitor[IR_Symbol, List[IR_Symbol]]):
             body.append(IR_SingleAssign(out_vars[idx], var))
 
 
-        return IR_LooseFunction(IR_DataTypes.VOID, in_vars, out_vars,body)
+        return IR_LooseFunction(IR_DataTypes.VOID, in_vars, out_vars, body, node.name)
 
     def visitAdd(self, node:Add, props:List[IR_Symbol])->IR_Symbol:
         return IR_Add(props[0], props[1])

@@ -7,7 +7,7 @@ from compute_graph.IR.symbols import IR_Array, IR_SingleVariable, UniqueVariable
 from compute_graph.language_backend.c import C_Backend
 
 def Euler2D_X()->Graph:
-    g = Graph(4,4)
+    g = Graph(4,4, "Euler2d_X")
     p = Multiply(4)
     irho = PassThroughNode(friendly_name="irho")
 
@@ -56,7 +56,7 @@ def Euler2D_X()->Graph:
     return g
 
 def basic_graph()->Graph:
-    g=Graph(2,3)
+    g=Graph(2,3, "basic_computation")
     add = Add(2)
     mul = Multiply(2)
     sub = Subtract()

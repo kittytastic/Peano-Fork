@@ -4,11 +4,12 @@ from compute_graph.IR.symbols.variables import IR_Variable, IR_Assign
 
 
 class IR_LooseFunction(IR_Symbol):
-    def __init__(self, data_type:IR_DataTypes, in_var: List['IR_Variable'], out_var: List['IR_Variable'], body: List['IR_Assign']):
+    def __init__(self, data_type:IR_DataTypes, in_var: List['IR_Variable'], out_var: List['IR_Variable'], body: List['IR_Assign'], name:str):
         self.data_type = data_type
         self.in_var = in_var
         self.out_var = out_var
         self.body = body
+        self.name = name
     
     def __str__(self):
         in_var_str = ", ".join([str(iv) for iv in self.in_var])
@@ -18,11 +19,12 @@ class IR_LooseFunction(IR_Symbol):
         return out_str
 
 class IR_TightFunction(IR_Symbol):
-    def __init__(self, data_type:IR_DataTypes, args: List['IR_Variable'], body: List['IR_Assign'], return_statement: 'IR_Return'):
+    def __init__(self, data_type:IR_DataTypes, args: List['IR_Variable'], body: List['IR_Assign'], return_statement: 'IR_Return', name:str):
         self.data_type = data_type
         self.args = args
         self.body = body
         self.return_statement = return_statement
+        self.name = name
     
     def __str__(self):
         arg_str = ", ".join([str(a) for a in self.args])

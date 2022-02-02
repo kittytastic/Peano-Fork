@@ -74,7 +74,7 @@ class ApplyCallStencil(IR_Transfrom):
         for out_v, target_v in zip(working_ir.out_var, self.out_map):
             working_ir.replace(out_v, target_v)
 
-        out_ir = IR_TightFunction(working_ir.data_type, self.target_args, working_ir.body, IR_NoReturn())
+        out_ir = IR_TightFunction(working_ir.data_type, self.target_args, working_ir.body, IR_NoReturn(), working_ir.name)
 
         return out_ir
 

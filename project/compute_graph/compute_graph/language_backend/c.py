@@ -16,7 +16,7 @@ class IR_To_C_TF(IR_Visitor[Any]):
         self.data_type_map = data_type_map
         
     def visit_IR_TightFunction(self, node:IR_TightFunction)->Any:
-        function_name = "compute_kernel"
+        function_name = node.name
 
         # Head
         identifier_type = IdentifierType(names=[self.data_type_map[node.data_type]])

@@ -1,4 +1,4 @@
-from typing import Optional, Set, List, Any, Dict
+from typing import Set, List, Any, Dict
 
 
 from compute_graph.local_types import  ErrorMessage
@@ -7,11 +7,12 @@ from compute_graph.DAG.helpers import assert_in_port_exists,  assert_out_port_ex
 from compute_graph.DAG.primitive_node import InputPassThrough, PassThroughNode
 
 class Graph(DAG_Node):
-    def __init__(self, inputs: int, outputs: int, friendly_name:Optional[str]=None):
+    def __init__(self, inputs: int, outputs: int, friendly_name:str):
         super().__init__(inputs, outputs, friendly_name=friendly_name, type_name="Graph")
         self._edges: GraphEdges = {}
         self.input_interface = [InputPassThrough(i, friendly_name=f"input{i}") for i in range(inputs)]
         self.output_interface = [PassThroughNode(friendly_name=f"output{_}") for _ in range(outputs)]
+        self.name = friendly_name
 
     def get_internal_input(self, idx:int)->OutPort:
         return OutPort((self.input_interface[idx], 0))
