@@ -2,7 +2,7 @@ from compute_graph.DAG.IR_tf import DAGToIRVisitor
 from compute_graph.DAG.graph import *
 from compute_graph.DAG.ops import *
 from compute_graph.DAG.visualize import visualize_graph
-from compute_graph.IR.misc import ApplyCallStencil, InlineInOut, RemoveAllTemp
+from compute_graph.IR.misc import ApplyCallStencil, DefineAllVars, InlineInOut, RemoveAllTemp
 from compute_graph.IR.symbols import IR_Array, IR_SingleVariable
 
 def Euler2D_X()->Graph:
@@ -99,5 +99,10 @@ if __name__=="__main__":
 
     tf3 = RemoveAllTemp()
     func = tf3.tf(func)
+    print()
+    print(func)
+    
+    tf4 = DefineAllVars()
+    func = tf4.tf(func)
     print()
     print(func)

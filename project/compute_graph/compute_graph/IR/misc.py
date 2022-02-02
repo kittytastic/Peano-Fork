@@ -1,5 +1,5 @@
-from typing import Dict, List
-from compute_graph.IR.symbols import IR_LooseFunction, IR_NoReturn, IR_SingleAssign, IR_Symbol, IR_TempVariable, IR_TightFunction, IR_Variable, IR_SingleVariable
+from typing import Dict, List, Set
+from compute_graph.IR.symbols import IR_Array, IR_LooseFunction, IR_MultiAssign, IR_NoReturn, IR_SingleAssign, IR_Symbol, IR_TempVariable, IR_TightFunction, IR_VarArgDefine, IR_VarBodyDefine, IR_Variable, IR_SingleVariable
 from compute_graph.IR.transform import IR_Transfrom
 
 
@@ -87,4 +87,29 @@ class RemoveAllTemp(IR_Transfrom):
         for nv, tv in zip(new_vars, temp_vars):
             working_ir.replace(tv, nv)
         
+        return working_ir
+
+class DefineAllVars(IR_Transfrom):
+    def tf(self, in_IR: IR_Symbol)-> IR_Symbol:
+        working_ir = self.assert_and_cast_symbol_type(in_IR, IR_TightFunction)
+        symbol_table:Set[IR_Variable] = set()
+
+        for idx, a in enumerate(working_ir.args):
+            symbol_table.add(a)
+            working_ir.args[idx] = IR_VarArgDefine(a)
+
+            if isinstance(a, IR_Array):
+                symbol_table.update(a.refs)
+
+
+        for line in working_ir.body:
+            if isinstance(line, IR_MultiAssign):
+                raise Exception("Not implemented")
+            
+            if isinstance(line, IR_SingleAssign):
+                assign_var = line.assign_var
+                if assign_var not in symbol_table:
+                    line.assign_var = IR_VarBodyDefine(assign_var)
+                    symbol_table.add(assign_var)
+
         return working_ir

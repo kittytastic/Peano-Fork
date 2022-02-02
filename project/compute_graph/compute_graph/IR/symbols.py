@@ -201,6 +201,21 @@ class IR_Array(IR_Variable):
     def __str__(self):
         return f"#list({self.name})"
 
+class IR_VarBodyDefine(IR_Variable):
+    def __init__(self, var: IR_Variable):
+        self.var = var
+
+    def __str__(self):
+        return f"new {str(self.var)}"
+
+class IR_VarArgDefine(IR_Variable):
+    def __init__(self, var: IR_Variable):
+        self.var = var
+    
+    def __str__(self):
+        return f"new {str(self.var)}"
+        
+
 
 class IR_ArrayRef(IR_Variable):
     def __init__(self, parent_name:str, id:int) -> None:
