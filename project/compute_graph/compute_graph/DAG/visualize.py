@@ -2,12 +2,12 @@ from typing import Optional, List, Dict
 import graphviz #type: ignore
 import os.path
 from compute_graph.DAG.dag_visitor import DAG_PropsVisitor 
-from compute_graph.DAG.graph import Graph
+from compute_graph.DAG.graph import Graph, InputInterface, OutputInterface
 from compute_graph.DAG.node import DAG_Node
 from compute_graph.local_types import GraphViz
 
 from compute_graph.DAG.ops import Add, Multiply, Subtract
-from compute_graph.DAG.primitive_node import InputInterface, OutputInterface, PassThroughNode, TerminalInput
+from compute_graph.DAG.primitive_node import PassThroughNode, TerminalInput
 
 class DAGVizVisitor(DAG_PropsVisitor[None, int]):
     def __init__(self, dot:GraphViz, max_depth:Optional[int]=None) -> None:
@@ -24,7 +24,7 @@ class DAGVizVisitor(DAG_PropsVisitor[None, int]):
 
     def visitGraph(self, node:Graph, props:int)->None:
         if self._exceed_max_depth(props):
-            self.dot.node(str(node.id), str(node.friendly_name)) # type: ignore
+            self.dot.node(str(node.id), str(node.friendly_name), color=self.colour(props)) # type: ignore
             return
 
         all_nodes = node.get_sub_nodes()
@@ -81,9 +81,9 @@ class DAGVizVisitor(DAG_PropsVisitor[None, int]):
         name = node.friendly_name if node.friendly_name else str(node)
         self.dot.node(str(node.id), f"{name}", color=self.colour(props)) # type:ignore
 
-def visualize_graph(g: Graph, out_path:str="Artifacts", out_file_name:str="tmp"):
+def visualize_graph(g: Graph, out_path:str="Artifacts", out_file_name:str="tmp", max_depth:Optional[int]=None):
     dot = graphviz.Digraph()
-    gv = DAGVizVisitor(dot, max_depth=-1)
+    gv = DAGVizVisitor(dot, max_depth=max_depth)
     gv.visit(g, 0)
 
     dot_file_name = os.path.join(out_path, f"{out_file_name}.dot")

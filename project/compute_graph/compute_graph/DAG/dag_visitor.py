@@ -1,10 +1,10 @@
 from typing import Callable, TypeVar, Generic
 from abc import ABC, abstractmethod
-from compute_graph.DAG.graph import Graph
+from compute_graph.DAG.graph import Graph, InputInterface, OutputInterface
 
 from compute_graph.DAG.node import DAG_Node
 from compute_graph.DAG.ops import Add, Multiply, Subtract
-from compute_graph.DAG.primitive_node import InputInterface, OutputInterface, PassThroughNode, TerminalInput
+from compute_graph.DAG.primitive_node import  PassThroughNode, TerminalInput
 
 _NOT_IMPLEMENTED = "Visitor method not implemented"
 

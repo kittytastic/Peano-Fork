@@ -1,10 +1,24 @@
-from typing import Callable, Set, List, Any, Dict
+from typing import Set, List, Any, Dict, Tuple, Optional
 
 
 from compute_graph.local_types import  ErrorMessage
 from compute_graph.DAG.node import DAG_Node, GraphEdges, InPort, OutPort, NodePort
 from compute_graph.DAG.helpers import assert_in_port_exists,  assert_out_port_exists
-from compute_graph.DAG.primitive_node import GraphInterface, InputInterface, OutputInterface
+from compute_graph.DAG.primitive_node import PassThroughNode
+
+class GraphInterface(PassThroughNode):
+    def __init__(self, idx:int, parent_graph: 'Graph', type_name:str, friendly_name:Optional[str]):
+        self.idx = idx
+        self.parent_graph = parent_graph
+        super().__init__(friendly_name=friendly_name, type_name=type_name)
+
+class InputInterface(GraphInterface):
+    def __init__(self, idx:int, parent_graph: 'Graph', friendly_name:Optional[str] = None):
+        super().__init__(idx, parent_graph, "input", friendly_name=friendly_name)
+
+class OutputInterface(GraphInterface):
+    def __init__(self, idx:int, parent_graph: 'Graph', friendly_name:Optional[str] = None):
+        super().__init__(idx, parent_graph, "output", friendly_name=friendly_name)
 
 class Graph(DAG_Node):
     def __init__(self, inputs: int, outputs: int, friendly_name:str):
@@ -36,9 +50,10 @@ class Graph(DAG_Node):
         self._edges[key] = value
 
     def get_sub_nodes(self):
-        return self._get_sub_nodes()
+        sn, sg = self.get_categoriesed_sub_nodes()
+        return sn.union(sg)
 
-    def _get_sub_nodes(self)->Set[DAG_Node]:
+    def get_categoriesed_sub_nodes(self)->Tuple[Set[DAG_Node], Set['Graph']]:
         sub_nodes:set[DAG_Node] = set(self.input_interface)
         sub_nodes = sub_nodes.union(self.output_interface)
 
@@ -54,11 +69,11 @@ class Graph(DAG_Node):
         
 
         sub_nodes = sub_nodes.union(set(pure_sub_nodes))
-        sub_nodes = sub_nodes.union(sub_graphs)
-        return sub_nodes
+        return sub_nodes, sub_graphs
+       
 
     def validate(self) -> List[ErrorMessage]:
-        sub_nodes = self._get_sub_nodes()
+        sub_nodes = self.get_sub_nodes()
         require_full_input = sub_nodes - set(self.input_interface)
 
         ports_to_fullfill:Set[InPort] = set()
@@ -104,7 +119,7 @@ class Graph(DAG_Node):
 
     def _eval(self, inputs: List[Any])->List[Any]:
 
-        sub_nodes = self._get_sub_nodes()
+        sub_nodes = self.get_sub_nodes()
         node_requirements:Dict[DAG_Node, Set[int]] = {n: set(range(n.num_inputs)) for n in sub_nodes if n not in self.input_interface} 
         port_input_data:Dict[InPort, Any] = {InPort((self.input_interface[i], 0)):inputs[i] for i in range(self.num_inputs)}
         port_output_data:Dict[OutPort, Any] = {}
@@ -145,7 +160,7 @@ class Graph(DAG_Node):
         return [port_output_data[OutPort((on,0))] for on in self.output_interface]
 
     def eval_order(self)->List[DAG_Node]:
-        sub_nodes = self._get_sub_nodes()
+        sub_nodes = self.get_sub_nodes()
         node_requirements:Dict[DAG_Node, Set[int]] = {n: set(range(n.num_inputs)) for n in sub_nodes if n not in self.input_interface} 
         ready_nodes:Set[DAG_Node] =  set(self.input_interface)
         complete_nodes: Set[DAG_Node] = set()
