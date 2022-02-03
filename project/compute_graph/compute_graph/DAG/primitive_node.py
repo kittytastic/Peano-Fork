@@ -10,11 +10,19 @@ class PassThroughNode(DAG_Node):
         return [inputs[0]]
     
 
-class InputPassThrough(PassThroughNode):
-    def __init__(self, idx:int, friendly_name:Optional[str] = None):
+class GraphInterface(PassThroughNode):
+    def __init__(self, idx:int, parent_graph: DAG_Node, type_name:str, friendly_name:Optional[str]):
         self.idx = idx
-        super().__init__(friendly_name=friendly_name, type_name="input")
+        self.parent_graph = parent_graph
+        super().__init__(friendly_name=friendly_name, type_name=type_name)
 
+class InputInterface(GraphInterface):
+    def __init__(self, idx:int, parent_graph: DAG_Node, friendly_name:Optional[str] = None):
+        super().__init__(idx, parent_graph, "input", friendly_name=friendly_name)
+
+class OutputInterface(GraphInterface):
+    def __init__(self, idx:int, parent_graph:DAG_Node, friendly_name:Optional[str] = None):
+        super().__init__(idx, parent_graph, "output", friendly_name=friendly_name)
 
 class TerminalInput(DAG_Node):
     def __init__(self):

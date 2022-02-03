@@ -1,3 +1,4 @@
+from typing import Tuple
 from compute_graph.DAG.IR_tf import DAGToIRVisitor
 from compute_graph.DAG.graph import *
 from compute_graph.DAG.ops import *
@@ -76,8 +77,8 @@ def basic_graph()->Graph:
 
     return g
 
-if __name__=="__main__":
 
+def investivate_basic_build():
     g = basic_graph()    
     visualize_graph(g)
 
@@ -112,5 +113,45 @@ if __name__=="__main__":
     code = cbe.code_gen(func)
     print()
     print(code)
+
+def nested_comp()->Tuple[Graph, Graph]:
+    g2 = Graph(2,2, "nested_g")
+    add1 = Add(2)
+    add2 = Add(2)
+    g2.add_edge(g2.get_internal_input(0), (add1, 0))
+    g2.add_edge(g2.get_internal_input(1), (add1, 1))
+    
+    g2.add_edge((add1, 0), (add2, 0))
+    g2.add_edge(g2.get_internal_input(1), (add2, 1))
+
+    g2.add_edge((add1, 0), g2.get_internal_output(0))
+    g2.add_edge((add2, 0), g2.get_internal_output(1))
+
+    g=Graph(2,3, "basic_computation")
+    
+    mul = Multiply(2)
+    sub = Subtract()
+    
+    
+    g.add_edge(g.get_internal_input(0), g2.get_external_input(0))
+    g.add_edge(g.get_internal_input(1), g2.get_external_input(1))
+    g.add_edge(g2.get_external_output(0), g.get_internal_output(0))
+    
+    g.add_edge(g2.get_internal_input(0), (sub,0))
+    g.add_edge(g.get_internal_input(1), (sub,1))
+    g.add_edge((sub,0), g.get_internal_output(2))
+
+    g.add_edge((sub, 0), (mul,0))
+    g.add_edge(g2.get_external_output(1), (mul,1))
+    g.add_edge((mul, 0), g.get_internal_output(1))
+
+    return g, g2
+
+if __name__=="__main__":
+
+    g, g2 = nested_comp() 
+    print(g.get_sub_nodes())  
+    visualize_graph(g)
+
 
     

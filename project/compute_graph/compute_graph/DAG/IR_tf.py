@@ -2,7 +2,7 @@ from typing import List, Set, Dict
 from compute_graph.DAG.dag_visitor import DAG_Visitor, DAG_PropsVisitor
 from compute_graph.DAG.node import InPort, OutPort
 from compute_graph.IR.symbols import IR_Assign, IR_CallLooseFunction, IR_DataTypes, IR_LooseFunction, IR_Symbol, IR_TempVariable, IR_Variable, IR_MultiAssign, IR_SingleAssign, IR_Add, IR_Mul, IR_Sub, UniqueVariableName
-from compute_graph.DAG import Graph, Add, Subtract, Multiply, TerminalInput, PassThroughNode, InputPassThrough
+from compute_graph.DAG import Graph, Add, Subtract, Multiply, TerminalInput, PassThroughNode, InputInterface, OutputInterface 
 
 class DAG_GatherSubgraphVisitor(DAG_Visitor[Set[Graph]]):
     
@@ -27,7 +27,7 @@ class DAG_GatherSubgraphVisitor(DAG_Visitor[Set[Graph]]):
     def visitPassThroughNode(self, node:PassThroughNode)->Set[Graph]:
         raise Exception("Not implemented")
 
-    def visitInputPassThrough(self, node:InputPassThrough)->Set[Graph]:
+    def visitInputInterface(self, node:InputInterface)->Set[Graph]:
         raise Exception("Not implemented")
 
 
@@ -94,5 +94,8 @@ class DAGToIRVisitor(DAG_PropsVisitor[IR_Symbol, List[IR_Symbol]]):
     def visitPassThroughNode(self, node:PassThroughNode, props:List[IR_Symbol])->IR_Symbol:
         return props[0]
     
-    def visitInputPassThrough(self, node:InputPassThrough, props:List[IR_Symbol])->IR_Symbol:
+    def visitInputInterface(self, node:InputInterface, props:List[IR_Symbol])->IR_Symbol:
+        return props[0]
+
+    def visitOutputInterface(self, node:OutputInterface, props:List[IR_Symbol])->IR_Symbol:
         return props[0]

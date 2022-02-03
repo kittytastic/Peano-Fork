@@ -1,17 +1,17 @@
-from typing import Set, List, Any, Dict
+from typing import Callable, Set, List, Any, Dict
 
 
 from compute_graph.local_types import  ErrorMessage
 from compute_graph.DAG.node import DAG_Node, GraphEdges, InPort, OutPort, NodePort
 from compute_graph.DAG.helpers import assert_in_port_exists,  assert_out_port_exists
-from compute_graph.DAG.primitive_node import InputPassThrough, PassThroughNode
+from compute_graph.DAG.primitive_node import GraphInterface, InputInterface, OutputInterface
 
 class Graph(DAG_Node):
     def __init__(self, inputs: int, outputs: int, friendly_name:str):
         super().__init__(inputs, outputs, friendly_name=friendly_name, type_name="Graph")
         self._edges: GraphEdges = {}
-        self.input_interface = [InputPassThrough(i, friendly_name=f"input{i}") for i in range(inputs)]
-        self.output_interface = [PassThroughNode(friendly_name=f"output{_}") for _ in range(outputs)]
+        self.input_interface = [InputInterface(i, self, friendly_name=f"input{i}") for i in range(inputs)]
+        self.output_interface = [OutputInterface(i, self, friendly_name=f"output{i}") for i in range(outputs)]
         self.name = friendly_name
 
     def get_internal_input(self, idx:int)->OutPort:
@@ -41,10 +41,20 @@ class Graph(DAG_Node):
     def _get_sub_nodes(self)->Set[DAG_Node]:
         sub_nodes:set[DAG_Node] = set(self.input_interface)
         sub_nodes = sub_nodes.union(self.output_interface)
-        sub_nodes = sub_nodes.union(set([n for n,_ in self._edges.keys()]))
-        for nps in self._edges.values():
-            sub_nodes = sub_nodes.union([n for n,_ in nps])
 
+        pure_sub_nodes = [n for n, _ in self._edges.keys() if not isinstance(n, GraphInterface)]
+        interface_nodes:List[GraphInterface] = [n for n, _ in self._edges.keys() if isinstance(n, GraphInterface)]
+        for nps in self._edges.values():
+            pure_sub_nodes += [n for n,_ in nps if not isinstance(n, GraphInterface)]
+            interface_nodes += [n for n,_ in nps if isinstance(n, GraphInterface)]
+
+        all_graphs = [ifn.parent_graph for ifn in interface_nodes]
+        sub_graphs = set(all_graphs)
+        sub_graphs.discard(self) 
+        
+
+        sub_nodes = sub_nodes.union(set(pure_sub_nodes))
+        sub_nodes = sub_nodes.union(sub_graphs)
         return sub_nodes
 
     def validate(self) -> List[ErrorMessage]:

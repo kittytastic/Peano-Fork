@@ -4,7 +4,7 @@ from compute_graph.DAG.graph import Graph
 
 from compute_graph.DAG.node import DAG_Node
 from compute_graph.DAG.ops import Add, Multiply, Subtract
-from compute_graph.DAG.primitive_node import InputPassThrough, PassThroughNode, TerminalInput
+from compute_graph.DAG.primitive_node import InputInterface, OutputInterface, PassThroughNode, TerminalInput
 
 _NOT_IMPLEMENTED = "Visitor method not implemented"
 
@@ -48,7 +48,11 @@ class DAG_Visitor(Generic[_T], ABC):
         raise NotImplementedError(_NOT_IMPLEMENTED)
     
     @abstractmethod
-    def visitInputPassThrough(self, node:InputPassThrough)->_T:
+    def visitInputInterface(self, node:InputInterface)->_T:
+        raise NotImplementedError(_NOT_IMPLEMENTED)
+    
+    @abstractmethod
+    def visitOutputInterface(self, node:OutputInterface)->_T:
         raise NotImplementedError(_NOT_IMPLEMENTED)
 
 
@@ -89,7 +93,11 @@ class DAG_PropsVisitor(Generic[_T, _S], ABC):
         raise NotImplementedError(_NOT_IMPLEMENTED)
     
     @abstractmethod
-    def visitInputPassThrough(self, node:InputPassThrough, props:_S)->_T:
+    def visitInputInterface(self, node:InputInterface, props:_S)->_T:
+        raise NotImplementedError(_NOT_IMPLEMENTED)
+    
+    @abstractmethod
+    def visitOutputInterface(self, node:OutputInterface, props:_S)->_T:
         raise NotImplementedError(_NOT_IMPLEMENTED)
 
 
@@ -115,7 +123,10 @@ class BasicDagVisitor(DAG_Visitor[str]):
     def visitPassThroughNode(self, node:PassThroughNode)->str:
         return "Pass Through"
     
-    def visitInputPassThrough(self, node:InputPassThrough)->str:
+    def visitInputInterface(self, node:InputInterface)->str:
         return "Input Pass Through"
+    
+    def visitOutputInterface(self, node:OutputInterface)->str:
+        return "Output Pass Through"
 
 
