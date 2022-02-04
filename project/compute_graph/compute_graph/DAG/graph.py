@@ -32,13 +32,13 @@ class Graph(DAG_Node):
         return OutPort((self.input_interface[idx], 0))
     
     def get_external_input(self, idx:int)->InPort:
-        return InPort((self.input_interface[idx], 0))
+        return InPort((self, idx))
 
     def get_internal_output(self, idx:int)->InPort:
         return InPort((self.output_interface[idx], 0))
     
     def get_external_output(self, idx:int)->OutPort:
-        return OutPort((self.output_interface[idx], 0))
+        return OutPort((self, idx))
 
     def get_edges(self)->GraphEdges:
         return self._edges
@@ -57,18 +57,17 @@ class Graph(DAG_Node):
         sub_nodes:set[DAG_Node] = set(self.input_interface)
         sub_nodes = sub_nodes.union(self.output_interface)
 
-        pure_sub_nodes = [n for n, _ in self._edges.keys() if not isinstance(n, GraphInterface)]
-        interface_nodes:List[GraphInterface] = [n for n, _ in self._edges.keys() if isinstance(n, GraphInterface)]
+        all_sub_node = [n for n, _ in self._edges.keys()]
         for nps in self._edges.values():
-            pure_sub_nodes += [n for n,_ in nps if not isinstance(n, GraphInterface)]
-            interface_nodes += [n for n,_ in nps if isinstance(n, GraphInterface)]
+            all_sub_node += [n for n,_ in nps]
+            
 
-        all_graphs = [ifn.parent_graph for ifn in interface_nodes]
-        sub_graphs = set(all_graphs)
-        sub_graphs.discard(self) 
+        all_graphs = [g for g in all_sub_node if isinstance(g, Graph)]
+        sub_graphs = set(all_graphs) 
         
+        all_nodes = [n for n in all_sub_node if not isinstance(n, Graph)]
+        sub_nodes = set(all_nodes)
 
-        sub_nodes = sub_nodes.union(set(pure_sub_nodes))
         return sub_nodes, sub_graphs
        
 

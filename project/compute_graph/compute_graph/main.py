@@ -137,7 +137,7 @@ def nested_comp()->Tuple[Graph, Graph]:
     g.add_edge(g.get_internal_input(1), g2.get_external_input(1))
     g.add_edge(g2.get_external_output(0), g.get_internal_output(0))
     
-    g.add_edge(g2.get_internal_input(0), (sub,0))
+    g.add_edge(g2.get_external_output(0), (sub,0))
     g.add_edge(g.get_internal_input(1), (sub,1))
     g.add_edge((sub,0), g.get_internal_output(2))
 
@@ -150,11 +150,11 @@ def nested_comp()->Tuple[Graph, Graph]:
 if __name__=="__main__":
 
     g, g2 = nested_comp() 
-    visualize_graph(g)
+    visualize_graph(g, max_depth=1)
 
-    v = DAGToIRVisitor()
-    func = v.visit(g, [])
-    print(func)
+    #v = DAGToIRVisitor()
+    #func = v.visit(g, [])
+    #print(func)
 
 
     
