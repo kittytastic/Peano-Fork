@@ -150,11 +150,11 @@ def nested_comp()->Tuple[Graph, Graph]:
 if __name__=="__main__":
 
     g, g2 = nested_comp() 
-    visualize_graph(g, max_depth=1)
+    visualize_graph(g, max_depth=2)
 
-    #v = DAGToIRVisitor()
-    #func = v.visit(g, [])
-    #print(func)
+    v = DAGToIRVisitor()
+    func = v.visit(g, [])
+    print(func)
 
 
     

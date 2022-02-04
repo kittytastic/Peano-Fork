@@ -15,7 +15,7 @@ class IR_LooseFunction(IR_Symbol):
         in_var_str = ", ".join([str(iv) for iv in self.in_var])
         out_var_str = ", ".join([str(iv) for iv in self.out_var])
         body_str = "\n\t".join([str(b) for b in self.body])
-        out_str = f"define {self.data_type} ({in_var_str}) ({out_var_str}):\n\t{body_str}"
+        out_str = f"define {self.data_type} @{self.name} ({in_var_str}) ({out_var_str}):\n\t{body_str}"
         return out_str
 
 class IR_TightFunction(IR_Symbol):
@@ -29,7 +29,7 @@ class IR_TightFunction(IR_Symbol):
     def __str__(self):
         arg_str = ", ".join([str(a) for a in self.args])
         body_str = "\n\t".join([str(b) for b in self.body])
-        out_str = f"define {self.data_type} ({arg_str}):\n\t{body_str}\n\t{str(self.return_statement)}"
+        out_str = f"define {self.data_type} @{self.name} ({arg_str}):\n\t{body_str}\n\t{str(self.return_statement)}"
         return out_str   
 
 class IR_Return(IR_Symbol): pass
@@ -42,6 +42,13 @@ class IR_NoReturn(IR_Return):
         return "<return nothing>"
 
 
-class IR_CallLooseFunction(IR_Symbol):
-    def __init__(self, args: List['IR_Variable']):
-        self.args = args
+class IR_CallLooseFunction(IR_Assign):
+    def __init__(self, function_name: str, inputs: List['IR_Variable'], outputs: List['IR_Variable']):
+        self.function_name = function_name
+        self.inputs = inputs
+        self.outputs = outputs
+
+    def __str__(self):
+        input_args = ", ".join([str(i) for i in self.inputs])
+        output_args = ", ".join([str(o) for o in self.outputs])
+        return f"call @{self.function_name}  in: ({input_args})  out: ({output_args})"

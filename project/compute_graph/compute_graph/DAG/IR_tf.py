@@ -53,13 +53,13 @@ class DAGToIRVisitor(DAG_PropsVisitor[IR_Symbol, List[IR_Symbol]]):
 
         body:List[IR_Assign] = []
         for n in eval_order:
-            node_in_vars = [inport_vars[InPort((n,i))] for i in range(n.num_inputs)]
-            node_out_vars = [self.next_temp_var() for _ in range(n.num_outputs)]
+            node_in_vars:List[IR_Variable] = [inport_vars[InPort((n,i))] for i in range(n.num_inputs)]
+            node_out_vars:List[IR_Variable] = [self.next_temp_var() for _ in range(n.num_outputs)]
 
 
             if isinstance(n, Graph):
-                body.append(IR_MultiAssign(node_out_vars, IR_CallLooseFunction(node_in_vars)))
-                raise Exception("Nested graphs support not complete")
+                body.append(IR_CallLooseFunction(n.name, node_in_vars, node_out_vars))
+                #raise Exception("Nested graphs support not complete")
             else:
                 body.append(IR_SingleAssign(node_out_vars[0], self.visit(n, node_in_vars)))
             
