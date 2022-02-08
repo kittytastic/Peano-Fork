@@ -1,10 +1,11 @@
 from typing import Tuple
-from compute_graph.DAG.IR_tf import DAGToIRVisitor
+from compute_graph.DAG.IR_tf import DAG_GatherSubgraphVisitor, DAGToIRVisitor
 from compute_graph.DAG.graph import *
 from compute_graph.DAG.ops import *
 from compute_graph.DAG.visualize import visualize_graph
-from compute_graph.IR.misc import ApplyCallStencil, DefineAllVars, InlineInOut, RemoveAllTemp
+from compute_graph.IR.misc import ApplyCallStencil, DefineAllVars, FileApplyCallStencil, FilterApply, FunctionStencil, InlineInOut, RemoveAllTemp
 from compute_graph.IR.symbols import IR_Array, IR_SingleVariable, UniqueVariableName
+from compute_graph.IR.symbols.functions import IR_File, IR_LooseFunction
 from compute_graph.language_backend.c import C_Backend
 
 def Euler2D_X()->Graph:
@@ -147,14 +148,45 @@ def nested_comp()->Tuple[Graph, Graph]:
 
     return g, g2
 
+def dag_to_IR(g:Graph)->IR_File:
+    sub_v = DAG_GatherSubgraphVisitor()
+    all_g = sub_v.visit(g)
+
+    v = DAGToIRVisitor()
+    body = [v.visit(sg, []) for sg in all_g]
+    
+    return IR_File(body)
+
 if __name__=="__main__":
 
     g, g2 = nested_comp() 
     visualize_graph(g, max_depth=2)
 
-    v = DAGToIRVisitor()
-    func = v.visit(g, [])
+    func = dag_to_IR(g) 
+    print('----- Dag -> IR -----')
     print(func)
 
+    tf = FilterApply(IR_LooseFunction, InlineInOut())
+    func = tf.tf(func)
+    print("\n------ tf ------")
+    print(func)
+
+
+    in1 = IR_SingleVariable(UniqueVariableName("input1"), False)
+    in2 = IR_SingleVariable(UniqueVariableName("input2"), False)
+    out = IR_Array(UniqueVariableName("out"), 3)
+    
+    in3 = IR_Array(UniqueVariableName("in_nest"), 3)
+    out3 = IR_Array(UniqueVariableName("out_nest"), 3)
+    
+    func_stencil:FunctionStencil = {
+        'basic_computation': ([in1, in2, out], [in1, in2], [out.get_ref(0), out.get_ref(1), out.get_ref(2)]),
+        'nested_g': ([in3, out3], [in3.get_ref(0), in3.get_ref(1)], [out3.get_ref(0), out3.get_ref(1)])
+    }
+
+    tf = FileApplyCallStencil(func_stencil)
+    func = tf.tf(func)
+    print("\n------ tf ------")
+    print(func)
 
     

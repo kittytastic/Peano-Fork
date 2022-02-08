@@ -1,4 +1,4 @@
-from typing import Dict, List, Set
+from typing import Dict, List, Set, Type, Tuple
 from compute_graph.IR.symbols import IR_Array, IR_LooseFunction, IR_MultiAssign, IR_NoReturn, IR_SingleAssign, IR_Symbol, IR_TempVariable, IR_TightFunction, IR_VarArgDefine, IR_VarBodyDefine, IR_Variable, IR_SingleVariable
 from compute_graph.IR.transform import IR_Transfrom
 
@@ -7,7 +7,6 @@ class InlineInOut(IR_Transfrom):
     def tf(self, in_IR: IR_Symbol)->IR_Symbol:
         working_ir = self.assert_and_cast_symbol_type(in_IR, IR_LooseFunction) 
         working_ir = self.inline_inputs(working_ir)
-        print(working_ir)
         working_ir = self.inline_outputs(working_ir)
         
 
@@ -113,3 +112,37 @@ class DefineAllVars(IR_Transfrom):
                     symbol_table.add(assign_var)
 
         return working_ir
+
+
+class FilterApply(IR_Transfrom):
+    def __init__(self, filter_type: Type[IR_Symbol], apply_tf:IR_Transfrom):
+        self.filter_type = filter_type
+        self.apply_tf = apply_tf
+
+    def tf(self, in_IR: IR_Symbol)->IR_Symbol:
+        expr = in_IR.get_instances(self.filter_type)
+        list_expr = list(expr)
+        tf_expr = [self.apply_tf.tf(ep) for ep in expr]
+
+        for original, new_expr in zip(list_expr, tf_expr):
+            in_IR.replace(original, new_expr)
+    
+        return in_IR
+
+FunctionStencil =  Dict[str, Tuple[List[IR_Variable], List[IR_Variable], List[IR_Variable]]]
+class FileApplyCallStencil(IR_Transfrom):
+    def __init__(self, func_stencils: FunctionStencil):
+         self.func_stencil = func_stencils
+    
+    def tf(self, in_IR: IR_Symbol)->IR_Symbol:
+        all_sub_funcs = in_IR.get_instances(IR_LooseFunction)        
+        func_map = {sf.name:sf for sf in all_sub_funcs}
+
+        for func_name, stencil in self.func_stencil.items():
+            og_func = func_map[func_name]
+            tf = ApplyCallStencil(stencil[0], stencil[1], stencil[2])
+            new_func = tf.tf(og_func)
+
+            in_IR.replace(og_func, new_func)
+
+        return in_IR    

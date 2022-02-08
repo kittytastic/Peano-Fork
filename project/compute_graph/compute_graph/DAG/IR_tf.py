@@ -1,33 +1,37 @@
-from typing import List, Set, Dict
+from typing import List, Dict
 from compute_graph.DAG.dag_visitor import DAG_Visitor, DAG_PropsVisitor
 from compute_graph.DAG.node import InPort, OutPort
-from compute_graph.IR.symbols import IR_Assign, IR_CallLooseFunction, IR_DataTypes, IR_LooseFunction, IR_Symbol, IR_TempVariable, IR_Variable, IR_MultiAssign, IR_SingleAssign, IR_Add, IR_Mul, IR_Sub, UniqueVariableName
+from compute_graph.IR.symbols import IR_Assign, IR_CallLooseFunction, IR_DataTypes, IR_LooseFunction, IR_Symbol, IR_TempVariable, IR_Variable, IR_SingleAssign, IR_Add, IR_Mul, IR_Sub, UniqueVariableName
 from compute_graph.DAG import Graph, Add, Subtract, Multiply, TerminalInput, PassThroughNode, InputInterface, OutputInterface 
 
-class DAG_GatherSubgraphVisitor(DAG_Visitor[Set[Graph]]):
+class DAG_GatherSubgraphVisitor(DAG_Visitor[List[Graph]]):
     
-    def visitGraph(self, node:Graph)->Set[Graph]:
-        children_graphs = [n for n in node.get_sub_nodes() if isinstance(n, Graph)]
+    def visitGraph(self, node:Graph)->List[Graph]:
+        _, children_graphs = node.get_categoriesed_sub_nodes()
         all_decedent_graphs = [self.visit(cg) for cg in children_graphs]
-        retrun_set:Set[Graph] = set() 
-        return retrun_set.union(*all_decedent_graphs)
+        return_list:List[Graph] = [g for dgs in all_decedent_graphs for g in dgs]
+        return_list.append(node) 
+        return return_list
 
-    def visitAdd(self, node:Add)->Set[Graph]:
+    def visitAdd(self, node:Add)->List[Graph]:
         raise Exception("Not implemented")
     
-    def visitSubtract(self, node:Subtract)->Set[Graph]:
+    def visitSubtract(self, node:Subtract)->List[Graph]:
         raise Exception("Not implemented")
     
-    def visitMultiply(self, node:Multiply)->Set[Graph]:
+    def visitMultiply(self, node:Multiply)->List[Graph]:
         raise Exception("Not implemented")
     
-    def visitTerminalInput(self, node:TerminalInput)->Set[Graph]:
+    def visitTerminalInput(self, node:TerminalInput)->List[Graph]:
         raise Exception("Not implemented")
     
-    def visitPassThroughNode(self, node:PassThroughNode)->Set[Graph]:
+    def visitPassThroughNode(self, node:PassThroughNode)->List[Graph]:
         raise Exception("Not implemented")
 
-    def visitInputInterface(self, node:InputInterface)->Set[Graph]:
+    def visitInputInterface(self, node:InputInterface)->List[Graph]:
+        raise Exception("Not implemented")
+
+    def visitOutputInterface(self, node:OutputInterface)->List[Graph]:
         raise Exception("Not implemented")
 
 

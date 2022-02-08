@@ -2,6 +2,12 @@ from typing import List
 from compute_graph.IR.symbols.symbol_base import IR_Symbol, IR_DataTypes
 from compute_graph.IR.symbols.variables import IR_Variable, IR_Assign
 
+class IR_File(IR_Symbol):
+    def __init__(self, body: List[IR_Symbol]) -> None:
+        self.body = body
+    
+    def __str__(self):
+        return "\n\n".join([str(b) for b in self.body])
 
 class IR_LooseFunction(IR_Symbol):
     def __init__(self, data_type:IR_DataTypes, in_var: List['IR_Variable'], out_var: List['IR_Variable'], body: List['IR_Assign'], name:str):

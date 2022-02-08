@@ -13,7 +13,7 @@ class IR_Transfrom(ABC):
         if isinstance(ir, subclass):
             return ir
         else:
-            raise Exception(f"Transform: received node type {type(ir).__name__} but expected {type(_T)}")
+            raise Exception(f"Transform: received node type {type(ir).__name__} but expected {subclass.__name__}")
 
     @abstractmethod
     def tf(self, in_IR: IR_Symbol)->IR_Symbol:
