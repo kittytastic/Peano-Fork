@@ -1,4 +1,3 @@
-from array import array
 from typing import Any, Dict
 from compute_graph.IR.symbols.functions import IR_CallTightFunction, IR_File
 from compute_graph.IR.symbols.variables import IR_DefineOnly

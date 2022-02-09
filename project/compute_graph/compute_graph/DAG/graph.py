@@ -1,3 +1,4 @@
+import enum
 from typing import Set, List, Any, Dict, Tuple, Optional
 
 
@@ -115,6 +116,10 @@ class Graph(DAG_Node):
         else:
             self._edges[from_node]={to_node}
 
+    def fill_node_inputs(self, inputs: List[NodePort], to_node:DAG_Node):
+        assert(len(inputs)==to_node.num_inputs)
+        for idx, port in enumerate(inputs):
+            self.add_edge(port, (to_node, idx)) 
 
     def _eval(self, inputs: List[Any])->List[Any]:
 

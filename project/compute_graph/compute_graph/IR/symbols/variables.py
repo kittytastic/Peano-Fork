@@ -1,7 +1,6 @@
 from typing import List, NewType
 from abc import ABC
 
-from sympy import var
 from compute_graph.IR.symbols.symbol_base import IR_Symbol
 
 UniqueVariableName = NewType("UniqueVariableName", str)
@@ -39,6 +38,9 @@ class IR_Array(IR_Variable):
 
     def get_ref(self, idx: int):
         return self.refs[idx]
+    
+    def all_ref(self)->List[IR_Variable]:
+        return self.refs # type: ignore
 
     def __str__(self):
         return f"#list({self.name})"

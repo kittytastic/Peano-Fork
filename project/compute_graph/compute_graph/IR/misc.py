@@ -164,6 +164,8 @@ class FileApplyCallStencil(IR_Transfrom):
         return in_IR
     
     def _fix_calls(self, function: IR_TightFunction)->IR_TightFunction:
+        amendments: List[Tuple[int, List[IR_Assign]]] = []
+
         for idx, l in enumerate(function.body):
             if isinstance(l, IR_CallLooseFunction):
                 stencil = self.func_stencil[l.function_name]
@@ -179,5 +181,10 @@ class FileApplyCallStencil(IR_Transfrom):
                 for t_ov, c_ov in zip(stencil[2], l.outputs):
                     new_l.append(IR_SingleAssign(c_ov, t_ov))
 
-                function.body = function.body[0:idx] + new_l + function.body[idx+1:]
+                amendments.append((idx, new_l))
+        
+        for idx, new_body in reversed(amendments):
+            function.body =  function.body[0:idx] + new_body + function.body[idx+1:]
+
+        
         return function
