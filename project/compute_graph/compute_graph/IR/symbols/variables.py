@@ -1,5 +1,7 @@
 from typing import List, NewType
 from abc import ABC
+
+from sympy import var
 from compute_graph.IR.symbols.symbol_base import IR_Symbol
 
 UniqueVariableName = NewType("UniqueVariableName", str)
@@ -79,3 +81,10 @@ class IR_MultiAssign(IR_Assign):
     def __init__(self, assign_vars: List['IR_Variable'], func: str = "TODO"):
         self.assign_vars = assign_vars
         self.func = func
+
+class IR_DefineOnly(IR_Assign):
+    def __init__(self, var:'IR_Variable') -> None:
+        self.var = var
+    
+    def __str__(self):
+        return f"define {self.var}"

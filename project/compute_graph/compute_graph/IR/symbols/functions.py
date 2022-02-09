@@ -58,3 +58,12 @@ class IR_CallLooseFunction(IR_Assign):
         input_args = ", ".join([str(i) for i in self.inputs])
         output_args = ", ".join([str(o) for o in self.outputs])
         return f"call @{self.function_name}  in: ({input_args})  out: ({output_args})"
+
+class IR_CallTightFunction(IR_Assign):
+    def __init__(self, function_name: str, args: List['IR_Variable']):
+        self.function_name = function_name
+        self.args = args
+
+    def __str__(self):
+        args = ", ".join([str(i) for i in self.args])
+        return f"call @{self.function_name} ({args})"

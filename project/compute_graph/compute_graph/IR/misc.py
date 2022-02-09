@@ -1,5 +1,7 @@
 from typing import Dict, List, Set, Type, Tuple
 from compute_graph.IR.symbols import IR_Array, IR_LooseFunction, IR_MultiAssign, IR_NoReturn, IR_SingleAssign, IR_Symbol, IR_TempVariable, IR_TightFunction, IR_VarArgDefine, IR_VarBodyDefine, IR_Variable, IR_SingleVariable
+from compute_graph.IR.symbols.functions import IR_CallLooseFunction, IR_CallTightFunction
+from compute_graph.IR.symbols.variables import IR_Assign, IR_DefineOnly
 from compute_graph.IR.transform import IR_Transfrom
 
 
@@ -142,7 +144,32 @@ class FileApplyCallStencil(IR_Transfrom):
             og_func = func_map[func_name]
             tf = ApplyCallStencil(stencil[0], stencil[1], stencil[2])
             new_func = tf.tf(og_func)
+            new_func = self._fix_calls(new_func) # type:ignore
 
             in_IR.replace(og_func, new_func)
 
-        return in_IR    
+        return in_IR
+    
+    def _fix_calls(self, function: IR_TightFunction)->IR_TightFunction:
+        print(f"Fixing calls in {function.name}")
+        for idx, l in enumerate(function.body):
+            if isinstance(l, IR_CallLooseFunction):
+                print(l)
+                stencil = self.func_stencil[l.function_name]
+                print(stencil)
+                new_l:List[IR_Assign] = []
+                for var in stencil[0]:
+                    new_l.append(IR_DefineOnly(var))
+                
+                for t_iv, c_iv in zip(stencil[1], l.inputs):
+                    new_l.append(IR_SingleAssign(t_iv, c_iv))
+
+                new_l.append(IR_CallTightFunction(l.function_name, stencil[0]))
+
+                for t_ov, c_ov in zip(stencil[2], l.outputs):
+                    new_l.append(IR_SingleAssign(c_ov, t_ov))
+
+                print(new_l)
+            
+                function.body = function.body[0:idx] + new_l + function.body[idx+1:]
+        return function

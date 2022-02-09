@@ -185,8 +185,8 @@ if __name__=="__main__":
     }
 
     tf = FileApplyCallStencil(func_stencil)
-    func = tf.tf(func)
     print("\n------ tf ------")
+    func = tf.tf(func)
     print(func)
 
     
