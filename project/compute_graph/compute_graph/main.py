@@ -5,7 +5,7 @@ from compute_graph.DAG.ops import *
 from compute_graph.DAG.visualize import visualize_graph
 from compute_graph.IR.misc import ApplyCallStencil, DefineAllVars, FileApplyCallStencil, FilterApply, FunctionStencil, InlineInOut, RemoveAllTemp
 from compute_graph.IR.symbols import IR_Array, IR_SingleVariable, UniqueVariableName
-from compute_graph.IR.symbols.functions import IR_File, IR_LooseFunction
+from compute_graph.IR.symbols.functions import IR_File, IR_LooseFunction, IR_TightFunction
 from compute_graph.language_backend.c import C_Backend
 
 def Euler2D_X()->Graph:
@@ -176,8 +176,8 @@ if __name__=="__main__":
     in2 = IR_SingleVariable(UniqueVariableName("input2"), False)
     out = IR_Array(UniqueVariableName("out"), 3)
     
-    in3 = IR_Array(UniqueVariableName("in_nest"), 3)
-    out3 = IR_Array(UniqueVariableName("out_nest"), 3)
+    in3 = IR_Array(UniqueVariableName("in_nest"), 2)
+    out3 = IR_Array(UniqueVariableName("out_nest"), 2)
     
     func_stencil:FunctionStencil = {
         'basic_computation': ([in1, in2, out], [in1, in2], [out.get_ref(0), out.get_ref(1), out.get_ref(2)]),
@@ -188,5 +188,21 @@ if __name__=="__main__":
     print("\n------ tf ------")
     func = tf.tf(func)
     print(func)
+
+
+    tf3 = FilterApply(IR_TightFunction, RemoveAllTemp())
+    func = tf3.tf(func)
+    print("\n------ tf - remove temp ------")
+    print(func)
+    
+    tf4 = FilterApply(IR_TightFunction, DefineAllVars())
+    func = tf4.tf(func)
+    print("\n------ tf - define all vars ------")
+    print(func)
+    
+    cbe = C_Backend()
+    code = cbe.code_gen(func)
+    print()
+    print(code)
 
     

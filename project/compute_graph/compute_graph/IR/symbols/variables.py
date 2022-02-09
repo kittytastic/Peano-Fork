@@ -87,4 +87,4 @@ class IR_DefineOnly(IR_Assign):
         self.var = var
     
     def __str__(self):
-        return f"define {self.var}"
+        return f"{self.var}"

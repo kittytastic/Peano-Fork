@@ -19,8 +19,8 @@ def translate_to_c(filename:str):
 
     print()
     print()
-    inspect_ast(ast.ext[0].body.block_items[5])
-    #inspect_ast(ast)
+    #inspect_ast(ast.ext[0].body.block_items[5])
+    inspect_ast(ast)
 
 
 def inspect_ast(node:Any):

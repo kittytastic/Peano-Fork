@@ -112,6 +112,19 @@ class DefineAllVars(IR_Transfrom):
                 if assign_var not in symbol_table:
                     line.assign_var = IR_VarBodyDefine(assign_var)
                     symbol_table.add(assign_var)
+            
+            if isinstance(line, IR_DefineOnly):
+                def_var = line.var
+                if def_var not in symbol_table:
+                    line.var = IR_VarBodyDefine(def_var)
+                
+                    if isinstance(def_var, IR_Array):
+                        symbol_table.update(def_var.refs)
+                        symbol_table.add(def_var)
+                    else:
+                        symbol_table.add(def_var)
+        
+
 
         return working_ir
 
@@ -151,12 +164,9 @@ class FileApplyCallStencil(IR_Transfrom):
         return in_IR
     
     def _fix_calls(self, function: IR_TightFunction)->IR_TightFunction:
-        print(f"Fixing calls in {function.name}")
         for idx, l in enumerate(function.body):
             if isinstance(l, IR_CallLooseFunction):
-                print(l)
                 stencil = self.func_stencil[l.function_name]
-                print(stencil)
                 new_l:List[IR_Assign] = []
                 for var in stencil[0]:
                     new_l.append(IR_DefineOnly(var))
@@ -169,7 +179,5 @@ class FileApplyCallStencil(IR_Transfrom):
                 for t_ov, c_ov in zip(stencil[2], l.outputs):
                     new_l.append(IR_SingleAssign(c_ov, t_ov))
 
-                print(new_l)
-            
                 function.body = function.body[0:idx] + new_l + function.body[idx+1:]
         return function

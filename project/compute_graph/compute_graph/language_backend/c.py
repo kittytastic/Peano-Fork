@@ -1,8 +1,11 @@
+from array import array
 from typing import Any, Dict
+from compute_graph.IR.symbols.functions import IR_CallTightFunction, IR_File
+from compute_graph.IR.symbols.variables import IR_DefineOnly
 from compute_graph.IR.visitor import IR_Visitor
 from compute_graph.IR.symbols import *
 
-from pycparser.c_ast import FileAST, FuncDef, ID, Decl, FuncDecl, TypeDecl, ParamList, IdentifierType, PtrDecl, Compound, Assignment, ID, ArrayRef, Constant, BinaryOp # type: ignore
+from pycparser.c_ast import FileAST, FuncDef, ID, Decl, FuncDecl, TypeDecl, ParamList, IdentifierType, PtrDecl, Compound, Assignment, ID, ArrayRef, Constant, BinaryOp, FuncCall, ExprList, ArrayDecl # type: ignore
 from pycparser import c_generator # type: ignore
 
 from compute_graph.language_backend.backend_base import LanguageBackend # type: ignore
@@ -73,7 +76,7 @@ class IR_To_C_TF(IR_Visitor[Any]):
         return ID(node.name)
     
     def visit_IR_Array(self, node:IR_Array)->Any:
-        raise Exception("Not implemented")
+        return ID(node.name)
 
     def visit_IR_VarBodyDefine(self, node:IR_VarBodyDefine)->Any:
         raise Exception("Not implemented")
@@ -104,6 +107,23 @@ class IR_To_C_TF(IR_Visitor[Any]):
 
     def visit_IR_CallLooseFunction(self, node:IR_CallLooseFunction)->Any:
         raise Exception("Illegal Symbol")
+    
+    def visit_IR_CallTightFunction(self, node:IR_CallTightFunction)->Any:
+        return FuncCall(ID(node.function_name), ExprList([self.visit(var.var) for var in node.args])) # type: ignore
+    
+    def visit_IR_File(self, node:IR_File)->Any:
+        return FileAST([self.visit(n) for n in node.body])
+    
+    def visit_IR_DefineOnly(self, node:IR_DefineOnly)->Any:
+        if isinstance(node.var, IR_VarBodyDefine):
+            var = node.var.var
+            assert(isinstance(var, IR_Array)) 
+            id_type = IdentifierType(names=["double"])
+            type_decl = TypeDecl(var.name, [], [], id_type)
+            array_decl = ArrayDecl(type_decl, Constant('int', str(var.length)), [])
+            return Decl(var.name, [], [], [], [], array_decl, None, None)
+        else:
+            raise Exception("Not implemented")
 
 
 

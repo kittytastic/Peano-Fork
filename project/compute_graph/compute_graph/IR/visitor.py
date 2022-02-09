@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import  TypeVar, Generic, Callable 
-from compute_graph.IR.symbols import * 
+from compute_graph.IR.symbols import *
+from compute_graph.IR.symbols.functions import IR_CallTightFunction, IR_File
+from compute_graph.IR.symbols.variables import IR_DefineOnly 
 
 _T = TypeVar("_T") # type:ignore
 
@@ -89,4 +91,16 @@ class IR_Visitor(Generic[_T], ABC):
 
     @abstractmethod
     def visit_IR_CallLooseFunction(self, node:IR_CallLooseFunction)->_T:
+        raise Exception("Not implemented")
+    
+    @abstractmethod
+    def visit_IR_CallTightFunction(self, node:IR_CallTightFunction)->_T:
+        raise Exception("Not implemented")
+    
+    @abstractmethod
+    def visit_IR_File(self, node:IR_File)->_T:
+        raise Exception("Not implemented")
+    
+    @abstractmethod
+    def visit_IR_DefineOnly(self, node:IR_DefineOnly)->_T:
         raise Exception("Not implemented")
