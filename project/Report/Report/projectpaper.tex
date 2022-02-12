@@ -1,0 +1,129 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage{biblatex}
+\usepackage{times}
+\usepackage{durhampaper}
+%\usepackage{harvard}
+
+
+%\newcommand{\testingbreak}{\pagebreak}%
+
+\newif\iftesting
+\testingtrue
+
+\newcommand{\testingbreak}{\iftesting \pagebreak \fi}%
+
+\usepackage{psvectorian}
+
+\newcommand{\ornamentleft}{%
+    \psvectorian[width=2em]{2}%
+}
+\newcommand{\ornamentright}{%
+    \psvectorian[width=2em,mirror]{2}%
+}
+\newcommand{\ornamentbreak}{%
+    \begin{center}
+        $\ast$~$\ast$~$\ast$
+    \end{center}
+}
+\usepackage{mathtools}
+
+\usepackage{listings}
+\usepackage{xparse}
+
+\usepackage{xcolor}
+
+\usepackage{pifont}
+\newcommand{\cmark}{\ding{51}}%
+\newcommand{\xmark}{\ding{55}}%
+
+\usepackage{booktabs}
+\usepackage{multirow}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+
+\lstset{language=C, style=mystyle}
+
+%\citationmode{abbr}
+%\bibliographystyle{agsm}
+\addbibresource{projectpaper.bib}
+
+\title{TBD}
+\author{} % leave; your name goes into \student{}
+\student{qwrx21}
+\supervisor{}
+\degree{MEng Computer Science}
+
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+\input{Sections/abstract}
+\end{abstract}
+
+\begin{keywords}
+ExaHyPE
+\end{keywords}
+
+\testingbreak
+\section{Introduction}
+\input{Sections/introduction}
+
+\testingbreak
+\section{Related Work}
+\input{Sections/related}
+
+
+\testingbreak
+\section{Solution}
+\input{Sections/methodology}
+
+\testingbreak
+\section{Validity}
+\input{Sections/validity}
+
+\testingbreak
+\section{Results}
+%\ornamentbreak
+
+\section{Evaluation}
+%\ornamentbreak
+
+\section{Conclusions}
+%\ornamentbreak
+
+\testingbreak
+%\bibliography{projectpaper}
+\printbibliography
+
+\iftesting
+\pagebreak
+\input{Sections/literature}
+\fi
+
+\end{document}
