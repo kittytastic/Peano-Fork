@@ -1,0 +1,58 @@
+% Proj Prep
+\textbf{YATeTo:} \cite{YATeTo} describes a tensor toolbox for solving PDEs. 
+It motivates using tensors and shows how tensors can be used to describe PDEs. 
+It follows on to describe how the toolbox works and the compilation steps from DSL to C++. 
+It talks about validating approach on SeisSol vs known benchmark. 
+They show using YATeTo is equivalent or faster.
+
+\textbf{ExaHyPE:} \cite{exahype} introduces the ExaHyPE engine. 
+Takes you through the concepts used by ExaHyPE to to solve and distribute hyperbolic PDEs. 
+Analyse scaling and convergence of ExaHyPE.
+
+\textbf{Templates in ExaHyPE:} \cite{templateExahype} suggests that using ExaHyPE teams are made up of 3 types of people: Application experts with problem specific knowledge; Algorithm experts with knowledge of algorithmic approaches to numerical methods; and Optimisation expert. 
+Unlike firedrake which takes a compiler approach this paper looks to use code generation to separate out the roles as much as possible. 
+Gives a good overview of how ADER-DG works. 
+Presents the idea of using Jninja a html template library to generate the C++ kernels.
+
+\textbf{SeiSol hits PFLOP:} \cite{seisolPFLOP} takes us through the major rework that allows seisol to peek at 1 PFLOP. Importantly using matrix matrix operations in compute kernels.
+`` In fully explicit
+formulation each of these integration steps is formulated as a compute kernel
+that may be expressed as a series of matrix-matrix multiplications''.
+
+\textbf{SeisSol GB Finalist:} \cite{gbseisolPFLOP} is a Gordon Bell finalist.
+It is very similar to Seisol hitting 1 PFLOP but optimises for Intel Phi chips.
+
+\textbf{Tensors in Chemistry:} \cite{tensorChemistry} introduces a "program synthesis system" for chemistry where calculations are expressed as tensors.
+It has the goal of cutting down development time by introducing a general tool that can generate programs of tensor equations.
+There is a lot of emphasis on the size of tensors as they cannot necessarily fit on one nodes memory.
+Full of lots of references.
+
+\textbf{Earthquakes are PDEs:} \cite{earthquakePDE} serves 2 purposes. Firstly it is an authoritative source that earthquakes can be modeled by PDEs. Secondly it derives how to use ADER-DG schemes for these equations.
+
+\textbf{Relativistic PDEs:} \cite{relativisticPDE} derives ADER-DG for relativistic effects. Glancing reference.
+
+\textbf{Tsunami PDEs:} \cite{tsunamiPDE} talks about tsunamis and their PDEs. Glancing reference.
+
+\textbf{Peano Framework:} \cite{PeanoFramework} describes the Peano Framework. Glancing reference.
+
+\textbf{UFL for FE:} \cite{UFLforFE} describes a Unified Form Language for finite element methods, subsequently used by firedrake. Glancing reference.
+
+\textbf{Firedrake uses UFL:} \cite{FiredrakeUFL} shows firedrake using UFL. Glancing reference.
+
+\textbf{Roofline model:} \cite{roofline} introduces the roofline model and shows how we get better throughput using SIMD.
+
+\textbf{YATeTo GPU:} \cite{YATeToGPU} trying to get YATeTo on a GPU. 
+
+\textbf{GEMM like tensor contractions:} \cite{GEMMlikeTC} proposes a new method to do tensor contractions. Dissuses and references previous methods Loop-over-GEMM, TT-GEMM-T.
+
+
+\textbf{Tensors for FV:} \cite{tensorFV}
+
+\textbf{Strength reduction NP-complete:} \cite{strengthReductionNP}
+
+\textbf{COFFEE:} \cite{COFFEE}
+\textbf{Cyclops:} \cite{cyclops}
+
+\textbf{TX with Extended BLAS on GPU}: \cite{TCBLASGPU}
+
+% Project

@@ -1,0 +1,300 @@
+% example .bib file for use with projectpaper.tex
+@article{YATeTo,
+author = {Uphoff, Carsten and Bader, Michael},
+title = {Yet Another Tensor Toolbox for Discontinuous Galerkin Methods and Other Applications},
+year = {2020},
+issue_date = {November 2020},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+volume = {46},
+number = {4},
+issn = {0098-3500},
+%url = {https://doi.org/10.1145/3406835},
+doi = {10.1145/3406835},
+journal = {ACM Trans. Math. Softw.},
+month = oct,
+articleno = {34},
+numpages = {40},
+keywords = {finite element method, high-performance computing, Tensor operations, ADER-DG}
+}
+
+@article{exahype,
+title = {ExaHyPE: An engine for parallel dynamically adaptive simulations of wave problems},
+journal = {Computer Physics Communications},
+volume = {254},
+pages = {107251},
+year = {2020},
+issn = {0010-4655},
+doi = {10.1016/j.cpc.2020.107251},
+%url = {https://www.sciencedirect.com/science/article/pii/S001046552030076X},
+author = {Anne Reinarz and Dominic E. Charrier and Michael Bader and Luke Bovard and Michael Dumbser and Kenneth Duru and Francesco Fambri and Alice-Agnes Gabriel and Jean-Matthieu Gallard and Sven Köppel and Lukas Krenz and Leonhard Rannabauer and Luciano Rezzolla and Philipp Samfass and Maurizio Tavelli and Tobias Weinzierl},
+keywords = {Hyperbolic, PDE, ADER-DG, Finite volumes, AMR, MPI, TBB, MPI+X},
+abstract = {ExaHyPE (“An Exascale Hyperbolic PDE Engine”) is a software engine for solving systems of first-order hyperbolic partial differential equations (PDEs). Hyperbolic PDEs are typically derived from the conservation laws of physics and are useful in a wide range of application areas. Applications powered by ExaHyPE can be run on a student’s laptop, but are also able to exploit thousands of processor cores on state-of-the-art supercomputers. The engine is able to dynamically increase the accuracy of the simulation using adaptive mesh refinement where required. Due to the robustness and shock capturing abilities of ExaHyPE’s numerical methods, users of the engine can simulate linear and non-linear hyperbolic PDEs with very high accuracy. Users can tailor the engine to their particular PDE by specifying evolved quantities, fluxes, and source terms. A complete simulation code for a new hyperbolic PDE can often be realised within a few hours — a task that, traditionally, can take weeks, months, often years for researchers starting from scratch. In this paper, we showcase ExaHyPE’s workflow and capabilities through real-world scenarios from our two main application areas: seismology and astrophysics.
+Program summary
+Program title: ExaHyPE-Engine Program Files doi: http://dx.doi.org/10.17632/6sz8h6hnpz.1 Licensing provisions: BSD 3-clause Programming languages: C++, Python, Fortran Nature of Problem: The ExaHyPE PDE engine offers robust algorithms to solve linear and non-linear hyperbolic systems of PDEs written in first order form. The systems may contain both conservative and non-conservative terms. Solution method: ExaHyPE employs the discontinuous Galerkin (DG) method combined with explicit one-step ADER (arbitrary high-order derivative) time-stepping. An a-posteriori limiting approach is applied to the ADER-DG solution, whereby spurious solutions are discarded and recomputed with a robust, patch-based finite volume scheme. ExaHyPE uses dynamical adaptive mesh refinement to enhance the accuracy of the solution around shock waves, complex geometries, and interesting features.}
+}
+
+@article{templateExahype,
+  author    = {Jean{-}Matthieu Gallard and
+               Lukas Krenz and
+               Leonhard Rannabauer and
+               Anne Reinarz and
+               Michael Bader},
+  title     = {Role-Oriented Code Generation in an Engine for Solving Hyperbolic
+               {PDE} Systems},
+  journal   = {CoRR},
+  volume    = {abs/1911.06817},
+  year      = {2019},
+  %url       = {http://arxiv.org/abs/1911.06817},
+  archivePrefix = {arXiv},
+  %eprint    = {1911.06817},
+  timestamp = {Mon, 02 Dec 2019 13:44:01 +0100},
+  %biburl    = {https://dblp.org/rec/journals/corr/abs-1911-06817.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+
+@inproceedings{seisolPFLOP,
+author = {Breuer, Alexander and Heinecke, Alexander and Rettenberger, Sebastian and Bader, Michael and Gabriel, Alice-Agnes and Pelties, Christian},
+title = {Sustained Petascale Performance of Seismic Simulations with SeisSol on SuperMUC},
+year = {2014},
+isbn = {9783319075174},
+%publisher = {Springer-Verlag},
+%address = {Berlin, Heidelberg},
+%url = {https://doi.org/10.1007/978-3-319-07518-1},
+%doi = {10.1007/978-3-319-07518-1_1},
+booktitle = {Proceedings of the 29th International Conference on Supercomputing - Volume 8488},
+pages = {1–18},
+numpages = {18},
+keywords = {parallel I/O, vectorization, petascale, seismic wave and earthquake simulations, ADER-DG},
+%location = {Leipzig, Germany},
+series = {ISC 2014}
+}
+
+@INPROCEEDINGS{gbseisolPFLOP,  
+author={A. {Heinecke} and A. {Breuer} and S. {Rettenberger} and M. {Bader} and A. {Gabriel} and C. {Pelties} and A. {Bode} and W. {Barth} and X. {Liao} and K. {Vaidyanathan} and M. {Smelyanskiy} and P. {Dubey}},  
+booktitle={SC '14: Proceedings of the International Conference for High Performance Computing, Networking, Storage and Analysis},   
+title={Petascale High Order Dynamic Rupture Earthquake Simulations on Heterogeneous Supercomputers},   
+year={2014},  
+volume={},  
+number={},  
+pages={3-14},  
+doi={10.1109/SC.2014.6}}
+
+
+@ARTICLE{tensorChemistry,  
+author={G. {Baumgartner} and A. {Auer} and D. E. {Bernholdt} and A. {Bibireata} and V. {Choppella} and D. {Cociorva} and  {Xiaoyang Gao} and R. J. {Harrison} and S. {Hirata} and S. {Krishnamoorthy} and S. {Krishnan} and  {Chi-chung Lam} and  {Qingda Lu} and M. {Nooijen} and R. M. {Pitzer} and J. {Ramanujam} and P. {Sadayappan} and A. {Sibiryakov}},
+journal={Proceedings of the IEEE},
+title={Synthesis of High-Performance Parallel Programs for a Class of ab Initio Quantum Chemistry Models},
+year={2005},
+volume={93},
+number={2},
+pages={276-292},
+doi={10.1109/JPROC.2004.840311}}
+
+
+@article{earthquakePDE,
+    author = {Castro, Cristóbal E. and Käser, Martin and Brietzke, Gilbert B.},
+    title = "{Seismic waves in heterogeneous material: subcell resolution of the discontinuous Galerkin method}",
+    journal = {Geophysical Journal International},
+    volume = {182},
+    number = {1},
+    pages = {250-264},
+    year = {2010},
+    month = {07},
+    abstract = "{We present an important extension of the arbitrary high-order discontinuous Galerkin (DG) finite-element method to model 2-D elastic wave propagation in highly heterogeneous material. In this new approach we include space-variable coefficients to describe smooth or discontinuous material variations inside each element using the same numerical approximation strategy as for the velocity–stress variables in the formulation of the elastic wave equation. The combination of the DG method with a time integration scheme based on the solution of arbitrary accuracy derivatives Riemann problems still provides an explicit, one-step scheme which achieves arbitrary high-order accuracy in space and time. Compared to previous formulations the new scheme contains two additional terms in the form of volume integrals. We show that the increasing computational cost per element can be overcompensated due to the improved material representation inside each element as coarser meshes can be used which reduces the total number of elements and therefore computational time to reach a desired error level. We confirm the accuracy of the proposed scheme performing convergence tests and several numerical experiments considering smooth and highly heterogeneous material. As the approximation of the velocity and stress variables in the wave equation and of the material properties in the model can be chosen independently, we investigate the influence of the polynomial material representation on the accuracy of the synthetic seismograms with respect to computational cost. Moreover, we study the behaviour of the new method on strong material discontinuities, in the case where the mesh is not aligned with such a material interface. In this case second-order linear material approximation seems to be the best choice, with higher-order intra-cell approximation leading to potential instable behaviour. For all test cases we validate our solution against the well-established standard fourth-order finite difference and spectral element method.}",
+    issn = {0956-540X},
+    %doi = {10.1111/j.1365-246X.2010.04605.x},
+    %url = {https://doi.org/10.1111/j.1365-246X.2010.04605.x},
+    %eprint = {https://academic.oup.com/gji/article-pdf/182/1/250/1498869/182-1-250.pdf},
+}
+
+
+@article{PeanoFramework,
+   title={The Peano Software—Parallel, Automaton-based, Dynamically Adaptive Grid Traversals},
+   volume={45},
+   ISSN={1557-7295},
+   %url={http://dx.doi.org/10.1145/3319797},
+   DOI={10.1145/3319797},
+   number={2},
+   journal={ACM Transactions on Mathematical Software},
+   publisher={Association for Computing Machinery (ACM)},
+   author={Weinzierl, Tobias},
+   year={2019},
+   month={Jun},
+   pages={1–41}
+}
+
+@article{relativisticPDE,
+    author = {Fambri, F and Dumbser, M and Köppel, S and Rezzolla, L and Zanotti, O},
+    title = "{ADER discontinuous Galerkin schemes for general-relativistic ideal magnetohydrodynamics}",
+    journal = {Monthly Notices of the Royal Astronomical Society},
+    volume = {477},
+    number = {4},
+    pages = {4543-4564},
+    year = {2018},
+    month = {03},
+    abstract = "{We present a new class of high-order accurate numerical algorithms for solving the equations of general-relativistic ideal magnetohydrodynamics in curved space–times. In this paper, we assume the background space–time to be given and static, i.e. we make use of the Cowling approximation. The governing partial differential equations are solved via a new family of fully discrete and arbitrary high-order accurate path-conservative discontinuous Galerkin (DG) finite-element methods combined with adaptive mesh refinement and time accurate local time-stepping. In order to deal with shock waves and other discontinuities, the high-order DG schemes are supplemented with a novel a posteriori subcell finite-volume limiter, which makes the new algorithms as robust as classical second-order total-variation diminishing finite-volume methods at shocks and discontinuities, but also as accurate as unlimited high-order DG schemes in smooth regions of the flow. We show the advantages of this new approach by means of various classical two- and three-dimensional benchmark problems on fixed space–times. Finally, we present a performance and accuracy comparisons between Runge–Kutta DG schemes and ADER high-order finite-volume schemes, showing the higher efficiency of DG schemes.}",
+    issn = {0035-8711},
+    doi = {10.1093/mnras/sty734},
+    %url = {https://doi.org/10.1093/mnras/sty734},
+    %eprint = {https://academic.oup.com/mnras/article-pdf/477/4/4543/24831974/sty734.pdf},
+}
+
+@Article{tsunamiPDE,
+author={Maeda, Takuto
+and Furumura, Takashi},
+title={FDM Simulation of Seismic Waves, Ocean Acoustic Waves, and Tsunamis Based on Tsunami-Coupled Equations of Motion},
+journal={Pure and Applied Geophysics},
+year={2013},
+month={Jan},
+day={01},
+volume={170},
+number={1},
+pages={109-127},
+abstract={We have developed a new, unified modeling technique for the total simulation of seismic waves, ocean acoustic waves, and tsunamis resulting from earthquakes, based on a finite difference method simulation of the 3D equations of motion. Using the equilibrium between the pressure gradient and gravity in these equations, tsunami propagation is naturally incorporated in the simulation based on the equations of motion. The performance of the parallel computation for the newly developed tsunami-coupled equations using a domain partitioning procedure shows a high efficiency coefficient with a large number of CPU cores. The simulation results show how the near-field term associated with seismic waves produced by shallow earthquakes leads to a permanent coseismic deformation of the ground surface, which gives rise to the initial tsunami on the sea surface. Propagation of the tsunami along the sea surface as a gravity wave, and ocean acoustic waves in seawater with high-frequency multiple P-wave reflections between the free surface and sea bottom, are also clearly demonstrated by the present simulations. We find a good agreement in the tsunami waveform between our results and those obtained by other simulations based on an analytical model and the Navier--Stokes equations, demonstrating the effectiveness of the tsunami-coupling simulation model. Based on this simulation, we show that the ratio of the amplitude of ocean acoustic waves to the height of the tsunami, both of which are produced by the earthquake, strongly depends on the rise time of the earthquake rupture. This ratio can be used to obtain a more detailed understanding of the source rupture processes of subduction zone earthquakes, and for implementing an improved tsunami alert system for slow tsunami earthquakes.},
+issn={1420-9136},
+doi={10.1007/s00024-011-0430-z},
+%url={https://doi.org/10.1007/s00024-011-0430-z}
+}
+
+ @misc{UFLforFE,
+      title={Unified Form Language: A domain-specific language for weak formulations of partial differential equations}, 
+      author={Martin S. Alnaes and Anders Logg and Kristian B. Oelgaard and Marie E. Rognes and Garth N. Wells},
+      year={2013},
+      %eprint={1211.4047},
+      archivePrefix={arXiv},
+      primaryClass={cs.MS}
+}
+
+@article{FiredrakeAndCOFFEE,
+author = {Luporini, Fabio and Varbanescu, Ana Lucia and Rathgeber, Florian and Bercea, Gheorghe-Teodor and Ramanujam, J. and Ham, David A. and Kelly, Paul H. J.},
+title = {Cross-Loop Optimization of Arithmetic Intensity for Finite Element Local Assembly},
+year = {2015},
+issue_date = {January 2015},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+volume = {11},
+number = {4},
+issn = {1544-3566},
+%url = {https://doi.org/10.1145/2687415},
+doi = {10.1145/2687415},
+abstract = {We study and systematically evaluate a class of composable code transformations that improve arithmetic intensity in local assembly operations, which represent a significant fraction of the execution time in finite element methods. Their performance optimization is indeed a challenging issue. Even though affine loop nests are generally present, the short trip counts and the complexity of mathematical expressions, which vary among different problems, make it hard to determine an optimal sequence of successful transformations. Our investigation has resulted in the implementation of a compiler (called COFFEE) for local assembly kernels, fully integrated with a framework for developing finite element methods. The compiler manipulates abstract syntax trees generated from a domain-specific language by introducing domain-aware optimizations for instruction-level parallelism and register locality. Eventually, it produces C code including vector SIMD intrinsics. Experiments using a range of real-world finite element problems of increasing complexity show that significant performance improvement is achieved. The generality of the approach and the applicability of the proposed code transformations to other domains is also discussed.},
+journal = {ACM Trans. Archit. Code Optim.},
+month = jan,
+articleno = {57},
+numpages = {25},
+keywords = {compilers, SIMD vectorization, optimizations, Finite element integration, local assembly}
+}
+
+@article{roofline,
+author = {Williams, Samuel and Waterman, Andrew and Patterson, David},
+title = {Roofline: An Insightful Visual Performance Model for Multicore Architectures},
+year = {2009},
+issue_date = {April 2009},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+volume = {52},
+number = {4},
+issn = {0001-0782},
+%url = {https://doi.org/10.1145/1498765.1498785},
+doi = {10.1145/1498765.1498785},
+abstract = {The Roofline model offers insight on how to improve the performance of software and hardware.},
+journal = {Commun. ACM},
+month = apr,
+pages = {65–76},
+numpages = {12}
+}
+
+@inproceedings{YATeToGPU,
+author = {Dorozhinskii, Ravil and Bader, Michael},
+title = {SeisSol on Distributed Multi-GPU Systems: CUDA Code Generation for the Modal Discontinuous Galerkin Method},
+year = {2021},
+isbn = {9781450388429},
+%publisher = {Association for Computing Machinery},
+%address = {New York, NY, USA},
+%url = {https://doi.org/10.1145/3432261.3436753},
+doi = {10.1145/3432261.3436753},
+abstract = { We present a GPU implementation of the high order Discontinuous Galerkin (DG) scheme in SeisSol, a software package for simulating seismic waves and earthquake dynamics. Our particular focus is on providing a performance portable solution for heterogeneous distributed multi-GPU systems. We therefore redesigned SeisSol’s code generation cascade for GPU programming models. This includes CUDA source code generation for the performance-critical small batched matrix multiplications kernels. The parallelisation extends the existing MPI+X scheme and supports SeisSol’s cluster-wise Local Time Stepping (LTS) algorithm for ADER time integration. We performed a Roofline model analysis to ensure that the generated batched matrix operations achieve the performance limits posed by the memory-bandwidth roofline. Our results also demonstrate that the generated GPU kernels outperform the corresponding cuBLAS subroutines by 2.5 times on average. We present strong and weak scaling studies of our implementation on the Marconi100 supercomputer (with 4 Nvidia Volta V100 GPUs per node) on up to 256 GPUs , which revealed good parallel performance and efficiency in case of time integration using global time stepping. However, we show that directly mapping the LTS method from CPUs to distributed GPU environments results in lower hardware utilization. Nevertheless, due to the algorithmic advantages of local time stepping, the method still reduces time-to-solution by a factor of 1.3 on average in contrast to the GTS scheme.},
+booktitle = {The International Conference on High Performance Computing in Asia-Pacific Region},
+pages = {69–82},
+numpages = {14},
+keywords = {local time stepping, GPU, seismic wave propagation, code generation, ADER, Discontinuous Galerkin, high performance computing, SeisSol},
+%location = {Virtual Event, Republic of Korea},
+%series = {HPC Asia 2021}
+}
+
+
+@article{GEMMlikeTC,
+author = {Springer, Paul and Bientinesi, Paolo},
+title = {Design of a High-Performance GEMM-like Tensor–Tensor Multiplication},
+year = {2018},
+issue_date = {April 2018},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+volume = {44},
+number = {3},
+issn = {0098-3500},
+%url = {https://doi.org/10.1145/3157733},
+doi = {10.1145/3157733},
+abstract = {},
+journal = {ACM Trans. Math. Softw.},
+month = jan,
+articleno = {28},
+numpages = {29},
+keywords = {tensor contractions, matrix–matrix multiplication, high-performance computing, Domain-specific code generator}
+}
+
+@article{tensorFV,
+author = {Mishra, Siddhartha and Schwab, Chrishtoph},
+year = {2010},
+month = {01},
+pages = {-},
+title = {Sparse tensor multi-level Monte Carlo finite volume methods for hyperbolic conservation laws with random initial data},
+volume = {accepted},
+journal = {Mathematics of Computation},
+doi = {10.1090/S0025-5718-2012-02574-9}
+}
+
+
+@InProceedings{strengthReductionNP,
+author="Lam, Chi-Chung
+and Sadayappan, P.
+and Wenger, Rephael",
+editor="Sehr, David
+and Banerjee, Utpal
+and Gelernter, David
+and Nicolau, Alex
+and Padua, David",
+title="Optimal reordering and mapping of a class of nested-loops for parallel execution",
+booktitle="Languages and Compilers for Parallel Computing",
+year="1997",
+publisher="Springer Berlin Heidelberg",
+%address="Berlin, Heidelberg",
+pages="315--329",
+abstract="This paper addresses the compile-time optimization of a class of nested-loop computations that arise in some computational physics applications. The computations involve summations over products of array terms in order to compute multi-dimensional surface and volume integrals. Reordering additions and multiplications and applying the distributive law can significantly reduce the number of operations required in evaluating these summations. In a multiprocessor environment, proper distribution of the arrays among processors will reduce the inter-processor communication time. We present a formal description of the operation minimization problem, a proof of its NP-completeness, and a pruning strategy for finding the optimal solution in small cases. We also give an algorithm for determining the optimal distribution of the arrays among processors in a multiprocessor environment.",
+isbn="978-3-540-69128-0"
+}
+
+@INPROCEEDINGS{cyclops,  
+  author={E. {Solomonik} and D. {Matthews} and J. {Hammond} and J. {Demmel}},
+  booktitle={2013 IEEE 27th International Symposium on Parallel and Distributed Processing},
+  title={Cyclops Tensor Framework: Reducing Communication and Eliminating Load Imbalance in Massively Parallel Contractions},
+  year={2013},
+  volume={},
+  number={},
+  pages={813-824},
+  %doi={10.1109/IPDPS.2013.112}
+}
+
+
+@article{TCBLASGPU,
+   title={Tensor Contractions with Extended BLAS Kernels on CPU and GPU},
+   ISBN={9781509054114},
+   %url={http://dx.doi.org/10.1109/HiPC.2016.031},
+   DOI={10.1109/hipc.2016.031},
+   journal={2016 IEEE 23rd International Conference on High Performance Computing (HiPC)},
+   publisher={IEEE},
+   author={Shi, Yang and Niranjan, U. N. and Anandkumar, Animashree and Cecka, Cris},
+   year={2016},
+   month={Dec}
+}
