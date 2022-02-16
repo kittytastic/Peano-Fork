@@ -47,33 +47,63 @@ To answer this question we will look at an example problem.
 We will look at the 2D Euler equations and use the engine provided Rusanov numerical method.
 
 
+\func{Patch update} starts by creating 2 variables \var{tmpA}, \var{tmpB} which are vectors the same size as a cell.
 
-Our patch update starts by creating 2 variables we will call \var{a}, \var{b} that are arrays of doubles that can be thought as of a vector the size as a cell vector.
-These variable are used througout patch update a destination for the return result of functions.
-Given that these variables are the same size as a cell, they are allocated on the Heap as we have no guarentee that our cell state is small enough to fit on the stack.
-This is our first inefficenty.
+\begin{lstlisting}[language=c]
+double * tmpA = ::tarch::allocateMemory(unknowns, tarch::MemoryLocation::Heap);
+double * tmpB = ::tarch::allocateMemory(unknowns, tarch::MemoryLocation::Heap);
+\end{lstlisting}
 
-We next iterate through every cell in the patch using a double for loop, applying the source term to them, using \var{a} as a buffer for the result of the source term.
-Within these for loops we do several scalar operations to work out memory locations of cells.
-The size of a patch, number of unknowns and number of auxiliary variables is a constant parameter we specify in our problem definition.
-However these values are passed into patch updates as arguments, so although we know they are fixed, the compiler wont. %TODO fact check
-Hence these for loops and scalar operations cant be unrolled and precalculated respectively as the compiler sees the patch size as dynamic.
-These is our ssecond inefficenty.
+We use these variable to store the return values from calls to the source term function and \func{Numerical Method} steps.
+To provide safe behaviour for all possible problems these variables are allocated on the heap.
+For many problems, including our example 2D Euler problem, cell sizes are small (e.g. 5 doubles), hence heap allocation is not required. 
+This is our first definate inefficiency.
+This issue also appears again in the Numerical method step which is used many times in \func{Patch update}
 
-After dealing with the source terms we update each cell by evaluating the flux through the face.
-Again this uses double for loops and scalar operations we identified as our second inefficenty.
-Furthermore our patch update calls our numerical method of each left and right cell.
-It just so happens that in rusanov we calculate the eigenvalues on a per cell basis.
-Hence as our numerical method runs though the cell pairs [(0,0), (0,1)] [(0,1), (0,2)], ... we needlessly recompute the eigenvalues of the cells.
-Such a glaring inefficency is not only at a higher level than we would expect the compiler to be able optimise but also obfescated by the use of lambda functions.
-Hence this is our third inefficency.
+The next step in \func{Path update} iterates through every cell in the patch, applying the source term.
+\begin{lstlisting}[language=c]
+for(int i=0; i<patchSize; i++){
+    for(int j=0; j<patchSize; j++){
+        double * cellData = ...
+        double cellCenterX = ...
+        double cellCenterY = ...    
+        sourceTerm(cellData, cellCenterX, cellCenterY, ..., tmpA);
+        for(int k=0; k<unknowns; k++){
+            outCell[...][k] = tmpA[k] * ...
+        }
+    }
+}
+\end{lstlisting}
 
 
-If we look back at our inefficeies we ca see that they all stem from the use of using general code.
-Given time it is very possible for a developer to fix these issues.
-We took the time to fix issue 1 and 2 and observed a <AMAZING NUMBER> speedup.
-However these optomisation require a significant amount of manual work to preform, while risking a redction of reabability/usability to users codess.
+We can observe that these loops are of fixed size, as the patchSize is known at compile time. 
+Hence, they can be unrolled and values such as cellData can be precomputed.   
+However, patchSize is an argument to patchUpdate and then patch update wrapped in a lambda function.
+Therefore we run the risk of our compiler being unable to spot this optimisation.
+We will label this a possible inefficiency.
 
-Therefor we propose creatign a domain specific compiler that are make these optimisations automatically.
+In this piece of code we also see a rucurring patten of function calls to lambda functions, reciving return values in one of our tmp variables.
+In this case it is likely that the compiler will inline the code.
+However proceeding calls to nested functions such as \func{Numerical Method} are much harder to inline, hence risk limiting the compilers ability to do SIMD operations.    
+This is a second possible inefficiency.
+
+After we process the source terms we update each cell by evaluating the flux between cell faces.
+Again this uses the double for loop patten we labeled as our first possible inefficiency.
+This step calls our numerical method on every pair on neighboring cells which we will call left and right.
+In our example we use Rusanov as our numericla method.
+In Rusanov we calculate the eigenvalues for the left cell and the right cell.
+However, if we think about the traversal of cells e.g. [(0,0), (0,1)] [(0,1), (0,2)], .... First (0,1) will be a right cell, and then in the next call to Rusanov it will be the left cell, hence we calculate with eigenvalue for (0,1) twice, even though it hasn't changed.
+Hence this is our 2nd definate inefficency.
+This issue eludes to a set of definate inefficeies where there are inter-process optimisation opotunities (e.g. patch update and numerical method can work together to avoid this double eigenvalue issue).   
+
+
+If we look back at our inefficeies we ca see that they all stem from the implementation of general iterfaces for user code.
+Given time, it is more than possible for a developer to manually fix these issues.
+For example we took our example and fixed all issues excluding the double eigenvalue issue.
+Doing this we observed a <AMAZING NUMBER> speedup in synthetic benchmarking.
+
+However these optomisation require a significant amount of manual work to preform, while risking both thee introduction of errors and a redction of reabability/usability of users codes.
+
+Therefore we propose creating a domain specific compiler that are make these optimisations automatically.
 
 
