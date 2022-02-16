@@ -1,0 +1,90 @@
+The ExaHyPE engine is very flexible.
+Allowing users to model many different problems using a variety of numerical methods.
+ExaHyPE achieves this by generating large amounts of code.
+This code both carries out core functionality, and provides templates for a user to complete.
+Namely, a user creating a new project will use the ExaHyPE tool kit to create the full project codes, and then need to complete generated templates for flux evaluation, source terms e.t.c..
+
+Having to interface between user codes and generated codes leaves room for inefficenties to creep in. 
+In particular our geenerated codes need to interface with any user codes so must maintain a level of generality.
+However this generality is a leaves us with many inefficenties, some of which are at too high of a conceptial level for our compiler to be able to eliminate these issues.
+
+Take for example the Euler equations in 2D, a prototypical Hyperbolic PDE.
+Creating a  
+
+
+
+Our focus will be the interface between engine and user codes.
+Namely, we will be looking at the patch update process.
+In this step we update every cell in our domain.
+Each cell is a simply a vector of doubles that represents the state for a region of space in our FV scheme. 
+A patch is a group of cells.
+The size of a patch is specified by the user and will usually be in the region of 3x3 to 11x11 cells in 2D or 3x3x3 to 7x7x7 cells in 3D. % TODO fact check.
+
+The patch update process requires the ExaHyPE engine to interface with user codes on many occasions for each patch.
+This process dominates both the time spent in user codes and the total runtime of the program.
+Hence we are interested in optimising this process. 
+
+
+\newcommand{\func}[1]{\textbf{#1}}
+\newcommand{\var}[1]{\textbf{#1}}
+
+We now will investigate the patch update process, and identify inefficiencies.
+We can break patch update into 3 conceptual levels.
+\begin{enumerate}
+    \item \func{Patch update} - engine generated code
+    \item  \func{Numerical method} - either engine generated or user code
+    \item \func{Problem forumlation} - user code
+\end{enumerate}
+
+\func{Patch update} updates every cell in the patch by first considering source terms and then iter-cell flux.
+This function takes multiple input arguments.
+Firstly it receives of the current patch surrounded by halo of cells on the boundary.
+It also receives information about the patch, such as its spacial position and size.
+Finally it receives lambda functions wrapping the \func{Numerical Methods} and \func{Problem formuation}. 
+This function output the updated patch.  
+
+\func{Numerical method} solves the Riemann problem at the shared face of 2 adjacent cells.
+It takes as arguments: the 2 cells in question; information about cell size and position; and lambda functions wrapping the \func{Problem Forumlation}
+
+\func{Problem Formulation} are a set of functions used to describe the problem in question e.g. the Euler equations.
+These function calculate values of numerical flux, eigen values, source terms.
+
+The flexible nature of ExaHyPE along with its use of template driven code generation introduces an issue at this interface between the user and engine code.
+Namely, engine code at this interface has to be generalized as to work with a large range user codes.
+We can already see this in the form of the lambda function wrapping of all user codes in \func{Path update} and the \func{Numerical method}.
+But does this generalization hurt performance?
+
+To answer this question we will look at an example problem.
+We will look at the 2D Euler equations and use the engine provided Rusanov numerical method.
+
+
+
+Our patch update starts by creating 2 variables we will call \var{a}, \var{b} that are arrays of doubles that can be thought as of a vector the size as a cell vector.
+These variable are used througout patch update a destination for the return result of functions.
+Given that these variables are the same size as a cell, they are allocated on the Heap as we have no guarentee that our cell state is small enough to fit on the stack.
+This is our first inefficenty.
+
+We next iterate through every cell in the patch using a double for loop, applying the source term to them, using \var{a} as a buffer for the result of the source term.
+Within these for loops we do several scalar operations to work out memory locations of cells.
+The size of a patch, number of unknowns and number of auxiliary variables is a constant parameter we specify in our problem definition.
+However these values are passed into patch updates as arguments, so although we know they are fixed, the compiler wont. %TODO fact check
+Hence these for loops and scalar operations cant be unrolled and precalculated respectively as the compiler sees the patch size as dynamic.
+These is our ssecond inefficenty.
+
+After dealing with the source terms we update each cell by evaluating the flux through the face.
+Again this uses double for loops and scalar operations we identified as our second inefficenty.
+Furthermore our patch update calls our numerical method of each left and right cell.
+It just so happens that in rusanov we calculate the eigenvalues on a per cell basis.
+Hence as our numerical method runs though the cell pairs [(0,0), (0,1)] [(0,1), (0,2)], ... we needlessly recompute the eigenvalues of the cells.
+Such a glaring inefficency is not only at a higher level than we would expect the compiler to be able optimise but also obfescated by the use of lambda functions.
+Hence this is our third inefficency.
+
+
+If we look back at our inefficeies we ca see that they all stem from the use of using general code.
+Given time it is very possible for a developer to fix these issues.
+We took the time to fix issue 1 and 2 and observed a <AMAZING NUMBER> speedup.
+However these optomisation require a significant amount of manual work to preform, while risking a redction of reabability/usability to users codess.
+
+Therefor we propose creatign a domain specific compiler that are make these optimisations automatically.
+
+
