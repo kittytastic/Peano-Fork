@@ -1,35 +1,24 @@
-The ExaHyPE engine is very flexible.
-Allowing users to model many different problems using a variety of numerical methods.
-ExaHyPE achieves this by generating large amounts of code.
-This code both carries out core functionality, and provides templates for a user to complete.
-Namely, a user creating a new project will use the ExaHyPE tool kit to create the full project codes, and then need to complete generated templates for flux evaluation, source terms e.t.c..
+The ExaHyPE engine is very flexible, allowing users to model many different problems using a variety of numerical methods, while having to write very little code themselves.
+To achieve this ExaHyPE generates a large amount code.
+A majority of this code is highly optimised engine code that orchestrates solving the PDE over distributed systems.
+The user provides a minimal amount of code, only needing to provide code that describes the problem e.g. source terms and fluxes.
+This illudes to the inherent requirement for an interface between user and engine codes.
 
-Having to interface between user codes and generated codes leaves room for inefficenties to creep in. 
-In particular our geenerated codes need to interface with any user codes so must maintain a level of generality.
-However this generality is a leaves us with many inefficenties, some of which are at too high of a conceptial level for our compiler to be able to eliminate these issues.
-
-Take for example the Euler equations in 2D, a prototypical Hyperbolic PDE.
-Creating a  
-
-
-
-Our focus will be the interface between engine and user codes.
+We will focus on this interface.
 Namely, we will be looking at the patch update process.
-In this step we update every cell in our domain.
+This process dominates both the time spent in user codes and the total runtime of the program.
+Hence we are interested in evaluating and optimising this process.
+
+The patch update process updates every cell in our domain.
 Each cell is a simply a vector of doubles that represents the state for a region of space in our FV scheme. 
 A patch is a group of cells.
 The size of a patch is specified by the user and will usually be in the region of 3x3 to 11x11 cells in 2D or 3x3x3 to 7x7x7 cells in 3D. % TODO fact check.
-
-The patch update process requires the ExaHyPE engine to interface with user codes on many occasions for each patch.
-This process dominates both the time spent in user codes and the total runtime of the program.
-Hence we are interested in optimising this process. 
-
-
+This process requires the ExaHyPE engine to interface with user codes on many occasions for each patch.
+ 
 \newcommand{\func}[1]{\textbf{#1}}
 \newcommand{\var}[1]{\textbf{#1}}
 
-We now will investigate the patch update process, and identify inefficiencies.
-We can break patch update into 3 conceptual levels.
+We can break patch update into 3 discrete steps.
 \begin{enumerate}
     \item \func{Patch update} - engine generated code
     \item  \func{Numerical method} - either engine generated or user code
