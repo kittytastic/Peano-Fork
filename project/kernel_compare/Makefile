@@ -1,7 +1,7 @@
 .PHONY = all clean
 
 CXX = g++
-CXXFLAGS = -g3
+CXXFLAGS = -g3 -std=c++17
 OPTIMISE_CXX_FLAGS = -Ofast
  
 FAST_FILES = kernel_1.cpp kernel_2_base.cpp

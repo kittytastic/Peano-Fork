@@ -50,10 +50,10 @@ void compliedKernel (
         );
 
         for (int unknown = 0; unknown < unknowns; unknown++) {
+
         Qout[voxelInImage * (unknowns + auxiliaryVariables) + unknown] += dt * numericalFluxL[unknown];
         }
     }
-    return;
 
     // ------------- Flux 1 ---------------------
     // Left - Right

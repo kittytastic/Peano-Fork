@@ -2,8 +2,10 @@
 #include "kernel_2_base.h"
 #include "data_generator.h"
 #include "tarch/la/Vector.h"
+#include  <iostream>
 
 void k2_runKernel(double * inVec, double* outVec){
+    std::cout << "Runnign kernel\n";
     tarch::la::Vector<2,double> patchCenter;
     patchCenter(0)=1;
     patchCenter(1)=1;
