@@ -13,6 +13,8 @@ void compliedKernel (
   const double *__restrict__ Qin, // length = (vol in preimage) * (num vars) -- preimage = patch with ghost values
   double *__restrict__ Qout       // length = (vol in patch)    * (num vars)
 ) {
+    //int b=0;
+    //for(int i=0; i<10000000; i++){b++;}
 
     // Known from compile
     const int numberOfVolumesPerAxisInPatch = 3;
