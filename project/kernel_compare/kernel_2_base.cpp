@@ -1,4 +1,4 @@
-#include "kernel_2.h"
+#include "kernel_2_base.h"
 
 #include "tarch/Assertions.h"
 #include "tarch/logging/Log.h"
