@@ -1,1 +1,1 @@
-void doSomething();
+void generateNoise(int values, double *out);
