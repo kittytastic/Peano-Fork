@@ -1,1 +1,14 @@
-TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5.cpp
+# Ignore all files+dir in imediate dir
+/*
+
+# Let git know there is a file, then ignore it
+!observers/
+observers/*
+
+# Dont ignore these
+!euler2D.py
+!euler2D.cpp
+!euler2D.h
+!observers/TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5.cpp
+!MockKernel.cpp
+!MockKernel.h
