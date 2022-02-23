@@ -1,3 +1,4 @@
+#pragma once
 #include "tarch/la/Vector.h"
 #include "peano4/utils/Globals.h"
 

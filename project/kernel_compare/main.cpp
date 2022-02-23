@@ -29,7 +29,7 @@ bool isClose(double a, double b){
     return std::abs(a-b)<0.02;
 }
 
-void testKernel(Kernel* k){
+void testKernel(const Kernel* k){
     double* outVec = (double*) malloc(k->outputVectorLength*sizeof(double));
 
     const int lfw = 20;
@@ -55,13 +55,14 @@ void testKernel(Kernel* k){
              std::cout << "❌\n";
          }
     }
+
+    free(outVec);
 }
 
-void benchMarkKernel(Kernel* k){
+void benchMarkKernel(const Kernel* k){
     double* inVec = (double*) malloc(k->inputVectorLength*sizeof(double));
     double* outVec = (double*) malloc(k->outputVectorLength*sizeof(double));
 
-    std::cout << k->name << std::endl;
     k->prepareData(k->inputVectorLength, inVec);
     //std::cout << "In before:  ";
     //print_vector(inVec, k.inputVectorLength);
@@ -77,7 +78,13 @@ void benchMarkKernel(Kernel* k){
 int main(){
     std::cout << "------------ Kernel Compare -----------" << std::endl;
     //benchmark::benchmark(doKernelStuff, benchmark::NONE, 5);
-    testKernel(&k2);
-    benchMarkKernel(&k2);
+
+    std::vector<Kernel> allKernels = {k1, k2};
+
+    for(const auto &k: allKernels){
+        std::cout << std::endl<< k.name << std::endl;
+        testKernel(&k);
+        benchMarkKernel(&k);
+    }
 }
 
