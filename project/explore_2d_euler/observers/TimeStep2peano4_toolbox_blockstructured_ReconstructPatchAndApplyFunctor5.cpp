@@ -1,6 +1,42 @@
 #include "TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5.h"
+#include  <iomanip>
+#include <iostream>
+/******************* Run Peak ********************/
+void kkprint_vector(const double* vec, int length){
+    std::cout << "[";
+    bool skipped = false;
+    for(int i=0; i<length; i++){
+            
+        std::cout << std::setprecision(2)<< vec[i];
+        if (i<length-1){
+            std::cout<< ", ";
+        }
+    }
+    std::cout << "]" << std::endl;
+}
+
+void should_print(const double* Qin, const double *Qout, tarch::la::Vector<2, double> pos, tarch::la::Vector<2, double> size, double t, double ts, bool* shouldPrint, bool* shouldKill){
+  if(Qin[4]>0.3){
+    *shouldPrint=true;
+    *shouldKill=true;
+  }
+}
 
 
+void preprint(const double* Qin, const double *Qout, tarch::la::Vector<2, double> pos, tarch::la::Vector<2, double> size, double t, double ts){
+      std::cout << "Cell Pos: ("<< pos(0) << ", "<<  pos(1)<< ")\n";
+      std::cout << "Cell size: ("<< size(0) << ", "<<  size(1)<< ")\n";
+      std::cout << "Time: " << t << "\n";
+      std::cout << "dt: " << ts << "\n"; 
+        
+      kkprint_vector(Qin, 5*5*4);
+}
+
+void postprint(const double* Qin, const double *Qout, tarch::la::Vector<2, double> pos, tarch::la::Vector<2, double> size, double t, double ts){
+  kkprint_vector(Qout, 3*3*4);
+}
+
+/**********************************************************/
 tarch::logging::Log project::explore_2d_euler::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::_log( "project::explore_2d_euler::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5");
 
 
@@ -312,6 +348,13 @@ void project::explore_2d_euler::observers::TimeStep2peano4_toolbox_blockstructur
         1 // halo size
     );
 
+    bool print_round = false;
+    bool kill_run = false;
+    should_print(reconstructedPatch, targetPatch, marker.x(), marker.h(), cellTimeStamp, cellTimeStepSize, &print_round, &kill_run);
+
+    if(print_round){
+     preprint(reconstructedPatch, targetPatch, marker.x(), marker.h(), cellTimeStamp, cellTimeStepSize); 
+    }
     
     #if Dimensions==2
     ::exahype2::fv::applySplit1DRiemannToPatch_Overlap1AoS2d(
@@ -403,7 +446,10 @@ void project::explore_2d_euler::observers::TimeStep2peano4_toolbox_blockstructur
         targetPatch
     );
   
-    
+    if(print_round){
+      postprint(reconstructedPatch, targetPatch, marker.x(), marker.h(), cellTimeStamp, cellTimeStepSize); 
+      if(kill_run){assert(false);}
+    }
     
     fineGridCelleuler2DCellLabel.setTimeStamp(cellTimeStamp + usedTimeStepSize);
     fineGridCelleuler2DCellLabel.setTimeStepSize(cellTimeStepSize);
