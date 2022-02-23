@@ -28,7 +28,6 @@ bool isClose(double a, double b){
 
 void testKernel(const Kernel* k){
     double* outVec = (double*) malloc(k->outputVectorLength*sizeof(double));
-    //double outVec[3*3*4] = {1.01000000e-01, 3.53352604e-03, 0.00000000e+00, 7.60655157e-03, 1.00000000e-01, 0.00000000e+00, 0.00000000e+00, 0.00000000e+00, 1.00000000e-01, 0.00000000e+00, 0.00000000e+00, 0.00000000e+00, 1.01000000e-01, 3.53352604e-03, 0.00000000e+00, 7.60655157e-03, 1.00000000e-01, 0.00000000e+00, 0.00000000e+00, 0.00000000e+00, 1.00000000e-01, 0.00000000e+00, 0.00000000e+00, 0.00000000e+00, 1.01000000e-01, 3.53352604e-03, 0.00000000e+00, 7.60655157e-03, 1.00000000e-01, 0.00000000e+00, 0.00000000e+00, 0.00000000e+00, 1.00000000e-01, 0.00000000e+00, 0.00000000e+00, 0.00000000e+00}; 
 
     const int lfw = 20;
     const int rfw = 10;
@@ -79,7 +78,7 @@ void benchMarkKernel(const Kernel* k){
     //print_vector(inVec, k.inputVectorLength);
     //std::cout << "Out before: ";
     //print_vector(outVec, k.outputVectorLength);
-    k->runKernel(&k->testCases[0], outVec);
+    benchmark::benchmark([&](){k->runKernel(&k->testCases[0], outVec);}, benchmark::NONE, 20);
     //std::cout << "Out after:  ";
     //print_vector(outVec, k.outputVectorLength);
     free(inVec);
