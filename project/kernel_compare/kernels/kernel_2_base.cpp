@@ -1,10 +1,11 @@
+#include "../stdlibs.h"
+
 #include "kernel_2_base.h"
 
 #include "tarch/Assertions.h"
 #include "tarch/logging/Log.h"
 
 #include "exahype2/NonCriticalAssertions.h"
-#include <iostream>
 
 void compliedKernel (
   const tarch::la::Vector<2, double>&  patchCentre,

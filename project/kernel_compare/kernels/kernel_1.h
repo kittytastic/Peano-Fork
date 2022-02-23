@@ -1,9 +1,11 @@
+#include "../stdlibs.h"
+#include "tarch/la/Vector.h"
+
+#include "../data/data_generator.h"
+#include "../data/euler_data.h"
+
 #include "../kernel_base.h"
 #include "kernel_1_base.h"
-#include "../data/data_generator.h"
-#include "tarch/la/Vector.h"
-#include  <iostream>
-#include "../data/euler_data.h"
 
 void k1_getdata(int x, double* data){
     for(int i=0; i<x; i++){

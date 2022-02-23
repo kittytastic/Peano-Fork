@@ -1,10 +1,13 @@
 #pragma once
-#include "kernel_base.h"
-#include "kernel_2_base.h"
-#include "../data/data_generator.h"
+#include "../stdlibs.h"
+
 #include "tarch/la/Vector.h"
-#include  <iostream>
+
+#include "../data/data_generator.h"
 #include "../data/euler_data.h"
+
+#include "../kernel_base.h"
+#include "kernel_2_base.h"
 
 void k2_getdata(int x, double* data){
     for(int i=0; i<x; i++){

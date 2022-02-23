@@ -1,10 +1,9 @@
-#include <iostream>
+#include "stdlibs.h"
 #include "data/data_generator.h"
 #include "kernel_base.h"
 #include "kernels/kernel_1.h"
 #include "kernels/kernel_2.h"
 #include "../benchmark/benchmark.h"
-#include <cmath>
 
 
 void print_vector(double* vec, int length){

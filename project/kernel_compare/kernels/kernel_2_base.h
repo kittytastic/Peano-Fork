@@ -1,10 +1,9 @@
 #pragma once
+#include "../stdlibs.h"
 #include "tarch/la/Vector.h"
 #include "peano4/utils/Globals.h"
 
 
-#include <functional>
-#include <string>
 
 
 const int Dimensions=2;

@@ -1,8 +1,5 @@
 #pragma once
-#include <functional>
-#include <string>
-#include <vector>
-#include <utility>
+#include "stdlibs.h"
 
 struct testCase{
     testCase(std::string name, double * input, double * expected):
