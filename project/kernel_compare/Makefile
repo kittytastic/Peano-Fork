@@ -2,7 +2,7 @@
 
 CXX = g++
 CXXFLAGS = -g3 -std=c++17
-OPTIMISE_CXX_FLAGS = -Ofast
+OPTIMISE_CXX_FLAGS = -O3
  
 FAST_FILES = kernels/k1/kernel_1_base.cpp kernels/k2/kernel_2_base.cpp
 SLOW_FILES = data/data_generator.cpp main.cpp kernels/kernel_base.cpp

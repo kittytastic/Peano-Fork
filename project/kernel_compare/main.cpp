@@ -23,11 +23,12 @@ void print_vector(double* vec, int length){
 }
 
 bool isClose(double a, double b){
-    return std::abs(a-b)<0.02;
+    return std::abs(a-b)<0.00000001;
 }
 
 void testKernel(const Kernel* k){
     double* outVec = (double*) malloc(k->outputVectorLength*sizeof(double));
+    //double outVec[3*3*4] = {1.01000000e-01, 3.53352604e-03, 0.00000000e+00, 7.60655157e-03, 1.00000000e-01, 0.00000000e+00, 0.00000000e+00, 0.00000000e+00, 1.00000000e-01, 0.00000000e+00, 0.00000000e+00, 0.00000000e+00, 1.01000000e-01, 3.53352604e-03, 0.00000000e+00, 7.60655157e-03, 1.00000000e-01, 0.00000000e+00, 0.00000000e+00, 0.00000000e+00, 1.00000000e-01, 0.00000000e+00, 0.00000000e+00, 0.00000000e+00, 1.01000000e-01, 3.53352604e-03, 0.00000000e+00, 7.60655157e-03, 1.00000000e-01, 0.00000000e+00, 0.00000000e+00, 0.00000000e+00, 1.00000000e-01, 0.00000000e+00, 0.00000000e+00, 0.00000000e+00}; 
 
     const int lfw = 20;
     const int rfw = 10;
@@ -35,13 +36,26 @@ void testKernel(const Kernel* k){
     std::cout << "Runing test cases...\n";
     for(const auto& tc: k->testCases) {
         std::cout << std::setw(lfw) << std::left << tc.name;
+
+        for(int x=0; x<3; x++){
+            for(int y=0; y<3; y++){
+                const int voxelInPreImage  = x+1 + (y+1) * (3+2);
+                const int voxelInImage     = x+ y * 3;
+                for(int u=0; u<4; u++){
+                    const int locationInPreimage = voxelInPreImage*4 + u;
+                    const int locationInImage = voxelInImage*4 + u;
+                    outVec[locationInImage]=tc.input[locationInPreimage];
+                }
+            }
+        } 
+
         k->runKernel(&tc, outVec);
 
         bool allClose = true;
         for(int i=0; i<k->outputVectorLength; i++){
-            /*if(!isClose(outVec[i], tc.expected[i])){
+            if(!isClose(outVec[i], tc.expected[i])){
                 std::cout << "[" << i <<"] Expected: " << tc.expected[i] << " Recived: "<< outVec[i]<<std::endl;
-            }*/
+            }
             allClose &= isClose(outVec[i], tc.expected[i]);
         }
 
@@ -76,7 +90,11 @@ int main(){
     std::cout << "------------ Kernel Compare -----------" << std::endl;
     //benchmark::benchmark(doKernelStuff, benchmark::NONE, 5);
 
-    std::vector<Kernel> allKernels = {kernels::k1::k1, kernels::k2::k2};
+    std::vector<Kernel> allKernels = {
+        kernels::k1::k1
+    , 
+    kernels::k2::k2
+    };
 
     for(const auto &k: allKernels){
         std::cout << std::endl<< k.name << std::endl;
