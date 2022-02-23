@@ -1,24 +1,43 @@
 #include "TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5.h"
+/******************* Run Peak ********************/
 #include  <iomanip>
 #include <iostream>
-/******************* Run Peak ********************/
-void kkprint_vector(const double* vec, int length){
-    std::cout << "[";
-    bool skipped = false;
+#include <fstream>
+#include <string>
+
+const int TARGET_TEST_CASES = 10;
+int current_test_case = 0;
+
+bool hasInitialised = false;
+
+std::string format_vector(const double* vec, int length, int precision){
+  std::ostringstream out_str;
     for(int i=0; i<length; i++){
             
-        std::cout << std::setprecision(2)<< vec[i];
+        out_str <<std::scientific<< std::setprecision(precision)<< vec[i];
         if (i<length-1){
-            std::cout<< ", ";
+            out_str<< ", ";
         }
     }
-    std::cout << "]" << std::endl;
+    return out_str.str();
 }
 
+void print_vector(const double* vec, int length){
+      std::cout << "[" << format_vector(vec, length, 2) << "]" << std::endl;
+}
+
+std::ofstream testCaseFile;
+
+void initialise(){
+  testCaseFile.open ("testCases.txt");
+}
+
+double target_num = 0.1;
 void should_print(const double* Qin, const double *Qout, tarch::la::Vector<2, double> pos, tarch::la::Vector<2, double> size, double t, double ts, bool* shouldPrint, bool* shouldKill){
-  if(Qin[4]>0.3){
+  if(Qin[4]>target_num){
+    target_num+=0.02;
     *shouldPrint=true;
-    *shouldKill=true;
+    *shouldKill=current_test_case>=TARGET_TEST_CASES;
   }
 }
 
@@ -29,11 +48,35 @@ void preprint(const double* Qin, const double *Qout, tarch::la::Vector<2, double
       std::cout << "Time: " << t << "\n";
       std::cout << "dt: " << ts << "\n"; 
         
-      kkprint_vector(Qin, 5*5*4);
+      print_vector(Qin, 5*5*4);
 }
 
 void postprint(const double* Qin, const double *Qout, tarch::la::Vector<2, double> pos, tarch::la::Vector<2, double> size, double t, double ts){
-  kkprint_vector(Qout, 3*3*4);
+  
+  std::string in_vec = format_vector(Qin, 5*5*4, 17);
+  std::string out_vec = format_vector(Qout, 3*3*4, 17);
+  
+  testCaseFile << std::setprecision(17) << std::scientific;
+  testCaseFile << "\ndouble* euler_in_vec"<<current_test_case<<"[5*5*4]={"<<in_vec<<"};\n";
+  testCaseFile << "\ndouble* euler_out_vec"<<current_test_case<<"[3*3*4]={"<<out_vec<<"};\n";
+
+  testCaseFile << std::setprecision(17) << std::scientific << "\n\ntestCase eulerTC_"<<current_test_case<<" = testCase(\"TC "<<current_test_case<<"\", "<< pos(0) <<", "<< pos(1) << ", " << size(0) << ", " << size(1) << ", " << t<< ", "<<ts << ", euler_in_vec"<<current_test_case<<", euler_out_vec"<<current_test_case<<")\n\n";
+  std::cout << std::setprecision(17)<< "\n\ntestCase eulerTC_"<<current_test_case<<"testCase(\"unnamed\", "<< pos(0) <<", "<< pos(1) << ", " << size(0) << ", " << size(1) << ", " << t<< ", "<<ts << ", euler_in_vec"<<current_test_case<<", euler_out_vec"<<current_test_case<<")\n\n";
+
+  current_test_case++;
+}
+
+void finalise(){
+  testCaseFile<< "\n\n\nstd::vector<testCase> k2_tests = {";
+  for(int i=0; i<=TARGET_TEST_CASES; i++){
+    testCaseFile << "eulerTC_"<<i;
+    if(i<TARGET_TEST_CASES){
+      testCaseFile << ", ";
+    }
+  }
+  testCaseFile <<"};";
+  testCaseFile.close();
+  assert(false);
 }
 
 /**********************************************************/
@@ -348,6 +391,11 @@ void project::explore_2d_euler::observers::TimeStep2peano4_toolbox_blockstructur
         1 // halo size
     );
 
+
+    if(!hasInitialised){
+      initialise();
+      hasInitialised=true;
+    }
     bool print_round = false;
     bool kill_run = false;
     should_print(reconstructedPatch, targetPatch, marker.x(), marker.h(), cellTimeStamp, cellTimeStepSize, &print_round, &kill_run);
@@ -448,7 +496,7 @@ void project::explore_2d_euler::observers::TimeStep2peano4_toolbox_blockstructur
   
     if(print_round){
       postprint(reconstructedPatch, targetPatch, marker.x(), marker.h(), cellTimeStamp, cellTimeStepSize); 
-      if(kill_run){assert(false);}
+      if(kill_run){finalise();}
     }
     
     fineGridCelleuler2DCellLabel.setTimeStamp(cellTimeStamp + usedTimeStepSize);
