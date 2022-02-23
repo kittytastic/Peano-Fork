@@ -35,7 +35,7 @@ void testKernel(const Kernel* k){
     std::cout << "Runing test cases...\n";
     for(const auto& tc: k->testCases) {
         std::cout << std::setw(lfw) << std::left << tc.name;
-        k->runKernel(tc.input, outVec);
+        k->runKernel(&tc, outVec);
 
         bool allClose = true;
         for(int i=0; i<k->outputVectorLength; i++){
@@ -60,12 +60,12 @@ void benchMarkKernel(const Kernel* k){
     double* inVec = (double*) malloc(k->inputVectorLength*sizeof(double));
     double* outVec = (double*) malloc(k->outputVectorLength*sizeof(double));
 
-    k->prepareData(k->inputVectorLength, inVec);
+    //k->prepareData(k->inputVectorLength, inVec);
     //std::cout << "In before:  ";
     //print_vector(inVec, k.inputVectorLength);
     //std::cout << "Out before: ";
     //print_vector(outVec, k.outputVectorLength);
-    k->runKernel(inVec, outVec);
+    k->runKernel(&k->testCases[0], outVec);
     //std::cout << "Out after:  ";
     //print_vector(outVec, k.outputVectorLength);
     free(inVec);
