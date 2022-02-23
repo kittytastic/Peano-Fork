@@ -7,6 +7,7 @@
 #include "../kernel_base.h"
 #include "kernel_1_base.h"
 
+namespace kernels::k1{
 void k1_getdata(int x, double* data){
     for(int i=0; i<x; i++){
         data[i] = in_euler2d_1[i];
@@ -48,4 +49,5 @@ Kernel k1(
     3*3*4,
     k1_tests
     );
+};
 

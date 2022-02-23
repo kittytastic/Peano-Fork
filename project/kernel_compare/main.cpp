@@ -76,7 +76,7 @@ int main(){
     std::cout << "------------ Kernel Compare -----------" << std::endl;
     //benchmark::benchmark(doKernelStuff, benchmark::NONE, 5);
 
-    std::vector<Kernel> allKernels = {k1, k2};
+    std::vector<Kernel> allKernels = {kernels::k1::k1, kernels::k2::k2};
 
     for(const auto &k: allKernels){
         std::cout << std::endl<< k.name << std::endl;

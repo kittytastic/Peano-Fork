@@ -7,7 +7,7 @@
 
 #include "exahype2/NonCriticalAssertions.h"
 
-void compliedKernel (
+void kernels::k2::compliedKernel (
   const tarch::la::Vector<2, double>&  patchCentre,
   const tarch::la::Vector<2, double>&  patchSize,
   double t, double dt,
@@ -27,7 +27,7 @@ void compliedKernel (
     logTraceInWith6Arguments( "applySplit1DRiemannToPatch_Overlap1AoS2d(...)", patchCentre, patchSize, t, dt, numberOfVolumesPerAxisInPatch, unknowns );
     assertion4( dt>=0.0, patchCentre, patchSize, t, dt  ); 
 
-    tarch::la::Vector<2, double> volumeH = getVolumeSize(
+    tarch::la::Vector<2, double> volumeH = kernels::k2::getVolumeSize(
       patchSize, numberOfVolumesPerAxisInPatch); // Calc h for h/w
 
 
@@ -41,10 +41,10 @@ void compliedKernel (
         volumeX (0) += (x + 0.5) * volumeH (0); // Center volume (x,y)
         volumeX (1) += (y + 0.5) * volumeH (1); // Center volume (x,y)
 
-        const int voxelInPreImage  = voxelPosInPreimage(x,y, numberOfVolumesPerAxisInPatch);
-        const int voxelInImage     = voxelPosInImage(x, y, numberOfVolumesPerAxisInPatch);
+        const int voxelInPreImage  = kernels::k2::voxelPosInPreimage(x,y, numberOfVolumesPerAxisInPatch);
+        const int voxelInImage     = kernels::k2::voxelPosInImage(x, y, numberOfVolumesPerAxisInPatch);
 
-        sourceTerm(
+        kernels::k2::sourceTerm(
         Qin + voxelInPreImage * (unknowns + auxiliaryVariables), // Mem position of start of state array
         volumeX, // Center of volume
         volumeH(0), // h_x = h_y 
@@ -62,17 +62,17 @@ void compliedKernel (
     // Left - Right
     for (int x = 0; x <= numberOfVolumesPerAxisInPatch; x++) {
         for (int y = 0; y < numberOfVolumesPerAxisInPatch; y++) {
-            const int leftVoxelInPreimage  = voxelPosInPreimage(x-1,y,numberOfVolumesPerAxisInPatch); 
-            const int rightVoxelInPreimage = voxelPosInPreimage(x,y,numberOfVolumesPerAxisInPatch);
+            const int leftVoxelInPreimage  = kernels::k2::voxelPosInPreimage(x-1,y,numberOfVolumesPerAxisInPatch); 
+            const int rightVoxelInPreimage = kernels::k2::voxelPosInPreimage(x,y,numberOfVolumesPerAxisInPatch);
 
-            const int leftVoxelInImage  = voxelPosInImage(x-1, y, numberOfVolumesPerAxisInPatch);
-            const int rightVoxelInImage = voxelPosInImage(x, y, numberOfVolumesPerAxisInPatch);
+            const int leftVoxelInImage  = kernels::k2::voxelPosInImage(x-1, y, numberOfVolumesPerAxisInPatch);
+            const int rightVoxelInImage = kernels::k2::voxelPosInImage(x, y, numberOfVolumesPerAxisInPatch);
 
             tarch::la::Vector<2, double> volumeX = patchCentre - 0.5 * patchSize; // Patch origin
             volumeX (0) += x * volumeH (0); // Face between left and right volumes 
             volumeX (1) += (y + 0.5) * volumeH (1);
             
-            splitRusanov1d(
+            kernels::k2::splitRusanov1d(
                 Qin + leftVoxelInPreimage * (unknowns + auxiliaryVariables),
                 Qin + rightVoxelInPreimage * (unknowns + auxiliaryVariables),
                 volumeX,
@@ -100,17 +100,17 @@ void compliedKernel (
     // Lower
     for (int y = 0; y <= numberOfVolumesPerAxisInPatch; y++) {
         for (int x = 0; x < numberOfVolumesPerAxisInPatch; x++) {
-            const int lowerVoxelInPreimage = voxelPosInPreimage(x,y-1,numberOfVolumesPerAxisInPatch);
-            const int upperVoxelInPreimage = voxelPosInPreimage(x,y,numberOfVolumesPerAxisInPatch);
+            const int lowerVoxelInPreimage = kernels::k2::voxelPosInPreimage(x,y-1,numberOfVolumesPerAxisInPatch);
+            const int upperVoxelInPreimage = kernels::k2::voxelPosInPreimage(x,y,numberOfVolumesPerAxisInPatch);
 
-            const int lowerVoxelInImage = voxelPosInImage(x, y-1, numberOfVolumesPerAxisInPatch);
-            const int upperVoxelInImage = voxelPosInImage(x, y, numberOfVolumesPerAxisInPatch);
+            const int lowerVoxelInImage = kernels::k2::voxelPosInImage(x, y-1, numberOfVolumesPerAxisInPatch);
+            const int upperVoxelInImage = kernels::k2::voxelPosInImage(x, y, numberOfVolumesPerAxisInPatch);
 
             tarch::la::Vector<2, double> volumeX = patchCentre - 0.5 * patchSize; // Patch origin
             volumeX (0) += (x + 0.5) * volumeH (0); // Face between upper and lower volumes
             volumeX (1) += y * volumeH (1);
 
-            splitRusanov1d(
+            kernels::k2::splitRusanov1d(
                 Qin + lowerVoxelInPreimage * (unknowns + auxiliaryVariables),
                 Qin + upperVoxelInPreimage * (unknowns + auxiliaryVariables), volumeX,
                 volumeH (0), t, 
@@ -134,7 +134,7 @@ void compliedKernel (
 }
     
 
-void splitRusanov1d(
+void kernels::k2::splitRusanov1d(
   const double * __restrict__ QL,
   const double * __restrict__ QR,
   const tarch::la::Vector<Dimensions,double>&  x,
@@ -178,7 +178,7 @@ void splitRusanov1d(
 
 };
 
-void flux(
+void kernels::k2::flux(
   const double * __restrict__ Q, // Q[4+0],
   const tarch::la::Vector<Dimensions,double>&  faceCentre,
   const tarch::la::Vector<Dimensions,double>&  volumeH,
@@ -210,7 +210,7 @@ void flux(
 
 }
 
-double maxEigenvalue(
+double kernels::k2::maxEigenvalue(
   const double * __restrict__ Q, // Qma[4+0],
   const tarch::la::Vector<Dimensions,double>&  faceCentre,
   const tarch::la::Vector<Dimensions,double>&  volumeH,
@@ -240,7 +240,7 @@ double maxEigenvalue(
 
 }
 
-void sourceTerm(
+void kernels::k2::sourceTerm(
     const double * __restrict__                  Q,
     const tarch::la::Vector<2,double>&           volueCentre,
     double                                       volumeH,
@@ -254,20 +254,20 @@ void sourceTerm(
 /**
  * @brief Calculates interger position of volume in preimage
  */
-inline int voxelPosInPreimage(int x, int y, int numberOfVolumesPerAxisInPatch){
+inline int kernels::k2::voxelPosInPreimage(int x, int y, int numberOfVolumesPerAxisInPatch){
     return x + 1 + (y + 1) * (2 + numberOfVolumesPerAxisInPatch);
 }
 
 /**
  * @brief Calculates interger position of volume in image (aka patch)
  */
-inline int voxelPosInImage(int x, int y, int numberOfVolumesPerAxisInPatch){
+inline int kernels::k2::voxelPosInImage(int x, int y, int numberOfVolumesPerAxisInPatch){
     return x + y * numberOfVolumesPerAxisInPatch;
 }
 
 
 
-tarch::la::Vector<2,double>  getVolumeSize(
+tarch::la::Vector<2,double>  kernels::k2::getVolumeSize(
   const tarch::la::Vector<2,double>&  h,
   int                                 numberOfVolumesPerAxisInPatch
 ) {
