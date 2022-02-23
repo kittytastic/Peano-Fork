@@ -4,8 +4,8 @@ CXX = g++
 CXXFLAGS = -g3 -std=c++17
 OPTIMISE_CXX_FLAGS = -Ofast
  
-FAST_FILES = kernels/kernel_1_base.cpp kernels/kernel_2_base.cpp
-SLOW_FILES = data/data_generator.cpp main.cpp kernel_base.cpp
+FAST_FILES = kernels/k1/kernel_1_base.cpp kernels/k2/kernel_2_base.cpp
+SLOW_FILES = data/data_generator.cpp main.cpp kernels/kernel_base.cpp
 
 FAST_OBJ := $(FAST_FILES:%.cpp=%.o)
 SLOW_OBJ := $(SLOW_FILES:%.cpp=%.o)
@@ -18,7 +18,6 @@ LIBS +=  -lExaHyPE2Core2d -lToolboxBlockstructured2d -lToolboxLoadBalancing2d -l
 
 all: $(ALL_OBJECTS)
 	@echo "Target objects: $(ALL_OBJECTS)"
-	@echo "Target objects: $(ALL_OBJECTS_DIR)"
 	@echo "Fast objects: $(FAST_FILES)"
 	@echo "Normal objects: $(SLOW_FILES)\n"
 	${CXX} $(ALL_OBJECTS) $(LDFLAGS) $(LIBS)  -o KernelCompare
@@ -32,5 +31,5 @@ $(SLOW_OBJ): %.o: %.cpp
 
 clean:
 	@echo "Cleaning up..."
+	rm $(ALL_OBJECTS)
 	rm KernelCompare
-	rm *.o

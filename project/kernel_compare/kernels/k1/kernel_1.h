@@ -1,8 +1,8 @@
-#include "../stdlibs.h"
+#include "../../stdlibs.h"
 #include "tarch/la/Vector.h"
 
-#include "../data/data_generator.h"
-#include "../data/euler_data.h"
+#include "../../data/data_generator.h"
+#include "../../data/euler_data.h"
 
 #include "../kernel_base.h"
 #include "kernel_1_base.h"

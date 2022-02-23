@@ -1,4 +1,4 @@
-#include "stdlibs.h"
+#include "../stdlibs.h"
 #include "kernel_base.h"
 
 void Kernel::addTestCase(std::string name, double * input, double * expected){
