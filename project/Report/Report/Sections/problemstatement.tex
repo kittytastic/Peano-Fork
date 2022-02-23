@@ -99,7 +99,7 @@ This issue eludes to a set of definite inefficiencies where there are inter-proc
 Looking at the inefficiencies we identified we can see that they all stem from the general interface between user and engine code.
 Given time, it is possible for a developer to manually fix these issues.
 For example we took our example and fixed all issues excluding the double eigenvalue issue.
-Doing this we observed a 3x speedup in synthetic benchmarking.
+Doing this we observed a 3x speedup in the runtime of patch update, resulting in a 10\% speedup of the full program.
 
 However these optimisation require a significant amount of manual work to preform, while risking both the introduction of errors and a reduction of readability/usability of users codes.
 
