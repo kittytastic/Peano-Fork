@@ -5,7 +5,7 @@ CXXFLAGS = -g3 -std=c++17
 OPTIMISE_CXX_FLAGS = -Ofast
  
 FAST_FILES = kernel_1.cpp kernel_2_base.cpp
-SLOW_FILES = data_generator.cpp main.cpp
+SLOW_FILES = data_generator.cpp main.cpp kernel_base.cpp
 
 FAST_OBJ := $(FAST_FILES:%.cpp=%.o)
 SLOW_OBJ := $(SLOW_FILES:%.cpp=%.o)
