@@ -57,17 +57,17 @@ void postprint(const double* Qin, const double *Qout, tarch::la::Vector<2, doubl
   std::string out_vec = format_vector(Qout, 3*3*4, 17);
   
   testCaseFile << std::setprecision(17) << std::scientific;
-  testCaseFile << "\ndouble* euler_in_vec"<<current_test_case<<"[5*5*4]={"<<in_vec<<"};\n";
-  testCaseFile << "\ndouble* euler_out_vec"<<current_test_case<<"[3*3*4]={"<<out_vec<<"};\n";
+  testCaseFile << "\ndouble euler_in_vec"<<current_test_case<<"[5*5*4]={"<<in_vec<<"};\n";
+  testCaseFile << "\ndouble euler_out_vec"<<current_test_case<<"[3*3*4]={"<<out_vec<<"};\n";
 
-  testCaseFile << std::setprecision(17) << std::scientific << "\n\ntestCase eulerTC_"<<current_test_case<<" = testCase(\"TC "<<current_test_case<<"\", "<< pos(0) <<", "<< pos(1) << ", " << size(0) << ", " << size(1) << ", " << t<< ", "<<ts << ", euler_in_vec"<<current_test_case<<", euler_out_vec"<<current_test_case<<")\n\n";
-  std::cout << std::setprecision(17)<< "\n\ntestCase eulerTC_"<<current_test_case<<"testCase(\"unnamed\", "<< pos(0) <<", "<< pos(1) << ", " << size(0) << ", " << size(1) << ", " << t<< ", "<<ts << ", euler_in_vec"<<current_test_case<<", euler_out_vec"<<current_test_case<<")\n\n";
+  testCaseFile << std::setprecision(17) << std::scientific << "\n\ntestCase eulerTC_"<<current_test_case<<" = testCase(\"TC "<<current_test_case<<"\", "<< pos(0) <<", "<< pos(1) << ", " << size(0) << ", " << size(1) << ", " << t<< ", "<<ts << ", euler_in_vec"<<current_test_case<<", euler_out_vec"<<current_test_case<<");\n\n";
+  std::cout << std::setprecision(17)<< "\n\ntestCase eulerTC_"<<current_test_case<<"testCase(\"unnamed\", "<< pos(0) <<", "<< pos(1) << ", " << size(0) << ", " << size(1) << ", " << t<< ", "<<ts << ", euler_in_vec"<<current_test_case<<", euler_out_vec"<<current_test_case<<");\n\n";
 
   current_test_case++;
 }
 
 void finalise(){
-  testCaseFile<< "\n\n\nstd::vector<testCase> k2_tests = {";
+  testCaseFile<< "\n\n\nstd::vector<testCase> euler_2d_test_cases = {";
   for(int i=0; i<=TARGET_TEST_CASES; i++){
     testCaseFile << "eulerTC_"<<i;
     if(i<TARGET_TEST_CASES){
