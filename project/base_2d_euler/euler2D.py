@@ -30,6 +30,9 @@ time_step_size = 0.001
 max_h          = 0.01
 min_h          = 0.01
 
+plot_freq      = 0.01
+end_time = 0.1
+
 #
 # Still the same solver, but this time we use named arguments. This is the way
 # you can add further PDE terms btw.
@@ -41,9 +44,9 @@ auxiliary_variables = 0
 thesolver = exahype2.solvers.fv.rusanov.GlobalFixedTimeStep(
   name="euler2D",
   patch_size=3,
-  unknowns=4, auxiliary_variables=0,
-  min_volume_h=0, max_volume_h=0.01,
-  time_step_size=0.001,
+  unknowns=unknowns, auxiliary_variables=0,
+  min_volume_h=min_h, max_volume_h=max_h,
+  time_step_size=time_step_size,
   flux = exahype2.solvers.fv.PDETerms.User_Defined_Implementation
 )
 
@@ -57,9 +60,9 @@ project.set_global_simulation_parameters(
   dimensions = 2,
   offset = [0.0,0.0],
   size = [1.0,1.0],
-  end_time = 0.1,
+  end_time = end_time,
   first_plot_time_stamp = 0.0,
-  time_in_between_plots = 0.001
+  time_in_between_plots = plot_freq
 )
 
 #
@@ -69,7 +72,7 @@ project.set_global_simulation_parameters(
 project.set_load_balancing( "toolbox::loadbalancing::RecursiveSubdivision", "new ::exahype2::LoadBalancingConfiguration()" )
 project.set_Peano4_installation( "../../", build_mode )
 peano4_project = project.generate_Peano4_project(False)
-peano4_project.build(make_clean_first=True)
+peano4_project.build(make_clean_first=True, number_of_parallel_builds=32)
 
 print("Done. Executable is: Euler2D")
 
