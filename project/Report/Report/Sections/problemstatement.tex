@@ -1,0 +1,108 @@
+The ExaHyPE engine is very flexible, allowing users to model many different problems using a variety of numerical methods, while having to write very little code themselves.
+To achieve this ExaHyPE generates a large amount code.
+A majority of this code is highly optimised engine code that orchestrates solving the PDE over distributed systems.
+The user only needs to provides a minimal amount of code that describes the problem e.g. source terms and fluxes.
+This illudes to the inherent requirement for an interface between user and engine codes.
+
+We will focus on this interface.
+Namely, we will be looking at the patch update process.
+This process dominates the time spent in user codes and often also dominates the total runtime of program.
+Hence we are interested in evaluating and optimising this process.
+
+The patch update process updates every cell in our domain.
+Each cell is a vector of doubles that represents the state for a region of space in our FV scheme. 
+A patch is a group of cells.
+The size of a patch is specified by the user and will usually be in the region of 3x3 to 11x11 cells in 2D or 3x3x3 to 7x7x7 cells in 3D. % TODO fact check.
+This process requires the ExaHyPE engine to interface with user codes on many occasions for each patch.
+ 
+\newcommand{\func}[1]{\textbf{#1}}
+\newcommand{\var}[1]{\textbf{#1}}
+
+We can break patch update into 3 discrete steps.
+\begin{enumerate}
+    \item \func{Patch update} - engine generated code
+    \item  \func{Numerical method} - either engine generated or user code
+    \item \func{Problem forumlation} - user code
+\end{enumerate}
+
+\func{Patch update} updates every cell in the patch by first considering source terms and then iter-cell flux.
+This function takes multiple input arguments.
+Firstly, it receives the current patch surrounded by halo of cells.
+It also receives information about the patch, such as its spacial position and size.
+Finally it receives lambda functions wrapping the \func{Numerical Methods} and \func{Problem formuation}. 
+This function output the updated patch.  
+
+\func{Numerical method} solves the Riemann problem at the shared face of 2 adjacent cells.
+It takes as arguments: the 2 cells in question; information about cell size and position; and lambda functions wrapping the \func{Problem Forumlation}
+
+\func{Problem Formulation} are a set of functions used to describe the problem in question e.g. the Euler equations.
+These function calculate values of numerical flux, eigen values, source terms.
+
+The flexible nature of ExaHyPE, along with its use of template driven code generation, experiences performance issues at the interface between the user and engine code.
+Namely, engine code at this interface has to be general to accept a large range user codes, however this comes at the cost of performance.
+
+
+Next we will take an indepth look at where there are potential inefficiencies within the Path Update process.
+We will look at the 2D Euler equations and use the engine provided Rusanov numerical method.
+
+
+\func{Patch update} starts by creating 2 variables \var{tmpA}, \var{tmpB} which are vectors an equal same size as a cell.
+
+\begin{lstlisting}[language=c]
+double * tmpA = ::tarch::allocateMemory(unknowns, tarch::MemoryLocation::Heap);
+double * tmpB = ::tarch::allocateMemory(unknowns, tarch::MemoryLocation::Heap);
+\end{lstlisting}
+
+These variables are used to store the return values from calls to the source term function and \func{Numerical Method} steps.
+To provide safe behaviour for any possible problem, these variables are allocated on the heap.
+For many problems, including our example 2D Euler problem, cell sizes are small (e.g. 4 doubles), hence heap allocation is not required. 
+This is our first definite inefficiency.
+This issue also appears again in the Numerical method step which is used many times in \func{Patch update}.
+
+The next step in \func{Patch update} iterates through every cell in the patch, applying the source term.
+\begin{lstlisting}[language=c]
+for(int i=0; i<patchSize; i++){
+    for(int j=0; j<patchSize; j++){
+        double * cellData = ...
+        double cellCenterX = ...
+        double cellCenterY = ...    
+        sourceTerm(cellData, cellCenterX, cellCenterY, ..., tmpA);
+        for(int k=0; k<unknowns; k++){
+            outCell[...][k] = tmpA[k] * ...
+        }
+    }
+}
+\end{lstlisting}
+
+
+We can observe that these loops are of fixed size, as the patchSize is known at compile time. 
+Hence, they can be unrolled and values such as cellData can be precomputed.   
+However, patchSize is an argument to patchUpdate and then patch update wrapped in a lambda function.
+Therefore we run the risk of our compiler being unable to spot this optimisation.
+We will label this a possible inefficiency.
+
+This section of code also exhibits a recurring patten of function calls to lambda functions, receiving return values in one of our temporary variables.
+In this case it is likely that the compiler will inline the code.
+However proceeding calls to nested functions such as \func{Numerical Method} are much harder to inline, hence risk limiting the compilers ability to do SIMD operations.    
+This is a second possible inefficiency.
+
+After we process the source terms we update each cell by evaluating the flux between cell faces.
+This also uses the double for loop patten in example (REF). %TODO
+This step calls our numerical method on every pair on neighboring cells which we will call left and right.
+In our example we use Rusanov as our numerical method.
+In Rusanov we calculate the eigenvalues for the left cell and the right cell.
+However, if we think about the traversal of cells e.g. [(0,0), (0,1)] [(0,1), (0,2)], .... First (0,1) will be a right cell, and then in the next call to Rusanov it will be the left cell, hence we calculate with eigenvalue for (0,1) twice, even though it hasn't changed.
+This is our 2nd definite inefficiency.
+This issue eludes to a set of definite inefficiencies where there are inter-process optimisation opportunities (e.g. patch update and numerical method can work together to avoid this double eigenvalue issue).   
+
+
+Looking at the inefficiencies we identified we can see that they all stem from the general interface between user and engine code.
+Given time, it is possible for a developer to manually fix these issues.
+For example we took our example and fixed all issues excluding the double eigenvalue issue.
+Doing this we observed a 3x speedup in the runtime of patch update, resulting in a 10\% speedup of the full program.
+
+However these optimisation require a significant amount of manual work to preform, while risking both the introduction of errors and a reduction of readability/usability of users codes.
+
+Therefore we propose creating a domain specific compiler that are make these optimisations automatically.
+
+
