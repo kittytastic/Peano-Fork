@@ -81,11 +81,8 @@ def Euler2D_X()->Graph:
     add1 = Add(2)
     add2 = Add(2)
 
-    # To P
-    g.add_edge((irho, 0), (p,0))
-    g.add_edge(g.get_internal_input(1), (p,1))
-    g.add_edge(g.get_internal_input(2), (p,2))
-    g.add_edge(g.get_internal_input(3), (p,3))
+    # p
+    g.fill_node_inputs([(irho, 0), g.get_internal_input(1), g.get_internal_input(2), g.get_internal_input(3)], p) 
 
     # irho
     g.add_edge(g.get_internal_input(0), (irho, 0))
@@ -95,25 +92,17 @@ def Euler2D_X()->Graph:
     g.add_edge(g.get_internal_input(2), g.get_internal_output(0))
 
     # F[1]
-    g.add_edge((irho,0), (mul1, 0))
-    g.add_edge(g.get_internal_input(1), (mul1, 1))
-    g.add_edge(g.get_internal_input(1), (mul1, 2))
-    g.add_edge((mul1, 0), (add1, 0))
-    g.add_edge((p, 0), (add1, 1))
+    g.fill_node_inputs([(irho,0), g.get_internal_input(1),g.get_internal_input(1)], mul1)
+    g.fill_node_inputs([(mul1, 0), (p, 0)], add1)
     g.add_edge((add1, 0), g.get_internal_output(1))
 
     # F[2]
-    g.add_edge((irho,0), (mul2, 0))
-    g.add_edge(g.get_internal_input(1), (mul2, 1))
-    g.add_edge(g.get_internal_input(2), (mul2, 2))
+    g.fill_node_inputs([(irho,0), g.get_internal_input(1), g.get_internal_input(2)], mul2)
     g.add_edge((mul2, 0), g.get_internal_output(2))
 
     # F[3]
-    g.add_edge((irho,0), (mul3, 0))
-    g.add_edge(g.get_internal_input(1), (mul3, 1))
-    g.add_edge(g.get_internal_input(3), (add2, 0))
-    g.add_edge((p, 0), (add2, 1))
-    g.add_edge((add2, 0), (mul3, 2))
+    g.fill_node_inputs([g.get_internal_input(3), (p,0)], add2)
+    g.fill_node_inputs([(irho,0), g.get_internal_input(1), (add2, 0)], mul3)
     g.add_edge((mul3, 0), g.get_internal_output(3))
 
     return g
