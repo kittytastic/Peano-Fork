@@ -3,9 +3,10 @@ import graphviz #type: ignore
 import os.path
 from compute_graph.DAG.dag_visitor import DAG_PropsVisitor 
 from compute_graph.DAG.graph import Graph, InputInterface, OutputInterface
+from compute_graph.DAG.node import DAG_Node
 from compute_graph.local_types import GraphViz
 
-from compute_graph.DAG.ops import Add, Divide, Multiply, Subtract
+from compute_graph.DAG.ops import Add, Divide, Max, Multiply, Subtract, Abs, Sqrt
 from compute_graph.DAG.primitive_node import Constant, PassThroughNode, TerminalInput
 
 class DAGVizVisitor(DAG_PropsVisitor[None, int]):
@@ -20,6 +21,9 @@ class DAGVizVisitor(DAG_PropsVisitor[None, int]):
 
     def _exceed_max_depth(self, depth:int)->bool:
         return self.max_depth>=0 and depth>=self.max_depth
+
+    def _default(self, node:DAG_Node, props:int, display_name:str):
+        self.dot.node(str(node.id), display_name, color=self.colour(props)) # type:ignore
 
     def visitGraph(self, node:Graph, props:int)->None:
         if self._exceed_max_depth(props):
@@ -53,8 +57,17 @@ class DAGVizVisitor(DAG_PropsVisitor[None, int]):
         self.dot.node(str(node.id), f"*", color=self.colour(props)) # type:ignore
     
     def visitDivide(self, node:Divide, props:int)->None:
-        self.dot.node(str(node.id), f"/", color=self.colour(props)) # type:ignore
+        self._default(node, props, "/")
     
+    def visitMax(self, node:Max, props:int)->None:
+        self._default(node, props, "max") # type:ignore
+    
+    def visitAbs(self, node:Abs, props:int)->None:
+        self._default(node, props, "abs") # type:ignore
+
+    def visitSqrt(self, node:Sqrt, props:int)->None:
+        self._default(node, props, "sqrt") # type:ignore
+
     def visitConstant(self, node:Constant, props:int)->None:
         self.dot.node(str(node.id), f"{node.value}", color=self.colour(props)) # type:ignore
     

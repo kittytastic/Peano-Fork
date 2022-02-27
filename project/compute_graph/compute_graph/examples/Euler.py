@@ -145,8 +145,52 @@ def flux_y()->Graph:
 
     return g
 
+def max_eigen_x():
+    g = Graph(4,4, "max_eigen_x")
+    p = p_graph()
+    irho = irho_graph()
+
+    mul1 = Multiply(3)
+    mul2 = Multiply(2)
+
+    add1 = Add(2)
+    sub1 = Subtract()
+
+    abs1 = Abs()
+    abs2 = Abs()
+    max1 = Max(2)
+    sqrt1 = Sqrt()
+
+    c1 = Constant(0.4)
+
+    # p
+    g.fill_node_inputs([(irho, 0), g.get_internal_input(1), g.get_internal_input(2), g.get_internal_input(3)], p) 
+
+    # irho
+    g.add_edge(g.get_internal_input(0), (irho, 0))
+
+
+    # c
+    g.fill_node_inputs([(c1,0), (p,0), (irho, 0)], mul1)
+    g.fill_node_inputs([(mul1, 0)], sqrt1)
+
+    # Q[1] * irho
+    g.fill_node_inputs([g.get_internal_input(1), (irho,0)], mul2)
+    
+    # max
+    g.fill_node_inputs([(mul2, 0), (sqrt1,0)], sub1)
+    g.fill_node_inputs([(sub1, 0)], abs1)
+    g.fill_node_inputs([(mul2, 0), (sqrt1,0)], add1)
+    g.fill_node_inputs([(add1, 0)], abs2)
+    g.fill_node_inputs([(abs1,0), (abs2,0)], max1)
+    
+    g.add_edge((max1, 0), g.get_internal_output(0))
+
+    return g
+
+
 if __name__=="__main__":
-    g = flux_x()
+    g = max_eigen_x()
     #g=irho_graph()
     #g=p_graph()
     
