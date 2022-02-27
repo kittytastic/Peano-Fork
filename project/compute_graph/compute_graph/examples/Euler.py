@@ -69,8 +69,46 @@ def p_graph()->Graph:
 
 
 
-def Euler2D_X()->Graph:
-    g = Graph(4,4, "Euler2d_X")
+def flux_x()->Graph:
+    g = Graph(4,4, "flux_x")
+    p = p_graph()
+    irho = irho_graph()
+
+    mul1 = Multiply(3)
+    mul2 = Multiply(3)
+    mul3 = Multiply(3)
+
+    add1 = Add(2)
+    add2 = Add(2)
+
+    # p
+    g.fill_node_inputs([(irho, 0), g.get_internal_input(1), g.get_internal_input(2), g.get_internal_input(3)], p) 
+
+    # irho
+    g.add_edge(g.get_internal_input(0), (irho, 0))
+
+
+    # F[0]
+    g.add_edge(g.get_internal_input(1), g.get_internal_output(0))
+
+    # F[1]
+    g.fill_node_inputs([(irho,0), g.get_internal_input(1),g.get_internal_input(1)], mul1)
+    g.fill_node_inputs([(mul1, 0), (p, 0)], add1)
+    g.add_edge((add1, 0), g.get_internal_output(1))
+
+    # F[2]
+    g.fill_node_inputs([(irho,0), g.get_internal_input(1), g.get_internal_input(2)], mul2)
+    g.add_edge((mul2, 0), g.get_internal_output(2))
+
+    # F[3]
+    g.fill_node_inputs([g.get_internal_input(3), (p,0)], add2)
+    g.fill_node_inputs([(irho,0), g.get_internal_input(1), (add2, 0)], mul3)
+    g.add_edge((mul3, 0), g.get_internal_output(3))
+
+    return g
+
+def flux_y()->Graph:
+    g = Graph(4,4, "flux_y")
     p = p_graph()
     irho = irho_graph()
 
@@ -92,23 +130,23 @@ def Euler2D_X()->Graph:
     g.add_edge(g.get_internal_input(2), g.get_internal_output(0))
 
     # F[1]
-    g.fill_node_inputs([(irho,0), g.get_internal_input(1),g.get_internal_input(1)], mul1)
+    g.fill_node_inputs([(irho,0), g.get_internal_input(2), g.get_internal_input(1)], mul2)
+    g.add_edge((mul2, 0), g.get_internal_output(2))
+
+    # F[2]
+    g.fill_node_inputs([(irho,0), g.get_internal_input(2), g.get_internal_input(2)], mul1)
     g.fill_node_inputs([(mul1, 0), (p, 0)], add1)
     g.add_edge((add1, 0), g.get_internal_output(1))
 
-    # F[2]
-    g.fill_node_inputs([(irho,0), g.get_internal_input(1), g.get_internal_input(2)], mul2)
-    g.add_edge((mul2, 0), g.get_internal_output(2))
-
     # F[3]
     g.fill_node_inputs([g.get_internal_input(3), (p,0)], add2)
-    g.fill_node_inputs([(irho,0), g.get_internal_input(1), (add2, 0)], mul3)
+    g.fill_node_inputs([(irho,0), g.get_internal_input(2), (add2, 0)], mul3)
     g.add_edge((mul3, 0), g.get_internal_output(3))
 
     return g
 
 if __name__=="__main__":
-    g = Euler2D_X()
+    g = flux_y()
     #g=irho_graph()
     #g=p_graph()
     
@@ -125,7 +163,7 @@ if __name__=="__main__":
     out4 = IR_Array(UniqueVariableName("out_irho"), 1)
     
     func_stencil:FunctionStencil = {
-        'Euler2d_X': ([in1, out1], in1.all_ref(), out1.all_ref()),
+        'flux_x': ([in1, out1], in1.all_ref(), out1.all_ref()),
         'p': ([in3, out3], in3.all_ref(), out3.all_ref()),
         'irho': ([in4, out4], in4.all_ref(), out4.all_ref())
     }
