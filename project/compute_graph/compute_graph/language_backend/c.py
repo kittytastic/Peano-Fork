@@ -67,6 +67,12 @@ class IR_To_C_TF(IR_Visitor[Any]):
 
     def visit_IR_Mul(self, node:IR_Mul)->Any:
         return BinaryOp("*", self.visit(node.lval), self.visit(node.rval))
+    
+    def visit_IR_Div(self, node:IR_Div)->Any:
+        return BinaryOp("/", self.visit(node.lval), self.visit(node.rval))
+
+    def visit_IR_Const(self, node:IR_Const)->Any:
+        return Constant('double', str(node.val))
 
     def visit_IR_TempVariable(self, node:IR_TempVariable)->Any:
         raise Exception("Illegal Symbol")

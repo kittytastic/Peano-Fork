@@ -27,3 +27,11 @@ class Multiply(DAG_Node):
         for i in inputs:
             total *= i
         return [total]
+
+
+class Divide(DAG_Node):
+    def __init__(self,  friendly_name:Optional[str]=None):
+        super().__init__(2, 1, type_name="Div", friendly_name=friendly_name)
+
+    def _eval(self, inputs: List[Any])->List[Any]:
+        return [inputs[0]/inputs[1]]

@@ -62,6 +62,14 @@ class IR_Visitor(Generic[_T], ABC):
     def visit_IR_Mul(self, node:IR_Mul)->_T:
         raise Exception("Not implemented")
 
+    @abstractmethod
+    def visit_IR_Div(self, node:IR_Div)->_T:
+        raise Exception("Not implemented")
+    
+    @abstractmethod
+    def visit_IR_Const(self, node:IR_Const)->_T:
+        raise Exception("Not implemented")
+    
     def visit_IR_Variable(self, node:IR_Variable)->_T:
         raise Exception("Not implemented")
 

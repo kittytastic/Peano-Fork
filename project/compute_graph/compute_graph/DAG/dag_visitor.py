@@ -3,8 +3,8 @@ from abc import ABC, abstractmethod
 from compute_graph.DAG.graph import Graph, InputInterface, OutputInterface
 
 from compute_graph.DAG.node import DAG_Node
-from compute_graph.DAG.ops import Add, Multiply, Subtract
-from compute_graph.DAG.primitive_node import  PassThroughNode, TerminalInput
+from compute_graph.DAG.ops import Add, Divide, Multiply, Subtract
+from compute_graph.DAG.primitive_node import  Constant, PassThroughNode, TerminalInput
 
 _NOT_IMPLEMENTED = "Visitor method not implemented"
 
@@ -37,6 +37,14 @@ class DAG_Visitor(Generic[_T], ABC):
     
     @abstractmethod
     def visitMultiply(self, node:Multiply)->_T:
+        raise NotImplementedError(_NOT_IMPLEMENTED)
+    
+    @abstractmethod
+    def visitDivide(self, node:Divide)->_T:
+        raise NotImplementedError(_NOT_IMPLEMENTED)
+    
+    @abstractmethod
+    def visitConstant(self, node:Constant)->_T:
         raise NotImplementedError(_NOT_IMPLEMENTED)
     
     @abstractmethod
@@ -82,6 +90,14 @@ class DAG_PropsVisitor(Generic[_T, _S], ABC):
     
     @abstractmethod
     def visitMultiply(self, node:Multiply, props: _S)->_T:
+        raise NotImplementedError(_NOT_IMPLEMENTED)
+    
+    @abstractmethod
+    def visitDivide(self, node:Divide, props: _S)->_T:
+        raise NotImplementedError(_NOT_IMPLEMENTED)
+    
+    @abstractmethod
+    def visitConstant(self, node:Constant, props: _S)->_T:
         raise NotImplementedError(_NOT_IMPLEMENTED)
     
     @abstractmethod
