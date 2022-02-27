@@ -24,8 +24,8 @@ def p_graph()->Graph:
     #(gamma-1) * (Q[3] - 0.5*irho*(Q[1]*Q[1]+Q[2]*Q[2]))
     g = Graph(4,1, 'p')
 
-    #c1 = Constant(1.4-1)
-    #c2 = Constant(0.5)
+    c1 = Constant(0.4)
+    c2 = Constant(0.5)
 
 
     sub1 = Subtract()
@@ -33,20 +33,34 @@ def p_graph()->Graph:
     mul1 = Multiply(2)
     mul2 = Multiply(2)
     mul3 = Multiply(2)
+    mul4 = Multiply(2)
+    mul5 = Multiply(2)
 
+    # Q[1]*Q[1]
     g.add_edge(g.get_internal_input(1), (mul1, 0))
     g.add_edge(g.get_internal_input(1), (mul1, 1))
 
+    # Q[2]*Q[2]
     g.add_edge(g.get_internal_input(2), (mul2, 0))
     g.add_edge(g.get_internal_input(2), (mul2, 1))
 
+    # (Q1[1]*Q1[1]+Q[2]*Q[2])
     g.fill_node_inputs([(mul1, 0), (mul2, 0)], add1)
 
+    # irho * (Q1[1]...Q[2])
     g.fill_node_inputs([(add1, 0), g.get_internal_input(0)], mul3)
+    
+    # 0.5 * irho * (Q1[1]...Q[2])
+    g.fill_node_inputs([(c2,0), (mul3, 0)], mul4)
 
-    g.fill_node_inputs([g.get_internal_input(3), (mul3, 0)], sub1)
+    # Q[3] - 0.5 * ...
+    g.fill_node_inputs([g.get_internal_input(3), (mul4, 0)], sub1)
+    
+    # 0.4 * (Q[3] - ...)
+    g.fill_node_inputs([(c1,0), (sub1,0)], mul5)
 
-    g.add_edge((sub1, 0), g.get_internal_output(0))
+
+    g.add_edge((mul5, 0), g.get_internal_output(0))
 
     return g
 
@@ -103,7 +117,9 @@ def Euler2D_X()->Graph:
 
 if __name__=="__main__":
     #g = Euler2D_X()
-    g=irho_graph()
+    #g=irho_graph()
+    g=p_graph()
+    
     visualize_graph(g, out_path="../Artifacts", max_depth=1)
 
 
