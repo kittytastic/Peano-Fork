@@ -92,14 +92,22 @@ class DAGToIRVisitor(DAG_PropsVisitor[IR_Symbol, List[IR_Symbol]]):
         return IR_LooseFunction(IR_DataTypes.VOID, in_vars, out_vars, body, node.name)
 
     def visitAdd(self, node:Add, props:List[IR_Symbol])->IR_Symbol:
-        return IR_Add(props[0], props[1])
+        tail = props[-1]
+        for i in reversed(range(0, node.num_inputs-1)):
+            tail = IR_Add(props[i], tail)
+
+        return tail
     
     def visitSubtract(self, node:Subtract, props:List[IR_Symbol])->IR_Symbol:
         return IR_Sub(props[0], props[1])
     
     def visitMultiply(self, node:Multiply, props:List[IR_Symbol])->IR_Symbol:
-        return IR_Mul(props[0], props[1])
+        tail = props[-1]
+        for i in reversed(range(0, node.num_inputs-1)):
+            tail = IR_Mul(props[i], tail)
 
+        return tail
+    
     def visitDivide(self, node:Divide, props:List[IR_Symbol])->IR_Symbol:
        return IR_Div(props[0], props[1]) 
 

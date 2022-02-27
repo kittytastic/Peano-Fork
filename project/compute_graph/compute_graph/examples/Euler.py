@@ -146,7 +146,7 @@ def flux_y()->Graph:
     return g
 
 if __name__=="__main__":
-    g = flux_y()
+    g = flux_x()
     #g=irho_graph()
     #g=p_graph()
     
