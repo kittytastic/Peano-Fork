@@ -3,7 +3,7 @@ from compute_graph.DAG.dag_visitor import DAG_Visitor, DAG_PropsVisitor
 from compute_graph.DAG.node import InPort, OutPort
 from compute_graph.DAG.ops import Divide
 from compute_graph.DAG.primitive_node import Constant
-from compute_graph.IR.symbols import IR_Assign, IR_CallLooseFunction, IR_DataTypes, IR_LooseFunction, IR_Symbol, IR_TempVariable, IR_Variable, IR_SingleAssign, IR_Add, IR_Mul, IR_Sub, UniqueVariableName
+from compute_graph.IR.symbols import IR_Assign, IR_CallLooseFunction, IR_DataTypes, IR_LooseFunction, IR_Symbol, IR_TempVariable, IR_Variable, IR_SingleAssign, IR_Add, IR_Mul, IR_Sub, UniqueVariableName, IR_Div, IR_Const
 from compute_graph.DAG import Graph, Add, Subtract, Multiply, TerminalInput, PassThroughNode, InputInterface, OutputInterface 
 
 class DAG_GatherSubgraphVisitor(DAG_Visitor[List[Graph]]):
@@ -101,10 +101,10 @@ class DAGToIRVisitor(DAG_PropsVisitor[IR_Symbol, List[IR_Symbol]]):
         return IR_Mul(props[0], props[1])
 
     def visitDivide(self, node:Divide, props:List[IR_Symbol])->IR_Symbol:
-        raise Exception("Not implemented")
+       return IR_Div(props[0], props[1]) 
 
     def visitConstant(self, node:Constant, props:List[IR_Symbol])->IR_Symbol:
-        raise Exception("Not implemented")
+        return IR_Const(node.value)
     
     def visitTerminalInput(self, node:TerminalInput, props:List[IR_Symbol])->IR_Symbol:
         raise Exception("Not implemented")

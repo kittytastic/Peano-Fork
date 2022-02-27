@@ -153,8 +153,10 @@ class FileApplyCallStencil(IR_Transfrom):
         all_sub_funcs = in_IR.get_instances(IR_LooseFunction)        
         func_map = {sf.name:sf for sf in all_sub_funcs}
 
-        for func_name, stencil in self.func_stencil.items():
-            og_func = func_map[func_name]
+        for func_name, og_func in func_map.items():
+            if func_name not in self.func_stencil:
+                raise Exception(f"Couldn't find a call stencil for the graph {func_name}\nAvaliable stencils: {', '.join(self.func_stencil.keys())}")
+            stencil = self.func_stencil[func_name]
             tf = ApplyCallStencil(stencil[0], stencil[1], stencil[2])
             new_func = tf.tf(og_func)
             new_func = self._fix_calls(new_func) # type:ignore
