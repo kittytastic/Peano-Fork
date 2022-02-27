@@ -205,9 +205,13 @@ if __name__=="__main__":
     
     in4 = IR_Array(UniqueVariableName("in_irho"), 1)
     out4 = IR_Array(UniqueVariableName("out_irho"), 1)
+
+    in5 = IR_Array(UniqueVariableName("in_max_eig_x"), 4)
+    out5 = IR_Array(UniqueVariableName("out_max_eig_x"), 1)
     
     func_stencil:FunctionStencil = {
         'flux_x': ([in1, out1], in1.all_ref(), out1.all_ref()),
+        'max_eigen_x': ([in5, out5], in5.all_ref(), out5.all_ref()),
         'p': ([in3, out3], in3.all_ref(), out3.all_ref()),
         'irho': ([in4, out4], in4.all_ref(), out4.all_ref())
     }

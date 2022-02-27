@@ -1,4 +1,6 @@
 from typing import List
+
+from sympy import arg
 from compute_graph.IR.symbols.symbol_base import IR_Symbol, IR_DataTypes
 from compute_graph.IR.symbols.variables import IR_Variable, IR_Assign
 
@@ -67,3 +69,14 @@ class IR_CallTightFunction(IR_Assign):
     def __str__(self):
         args = ", ".join([str(i) for i in self.args])
         return f"call @{self.function_name} ({args})"
+
+class IR_BasicLibCall(IR_Symbol):
+    def __init__(self, function_name: str, namespace: str, header_file: str, args:List['IR_Symbol']):
+        self.function_name = function_name
+        self.namespace = namespace
+        self. header_file = header_file
+        self.args = args
+    
+    def __str__(self) -> str:
+        args = ", ".join([str(i) for i in self.args])
+        return f"call lib {self.namespace}::{self.function_name} ({args})"

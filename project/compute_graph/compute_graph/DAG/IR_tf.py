@@ -1,10 +1,12 @@
 from typing import List, Dict
+
 from compute_graph.DAG.dag_visitor import DAG_Visitor, DAG_PropsVisitor
 from compute_graph.DAG.node import InPort, OutPort
-from compute_graph.DAG.ops import Divide
+from compute_graph.DAG.ops import Divide, Max, Sqrt, Abs
 from compute_graph.DAG.primitive_node import Constant
 from compute_graph.IR.symbols import IR_Assign, IR_CallLooseFunction, IR_DataTypes, IR_LooseFunction, IR_Symbol, IR_TempVariable, IR_Variable, IR_SingleAssign, IR_Add, IR_Mul, IR_Sub, UniqueVariableName, IR_Div, IR_Const
-from compute_graph.DAG import Graph, Add, Subtract, Multiply, TerminalInput, PassThroughNode, InputInterface, OutputInterface 
+from compute_graph.DAG import Graph, Add, Subtract, Multiply, TerminalInput, PassThroughNode, InputInterface, OutputInterface
+from compute_graph.IR.symbols.functions import IR_BasicLibCall 
 
 class DAG_GatherSubgraphVisitor(DAG_Visitor[List[Graph]]):
     
@@ -25,6 +27,15 @@ class DAG_GatherSubgraphVisitor(DAG_Visitor[List[Graph]]):
         raise Exception("Not implemented")
     
     def visitDivide(self, node:Divide)->List[Graph]:
+        raise Exception("Not implemented")
+    
+    def visitMax(self, node:Max)->List[Graph]:
+        raise Exception("Not implemented")
+    
+    def visitAbs(self, node:Abs)->List[Graph]:
+        raise Exception("Not implemented")
+    
+    def visitSqrt(self, node:Sqrt)->List[Graph]:
         raise Exception("Not implemented")
     
     def visitConstant(self, node:Constant)->List[Graph]:
@@ -111,6 +122,15 @@ class DAGToIRVisitor(DAG_PropsVisitor[IR_Symbol, List[IR_Symbol]]):
     def visitDivide(self, node:Divide, props:List[IR_Symbol])->IR_Symbol:
        return IR_Div(props[0], props[1]) 
 
+    def visitMax(self, node:Max, props:List[IR_Symbol])->IR_Symbol:
+        return IR_BasicLibCall("max", "std", "algorithm", props)
+    
+    def visitAbs(self, node:Abs, props:List[IR_Symbol])->IR_Symbol:
+        return IR_BasicLibCall("abs", "std", "math", props)
+
+    def visitSqrt(self, node:Sqrt, props:List[IR_Symbol])->IR_Symbol:
+        return IR_BasicLibCall("sqrt", "std", "cmath", props)
+    
     def visitConstant(self, node:Constant, props:List[IR_Symbol])->IR_Symbol:
         return IR_Const(node.value)
     

@@ -1,5 +1,5 @@
 from typing import Any, Dict
-from compute_graph.IR.symbols.functions import IR_CallTightFunction, IR_File
+from compute_graph.IR.symbols.functions import IR_BasicLibCall, IR_CallTightFunction, IR_File
 from compute_graph.IR.symbols.variables import IR_DefineOnly
 from compute_graph.IR.visitor import IR_Visitor
 from compute_graph.IR.symbols import *
@@ -58,6 +58,9 @@ class IR_To_C_TF(IR_Visitor[Any]):
 
     def visit_IR_MultiAssign(self, node:IR_MultiAssign)->Any:
         raise Exception("Not implemented")
+    
+    def visit_IR_BasicLibCall(self, node:IR_BasicLibCall)->Any:
+        return FuncCall(ID(f"{node.namespace}::{node.function_name}"), ExprList([self.visit(var) for var in node.args]))
 
     def visit_IR_Add(self, node:IR_Add)->Any:
         return BinaryOp("+", self.visit(node.lval), self.visit(node.rval))
