@@ -5,8 +5,8 @@ from compute_graph.DAG.dag_visitor import DAG_PropsVisitor
 from compute_graph.DAG.graph import Graph, InputInterface, OutputInterface
 from compute_graph.local_types import GraphViz
 
-from compute_graph.DAG.ops import Add, Multiply, Subtract
-from compute_graph.DAG.primitive_node import PassThroughNode, TerminalInput
+from compute_graph.DAG.ops import Add, Divide, Multiply, Subtract
+from compute_graph.DAG.primitive_node import Constant, PassThroughNode, TerminalInput
 
 class DAGVizVisitor(DAG_PropsVisitor[None, int]):
     def __init__(self, dot:GraphViz, max_depth:Optional[int]=None) -> None:
@@ -51,6 +51,12 @@ class DAGVizVisitor(DAG_PropsVisitor[None, int]):
     
     def visitMultiply(self, node:Multiply, props:int)->None:
         self.dot.node(str(node.id), f"*", color=self.colour(props)) # type:ignore
+    
+    def visitDivide(self, node:Divide, props:int)->None:
+        self.dot.node(str(node.id), f"/", color=self.colour(props)) # type:ignore
+    
+    def visitConstant(self, node:Constant, props:int)->None:
+        self.dot.node(str(node.id), f"{node.value}", color=self.colour(props)) # type:ignore
     
     def visitTerminalInput(self, node:TerminalInput, props:int)->None:
         name = node.friendly_name if node.friendly_name else str(node)

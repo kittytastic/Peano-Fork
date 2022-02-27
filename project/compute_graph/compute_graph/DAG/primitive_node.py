@@ -16,4 +16,13 @@ class TerminalInput(DAG_Node):
     
     def _eval(self, inputs: List[Any])->List[Any]:
         raise Exception("Not implemented")
+
+
+class Constant(DAG_Node):
+    def __init__(self, value:float):
+        self.value = value
+        super().__init__(0, 1, "constant", f"{value}")
+
+    def _eval(self, inputs: List[Any])->List[Any]:
+        return [self.value]
     

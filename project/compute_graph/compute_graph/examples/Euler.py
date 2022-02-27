@@ -1,4 +1,6 @@
 from compute_graph.DAG import *
+from compute_graph.DAG.ops import Divide
+from compute_graph.DAG.primitive_node import Constant
 from compute_graph.DAG.visualize import visualize_graph
 from compute_graph.main import dag_to_IR
 from compute_graph.IR.misc import DefineAllVars, FileApplyCallStencil, FilterApply, FunctionStencil, InlineInOut, RemoveAllTemp
@@ -8,8 +10,10 @@ from compute_graph.language_backend.c import C_Backend
 
 def irho_graph()->Graph:
     g = Graph(1,1, "irho")
-    div = Multiply(2)
-    g.add_edge(g.get_internal_input(0), (div, 0))
+    div = Divide()
+    c1 = Constant(1)
+
+    g.add_edge((c1, 0), (div, 0))
     g.add_edge(g.get_internal_input(0), (div, 1))
 
     g.add_edge((div, 0), g.get_internal_output(0))
@@ -19,6 +23,10 @@ def irho_graph()->Graph:
 def p_graph()->Graph:
     #(gamma-1) * (Q[3] - 0.5*irho*(Q[1]*Q[1]+Q[2]*Q[2]))
     g = Graph(4,1, 'p')
+
+    #c1 = Constant(1.4-1)
+    #c2 = Constant(0.5)
+
 
     sub1 = Subtract()
     add1 = Add(2)
@@ -94,7 +102,8 @@ def Euler2D_X()->Graph:
     return g
 
 if __name__=="__main__":
-    g = Euler2D_X()
+    #g = Euler2D_X()
+    g=irho_graph()
     visualize_graph(g, out_path="../Artifacts", max_depth=1)
 
 
