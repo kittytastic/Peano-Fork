@@ -1,7 +1,7 @@
 from compute_graph.DAG import *
 from compute_graph.DAG.ops import Divide
 from compute_graph.DAG.primitive_node import Constant
-from compute_graph.DAG.transform import DAG_TransformChain
+from compute_graph.DAG.transform import DAG_Flatten, DAG_TransformChain, DAG_Viz
 from compute_graph.DAG.visualize import visualize_graph
 from compute_graph.IR.transform import IR_TransformChain
 from compute_graph.main import dag_to_IR
@@ -119,9 +119,9 @@ def Euler2D_X()->Graph:
     return g
 
 if __name__=="__main__":
-    #g = Euler2D_X()
+    g = Euler2D_X()
     #g=irho_graph()
-    g=p_graph()
+    #g=p_graph()
     
     visualize_graph(g, out_path="../Artifacts", max_depth=1)
 
@@ -143,8 +143,13 @@ if __name__=="__main__":
 
     
     tf_stack = FullStackTransform(
-        DAG_TransformChain([]),
+        DAG_TransformChain([
+            DAG_Viz(file_name = "before", max_depth=2),
+            DAG_Flatten(),
+            DAG_Viz(file_name = "after", max_depth=1),
+        ]),
         IR_TransformChain([
+            #IR_TF_STOP(),
             FilterApply(IR_LooseFunction, RemoveForwardAlias()),
             FilterApply(IR_LooseFunction, RemoveBackwardsAlias()),
             FileApplyCallStencil(func_stencil),
