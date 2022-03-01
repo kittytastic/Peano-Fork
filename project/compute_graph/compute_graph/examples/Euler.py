@@ -5,7 +5,7 @@ from compute_graph.DAG.transform import DAG_TransformChain
 from compute_graph.DAG.visualize import visualize_graph
 from compute_graph.IR.transform import IR_TransformChain
 from compute_graph.main import dag_to_IR
-from compute_graph.IR.misc import DefineAllVars, FileApplyCallStencil, FilterApply, FunctionStencil, InlineInOut, RemoveAllTemp
+from compute_graph.IR.misc import IR_TF_STOP, DefineAllVars, FileApplyCallStencil, FilterApply, FunctionStencil, InlineInOut, RemoveAllTemp, RemoveBackwardsAlias, RemoveForwardAlias
 from compute_graph.IR.symbols import IR_Array, IR_SingleVariable, UniqueVariableName
 from compute_graph.IR.symbols.functions import  IR_LooseFunction, IR_TightFunction
 from compute_graph.language_backend.c import C_Backend
@@ -145,7 +145,8 @@ if __name__=="__main__":
     tf_stack = FullStackTransform(
         DAG_TransformChain([]),
         IR_TransformChain([
-            FilterApply(IR_LooseFunction, InlineInOut()),
+            FilterApply(IR_LooseFunction, RemoveForwardAlias()),
+            FilterApply(IR_LooseFunction, RemoveBackwardsAlias()),
             FileApplyCallStencil(func_stencil),
             FilterApply(IR_TightFunction, RemoveAllTemp()),
             FilterApply(IR_TightFunction, DefineAllVars()),

@@ -27,6 +27,12 @@ class IR_TransformChain(IR_Transfrom):
 
     def tf(self, in_IR: IR_Symbol) -> IR_Symbol:
         working_IR = in_IR
+
+        if self.verbose:
+            print(f"---------- initial IR -----------")
+            print(working_IR)
+            print()
+
         for tf in self.transforms:
             working_IR = tf.tf(working_IR)
             if self.verbose:

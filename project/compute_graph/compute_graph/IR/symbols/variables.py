@@ -67,7 +67,12 @@ class IR_VarArgDefine(IR_Variable):
     def __str__(self):
         return f"new {str(self.var)}"
 
+class IR_Const(IR_Variable):
+    def __init__(self, val: float):
+        self.val = val
 
+    def __str__(self):
+        return f"{self.val}"
 
 class IR_Assign(IR_Symbol, ABC): pass
 

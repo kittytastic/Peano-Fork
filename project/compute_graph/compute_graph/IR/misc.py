@@ -1,4 +1,4 @@
-from typing import Dict, List, Set, Type, Tuple
+from typing import Dict, List, Optional, Set, Type, Tuple
 from compute_graph.IR.symbols import IR_Array, IR_LooseFunction, IR_MultiAssign, IR_NoReturn, IR_SingleAssign, IR_Symbol, IR_TempVariable, IR_TightFunction, IR_VarArgDefine, IR_VarBodyDefine, IR_Variable, IR_SingleVariable
 from compute_graph.IR.symbols.functions import IR_CallLooseFunction, IR_CallTightFunction
 from compute_graph.IR.symbols.variables import IR_Assign, IR_DefineOnly
@@ -190,3 +190,67 @@ class FileApplyCallStencil(IR_Transfrom):
 
         
         return function
+
+
+class RemoveForwardAlias(IR_Transfrom):
+    def tf(self, in_IR: IR_Symbol)->IR_Symbol:
+        working_ir = self.assert_and_cast_symbol_type(in_IR, IR_LooseFunction) 
+
+        next_alias = self._get_next_alias(working_ir)
+        while next_alias is not None:
+            alias, var, line_idx = next_alias
+            working_ir.body = working_ir.body[:line_idx] + working_ir.body[line_idx+1:] 
+            working_ir.replace(alias, var)
+
+            next_alias = self._get_next_alias(working_ir)
+        
+
+        return working_ir
+
+    def _get_next_alias(self, func: IR_LooseFunction)->Optional[Tuple[IR_Variable, IR_Variable, int]]:
+        for idx, l in enumerate(func.body):
+            if not isinstance(l, IR_SingleAssign): continue
+            
+            left = l.assign_var
+            right = l.expr
+
+            if not isinstance(right, IR_Variable): continue
+            if left in func.out_var: continue
+
+            return (left, right, idx)
+
+        return None
+
+
+class RemoveBackwardsAlias(IR_Transfrom):
+    def tf(self, in_IR: IR_Symbol)->IR_Symbol:
+        working_ir = self.assert_and_cast_symbol_type(in_IR, IR_LooseFunction) 
+
+        next_alias = self._get_next_alias(working_ir)
+        while next_alias is not None:
+            var, alias, line_idx = next_alias
+            working_ir.body = working_ir.body[:line_idx] + working_ir.body[line_idx+1:] 
+            working_ir.replace(alias, var)
+
+            next_alias = self._get_next_alias(working_ir)
+        
+
+        return working_ir
+
+    def _get_next_alias(self, func: IR_LooseFunction)->Optional[Tuple[IR_Variable, IR_Variable, int]]:
+        for idx, l in reversed(list(enumerate(func.body))):
+            if not isinstance(l, IR_SingleAssign): continue
+            
+            left = l.assign_var
+            right = l.expr
+
+            if not isinstance(right, IR_Variable): continue
+            if left not in func.out_var: continue
+
+            return (left, right, idx)
+
+        return None
+
+class IR_TF_STOP(IR_Transfrom):
+    def tf(self, in_IR: IR_Symbol) -> IR_Symbol:
+        exit()

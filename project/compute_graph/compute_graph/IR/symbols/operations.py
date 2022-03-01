@@ -31,10 +31,3 @@ class IR_Div(IR_Symbol):
     
     def __str__(self):
         return f"{self.lval} / {self.rval}"
-
-class IR_Const(IR_Symbol):
-    def __init__(self, val: float):
-        self.val = val
-
-    def __str__(self):
-        return f"{self.val}"
