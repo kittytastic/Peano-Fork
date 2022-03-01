@@ -1,12 +1,11 @@
 from compute_graph.DAG import *
-from compute_graph.DAG.ops import Divide
+from compute_graph.DAG.ops import Divide, Sqrt
 from compute_graph.DAG.primitive_node import Constant
 from compute_graph.DAG.transform import DAG_Flatten, DAG_TransformChain, DAG_Viz
 from compute_graph.DAG.visualize import visualize_graph
 from compute_graph.IR.transform import IR_TransformChain
-from compute_graph.main import dag_to_IR
-from compute_graph.IR.misc import IR_TF_STOP, DefineAllVars, FileApplyCallStencil, FilterApply, FunctionStencil, InlineInOut, RemoveAllTemp, RemoveBackwardsAlias, RemoveForwardAlias
-from compute_graph.IR.symbols import IR_Array, IR_SingleVariable, UniqueVariableName
+from compute_graph.IR.misc import IR_TF_STOP, DefineAllVars, FileApplyCallStencil, FilterApply, FunctionStencil,  RemoveAllTemp, RemoveBackwardsAlias, RemoveForwardAlias
+from compute_graph.IR.symbols import IR_Array,  UniqueVariableName
 from compute_graph.IR.symbols.functions import  IR_LooseFunction, IR_TightFunction
 from compute_graph.language_backend.c import C_Backend
 from compute_graph.transform import FullStackTransform
