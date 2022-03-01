@@ -1,12 +1,15 @@
 from compute_graph.DAG import *
 from compute_graph.DAG.ops import Divide
 from compute_graph.DAG.primitive_node import Constant
+from compute_graph.DAG.transform import DAG_Flatten, DAG_TransformChain, DAG_Viz
 from compute_graph.DAG.visualize import visualize_graph
+from compute_graph.IR.transform import IR_TransformChain
 from compute_graph.main import dag_to_IR
-from compute_graph.IR.misc import DefineAllVars, FileApplyCallStencil, FilterApply, FunctionStencil, InlineInOut, RemoveAllTemp
+from compute_graph.IR.misc import IR_TF_STOP, DefineAllVars, FileApplyCallStencil, FilterApply, FunctionStencil, InlineInOut, RemoveAllTemp, RemoveBackwardsAlias, RemoveForwardAlias
 from compute_graph.IR.symbols import IR_Array, IR_SingleVariable, UniqueVariableName
 from compute_graph.IR.symbols.functions import  IR_LooseFunction, IR_TightFunction
 from compute_graph.language_backend.c import C_Backend
+from compute_graph.transform import FullStackTransform
 
 def irho_graph()->Graph:
     g = Graph(1,1, "irho")
@@ -116,21 +119,11 @@ def Euler2D_X()->Graph:
     return g
 
 if __name__=="__main__":
-    #g = Euler2D_X()
+    g = Euler2D_X()
     #g=irho_graph()
-    g=p_graph()
+    #g=p_graph()
     
     visualize_graph(g, out_path="../Artifacts", max_depth=1)
-
-
-    func = dag_to_IR(g) 
-    print('----- Dag -> IR -----')
-    print(func)
-
-    tf = FilterApply(IR_LooseFunction, InlineInOut())
-    func = tf.tf(func)
-    print("\n------ tf ------")
-    print(func)
 
 
     in1 = IR_Array(UniqueVariableName("input"), 4)
@@ -148,23 +141,25 @@ if __name__=="__main__":
         'irho': ([in4, out4], in4.all_ref(), out4.all_ref())
     }
 
-    tf = FileApplyCallStencil(func_stencil)
-    print("\n------ tf ------")
-    func = tf.tf(func)
-    print(func)
-
-
-    tf3 = FilterApply(IR_TightFunction, RemoveAllTemp())
-    func = tf3.tf(func)
-    print("\n------ tf - remove temp ------")
-    print(func)
     
-    tf4 = FilterApply(IR_TightFunction, DefineAllVars())
-    func = tf4.tf(func)
-    print("\n------ tf - define all vars ------")
-    print(func)
+    tf_stack = FullStackTransform(
+        DAG_TransformChain([
+            DAG_Viz(file_name = "before", max_depth=2),
+            DAG_Flatten(),
+            DAG_Viz(file_name = "after", max_depth=1),
+        ]),
+        IR_TransformChain([
+            #IR_TF_STOP(),
+            FilterApply(IR_LooseFunction, RemoveForwardAlias()),
+            FilterApply(IR_LooseFunction, RemoveBackwardsAlias()),
+            FileApplyCallStencil(func_stencil),
+            FilterApply(IR_TightFunction, RemoveAllTemp()),
+            FilterApply(IR_TightFunction, DefineAllVars()),
+        ],
+        verbose=True),
+        C_Backend()
+    )
     
-    cbe = C_Backend()
-    code = cbe.code_gen(func)
-    print()
+    code = tf_stack.tf(g)
+
     print(code)

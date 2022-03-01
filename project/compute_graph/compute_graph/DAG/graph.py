@@ -43,6 +43,9 @@ class Graph(DAG_Node):
 
     def get_edges(self)->GraphEdges:
         return self._edges
+    
+    def set_edges(self, edges: GraphEdges):
+        self._edges = edges
 
     def __getitem__(self, key:OutPort)->Set[InPort]:
         return self._edges[key]
