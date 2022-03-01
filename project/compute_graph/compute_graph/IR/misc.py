@@ -246,6 +246,7 @@ class RemoveBackwardsAlias(IR_Transfrom):
 
             if not isinstance(right, IR_Variable): continue
             if left not in func.out_var: continue
+            if right in func.in_var: continue
 
             return (left, right, idx)
 
