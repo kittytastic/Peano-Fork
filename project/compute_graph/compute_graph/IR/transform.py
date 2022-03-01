@@ -1,4 +1,4 @@
-from typing import TypeVar, Type
+from typing import TypeVar, Type, List
 from abc import ABC, abstractmethod
 from compute_graph.IR.symbols import IR_Symbol
 
@@ -18,3 +18,20 @@ class IR_Transfrom(ABC):
     @abstractmethod
     def tf(self, in_IR: IR_Symbol)->IR_Symbol:
         pass
+
+class IR_TransformChain(IR_Transfrom):
+    def __init__(self, transforms:List[IR_Transfrom], verbose:bool=False) -> None:
+        self.transforms = transforms
+        self.verbose = verbose
+
+
+    def tf(self, in_IR: IR_Symbol) -> IR_Symbol:
+        working_IR = in_IR
+        for tf in self.transforms:
+            working_IR = tf.tf(working_IR)
+            if self.verbose:
+                print(f"---------- tf {type(tf).__name__} -----------")
+                print(working_IR)
+                print()
+            
+        return working_IR
