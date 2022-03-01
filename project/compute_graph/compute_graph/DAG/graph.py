@@ -1,5 +1,5 @@
 import enum
-from typing import Set, List, Any, Dict, Tuple, Optional
+from typing import Set, List, Any, Dict, Tuple, Optional, Union
 
 
 from compute_graph.local_types import  ErrorMessage
@@ -119,10 +119,14 @@ class Graph(DAG_Node):
         else:
             self._edges[from_node]={to_node}
 
-    def fill_node_inputs(self, inputs: List[NodePort], to_node:DAG_Node):
+    def fill_node_inputs(self, inputs: List[Union[NodePort, DAG_Node]], to_node:DAG_Node):
         assert(len(inputs)==to_node.num_inputs)
         for idx, port in enumerate(inputs):
-            self.add_edge(port, (to_node, idx)) 
+            if isinstance(port, DAG_Node):
+                assert(port.num_outputs==1)
+                self.add_edge((port,0), (to_node, idx)) 
+            else:
+                self.add_edge(port, (to_node, idx)) 
 
     def _eval(self, inputs: List[Any])->List[Any]:
 
