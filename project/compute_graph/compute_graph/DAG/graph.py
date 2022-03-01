@@ -105,6 +105,7 @@ class Graph(DAG_Node):
             errors.append(f"{len(ports_to_fullfill)} Unfilled ports: {','.join([str(p) for p in first_missing_ports])}")
 
         # TODO check for cycles
+        # TODO check for unused outports
 
         return errors
 

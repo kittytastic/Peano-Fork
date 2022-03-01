@@ -93,6 +93,9 @@ class DAGToIRVisitor(DAG_PropsVisitor[IR_Symbol, List[IR_Symbol]]):
                     o_idx = node.output_interface.index(n)
                     final_vars[o_idx] = node_out_vars[0]
                 else:
+                    if outport not in edges:
+                        raise Exception(f"Cant find the output: {outport} in the edges of graph: {str(node)}\nThis probably means that {str(node)} has an unused output port")
+                        
                     for ip in edges[outport]:
                         inport_vars[ip]=op_var
 

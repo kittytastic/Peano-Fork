@@ -146,7 +146,7 @@ def flux_y()->Graph:
     return g
 
 def max_eigen_x():
-    g = Graph(4,4, "max_eigen_x")
+    g = Graph(4,1, "max_eigen_x")
     p = p_graph()
     irho = irho_graph()
 
@@ -189,7 +189,7 @@ def max_eigen_x():
     return g
 
 def max_eigen_y():
-    g = Graph(4,4, "max_eigen_y")
+    g = Graph(4,1, "max_eigen_y")
     p = p_graph()
     irho = irho_graph()
 
@@ -265,7 +265,7 @@ def rusanov(max_eigen_builder: Callable[[], Graph], flux_builder: Callable[[], G
     g.add_edge(g.get_internal_input(7), eigen_r.get_external_input(3))
 
     l_max = Max(2)
-    g.fill_node_inputs([(eigen_l, 0), (eigen_r, 1)], l_max)
+    g.fill_node_inputs([(eigen_l, 0), (eigen_r, 0)], l_max)
 
     for i in range(4):
         h = Constant(0.5)
@@ -297,6 +297,8 @@ if __name__=="__main__":
     #g=irho_graph()
     #g=p_graph()
     
+    errs = g.validate()
+    print(errs)
     visualize_graph(g, out_path="../Artifacts", max_depth=1)
 
 
@@ -331,7 +333,7 @@ if __name__=="__main__":
     tf_stack = FullStackTransform(
         DAG_TransformChain([
             DAG_Viz(file_name = "before", max_depth=2),
-            #DAG_Flatten(),
+            DAG_Flatten(),
             DAG_Viz(file_name = "after", max_depth=1),
         ]),
         IR_TransformChain([
