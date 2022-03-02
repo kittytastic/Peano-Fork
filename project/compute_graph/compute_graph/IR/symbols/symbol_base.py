@@ -36,6 +36,7 @@ class IR_Symbol(ABC):
 
             self._cached_attributes = (set(single_keys), set(multi_keys), set(unknown_keys))
         
+        '''
         rs:Set[str] = set()
         for uk in self._cached_attributes[2]:
             uk_v = getattr(self, uk)
@@ -45,27 +46,33 @@ class IR_Symbol(ABC):
             if len(uk_v)>0:
                 rs.add(uk)
                 
-                if self._is_list_of_symbol(uk_v) is not None:
+                if self._is_list_of_symbol(uk_v):
                     self._cached_attributes[1].add(uk)
         
         for r in rs:
             self._cached_attributes[2].remove(r)
+        '''
                 
         return (self._cached_attributes[0], self._cached_attributes[1])
 
-    def _is_list_of_symbol(self, in_list:Any)->Optional[List['IR_Symbol']]:
+    def _is_list_of_symbol(self, in_list:Any)->bool:
         if not isinstance(in_list, list):
-            return None
+            return False
         
+        '''
         in_list = cast(List[Any], in_list)
         if len(in_list)==0:
-            return None
+            return False
         
-        for i in in_list:
-            if not isinstance(i, IR_Symbol):
-                return None
+        #for i in in_list:
+        #    if not isinstance(i, IR_Symbol):
+        #        return None
         
-        return in_list
+        if not isinstance(in_list[0], IR_Symbol):
+            return False
+            '''
+        
+        return True
     
 
     def __contains__(self, key:Union['IR_Symbol', type]):
@@ -73,36 +80,45 @@ class IR_Symbol(ABC):
             if isinstance(self, key):
                 return True
         else:
-            if key == self:
+            if key is self:
                 return True
         
         sing_attr, list_attr = self._get_sub_symbol_keys() 
-        child_ins:List[bool] = [key in getattr(self, k) for k in sing_attr]
-        child_lists:List[List['IR_Symbol']] = [getattr(self, k) for k in list_attr]
-        child_list_ins: List[bool] = [key in i for l in child_lists for i in l]
+        for k in sing_attr:
+            if key in getattr(self, k):
+                return True
+            
+        for k in list_attr:
+            lst = getattr(self, k)
+            for l in lst:
+                if key in l:
+                    return True
+        #child_ins:List[bool] = [key in getattr(self, k) for k in sing_attr]
+        #child_lists:List[List['IR_Symbol']] = [getattr(self, k) for k in list_attr]
+        #child_list_ins: List[bool] = [key in i for l in child_lists for i in l]
 
-        return any(child_ins) or any(child_list_ins)
-    
+        #        return any(child_ins) or any(child_list_ins)
+        return False
+
     def replace(self, find:'IR_Symbol', replace: 'IR_Symbol')->int:
-        if find == self:
+        if find is self:
             raise Exception("Cannot replace. The symbol you called replace on needs to be replaced")
 
         sing_attr, list_attr = self._get_sub_symbol_keys() 
-        child_symbols:List[Tuple[str, IR_Symbol]] = [(k, getattr(self, k)) for k in sing_attr]
-        child_lists:List[Tuple[str,List['IR_Symbol']]] = [(k, getattr(self, k)) for k in list_attr]
 
         replacement_count = 0
-        for k, s in child_symbols:
-            if s == find:
+        for k in sing_attr:
+            s = getattr(self, k)
+            if s is find:
                 setattr(self, k, replace)
                 replacement_count +=1
             else:
                 replacement_count += s.replace(find, replace)
 
-        for k, l in child_lists:
+        for k in list_attr:
             l_ref = getattr(self, k)
-            for idx, v in enumerate(l):
-                if v==find:
+            for idx, v in enumerate(l_ref):
+                if v is find:
                     l_ref[idx] = replace
                     replacement_count +=1
                 else:

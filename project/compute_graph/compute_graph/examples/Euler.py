@@ -384,12 +384,12 @@ def voxelInImage(x: int, y:int, patch_len: int): return x + y * patch_len
 if __name__=="__main__":
     make_rus_x:Callable[[str], Graph] = lambda x: rusanov(max_eigen_x, flux_x, friendly_name=x)
     make_rus_y:Callable[[str], Graph] = lambda x: rusanov(max_eigen_y, flux_y, friendly_name=x)
-    #g = patchUpdate(3, 2, 4, make_rus_x, make_rus_y)
-    g = rusanov(max_eigen_x, flux_x)
+    g = patchUpdate(3, 2, 4, make_rus_x, make_rus_y)
+    #g = rusanov(max_eigen_x, flux_x)
     #g=irho_graph()
     #g=p_graph()
     
-    visualize_graph(g, out_path="../Artifacts", max_depth=1)
+    #visualize_graph(g, out_path="../Artifacts", max_depth=1)
 
 
     in1 = IR_Array(UniqueVariableName("input"), 4)
@@ -410,11 +410,15 @@ if __name__=="__main__":
     in7 = IR_Array(UniqueVariableName("in_rusanov"), 8)
     out7 = IR_Array(UniqueVariableName("out_rusanov"), 4)
     
+    in8 = IR_Array(UniqueVariableName("in_patch"), 106)
+    out8 = IR_Array(UniqueVariableName("out_patch"), 36)
+    
     func_stencil:FunctionStencil = {
         'flux_x': ([in1, out1], in1.all_ref(), out1.all_ref()),
         'max_eigen_x': ([in5, out5], in5.all_ref(), out5.all_ref()),
         'max_eigen_y': ([in6, out6], in6.all_ref(), out6.all_ref()),
         'rusanov': ([in7, out7], in7.all_ref(), out7.all_ref()),
+        'PatchUpdate': ([in8, out8], in8.all_ref(), out8.all_ref()),
         'p': ([in3, out3], in3.all_ref(), out3.all_ref()),
         'irho': ([in4, out4], in4.all_ref(), out4.all_ref())
     }
@@ -422,9 +426,9 @@ if __name__=="__main__":
     
     tf_stack = FullStackTransform(
         DAG_TransformChain([
-            DAG_Viz(file_name = "before", max_depth=1),
+            #DAG_Viz(file_name = "before", max_depth=1),
             DAG_Flatten(),
-            DAG_Viz(file_name = "after", max_depth=None),
+            #DAG_Viz(file_name = "after", max_depth=None),
         ]),
         IR_TransformChain([
             #IR_TF_STOP(),

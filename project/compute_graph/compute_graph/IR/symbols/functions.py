@@ -1,6 +1,5 @@
 from typing import List
 
-from sympy import arg
 from compute_graph.IR.symbols.symbol_base import IR_Symbol, IR_DataTypes
 from compute_graph.IR.symbols.variables import IR_Variable, IR_Assign
 
