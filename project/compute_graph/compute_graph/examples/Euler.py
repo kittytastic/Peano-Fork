@@ -459,5 +459,5 @@ if __name__=="__main__":
     
     code = tf_stack.tf(g)
 
-    with open("../Artifacts/out-code.txt", "w+") as f:
+    with open("../Artifacts/out-code.cpp", "w+") as f:
         f.write(code)
