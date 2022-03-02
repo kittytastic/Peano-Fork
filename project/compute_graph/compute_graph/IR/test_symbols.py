@@ -64,7 +64,7 @@ class TestIRSymReplace(unittest.TestCase):
         n1 = IR_TempVariable(UniqueVariableName("new"))
         a1 = IR_SingleAssign(t1, t2)
 
-        self.assertEqual(a1.replace(t2, n1), 1)
+        self.assertEqual(a1.replace_and_count(t2, n1), 1)
         self.assertEqual(a1.expr, n1)
     
     def test_2(self):
@@ -74,7 +74,7 @@ class TestIRSymReplace(unittest.TestCase):
         s1 = IR_Sub(t1, t2)
         a1 = IR_SingleAssign(t2, s1)
 
-        self.assertEqual(a1.replace(t2, n1), 2)
+        self.assertEqual(a1.replace_and_count(t2, n1), 2)
         self.assertEqual(a1.assign_var, n1)
         self.assertEqual(s1.rval, n1)
     
@@ -84,7 +84,7 @@ class TestIRSymReplace(unittest.TestCase):
         n1 = IR_TempVariable(UniqueVariableName("new"))
         a1 = IR_CallTightFunction("", [t1, t2])
 
-        self.assertEqual(a1.replace(t2, n1), 1)
+        self.assertEqual(a1.replace_and_count(t2, n1), 1)
         self.assertEqual(a1.args[1], n1)
     
     def test_4(self):
@@ -139,7 +139,7 @@ class TestIRSymGetAttributes(unittest.TestCase):
     def test_4(self):
         t1 = IR_TempVariable(UniqueVariableName("test"))
         a1 = IR_CallTightFunction("", [])
-        expected:Tuple[Set[str], Set[str]] = (set(), set())
+        expected:Tuple[Set[str], Set[str]] = (set(), {"args"})
         self.assertEqual(a1._get_sub_symbol_keys(), expected) # type: ignore
         
         a1.args = [t1] # type: ignore
@@ -149,7 +149,7 @@ class TestIRSymGetAttributes(unittest.TestCase):
     def test_5(self):
         t1 = IR_TempVariable(UniqueVariableName("test"))
         a1 = IR_TightFunction(IR_DataTypes.VOID, [t1], [], IR_NoReturn(), "")
-        expected:Tuple[Set[str], Set[str]] = ({"return_statement"}, {"args"})
+        expected:Tuple[Set[str], Set[str]] = ({"return_statement"}, {"args", "body"})
         self.assertEqual(a1._get_sub_symbol_keys(), expected) # type: ignore
         
         a1.body = [t1] # type: ignore
