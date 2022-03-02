@@ -48,6 +48,14 @@ class DAG_Message():
         if exit_if_error and len(errors)>0:
             raise Exception(f"Graph Validate failed with {len(errors)} errors")
 
+    @staticmethod
+    def get_stats(messages: List['DAG_Message']):
+        errors = [m for m in messages if m.level == DAG_MessageType.ERROR]
+        warnings = [m for m in messages if m.level == DAG_MessageType.WARNING]
+        info = [m for m in messages if m.level == DAG_MessageType.INFO]
+    
+        return (len(errors), len(warnings), len(info))
+
 class GraphInterface(PassThroughNode):
     def __init__(self, idx:int, parent_graph: 'Graph', type_name:str, friendly_name:Optional[str]):
         self.idx = idx

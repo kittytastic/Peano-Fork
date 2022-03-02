@@ -384,13 +384,11 @@ def voxelInImage(x: int, y:int, patch_len: int): return x + y * patch_len
 if __name__=="__main__":
     make_rus_x:Callable[[str], Graph] = lambda x: rusanov(max_eigen_x, flux_x, friendly_name=x)
     make_rus_y:Callable[[str], Graph] = lambda x: rusanov(max_eigen_y, flux_y, friendly_name=x)
-    g = patchUpdate(3, 2, 4, make_rus_x, make_rus_y)
-    #g = rusanov(max_eigen_x, flux_x)
+    #g = patchUpdate(3, 2, 4, make_rus_x, make_rus_y)
+    g = rusanov(max_eigen_x, flux_x)
     #g=irho_graph()
     #g=p_graph()
     
-    errs = g.validate()
-    DAG_Message.print_summary(errs, 10)
     visualize_graph(g, out_path="../Artifacts", max_depth=1)
 
 
@@ -436,10 +434,12 @@ if __name__=="__main__":
             FilterApply(IR_TightFunction, RemoveAllTemp()),
             FilterApply(IR_TightFunction, DefineAllVars()),
         ],
-        verbose=True),
+        verbose=True,
+        large_output_mode="../Artifacts"),
         C_Backend()
     )
     
     code = tf_stack.tf(g)
 
-    print(code)
+    with open("../Artifacts/out-code.txt", "w+") as f:
+        f.write(code)
