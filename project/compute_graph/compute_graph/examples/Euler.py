@@ -233,7 +233,7 @@ def rusanov(max_eigen_builder: Callable[[], Graph], flux_builder: Callable[[], G
     g.add_edge(g.get_internal_input(7), eigen_r.get_external_input(3))
 
     l_max = Max(2)
-    g.fill_node_inputs([(eigen_l, 0), (eigen_r, 0)], l_max)
+    g.fill_node_inputs([eigen_l, eigen_r], l_max)
 
     for i in range(4):
         h = Constant(0.5)
@@ -245,7 +245,7 @@ def rusanov(max_eigen_builder: Callable[[], Graph], flux_builder: Callable[[], G
         add1 = Add(2)
 
         # QR - QL
-        g.fill_node_inputs([g.get_internal_input(i), g.get_internal_input(i+4)], sub1)
+        g.fill_node_inputs([g.get_internal_input(i+4), g.get_internal_input(i)], sub1)
         # 0.5 * lmax * (...)
         g.fill_node_inputs([h, l_max, sub1], mul3)
 
@@ -254,7 +254,7 @@ def rusanov(max_eigen_builder: Callable[[], Graph], flux_builder: Callable[[], G
         g.fill_node_inputs([h, (flux_r, i)], mul2)
         g.fill_node_inputs([mul1, mul2], add1)
 
-        g.fill_node_inputs([mul3, add1], sub2)
+        g.fill_node_inputs([add1, mul3], sub2)
 
         g.add_edge((sub2, 0), g.get_internal_output(i))
     

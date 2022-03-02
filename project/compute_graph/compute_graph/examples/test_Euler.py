@@ -47,7 +47,8 @@ class Test_P(unittest.TestCase):
         assert_float_array_equal(self, result, expected_data)
 
 class Test_Flux_X(unittest.TestCase):
-    def flux_formula_x(self, Q:List[float])->List[float]:
+    @staticmethod
+    def flux_formula_x(Q:List[float])->List[float]:
         f:List[float] = [0]*4
         irho = 1/Q[0]
         p = (1.4-1) * (Q[3] - 0.5*irho*(Q[1]*Q[1]+Q[2]*Q[2]))
@@ -75,7 +76,8 @@ class Test_Flux_X(unittest.TestCase):
         assert_float_array_equal(self, result, expected_data)
 
 class Test_Flux_Y(unittest.TestCase):
-    def flux_formula_y(self, Q:List[float])->List[float]:
+    @staticmethod
+    def flux_formula_y(Q:List[float])->List[float]:
         f:List[float] = [0]*4
         irho = 1/Q[0]
         p = (1.4-1) * (Q[3] - 0.5*irho*(Q[1]*Q[1]+Q[2]*Q[2]))
@@ -103,7 +105,8 @@ class Test_Flux_Y(unittest.TestCase):
         assert_float_array_equal(self, result, expected_data)
 
 class Test_Eigen_X(unittest.TestCase):
-    def eigen_formula_x(self, Q:List[float])->float:
+    @staticmethod
+    def eigen_formula_x(Q:List[float])->float:
         irho = 1/Q[0]
         p = (1.4-1) * (Q[3] - 0.5*irho*(Q[1]*Q[1]+Q[2]*Q[2]))
 
@@ -128,7 +131,8 @@ class Test_Eigen_X(unittest.TestCase):
         assert_float_array_equal(self, result, expected_data)
 
 class Test_Eigen_Y(unittest.TestCase):
-    def eigen_formula_y(self, Q:List[float])->float:
+    @staticmethod
+    def eigen_formula_y(Q:List[float])->float:
         irho = 1/Q[0]
         p = (1.4-1) * (Q[3] - 0.5*irho*(Q[1]*Q[1]+Q[2]*Q[2]))
 
@@ -151,6 +155,43 @@ class Test_Eigen_Y(unittest.TestCase):
 
         result = g.eval(input_data)
         assert_float_array_equal(self, result, expected_data)
+
+
+class Test_Rusanov(unittest.TestCase):
+    @staticmethod
+    def rusanov(Q:List[float])->List[float]:
+        QL = Q[:4]
+        QR = Q[4:]
+        f:list[float] = [0]*4
+
+        fluxL = Test_Flux_X.flux_formula_x(QL)
+        fluxR = Test_Flux_X.flux_formula_x(QR)
+        
+        lambdaMaxL = Test_Eigen_X.eigen_formula_x(QL)
+        lambdaMaxR = Test_Eigen_X.eigen_formula_x(QR)
+        lambdaMax = max(lambdaMaxL, lambdaMaxR)
+
+        for i in range(4):
+            f[i] = 0.5 * fluxL[i] + 0.5 * fluxR[i] - 0.5 * lambdaMax * (QR[i]-QL[i])
+       
+        return f
+
+    def test_1(self):
+        g = rusanov(max_eigen_x, flux_x)
+        input_data = [8.0, 2.0, 3.0, 15.0, 9.0, 6.0, 7.0, 100.0]
+        expected_data = self.rusanov(input_data)
+
+        result = g.eval(input_data)
+        assert_float_array_equal(self, result, expected_data)
+    
+    def test_2(self):
+        g = rusanov(max_eigen_x, flux_x)
+        input_data = [7.0, 5.0, 8.0, 101.0, 9.0, 1.0, 4.0, 16.0]
+        expected_data = self.rusanov(input_data)
+
+        result = g.eval(input_data)
+        assert_float_array_equal(self, result, expected_data)
+
 
 if __name__=="__main__":
     unittest.main()
