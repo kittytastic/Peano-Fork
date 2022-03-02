@@ -425,7 +425,7 @@ if __name__=="__main__":
     tf_stack = FullStackTransform(
         DAG_TransformChain([
             DAG_Viz(file_name = "before", max_depth=1),
-            #DAG_Flatten(),
+            DAG_Flatten(),
             DAG_Viz(file_name = "after", max_depth=None),
         ]),
         IR_TransformChain([
