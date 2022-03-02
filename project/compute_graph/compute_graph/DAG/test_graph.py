@@ -33,6 +33,20 @@ class TestGetCategoriesedSubNode(unittest.TestCase):
 
         self.assertEqual(observed_subnode, excpected_subnode)
         self.assertEqual(observed_graphs, excpected_graphs)
+    
+    def test_unused_input(self):
+        g = Graph(3, 1, "test")
+        a = Add(2)
+        g.add_edge(g.get_internal_input(0), (a,0))
+        g.add_edge(g.get_internal_input(1), (a,1))
+        g.add_edge((a,0), g.get_internal_output(0))
+
+        excpected_subnode = {*g.input_interface, *g.output_interface, a}
+        excpected_graphs = set() # type:ignore
+        observed_subnode, observed_graphs = g.get_categoriesed_sub_nodes()
+
+        self.assertEqual(observed_subnode, excpected_subnode)
+        self.assertEqual(observed_graphs, excpected_graphs)
 
 class TestGetSubNode(unittest.TestCase):
     def test_1(self):

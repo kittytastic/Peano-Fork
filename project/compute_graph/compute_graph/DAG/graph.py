@@ -1,10 +1,7 @@
-from distutils.log import ERROR
-from email import message_from_binary_file
 from enum import Enum
 from typing import Set, List, Any, Dict, Tuple, Optional, Union
 
 
-from compute_graph.local_types import  ErrorMessage
 from compute_graph.DAG.node import DAG_Node, GraphEdges, InPort, OutPort, NodePort
 from compute_graph.DAG.helpers import assert_in_port_exists,  assert_out_port_exists
 from compute_graph.DAG.primitive_node import PassThroughNode
@@ -32,12 +29,12 @@ class DAG_Message():
         return f"[{level}] {self.message}     ({st})"
 
     @staticmethod
-    def print_summary(messages: List['DAG_Message'], max_msg:Optional[int]=None, min_level:DAG_MessageType = DAG_MessageType.INFO):
+    def print_summary(messages: List['DAG_Message'], max_msg:Optional[int]=None, min_level:DAG_MessageType = DAG_MessageType.INFO, exit_if_error:bool=True):
         errors = [m for m in messages if m.level == DAG_MessageType.ERROR]
         warnings = [m for m in messages if m.level == DAG_MessageType.WARNING]
         info = [m for m in messages if m.level == DAG_MessageType.INFO]
 
-        print_order = errors
+        print_order = list(errors)
         if min_level==DAG_MessageType.WARNING or min_level==DAG_MessageType.INFO: print_order+=warnings 
         if min_level==DAG_MessageType.INFO: print_order+=info 
 
@@ -47,6 +44,9 @@ class DAG_Message():
 
         for i in range(print_count):
             print(str(print_order[i]))
+
+        if exit_if_error and len(errors)>0:
+            raise Exception(f"Graph Validate failed with {len(errors)} errors")
 
 class GraphInterface(PassThroughNode):
     def __init__(self, idx:int, parent_graph: 'Graph', type_name:str, friendly_name:Optional[str]):
@@ -99,13 +99,14 @@ class Graph(DAG_Node):
         return sn.union(sg)
 
     def get_categoriesed_sub_nodes(self)->Tuple[Set[DAG_Node], Set['Graph']]:
-        sub_nodes:set[DAG_Node] = set(self.input_interface)
-        sub_nodes = sub_nodes.union(self.output_interface)
+        interface_nodes:set[DAG_Node] = set(self.input_interface)
+        interface_nodes = interface_nodes.union(self.output_interface)
 
-        all_sub_node = [n for n, _ in self._edges.keys()]
+        child_sub_nodes = [n for n, _ in self._edges.keys()]
         for nps in self._edges.values():
-            all_sub_node += [n for n,_ in nps]
+            child_sub_nodes += [n for n,_ in nps]
             
+        all_sub_node = set(child_sub_nodes).union(interface_nodes)
 
         all_graphs = [g for g in all_sub_node if isinstance(g, Graph)]
         sub_graphs = set(all_graphs) 
@@ -118,7 +119,6 @@ class Graph(DAG_Node):
 
     def validate(self) -> List[DAG_Message]:
         # TODO check for cycles
-      
         return self._validate([])
 
     def _validate(self, parent_stack_trace: List['Graph'])->List[DAG_Message]:
@@ -128,6 +128,7 @@ class Graph(DAG_Node):
         sub_nodes, sub_graph = self.get_categoriesed_sub_nodes()
 
         all_sub_nodes = sub_nodes.union(sub_graph)
+        
         outport_tracker: Dict[OutPort, int] = {OutPort((n,i)): 0 for n in all_sub_nodes for i in range(n.num_outputs)}
         inport_tracker: Dict[InPort, Set[OutPort]] = {ip:set() for ip,_ in self.inverse_edges().items()}
 
@@ -135,13 +136,13 @@ class Graph(DAG_Node):
             if op not in outport_tracker:
                 msgs.append(DAG_Message(DAG_MessageType.ERROR, stack_trace, f"Outport {op} is used in graph, but not a subnode?!"))
             else:
-                outport_tracker[op] += 1
+                outport_tracker[op] += len(self._edges[op])
             for ip in ips:
                 inport_tracker[ip].add(op)
 
         for op, count in outport_tracker.items():
             if count == 0 and op[0] not in self.output_interface:
-                msgs.append(DAG_Message(DAG_MessageType.WARNING, stack_trace, f"Outport {op} is unused"))
+                msgs.append(DAG_Message(DAG_MessageType.INFO, stack_trace, f"Outport {op} is unused"))
         
         for ip, ops in inport_tracker.items():
             if len(ops) == 0 and ip[0] not in self.input_interface:

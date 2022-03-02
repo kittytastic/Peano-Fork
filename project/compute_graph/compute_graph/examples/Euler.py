@@ -233,8 +233,8 @@ def max_eigen_y():
     return g
 
 
-def rusanov(max_eigen_builder: Callable[[], Graph], flux_builder: Callable[[], Graph])->Graph:
-    g = Graph(8, 4, "rusanov")
+def rusanov(max_eigen_builder: Callable[[], Graph], flux_builder: Callable[[], Graph], friendly_name:str="rusanov")->Graph:
+    g = Graph(8, 4, friendly_name)
     flux_l = flux_builder()
     flux_r = flux_builder()
 
@@ -293,7 +293,7 @@ def rusanov(max_eigen_builder: Callable[[], Graph], flux_builder: Callable[[], G
     
     return g
 
-def patchUpdate(patch_len: int, dim: int, unknowns: int, rusanov_x:Callable[[], Graph], rusanov_y:Callable[[], Graph])->Graph:
+def patchUpdate(patch_len: int, dim: int, unknowns: int, rusanov_x:Callable[[str], Graph], rusanov_y:Callable[[str], Graph])->Graph:
     Qins:int = (patch_len+2)**dim * unknowns
     Qout:int = (patch_len)**dim * unknowns
 
@@ -326,9 +326,9 @@ def patchUpdate(patch_len: int, dim: int, unknowns: int, rusanov_x:Callable[[], 
             # SKIP volumeX - not used in rusanov
 
             # Rusanov
-            rus = rusanov_x()
+            rus = rusanov_x(f"rusanov-x ({x}, {y})")
             for u in range(unknowns): g.add_edge(g.get_internal_input(Q_in_start + leftVoxelInPreImage*unknowns + u), rus.get_external_input(u))
-            for u in range(unknowns): g.add_edge(g.get_internal_input(Q_in_start + rightVoxelInPreImage*unknowns + u), rus.get_external_input(u+dim))
+            for u in range(unknowns): g.add_edge(g.get_internal_input(Q_in_start + rightVoxelInPreImage*unknowns + u), rus.get_external_input(u+unknowns))
 
             # Update out
             for u in range(unknowns):
@@ -352,9 +352,9 @@ def patchUpdate(patch_len: int, dim: int, unknowns: int, rusanov_x:Callable[[], 
             # SKIP volumeX - not used in rusanov
 
             # Rusanov
-            rus = rusanov_y()
+            rus = rusanov_y(f"rusanov-y ({x}, {y})")
             for u in range(unknowns): g.add_edge(g.get_internal_input(Q_in_start + leftVoxelInPreImage*unknowns + u), rus.get_external_input(u))
-            for u in range(unknowns): g.add_edge(g.get_internal_input(Q_in_start + rightVoxelInPreImage*unknowns + u), rus.get_external_input(u+dim))
+            for u in range(unknowns): g.add_edge(g.get_internal_input(Q_in_start + rightVoxelInPreImage*unknowns + u), rus.get_external_input(u+unknowns))
 
             # Update out
             for u in range(unknowns):
@@ -382,8 +382,8 @@ def voxelInPreimage(x: int, y:int, patch_len: int): return x+1 + (y+1) * (2+patc
 def voxelInImage(x: int, y:int, patch_len: int): return x + y * patch_len
 
 if __name__=="__main__":
-    make_rus_x = lambda : rusanov(max_eigen_x, flux_x)
-    make_rus_y = lambda : rusanov(max_eigen_y, flux_y)
+    make_rus_x:Callable[[str], Graph] = lambda x: rusanov(max_eigen_x, flux_x, friendly_name=x)
+    make_rus_y:Callable[[str], Graph] = lambda x: rusanov(max_eigen_y, flux_y, friendly_name=x)
     g = patchUpdate(3, 2, 4, make_rus_x, make_rus_y)
     #g = rusanov(max_eigen_x, flux_x)
     #g=irho_graph()
