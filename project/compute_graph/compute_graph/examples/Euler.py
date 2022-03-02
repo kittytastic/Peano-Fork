@@ -1,4 +1,4 @@
-from typing import Callable
+from typing import Callable, List
 from compute_graph.DAG import *
 from compute_graph.DAG.ops import Divide, Sqrt
 from compute_graph.DAG.primitive_node import Constant
@@ -292,8 +292,96 @@ def rusanov(max_eigen_builder: Callable[[], Graph], flux_builder: Callable[[], G
     
     return g
 
+def patchUpdate(patch_len: int, dim: int, unknowns: int, rusanov_x:Callable[[], Graph], rusanov_y:Callable[[], Graph])->Graph:
+    Qins:int = (patch_len+2)**dim * unknowns
+    Qout:int = (patch_len)**dim * unknowns
+
+    Q_in_start = 0
+    t = Q_in_start + Qins
+    dt = t+1
+    patch_center_base = dt + 1
+    patch_size_base = patch_center_base + dim
+    total_ins = patch_size_base+dim
+
+    g=Graph(total_ins, Qout, "PatchUpdate")
+
+    Q_out_pos_contrib:List[List[OutPort]] = [[] for _ in range(Qout)]
+    Q_out_neg_contrib:List[List[OutPort]] = [[] for _ in range(Qout)]
+
+    dt_div_size = Constant(1)
+
+    # Flux x
+    for x in range(patch_len+1):
+        for y in range(patch_len):
+            leftVoxelInPreImage = voxelInPreimage(x-1, y, patch_len)
+            rightVoxelInPreImage = voxelInPreimage(x, y, patch_len)
+
+            leftVoxelInImage = voxelInImage(x-1, y, patch_len)
+            rightVoxelInImage = voxelInImage(x, y, patch_len)
+
+            # SKIP volumeX - not used in rusanov
+
+            # Rusanov
+            rus = rusanov_x()
+            for u in range(unknowns): g.add_edge(g.get_internal_input(Q_in_start + leftVoxelInPreImage + u), rus.get_external_input(u))
+            for u in range(unknowns): g.add_edge(g.get_internal_input(Q_in_start + rightVoxelInPreImage + u), rus.get_external_input(u+dim))
+
+            # Update out
+            for u in range(unknowns):
+                if x>0:
+                    Q_out_neg_contrib[leftVoxelInImage+u].append(rus.get_external_output(u))
+
+                if x<patch_len:
+                    Q_out_pos_contrib[rightVoxelInImage+u].append(rus.get_external_output(u))
+
+
+    
+    # Flux y
+    for x in range(patch_len):
+        for y in range(patch_len+1):
+            leftVoxelInPreImage = voxelInPreimage(x, y-1, patch_len)
+            rightVoxelInPreImage = voxelInPreimage(x, y, patch_len)
+
+            leftVoxelInImage = voxelInImage(x, y, patch_len)
+            rightVoxelInImage = voxelInImage(x, y-1, patch_len)
+
+            # SKIP volumeX - not used in rusanov
+
+            # Rusanov
+            rus = rusanov_y()
+            for u in range(unknowns): g.add_edge(g.get_internal_input(Q_in_start + leftVoxelInPreImage + u), rus.get_external_input(u))
+            for u in range(unknowns): g.add_edge(g.get_internal_input(Q_in_start + rightVoxelInPreImage + u), rus.get_external_input(u+dim))
+
+            # Update out
+            for u in range(unknowns):
+                if y>0:
+                    Q_out_neg_contrib[leftVoxelInImage+u].append(rus.get_external_output(u))
+
+                if y<patch_len:
+                    Q_out_pos_contrib[rightVoxelInImage+u].append(rus.get_external_output(u))
+
+    for i in range(Qout):
+        add_pos = Add(len(Q_out_pos_contrib[i]))
+        add_neg = Add(len(Q_out_neg_contrib[i]))
+        diff = Subtract()
+        scale = Multiply(2)
+
+        g.fill_node_inputs(Q_out_pos_contrib[i], add_pos) # type:ignore
+        g.fill_node_inputs(Q_out_neg_contrib[i], add_neg) # type:ignore
+        g.fill_node_inputs([add_pos, add_neg], diff)
+        g.fill_node_inputs([diff, dt_div_size], scale)
+        g.add_edge((scale, 0), g.get_internal_output(i))
+    
+    return g
+
+def voxelInPreimage(x: int, y:int, patch_len: int): return x+1 + (y+1) * (2+patch_len)
+def voxelInImage(x: int, y:int, patch_len: int): return x + y * patch_len
+
 if __name__=="__main__":
-    g = rusanov(max_eigen_x, flux_x)
+    make_rus_x = lambda : rusanov(max_eigen_x, flux_x)
+    make_rus_y = lambda : rusanov(max_eigen_y, flux_y)
+    g = patchUpdate(3, 2, 4, make_rus_x, make_rus_y)
+    #g = rusanov(max_eigen_x, flux_x)
     #g=irho_graph()
     #g=p_graph()
     
