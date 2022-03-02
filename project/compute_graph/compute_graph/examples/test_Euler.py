@@ -229,5 +229,71 @@ class Test_AnalyticalPatchUpdate(unittest.TestCase):
         ) 
         assert_float_array_equal(self, result, expected_data)
     
+    def test_1_cell_1d_1(self):
+        dt = 0.1
+        size = 1.0
+        cells_per_patch = 1
+        input_data = [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0] + [0.0, dt, 0.0, 0.0, size, size]
+        expected_data = [4 + (+2 +2 -2.5 -3.5)*dt /(size/cells_per_patch)]
+
+        result = analytical_patch_update(input_data, cells_per_patch, 2, 1,
+            lambda x: [max(x)/2],
+            lambda x: [max(x)/2],
+        ) 
+        assert_float_array_equal(self, result, expected_data)
+    
+    def test_1_cell_1d_2(self):
+        dt = 0.1
+        size = 1.0
+        cells_per_patch = 1
+        input_data = [0.0, 8.0, 1.0, 7.0, 4.0, 6.0, 2.0, 5.0, 3.0] + [0.0, dt, 0.0, 0.0, size, size]
+        expected_data = [4 + (+4 +3.5 -2.5 -3)*dt /(size/cells_per_patch)]
+
+        result = analytical_patch_update(input_data, cells_per_patch, 2, 1,
+            lambda x: [max(x)/2],
+            lambda x: [max(x)/2],
+        ) 
+        assert_float_array_equal(self, result, expected_data)
+    
+    def test_1_cell_2d_1(self):
+        dt = 0.1
+        size = 1.0
+        cells_per_patch = 1
+        input_data = [i for j in zip([0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0], [0.0, 8.0, 1.0, 7.0, 4.0, 6.0, 2.0, 5.0, 3.0]) for i in j] + [0.0, dt, 0.0, 0.0, size, size]
+        expected_data = [
+            4 + (+2 +2 -2.5 -3.5)*dt /(size/cells_per_patch),
+            4 + (+4 +3.5 -2.5 -3)*dt /(size/cells_per_patch)
+            ]
+
+        def mock_rusanov(Qin:List[float])->List[float]:
+            Qout = [0.0]*(len(Qin)//2)
+            for i in range(len(Qin)//2):
+                Qout[i] = max(Qin[i], Qin[i+len(Qin)//2])/2
+            return Qout
+
+        result = analytical_patch_update(input_data, cells_per_patch, 2, 2,
+            mock_rusanov,
+            mock_rusanov,
+        ) 
+        assert_float_array_equal(self, result, expected_data)
+    
+    def test_4(self):
+        dt = 0.1
+        size = 2.0
+        cells_per_patch = 2
+        input_data = [float(i) for i in range(16)] + [0.0, dt, 0.0, 0.0, size, size]
+        expected_data = [
+            5 + (+2.5 +2.5 -3 -4.5)*dt /(size/cells_per_patch),
+            6 + (+3 +3 -5 -3.5)*dt /(size/cells_per_patch),
+            9 + (+4.5 +4.5 -6.5 -5)*dt /(size/cells_per_patch),
+            10 + (+5 +5 -7 -5.5)*dt /(size/cells_per_patch),
+            ]
+
+        result = analytical_patch_update(input_data, cells_per_patch, 2, 1,
+            lambda x: [max(x)/2],
+            lambda x: [max(x)/2],
+        ) 
+        assert_float_array_equal(self, result, expected_data)
+    
 if __name__=="__main__":
     unittest.main()

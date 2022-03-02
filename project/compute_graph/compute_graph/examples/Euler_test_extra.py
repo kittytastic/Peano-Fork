@@ -20,12 +20,12 @@ def analytical_patch_update(Qin:List[float], patch_len: int, dim: int, unknowns:
     num_in_states:int = (patch_len+2)**dim * unknowns
     num_out_states:int = (patch_len)**dim * unknowns
 
-    t = Qin[num_in_states]
+    t = Qin[num_in_states] # type: ignore
     dt = Qin[num_in_states + 1]
-    pos0 = Qin[num_in_states + 2]
-    pos1 = Qin[num_in_states + 3]
+    pos0 = Qin[num_in_states + 2] #type: ignore
+    pos1 = Qin[num_in_states + 3] #type: ignore
     size0 = Qin[num_in_states + 4]
-    size1 = Qin[num_in_states + 5]
+    size1 = Qin[num_in_states + 5] # type: ignore
 
     
     Q_out_pos_contrib:List[List[float]] = [[] for _ in range(num_out_states)]
@@ -37,7 +37,6 @@ def analytical_patch_update(Qin:List[float], patch_len: int, dim: int, unknowns:
     vol_h = size0/patch_len
     dt_div_size = dt/vol_h
     
-
     # Flux x
     for x in range(patch_len+1):
         for y in range(patch_len):
@@ -49,7 +48,8 @@ def analytical_patch_update(Qin:List[float], patch_len: int, dim: int, unknowns:
 
 
             # Rusanov
-            rus = rusanov_x(Qin[leftVoxelInPreImage:leftVoxelInPreImage+unknowns]+Qin[rightVoxelInPreImage:rightVoxelInPreImage+unknowns])
+            rusanov_input = Qin[leftVoxelInPreImage*unknowns:(leftVoxelInPreImage+1)*unknowns]+Qin[rightVoxelInPreImage*unknowns:(rightVoxelInPreImage+1)*unknowns]
+            rus = rusanov_x(rusanov_input)
             
 
             # Update out
@@ -73,15 +73,16 @@ def analytical_patch_update(Qin:List[float], patch_len: int, dim: int, unknowns:
 
 
             # Rusanov
-            rus = rusanov_y(Qin[leftVoxelInPreImage:leftVoxelInPreImage+unknowns]+Qin[rightVoxelInPreImage:rightVoxelInPreImage+unknowns])
+            rusanov_input = Qin[leftVoxelInPreImage*unknowns:(leftVoxelInPreImage+1)*unknowns]+Qin[rightVoxelInPreImage*unknowns:(rightVoxelInPreImage+1)*unknowns]
+            rus = rusanov_y(rusanov_input)
             
 
             # Update out
             for u in range(unknowns):
-                if x>0:
+                if y>0:
                     Q_out_neg_contrib[leftVoxelInImage*unknowns+u].append(rus[u])
 
-                if x<patch_len:
+                if y<patch_len:
                     Q_out_pos_contrib[rightVoxelInImage*unknowns+u].append(rus[u])
 
     for x in range(patch_len):
@@ -89,6 +90,7 @@ def analytical_patch_update(Qin:List[float], patch_len: int, dim: int, unknowns:
 
             image_voxel = voxelInImage(x, y, patch_len)
             pre_image_voxel = voxelInPreimage(x, y, patch_len)
-            Qout[image_voxel] = Qin[pre_image_voxel] + dt_div_size * sum(Q_out_pos_contrib[image_voxel]) - dt_div_size * sum( Q_out_neg_contrib[image_voxel])
+            for u in range(unknowns):
+                Qout[image_voxel*unknowns+u] = Qin[pre_image_voxel*unknowns+u] + dt_div_size * sum(Q_out_pos_contrib[image_voxel*unknowns+u]) - dt_div_size * sum( Q_out_neg_contrib[image_voxel*unknowns+u])
     
     return Qout
