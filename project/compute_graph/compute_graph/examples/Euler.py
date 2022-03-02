@@ -5,6 +5,7 @@ from compute_graph.DAG.ops import Divide, Sqrt
 from compute_graph.DAG.primitive_node import Constant
 from compute_graph.DAG.transform import DAG_Flatten, DAG_TransformChain, DAG_Viz
 from compute_graph.DAG.visualize import visualize_graph
+from compute_graph.IR.symbols.variables import IR_SingleVariable, IR_Variable
 from compute_graph.IR.transform import IR_TransformChain
 from compute_graph.IR.misc import IR_TF_STOP, DefineAllVars, FileApplyCallStencil, FilterApply, FunctionStencil,  RemoveAllTemp, RemoveBackwardsAlias, RemoveForwardAlias
 from compute_graph.IR.symbols import IR_Array,  UniqueVariableName
@@ -312,7 +313,13 @@ def patchUpdate(patch_len: int, dim: int, unknowns: int, rusanov_x:Callable[[str
     Q_out_pos_contrib:List[List[OutPort]] = [[] for _ in range(Qout)]
     Q_out_neg_contrib:List[List[OutPort]] = [[] for _ in range(Qout)]
 
-    dt_div_size = Constant(1)
+
+    symNumPatches = Constant(dim) 
+    vol_h = Divide()
+    g.fill_node_inputs([g.get_internal_input(patch_size_base), symNumPatches], vol_h)
+
+    dt_div_size = Divide()
+    g.fill_node_inputs([g.get_internal_input(dt), vol_h], dt_div_size)
 
     # Flux x
     for x in range(patch_len+1):
@@ -410,7 +417,14 @@ if __name__=="__main__":
     in7 = IR_Array(UniqueVariableName("in_rusanov"), 8)
     out7 = IR_Array(UniqueVariableName("out_rusanov"), 4)
     
-    in8 = IR_Array(UniqueVariableName("in_patch"), 106)
+    in8 = IR_Array(UniqueVariableName("in_patch"), 100)
+    in9 = IR_SingleVariable(UniqueVariableName("t"), False)
+    in10 = IR_SingleVariable(UniqueVariableName("dt"), False)
+    in11 = IR_SingleVariable(UniqueVariableName("patch_center_0"), False)
+    in12 = IR_SingleVariable(UniqueVariableName("patch_center_1"), False)
+    in13 = IR_SingleVariable(UniqueVariableName("patch_size_0"), False)
+    in14 = IR_SingleVariable(UniqueVariableName("patch_size_1"), False)
+    
     out8 = IR_Array(UniqueVariableName("out_patch"), 36)
     
     func_stencil:FunctionStencil = {
@@ -418,7 +432,7 @@ if __name__=="__main__":
         'max_eigen_x': ([in5, out5], in5.all_ref(), out5.all_ref()),
         'max_eigen_y': ([in6, out6], in6.all_ref(), out6.all_ref()),
         'rusanov': ([in7, out7], in7.all_ref(), out7.all_ref()),
-        'PatchUpdate': ([in8, out8], in8.all_ref(), out8.all_ref()),
+        'PatchUpdate': ([in9, in10, in11, in12, in13, in14, in8, out8], in8.all_ref()+[in9, in10, in11, in12, in13, in14], out8.all_ref()),
         'p': ([in3, out3], in3.all_ref(), out3.all_ref()),
         'irho': ([in4, out4], in4.all_ref(), out4.all_ref())
     }
