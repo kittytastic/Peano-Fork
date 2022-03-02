@@ -303,6 +303,9 @@ def patchUpdate(patch_len: int, dim: int, unknowns: int, rusanov_x:Callable[[], 
     patch_size_base = patch_center_base + dim
     total_ins = patch_size_base+dim
 
+    print(f"Total inputs: {total_ins}")
+    print(f"Qin size: {Qins}")
+    print(f"Qout size: {Qout}")
     g=Graph(total_ins, Qout, "PatchUpdate")
 
     Q_out_pos_contrib:List[List[OutPort]] = [[] for _ in range(Qout)]
@@ -323,16 +326,16 @@ def patchUpdate(patch_len: int, dim: int, unknowns: int, rusanov_x:Callable[[], 
 
             # Rusanov
             rus = rusanov_x()
-            for u in range(unknowns): g.add_edge(g.get_internal_input(Q_in_start + leftVoxelInPreImage + u), rus.get_external_input(u))
-            for u in range(unknowns): g.add_edge(g.get_internal_input(Q_in_start + rightVoxelInPreImage + u), rus.get_external_input(u+dim))
+            for u in range(unknowns): g.add_edge(g.get_internal_input(Q_in_start + leftVoxelInPreImage*unknowns + u), rus.get_external_input(u))
+            for u in range(unknowns): g.add_edge(g.get_internal_input(Q_in_start + rightVoxelInPreImage*unknowns + u), rus.get_external_input(u+dim))
 
             # Update out
             for u in range(unknowns):
                 if x>0:
-                    Q_out_neg_contrib[leftVoxelInImage+u].append(rus.get_external_output(u))
+                    Q_out_neg_contrib[leftVoxelInImage*unknowns+u].append(rus.get_external_output(u))
 
                 if x<patch_len:
-                    Q_out_pos_contrib[rightVoxelInImage+u].append(rus.get_external_output(u))
+                    Q_out_pos_contrib[rightVoxelInImage*unknowns+u].append(rus.get_external_output(u))
 
 
     
@@ -342,23 +345,23 @@ def patchUpdate(patch_len: int, dim: int, unknowns: int, rusanov_x:Callable[[], 
             leftVoxelInPreImage = voxelInPreimage(x, y-1, patch_len)
             rightVoxelInPreImage = voxelInPreimage(x, y, patch_len)
 
-            leftVoxelInImage = voxelInImage(x, y, patch_len)
-            rightVoxelInImage = voxelInImage(x, y-1, patch_len)
+            leftVoxelInImage = voxelInImage(x, y-1, patch_len)
+            rightVoxelInImage = voxelInImage(x, y, patch_len)
 
             # SKIP volumeX - not used in rusanov
 
             # Rusanov
             rus = rusanov_y()
-            for u in range(unknowns): g.add_edge(g.get_internal_input(Q_in_start + leftVoxelInPreImage + u), rus.get_external_input(u))
-            for u in range(unknowns): g.add_edge(g.get_internal_input(Q_in_start + rightVoxelInPreImage + u), rus.get_external_input(u+dim))
+            for u in range(unknowns): g.add_edge(g.get_internal_input(Q_in_start + leftVoxelInPreImage*unknowns + u), rus.get_external_input(u))
+            for u in range(unknowns): g.add_edge(g.get_internal_input(Q_in_start + rightVoxelInPreImage*unknowns + u), rus.get_external_input(u+dim))
 
             # Update out
             for u in range(unknowns):
                 if y>0:
-                    Q_out_neg_contrib[leftVoxelInImage+u].append(rus.get_external_output(u))
+                    Q_out_neg_contrib[leftVoxelInImage*unknowns+u].append(rus.get_external_output(u))
 
                 if y<patch_len:
-                    Q_out_pos_contrib[rightVoxelInImage+u].append(rus.get_external_output(u))
+                    Q_out_pos_contrib[rightVoxelInImage*unknowns+u].append(rus.get_external_output(u))
 
     for i in range(Qout):
         add_pos = Add(len(Q_out_pos_contrib[i]))
@@ -386,7 +389,8 @@ if __name__=="__main__":
     #g=p_graph()
     
     errs = g.validate()
-    print(errs)
+    errs_fmt = "\n".join(errs[:min(len(errs), 10)])
+    print(f"There are {len(errs)} validation errors\n{errs_fmt}")
     visualize_graph(g, out_path="../Artifacts", max_depth=1)
 
 
@@ -420,9 +424,9 @@ if __name__=="__main__":
     
     tf_stack = FullStackTransform(
         DAG_TransformChain([
-            DAG_Viz(file_name = "before", max_depth=2),
-            DAG_Flatten(),
-            DAG_Viz(file_name = "after", max_depth=1),
+            DAG_Viz(file_name = "before", max_depth=1),
+            #DAG_Flatten(),
+            DAG_Viz(file_name = "after", max_depth=None),
         ]),
         IR_TransformChain([
             #IR_TF_STOP(),

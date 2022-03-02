@@ -36,7 +36,7 @@ class DAG_Flatten(DAG_Transfrom):
         self.max_depth = max_depth
     
     def tf(self, in_DAG: Graph) -> Graph:
-        print(f"Flattening: {in_DAG}")
+        #print(f"Flattening: {in_DAG}")
         return self._flatten(in_DAG, self.max_depth)
 
 
@@ -50,7 +50,7 @@ class DAG_Flatten(DAG_Transfrom):
         flat_sub_graphs = {sg: self._flatten(sg, next_depth) for sg in sub_graph}
         out_DAG = in_DAG
         for sg, fsg in flat_sub_graphs.items():
-            print(f"Flattening sub-graph: {sg}")
+            #print(f"Flattening sub-graph: {sg}")
             out_DAG = self._replace_sub_graph(out_DAG, sg, fsg)
         return out_DAG
 
@@ -58,10 +58,10 @@ class DAG_Flatten(DAG_Transfrom):
         start_edges = in_DAG.get_edges()
         
         out_edges = [(n,p) for n,p in start_edges.keys() if n == sub_g]
-        print(f"Out Edges: {out_edges}")
+        #print(f"Out Edges: {out_edges}")
 
         in_edges = {key:InPort((n, p)) for key, val in start_edges.items() for n, p in val if n==sub_g}
-        print(f"In Edges: {in_edges}")
+        #print(f"In Edges: {in_edges}")
 
         new_edges = {**start_edges, **flat_sub_g.get_edges()}
         
@@ -84,5 +84,5 @@ class DAG_Viz(DAG_Transfrom):
     
     def tf(self, in_DAG: Graph) -> Graph:
         
-        visualize_graph(in_DAG, out_path="../Artifacts", out_file_name=self.file_name, max_depth=self.max_depth)
+        visualize_graph(in_DAG, out_path="../Artifacts", out_file_name=self.file_name, max_depth=self.max_depth, format="svg")
         return in_DAG

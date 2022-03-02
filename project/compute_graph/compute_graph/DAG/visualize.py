@@ -87,13 +87,14 @@ class DAGVizVisitor(DAG_PropsVisitor[None, int]):
         name = node.friendly_name if node.friendly_name else str(node)
         self.dot.node(str(node.id), f"{name}", color=self.colour(props)) # type:ignore
 
-def visualize_graph(g: Graph, out_path:str="Artifacts", out_file_name:str="tmp", max_depth:Optional[int]=None):
+def visualize_graph(g: Graph, out_path:str="Artifacts", out_file_name:str="tmp", max_depth:Optional[int]=None, format:str="png"):
     dot = graphviz.Digraph()
     gv = DAGVizVisitor(dot, max_depth=max_depth)
     gv.visit(g, 0)
 
-    dot_file_name = os.path.join(out_path, f"{out_file_name}.dot")
+    base_file_name = os.path.join(out_path, f"{out_file_name}")
+    dot_file_name = f"{base_file_name}.dot"
     with open(dot_file_name, "w+") as f:
         f.write(dot.source)
 
-    dot.render(dot_file_name, format='png') #type:ignore
+    dot.render(base_file_name, format=format) #type:ignore
