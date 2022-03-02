@@ -2,7 +2,7 @@ from typing import Callable, List
 from compute_graph.DAG import *
 from compute_graph.DAG.graph import DAG_Message
 from compute_graph.DAG.ops import Divide, Sqrt
-from compute_graph.DAG.primitive_node import Constant
+from compute_graph.DAG.primitive_node import Constant, DebugNode
 from compute_graph.DAG.transform import DAG_Flatten, DAG_TransformChain, DAG_Viz
 from compute_graph.DAG.visualize import visualize_graph
 from compute_graph.IR.symbols.variables import IR_SingleVariable, IR_Variable
@@ -271,16 +271,13 @@ def patchUpdate(patch_len: int, dim: int, unknowns: int, rusanov_x:Callable[[str
     patch_size_base = patch_center_base + dim
     total_ins = patch_size_base+dim
 
-    print(f"Total inputs: {total_ins}")
-    print(f"Qin size: {Qins}")
-    print(f"Qout size: {Qout}")
     g=Graph(total_ins, Qout, "PatchUpdate")
 
     Q_out_pos_contrib:List[List[OutPort]] = [[] for _ in range(Qout)]
     Q_out_neg_contrib:List[List[OutPort]] = [[] for _ in range(Qout)]
 
 
-    symNumPatches = Constant(dim) 
+    symNumPatches = Constant(patch_len) 
     vol_h = Divide()
     g.fill_node_inputs([g.get_internal_input(patch_size_base), symNumPatches], vol_h)
 
@@ -300,16 +297,16 @@ def patchUpdate(patch_len: int, dim: int, unknowns: int, rusanov_x:Callable[[str
 
             # Rusanov
             rus = rusanov_x(f"rusanov-x ({x}, {y})")
-            for u in range(unknowns): g.add_edge(g.get_internal_input(Q_in_start + leftVoxelInPreImage*unknowns + u), rus.get_external_input(u))
-            for u in range(unknowns): g.add_edge(g.get_internal_input(Q_in_start + rightVoxelInPreImage*unknowns + u), rus.get_external_input(u+unknowns))
+            for u in range(unknowns): g.add_edge(g.get_internal_input(Q_in_start + leftVoxelInPreImage*unknowns + u), (rus, u))
+            for u in range(unknowns): g.add_edge(g.get_internal_input(Q_in_start + rightVoxelInPreImage*unknowns + u), (rus, u+unknowns))
 
             # Update out
             for u in range(unknowns):
                 if x>0:
-                    Q_out_neg_contrib[leftVoxelInImage*unknowns+u].append(rus.get_external_output(u))
+                    Q_out_neg_contrib[leftVoxelInImage*unknowns+u].append(OutPort((rus, u)))
 
                 if x<patch_len:
-                    Q_out_pos_contrib[rightVoxelInImage*unknowns+u].append(rus.get_external_output(u))
+                    Q_out_pos_contrib[rightVoxelInImage*unknowns+u].append(OutPort((rus,u)))
 
 
     
@@ -326,28 +323,35 @@ def patchUpdate(patch_len: int, dim: int, unknowns: int, rusanov_x:Callable[[str
 
             # Rusanov
             rus = rusanov_y(f"rusanov-y ({x}, {y})")
-            for u in range(unknowns): g.add_edge(g.get_internal_input(Q_in_start + leftVoxelInPreImage*unknowns + u), rus.get_external_input(u))
-            for u in range(unknowns): g.add_edge(g.get_internal_input(Q_in_start + rightVoxelInPreImage*unknowns + u), rus.get_external_input(u+unknowns))
+            for u in range(unknowns): g.add_edge(g.get_internal_input(Q_in_start + leftVoxelInPreImage*unknowns + u), (rus, u))
+            for u in range(unknowns): g.add_edge(g.get_internal_input(Q_in_start + rightVoxelInPreImage*unknowns + u), (rus, u+unknowns))
 
             # Update out
             for u in range(unknowns):
                 if y>0:
-                    Q_out_neg_contrib[leftVoxelInImage*unknowns+u].append(rus.get_external_output(u))
+                    Q_out_neg_contrib[leftVoxelInImage*unknowns+u].append(OutPort((rus, u)))
 
                 if y<patch_len:
-                    Q_out_pos_contrib[rightVoxelInImage*unknowns+u].append(rus.get_external_output(u))
+                    Q_out_pos_contrib[rightVoxelInImage*unknowns+u].append(OutPort((rus, u)))
 
-    for i in range(Qout):
-        add_pos = Add(len(Q_out_pos_contrib[i]))
-        add_neg = Add(len(Q_out_neg_contrib[i]))
-        diff = Subtract()
-        scale = Multiply(2)
+    for x in range(patch_len):
+        for y in range(patch_len):
 
-        g.fill_node_inputs(Q_out_pos_contrib[i], add_pos) # type:ignore
-        g.fill_node_inputs(Q_out_neg_contrib[i], add_neg) # type:ignore
-        g.fill_node_inputs([add_pos, add_neg], diff)
-        g.fill_node_inputs([diff, dt_div_size], scale)
-        g.add_edge((scale, 0), g.get_internal_output(i))
+            image_voxel = voxelInImage(x, y, patch_len)
+            pre_image_voxel = voxelInPreimage(x, y, patch_len)
+            for u in range(unknowns):
+                add_pos = Add(len(Q_out_pos_contrib[image_voxel*unknowns+u]))
+                add_neg = Add(len(Q_out_neg_contrib[image_voxel*unknowns+u]))
+                diff = Subtract()
+                scale = Multiply(2)
+                add_input = Add(2) 
+
+                g.fill_node_inputs(Q_out_pos_contrib[image_voxel*unknowns+u], add_pos) # type:ignore
+                g.fill_node_inputs(Q_out_neg_contrib[image_voxel*unknowns+u], add_neg) # type:ignore
+                g.fill_node_inputs([add_pos, add_neg], diff)
+                g.fill_node_inputs([diff, dt_div_size], scale)
+                g.fill_node_inputs([scale, g.get_internal_input(Q_in_start+ pre_image_voxel*unknowns+u)], add_input)
+                g.add_edge((add_input, 0), g.get_internal_output(image_voxel*unknowns+u))
     
     return g
 

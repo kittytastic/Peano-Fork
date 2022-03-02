@@ -203,11 +203,21 @@ class Test_Rusanov(unittest.TestCase):
         assert_float_array_equal(self, result, expected_data)
 
 class Test_PatchUpdate(unittest.TestCase):
+    def mock_rusanov_1_unknown(self, name:str)->Graph:
+        g = Graph(2,1, name)
+        max1 = Max(2)
+        div1 = Divide()
+        c1 = Constant(2)
+        g.fill_node_inputs([g.get_internal_input(0), g.get_internal_input(1)], max1)
+        g.fill_node_inputs([max1, c1], div1)
+        g.add_edge((div1,0), g.get_internal_output(0))
+        return g
+
     @staticmethod
     def pack_input(Qin: List[float], extras: Dict[str,float]):
         return Qin + [extras["t"], extras["dt"], extras["pos0"], extras["pos1"], extras["size0"], extras["size1"]]
 
-    def xtest_1(self):
+    def test_1(self):
         make_rus_x:Callable[[str], Graph] = lambda x: rusanov(max_eigen_x, flux_x, friendly_name=x)
         make_rus_y:Callable[[str], Graph] = lambda x: rusanov(max_eigen_y, flux_y, friendly_name=x)
         g = patchUpdate(3, 2, 4, make_rus_x, make_rus_y)
@@ -217,6 +227,24 @@ class Test_PatchUpdate(unittest.TestCase):
 
         result = g.eval(input_data)
         assert_float_array_equal(self, result, expected_data)
+
+    def test_mock_1(self):
+        g = self.mock_rusanov_1_unknown("mock_rusanov")
+        input_data = [7.0, 5.0]
+        expected_data = [3.5]
+        result = g.eval(input_data)
+        assert_float_array_equal(self, result, expected_data)
+    
+    def test_1_cell_1_unknown_1(self):
+        g = patchUpdate(1, 2, 1, self.mock_rusanov_1_unknown, self.mock_rusanov_1_unknown)
+
+        dt,size, cells_per_patch = 0.1, 1.0, 1
+        input_data = [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0] + [0.0, dt, 0.0, 0.0, size, size]
+        expected_data = [4 + (+2 +2 -2.5 -3.5)*dt /(size/cells_per_patch)]
+
+        result = g.eval(input_data)
+        assert_float_array_equal(self, result, expected_data)
+
 
 class Test_AnalyticalPatchUpdate(unittest.TestCase):
     def test_1(self):
