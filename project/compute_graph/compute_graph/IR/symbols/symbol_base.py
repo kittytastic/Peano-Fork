@@ -13,28 +13,21 @@ class IR_DataTypes(Enum):
 class IR_Symbol(ABC):
     def __init__(self) -> None:
         super().__init__()
-        self._cached_attributes:Optional[Tuple[Set[str], Set[str]]]=None
-
+        self._attributes: Tuple[Set[str], Set[str]] = self._get_sub_symbol_keys()
+        self._single_attr = self._attributes[0]
+        self._list_attr = self._attributes[1]
 
     def _get_all_attributes(self)->List[Tuple[str, Any]]:
         attributes = inspect.getmembers(self, lambda a:not(inspect.isroutine(a)))
-        attributes = [a for a in attributes if not(a[0].startswith('__') and a[0].endswith('__'))]
+        #attributes = [a for a in attributes if not(a[0].startswith('__') and a[0].endswith('__'))]
         return attributes
 
 
     def _get_sub_symbol_keys(self)->Tuple[Set[str], Set[str]]:
-        if not hasattr(self, "_cached_attributes"):
-            self._cached_attributes = None 
-        
-        if self._cached_attributes is None:
-            attribute_keys = [a for a, _ in self._get_all_attributes()]
-            single_keys = [k for k in attribute_keys if isinstance(getattr(self, k), IR_Symbol)]
-            multi_keys = [k for k in attribute_keys if isinstance(getattr(self, k), list)]
-
-            self._cached_attributes = (set(single_keys), set(multi_keys))
-        
-                
-        return self._cached_attributes
+        attribute_keys = [a for a, _ in self._get_all_attributes()]
+        single_keys = [k for k in attribute_keys if isinstance(getattr(self, k), IR_Symbol)]
+        multi_keys = [k for k in attribute_keys if isinstance(getattr(self, k), list)]
+        return (set(single_keys), set(multi_keys))
     
 
     def __contains__(self, key:Union['IR_Symbol', type]):
@@ -45,7 +38,7 @@ class IR_Symbol(ABC):
             if key is self:
                 return True
         
-        sing_attr, list_attr = self._get_sub_symbol_keys() 
+        sing_attr, list_attr = self._attributes 
         for k in sing_attr:
             if key in getattr(self, k):
                 return True
@@ -62,10 +55,8 @@ class IR_Symbol(ABC):
         if find is self:
             raise Exception("Cannot replace. The symbol you called replace on needs to be replaced")
 
-        sing_attr, list_attr = self._get_sub_symbol_keys() 
-
         replacement_count = 0
-        for k in sing_attr:
+        for k in self._single_attr:
             s = getattr(self, k)
             if s is find:
                 setattr(self, k, replace)
@@ -73,7 +64,7 @@ class IR_Symbol(ABC):
             else:
                 replacement_count += s.replace_and_count(find, replace)
 
-        for k in list_attr:
+        for k in self._list_attr:
             l_ref = getattr(self, k)
             for idx, v in enumerate(l_ref):
                 if v is find:
@@ -89,16 +80,14 @@ class IR_Symbol(ABC):
         if find is self:
             raise Exception("Cannot replace. The symbol you called replace on needs to be replaced")
 
-        sing_attr, list_attr = self._get_sub_symbol_keys() 
-
-        for k in sing_attr:
+        for k in self._single_attr:
             s = getattr(self, k)
             if s is find:
                 setattr(self, k, replace)
             else:
                 s.replace(find, replace)
 
-        for k in list_attr:
+        for k in self._list_attr:
             l_ref = getattr(self, k)
             for idx, v in enumerate(l_ref):
                 if v is find:
@@ -111,7 +100,7 @@ class IR_Symbol(ABC):
         if isinstance(self, symbol_type):
             return set([self])
         
-        sing_attr, list_attr = self._get_sub_symbol_keys() 
+        sing_attr, list_attr = self._attributes
         child_symbols:List[ IR_Symbol] = [getattr(self, k) for k in sing_attr]
         child_lists:List[List['IR_Symbol']] = [getattr(self, k) for k in list_attr]
 

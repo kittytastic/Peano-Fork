@@ -6,6 +6,7 @@ from compute_graph.IR.symbols.variables import IR_Variable, IR_Assign
 class IR_File(IR_Symbol):
     def __init__(self, body: List[IR_Symbol]) -> None:
         self.body = body
+        super().__init__()
     
     def __str__(self):
         return "\n\n".join([str(b) for b in self.body])
@@ -17,6 +18,7 @@ class IR_LooseFunction(IR_Symbol):
         self.out_var = out_var
         self.body = body
         self.name = name
+        super().__init__()
     
     def __str__(self):
         in_var_str = ", ".join([str(iv) for iv in self.in_var])
@@ -32,6 +34,7 @@ class IR_TightFunction(IR_Symbol):
         self.body = body
         self.return_statement = return_statement
         self.name = name
+        super().__init__()
     
     def __str__(self):
         arg_str = ", ".join([str(a) for a in self.args])
@@ -39,12 +42,21 @@ class IR_TightFunction(IR_Symbol):
         out_str = f"define {self.data_type} @{self.name} ({arg_str}):\n\t{body_str}\n\t{str(self.return_statement)}"
         return out_str   
 
-class IR_Return(IR_Symbol): pass
+class IR_Return(IR_Symbol):
+    def __init__(self) -> None:
+        super().__init__()
+
 class IR_ReturnValue(IR_Return):
+    def __init__(self) -> None:
+        super().__init__()
+
     def __str__(self) -> str:
         return "<return something>"
 
 class IR_NoReturn(IR_Return):
+    def __init__(self) -> None:
+        super().__init__()
+
     def __str__(self) -> str:
         return "<return nothing>"
 
@@ -54,6 +66,7 @@ class IR_CallLooseFunction(IR_Assign):
         self.function_name = function_name
         self.inputs = inputs
         self.outputs = outputs
+        super().__init__()
 
     def __str__(self):
         input_args = ", ".join([str(i) for i in self.inputs])
@@ -64,6 +77,7 @@ class IR_CallTightFunction(IR_Assign):
     def __init__(self, function_name: str, args: List['IR_Variable']):
         self.function_name = function_name
         self.args = args
+        super().__init__()
 
     def __str__(self):
         args = ", ".join([str(i) for i in self.args])
@@ -75,6 +89,7 @@ class IR_BasicLibCall(IR_Symbol):
         self.namespace = namespace
         self. header_file = header_file
         self.args = args
+        super().__init__()
     
     def __str__(self) -> str:
         args = ", ".join([str(i) for i in self.args])
