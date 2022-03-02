@@ -128,7 +128,7 @@ class DAGToIRVisitor(DAG_PropsVisitor[IR_Symbol, List[IR_Symbol]]):
         return IR_BasicLibCall("max", "std", "algorithm", props)
     
     def visitAbs(self, node:Abs, props:List[IR_Symbol])->IR_Symbol:
-        return IR_BasicLibCall("abs", "std", "math", props)
+        return IR_BasicLibCall("abs", "std", "cmath", props)
 
     def visitSqrt(self, node:Sqrt, props:List[IR_Symbol])->IR_Symbol:
         return IR_BasicLibCall("sqrt", "std", "cmath", props)

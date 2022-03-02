@@ -16,6 +16,7 @@ _NO_OP = ID("no_op")
 class IR_To_C_TF(IR_Visitor[Any]):
     def __init__(self, data_type_map: Dict[IR_DataTypes, str]):
         self.data_type_map = data_type_map
+        self.required_preprocessor_statements:set[str] = set()
         
     def visit_IR_TightFunction(self, node:IR_TightFunction)->Any:
         function_name = node.name
@@ -60,6 +61,7 @@ class IR_To_C_TF(IR_Visitor[Any]):
         raise Exception("Not implemented")
     
     def visit_IR_BasicLibCall(self, node:IR_BasicLibCall)->Any:
+        self.required_preprocessor_statements.add(node.header_file)
         return FuncCall(ID(f"{node.namespace}::{node.function_name}"), ExprList([self.visit(var) for var in node.args]))
 
     def visit_IR_Add(self, node:IR_Add)->Any:
@@ -143,7 +145,8 @@ class C_Backend(LanguageBackend):
         generator:Any = c_generator.CGenerator()
 
         code = generator.visit(return_ast)
-        return code
+        preproc = "".join([f"#include <{h}>\n" for h in ast_builder.required_preprocessor_statements])
+        return preproc+"\n"+code
 
     def DEBUG_code_gen(self, ir: IR_Symbol)-> str:
         ast_builder = IR_To_C_TF(C_DATA_TYPE_MAP)
