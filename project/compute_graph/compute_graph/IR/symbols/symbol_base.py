@@ -20,29 +20,10 @@ class IR_Symbol(ABC):
         attributes = inspect.getmembers(self, lambda a:not(inspect.isroutine(a)))
         attributes = [a for a in attributes if not(a[0].startswith('__') and a[0].endswith('__'))]
         return attributes
-    
-    '''def _asd(self)->List[Tuple[str, Any]]:
-        # !!! DONT CACHE VALUES !!!
-        if not hasattr(self, "_cached_attributes"):
-            self._cached_attributes = None
-        
-        if self._cached_attributes is None:
-            self._cached_attributes = self._generate_attributes()
-        
-        test_gen = self._generate_attributes()
-        if test_gen!=self._cached_attributes:
-            print(f"True: {test_gen}")
-            print(f"Cached: {self._cached_attributes}")
-
-            #raise Exception()
-        return self._cached_attributes
-        #return self._generate_attributes()
-    '''
 
     def _enforce_property_creation(self):
         if not hasattr(self, "_cached_attributes"):
-            self._cached_attributes = None
-         
+            self._cached_attributes = None         
 
     def _get_sub_symbol_keys(self)->Tuple[Set[str], Set[str]]:
         self._enforce_property_creation()
@@ -95,11 +76,10 @@ class IR_Symbol(ABC):
             if key == self:
                 return True
         
-        attributes = self._get_all_attributes()
-        child_ins:List[bool] = [key in val for _, val in attributes if isinstance(val, IR_Symbol)]
-        
-        child_sym_lists:List[List['IR_Symbol']] = [l for _,l in attributes if self._is_list_of_symbol(l)]
-        child_list_ins: List[bool] = [key in i for l in child_sym_lists for i in l]
+        sing_attr, list_attr = self._get_sub_symbol_keys() 
+        child_ins:List[bool] = [key in getattr(self, k) for k in sing_attr]
+        child_lists:List[List['IR_Symbol']] = [getattr(self, k) for k in list_attr]
+        child_list_ins: List[bool] = [key in i for l in child_lists for i in l]
 
         return any(child_ins) or any(child_list_ins)
     
@@ -107,9 +87,9 @@ class IR_Symbol(ABC):
         if find == self:
             raise Exception("Cannot replace. The symbol you called replace on needs to be replaced")
 
-        attributes = self._get_all_attributes() 
-        child_symbols = [(k,v) for k, v in attributes if isinstance(v, IR_Symbol)]
-        child_lists:List[Tuple[str,List['IR_Symbol']]] = [(k,l) for k,l in attributes if self._is_list_of_symbol(l)]
+        sing_attr, list_attr = self._get_sub_symbol_keys() 
+        child_symbols:List[Tuple[str, IR_Symbol]] = [(k, getattr(self, k)) for k in sing_attr]
+        child_lists:List[Tuple[str,List['IR_Symbol']]] = [(k, getattr(self, k)) for k in list_attr]
 
         replacement_count = 0
         for k, s in child_symbols:
@@ -135,9 +115,9 @@ class IR_Symbol(ABC):
         if isinstance(self, symbol_type):
             return set([self])
         
-        attributes = self._get_all_attributes() 
-        child_symbols = [s for _, s in attributes if isinstance(s, IR_Symbol)]
-        child_lists:List[List['IR_Symbol']] = [l for _,l in attributes if self._is_list_of_symbol(l)]
+        sing_attr, list_attr = self._get_sub_symbol_keys() 
+        child_symbols:List[ IR_Symbol] = [getattr(self, k) for k in sing_attr]
+        child_lists:List[List['IR_Symbol']] = [getattr(self, k) for k in list_attr]
 
         instances_from_syms = [s.get_instances(symbol_type) for s in child_symbols]
         instances_from_list = [s.get_instances(symbol_type) for l in child_lists for s in l]
