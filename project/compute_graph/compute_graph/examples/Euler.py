@@ -132,13 +132,13 @@ def flux_y()->Graph:
     g.add_edge(g.get_internal_input(2), g.get_internal_output(0))
 
     # F[1]
-    g.fill_node_inputs([(irho,0), g.get_internal_input(2), g.get_internal_input(1)], mul2)
-    g.add_edge((mul2, 0), g.get_internal_output(2))
+    g.fill_node_inputs([irho, g.get_internal_input(2), g.get_internal_input(1)], mul2)
+    g.add_edge((mul2, 0), g.get_internal_output(1))
 
     # F[2]
-    g.fill_node_inputs([(irho,0), g.get_internal_input(2), g.get_internal_input(2)], mul1)
-    g.fill_node_inputs([(mul1, 0), (p, 0)], add1)
-    g.add_edge((add1, 0), g.get_internal_output(1))
+    g.fill_node_inputs([irho, g.get_internal_input(2), g.get_internal_input(2)], mul1)
+    g.fill_node_inputs([mul1, p], add1)
+    g.add_edge((add1, 0), g.get_internal_output(2))
 
     # F[3]
     g.fill_node_inputs([g.get_internal_input(3), (p,0)], add2)
@@ -147,8 +147,10 @@ def flux_y()->Graph:
 
     return g
 
-def max_eigen_x():
-    g = Graph(4,1, "max_eigen_x")
+
+def _eigen_base(dir:str):
+    assert(dir=="x" or dir=="y")
+    g = Graph(4,1, f"max_eigen_{dir}")
     p = p_graph()
     irho = irho_graph()
 
@@ -161,9 +163,9 @@ def max_eigen_x():
     abs1 = Abs()
     abs2 = Abs()
     max1 = Max(2)
-    sqrt1 = Sqrt()
+    c = Sqrt()
 
-    c1 = Constant(0.4)
+    gamma = Constant(1.4)
 
     # p
     g.fill_node_inputs([(irho, 0), g.get_internal_input(1), g.get_internal_input(2), g.get_internal_input(3)], p) 
@@ -173,65 +175,29 @@ def max_eigen_x():
 
 
     # c
-    g.fill_node_inputs([(c1,0), (p,0), (irho, 0)], mul1)
-    g.fill_node_inputs([(mul1, 0)], sqrt1)
+    g.fill_node_inputs([gamma, p, irho], mul1)
+    g.fill_node_inputs([mul1], c)
 
-    # Q[1] * irho
-    g.fill_node_inputs([g.get_internal_input(1), (irho,0)], mul2)
+    # Q[x] * irho
+    x = 1 if dir=="x" else 2
+    g.fill_node_inputs([g.get_internal_input(x), irho], mul2)
     
     # max
-    g.fill_node_inputs([(mul2, 0), (sqrt1,0)], sub1)
-    g.fill_node_inputs([(sub1, 0)], abs1)
-    g.fill_node_inputs([(mul2, 0), (sqrt1,0)], add1)
-    g.fill_node_inputs([(add1, 0)], abs2)
-    g.fill_node_inputs([(abs1,0), (abs2,0)], max1)
+    g.fill_node_inputs([mul2, c], sub1)
+    g.fill_node_inputs([sub1], abs1)
+    g.fill_node_inputs([mul2, c], add1)
+    g.fill_node_inputs([add1], abs2)
+    g.fill_node_inputs([abs1, abs2], max1)
     
     g.add_edge((max1, 0), g.get_internal_output(0))
 
     return g
+
+def max_eigen_x():
+    return _eigen_base("x")
 
 def max_eigen_y():
-    g = Graph(4,1, "max_eigen_y")
-    p = p_graph()
-    irho = irho_graph()
-
-    mul1 = Multiply(3)
-    mul2 = Multiply(2)
-
-    add1 = Add(2)
-    sub1 = Subtract()
-
-    abs1 = Abs()
-    abs2 = Abs()
-    max1 = Max(2)
-    sqrt1 = Sqrt()
-
-    c1 = Constant(0.4)
-
-    # p
-    g.fill_node_inputs([(irho, 0), g.get_internal_input(1), g.get_internal_input(2), g.get_internal_input(3)], p) 
-
-    # irho
-    g.add_edge(g.get_internal_input(0), (irho, 0))
-
-
-    # c
-    g.fill_node_inputs([(c1,0), (p,0), (irho, 0)], mul1)
-    g.fill_node_inputs([(mul1, 0)], sqrt1)
-
-    # Q[1] * irho
-    g.fill_node_inputs([g.get_internal_input(2), (irho,0)], mul2)
-    
-    # max
-    g.fill_node_inputs([(mul2, 0), (sqrt1,0)], sub1)
-    g.fill_node_inputs([(sub1, 0)], abs1)
-    g.fill_node_inputs([(mul2, 0), (sqrt1,0)], add1)
-    g.fill_node_inputs([(add1, 0)], abs2)
-    g.fill_node_inputs([(abs1,0), (abs2,0)], max1)
-    
-    g.add_edge((max1, 0), g.get_internal_output(0))
-
-    return g
+   return _eigen_base("y")
 
 
 def rusanov(max_eigen_builder: Callable[[], Graph], flux_builder: Callable[[], Graph], friendly_name:str="rusanov")->Graph:

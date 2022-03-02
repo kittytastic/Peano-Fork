@@ -201,8 +201,6 @@ class Graph(DAG_Node):
             next_node = next(iter(ready_nodes))
             ready_nodes.remove(next_node)
             complete_nodes.add(next_node)
-            print("New iteration")
-            print(f"Next node {next_node}")
 
             # compute node
             input_data = [port_input_data[InPort((next_node, i))] for i in range(next_node.num_inputs)]
