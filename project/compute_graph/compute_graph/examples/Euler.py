@@ -1,5 +1,6 @@
 from typing import Callable, List
 from compute_graph.DAG import *
+from compute_graph.DAG.graph import DAG_Message
 from compute_graph.DAG.ops import Divide, Sqrt
 from compute_graph.DAG.primitive_node import Constant
 from compute_graph.DAG.transform import DAG_Flatten, DAG_TransformChain, DAG_Viz
@@ -389,8 +390,7 @@ if __name__=="__main__":
     #g=p_graph()
     
     errs = g.validate()
-    errs_fmt = "\n".join(errs[:min(len(errs), 10)])
-    print(f"There are {len(errs)} validation errors\n{errs_fmt}")
+    DAG_Message.print_summary(errs, 10)
     visualize_graph(g, out_path="../Artifacts", max_depth=1)
 
 

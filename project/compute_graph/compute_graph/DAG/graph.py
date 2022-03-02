@@ -1,4 +1,6 @@
-import enum
+from distutils.log import ERROR
+from email import message_from_binary_file
+from enum import Enum
 from typing import Set, List, Any, Dict, Tuple, Optional, Union
 
 
@@ -6,6 +8,45 @@ from compute_graph.local_types import  ErrorMessage
 from compute_graph.DAG.node import DAG_Node, GraphEdges, InPort, OutPort, NodePort
 from compute_graph.DAG.helpers import assert_in_port_exists,  assert_out_port_exists
 from compute_graph.DAG.primitive_node import PassThroughNode
+
+class DAG_MessageType(Enum):
+    INFO = 0
+    WARNING = 1
+    ERROR = 2
+
+
+class DAG_Message():
+    def __init__(self, level:DAG_MessageType, stack_trace: List['Graph'], message:str) -> None:
+        self.level = level
+        self.stack_trace = stack_trace
+        self.message = message
+
+    def __str__(self):
+        if self.level == DAG_MessageType.INFO: level="INFO"
+        elif self.level == DAG_MessageType.WARNING: level="WARNING"
+        else: level="ERROR"
+        
+        st = [str(g) for g in self.stack_trace]
+        st = " > ".join(st)
+
+        return f"[{level}] {self.message}     ({st})"
+
+    @staticmethod
+    def print_summary(messages: List['DAG_Message'], max_msg:Optional[int]=None, min_level:DAG_MessageType = DAG_MessageType.INFO):
+        errors = [m for m in messages if m.level == DAG_MessageType.ERROR]
+        warnings = [m for m in messages if m.level == DAG_MessageType.WARNING]
+        info = [m for m in messages if m.level == DAG_MessageType.INFO]
+
+        print_order = errors
+        if min_level==DAG_MessageType.WARNING or min_level==DAG_MessageType.INFO: print_order+=warnings 
+        if min_level==DAG_MessageType.INFO: print_order+=info 
+
+        print(f"Validate found: {len(errors)} errors  {len(warnings)} warnings  {len(info)} info  ({len(messages)} total)")
+        max_print_count = len(messages) if max_msg is None else max_msg
+        print_count = min(len(print_order), max_print_count)
+
+        for i in range(print_count):
+            print(str(print_order[i]))
 
 class GraphInterface(PassThroughNode):
     def __init__(self, idx:int, parent_graph: 'Graph', type_name:str, friendly_name:Optional[str]):
@@ -75,39 +116,48 @@ class Graph(DAG_Node):
         return sub_nodes, sub_graphs
        
 
-    def validate(self) -> List[ErrorMessage]:
-        sub_nodes = self.get_sub_nodes()
-        require_full_input = sub_nodes - set(self.input_interface)
-
-        ports_to_fullfill:Set[InPort] = set()
-        for n in require_full_input:
-            ports_to_fullfill.update([InPort((n, i)) for i in range(n.num_inputs)])
-
-        ports_already_filled:Set[InPort] = set()
-        errors:List[str] = []
-
-        for set_op in self._edges.values():
-            for in_port in set_op:
-                if in_port in ports_already_filled:
-                    errors.append(f"Port: {in_port} has already been used")
-
-
-                if in_port not in ports_to_fullfill:
-                    errors.append(f"Port: {in_port} filled in graph, but isn't in graph")
-                 
-
-                ports_to_fullfill.discard(in_port)
-                ports_already_filled.add(in_port)
-
-        
-        if len(ports_to_fullfill)!=0:
-            first_missing_ports:List[InPort] = list(ports_to_fullfill)[:min(len(ports_to_fullfill), 3)]
-            errors.append(f"{len(ports_to_fullfill)} Unfilled ports: {','.join([str(p) for p in first_missing_ports])}")
-
+    def validate(self) -> List[DAG_Message]:
         # TODO check for cycles
-        # TODO check for unused outports
+      
+        return self._validate([])
 
-        return errors
+    def _validate(self, parent_stack_trace: List['Graph'])->List[DAG_Message]:
+        stack_trace = list(parent_stack_trace) + [self]
+        msgs:List[DAG_Message] = []
+
+        sub_nodes, sub_graph = self.get_categoriesed_sub_nodes()
+
+        all_sub_nodes = sub_nodes.union(sub_graph)
+        outport_tracker: Dict[OutPort, int] = {OutPort((n,i)): 0 for n in all_sub_nodes for i in range(n.num_outputs)}
+        inport_tracker: Dict[InPort, Set[OutPort]] = {ip:set() for ip,_ in self.inverse_edges().items()}
+
+        for op, ips in self._edges.items():
+            if op not in outport_tracker:
+                msgs.append(DAG_Message(DAG_MessageType.ERROR, stack_trace, f"Outport {op} is used in graph, but not a subnode?!"))
+            else:
+                outport_tracker[op] += 1
+            for ip in ips:
+                inport_tracker[ip].add(op)
+
+        for op, count in outport_tracker.items():
+            if count == 0 and op[0] not in self.output_interface:
+                msgs.append(DAG_Message(DAG_MessageType.WARNING, stack_trace, f"Outport {op} is unused"))
+        
+        for ip, ops in inport_tracker.items():
+            if len(ops) == 0 and ip[0] not in self.input_interface:
+                msgs.append(DAG_Message(DAG_MessageType.ERROR, stack_trace, f"Inport {ip} has not been filled"))
+            elif len(ops)>1:
+                msgs.append(DAG_Message(DAG_MessageType.ERROR, stack_trace, f"Inport {ip} has {len(ops)} incoming connections. It can only have 1. {ops}"))
+
+
+
+
+        for sg in sub_graph:
+            msgs += sg._validate(stack_trace)
+        
+        return msgs
+
+
 
     def add_edge(self, from_node:NodePort, to_node:NodePort):
         from_node = OutPort(from_node)
