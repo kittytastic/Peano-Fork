@@ -1,6 +1,7 @@
 #include "stdlibs.h"
 #include "kernels/k1/kernel_1.h"
 #include "kernels/k2/kernel_2.h"
+#include "kernels/k3/kernel_3.h"
 #include "../benchmark/benchmark.h"
 
 
@@ -53,7 +54,7 @@ void testKernel(const Kernel* k){
         bool allClose = true;
         for(int i=0; i<k->outputVectorLength; i++){
             if(!isClose(outVec[i], tc.expected[i])){
-                std::cout << "[" << i <<"] Expected: " << tc.expected[i] << " Recived: "<< outVec[i]<<std::endl;
+                //std::cout << "[" << i <<"] Expected: " << tc.expected[i] << " Recived: "<< outVec[i]<<std::endl;
             }
             allClose &= isClose(outVec[i], tc.expected[i]);
         }
@@ -78,7 +79,7 @@ void benchMarkKernel(const Kernel* k){
     //print_vector(inVec, k.inputVectorLength);
     //std::cout << "Out before: ";
     //print_vector(outVec, k.outputVectorLength);
-    benchmark::benchmark([&](){k->runKernel(&k->testCases[0], outVec);}, benchmark::NONE, 20);
+    benchmark::benchmark([&](){k->runKernel(&k->testCases[0], outVec);}, benchmark::NONE, 5);
     //std::cout << "Out after:  ";
     //print_vector(outVec, k.outputVectorLength);
     free(inVec);
@@ -90,9 +91,9 @@ int main(){
     //benchmark::benchmark(doKernelStuff, benchmark::NONE, 5);
 
     std::vector<Kernel> allKernels = {
-        kernels::k1::k1
-    , 
-    kernels::k2::k2
+        kernels::k1::k1,
+        kernels::k2::k2,
+        kernels::k3::k3
     };
 
     for(const auto &k: allKernels){

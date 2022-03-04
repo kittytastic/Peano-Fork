@@ -1,7 +1,8 @@
-from typing import TypeVar, Type, List
+from typing import Optional, TypeVar, Type, List
 from abc import ABC, abstractmethod
 from compute_graph.IR.symbols import IR_Symbol
-
+import os.path
+import time
 
 _T = TypeVar("_T")
 
@@ -20,24 +21,36 @@ class IR_Transfrom(ABC):
         pass
 
 class IR_TransformChain(IR_Transfrom):
-    def __init__(self, transforms:List[IR_Transfrom], verbose:bool=False) -> None:
+    def __init__(self, transforms:List[IR_Transfrom], verbose:bool=False, large_output_mode:Optional[str]=None) -> None:
         self.transforms = transforms
         self.verbose = verbose
+        self.large_output_mode = large_output_mode
 
+    def safe_large_print(self, msg: str, alias:str):
+        if self.large_output_mode:
+            with open(os.path.join(self.large_output_mode, f"{alias}.txt"), "w+") as f:
+                f.write(msg)
+        else:
+            print(msg)
 
     def tf(self, in_IR: IR_Symbol) -> IR_Symbol:
         working_IR = in_IR
 
         if self.verbose:
             print(f"---------- initial IR -----------")
-            print(working_IR)
+            self.safe_large_print(str(working_IR), "initial")
             print()
 
+
+        tc_c = 0
         for tf in self.transforms:
+            tc_c += 1
+            start = time.time()
             working_IR = tf.tf(working_IR)
+            end = time.time()
             if self.verbose:
                 print(f"---------- tf {type(tf).__name__} -----------")
-                print(working_IR)
-                print()
+                self.safe_large_print(str(working_IR), f"tf-{tc_c}")
+                print(f"Elapsed: {end-start:.2f}s")
             
         return working_IR

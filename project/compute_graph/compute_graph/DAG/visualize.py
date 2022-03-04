@@ -3,9 +3,10 @@ import graphviz #type: ignore
 import os.path
 from compute_graph.DAG.dag_visitor import DAG_PropsVisitor 
 from compute_graph.DAG.graph import Graph, InputInterface, OutputInterface
+from compute_graph.DAG.node import DAG_Node
 from compute_graph.local_types import GraphViz
 
-from compute_graph.DAG.ops import Add, Divide, Multiply, Subtract
+from compute_graph.DAG.ops import Add, Divide, Max, Multiply, Subtract, Abs, Sqrt
 from compute_graph.DAG.primitive_node import Constant, PassThroughNode, TerminalInput
 
 class DAGVizVisitor(DAG_PropsVisitor[None, int]):
@@ -20,6 +21,9 @@ class DAGVizVisitor(DAG_PropsVisitor[None, int]):
 
     def _exceed_max_depth(self, depth:int)->bool:
         return self.max_depth>=0 and depth>=self.max_depth
+
+    def _default(self, node:DAG_Node, props:int, display_name:str):
+        self.dot.node(str(node.id), display_name, color=self.colour(props)) # type:ignore
 
     def visitGraph(self, node:Graph, props:int)->None:
         if self._exceed_max_depth(props):
@@ -53,8 +57,17 @@ class DAGVizVisitor(DAG_PropsVisitor[None, int]):
         self.dot.node(str(node.id), f"*", color=self.colour(props)) # type:ignore
     
     def visitDivide(self, node:Divide, props:int)->None:
-        self.dot.node(str(node.id), f"/", color=self.colour(props)) # type:ignore
+        self._default(node, props, "/")
     
+    def visitMax(self, node:Max, props:int)->None:
+        self._default(node, props, "max") # type:ignore
+    
+    def visitAbs(self, node:Abs, props:int)->None:
+        self._default(node, props, "abs") # type:ignore
+
+    def visitSqrt(self, node:Sqrt, props:int)->None:
+        self._default(node, props, "sqrt") # type:ignore
+
     def visitConstant(self, node:Constant, props:int)->None:
         self.dot.node(str(node.id), f"{node.value}", color=self.colour(props)) # type:ignore
     
@@ -74,13 +87,14 @@ class DAGVizVisitor(DAG_PropsVisitor[None, int]):
         name = node.friendly_name if node.friendly_name else str(node)
         self.dot.node(str(node.id), f"{name}", color=self.colour(props)) # type:ignore
 
-def visualize_graph(g: Graph, out_path:str="Artifacts", out_file_name:str="tmp", max_depth:Optional[int]=None):
+def visualize_graph(g: Graph, out_path:str="Artifacts", out_file_name:str="tmp", max_depth:Optional[int]=None, format:str="png"):
     dot = graphviz.Digraph()
     gv = DAGVizVisitor(dot, max_depth=max_depth)
     gv.visit(g, 0)
 
-    dot_file_name = os.path.join(out_path, f"{out_file_name}.dot")
+    base_file_name = os.path.join(out_path, f"{out_file_name}")
+    dot_file_name = f"{base_file_name}.dot"
     with open(dot_file_name, "w+") as f:
         f.write(dot.source)
 
-    dot.render(dot_file_name, format='png') #type:ignore
+    dot.render(base_file_name, format=format) #type:ignore

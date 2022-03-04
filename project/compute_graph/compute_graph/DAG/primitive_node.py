@@ -25,4 +25,16 @@ class Constant(DAG_Node):
 
     def _eval(self, inputs: List[Any])->List[Any]:
         return [self.value]
+
+class DebugNode(DAG_Node):
+    def __init__(self, child_node:DAG_Node):
+        super().__init__(child_node.num_inputs, child_node.num_outputs, type_name=f"DEBUG-{child_node.type_name}", friendly_name=f"DEBUG-{child_node.friendly_name}")
+        self.child_node = child_node
+
+    def _eval(self, inputs: List[Any]) -> List[Any]:
+        print(f"[{str(self)}] inputs: {inputs}")
+        res = self.child_node.eval(inputs)
+        print(f"[{str(self)}] output: {res}")
+        return res
+
     

@@ -26,9 +26,6 @@ class DAG_Node(ABC):
     def _eval(self, inputs:List[Any])->List[Any]:
         pass
 
-    def validate(self)->List[ErrorMessage]:
-        return [] 
-
     def eval(self, input_data:List[Any])->List[Any]:
         if len(input_data)!= self.num_inputs:
             raise BadEval(f"Node {str(self)} was given a bad number of eval inputs, expected: {self.num_inputs} but received: {len(input_data)}")
