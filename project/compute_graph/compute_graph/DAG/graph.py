@@ -138,7 +138,9 @@ class Graph(DAG_Node):
         all_sub_nodes = sub_nodes.union(sub_graph)
         
         outport_tracker: Dict[OutPort, int] = {OutPort((n,i)): 0 for n in all_sub_nodes for i in range(n.num_outputs)}
-        inport_tracker: Dict[InPort, Set[OutPort]] = {ip:set() for ip,_ in self.inverse_edges().items()}
+        inport_tracker: Dict[InPort, Set[OutPort]] = {InPort((n,i)):set() for n in all_sub_nodes if n not in self.input_interface for i in range(n.num_inputs)}
+
+
 
         for op, ips in self._edges.items():
             if op not in outport_tracker:
