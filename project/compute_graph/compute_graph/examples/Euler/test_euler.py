@@ -1,8 +1,8 @@
 import math
 from typing import Dict
 import unittest
-from compute_graph.examples.Euler.Euler import *
-from compute_graph.examples.Euler.Euler_test_extra import *
+from compute_graph.examples.Euler.euler import *
+from compute_graph.examples.Euler.euler_test_extra import *
 
 def assert_float_array_equal(obj: unittest.TestCase, a: List[float], b: List[float]):
     obj.assertEqual(len(a), len(b))

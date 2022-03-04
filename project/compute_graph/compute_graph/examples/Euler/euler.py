@@ -197,9 +197,7 @@ def max_eigen_x():
 def max_eigen_y():
    return _eigen_base("y")
 
-def proper_flux_x()->Graph:
-    g = Graph(1,1, "proper-flux-x")
-    return g
+
 
 def rusanov_neat(max_eigen_builder: Callable[[], Graph], flux_builder: Callable[[], Graph], friendly_name:str="rusanov")->Graph:
     g = Graph(8, 4, friendly_name)
