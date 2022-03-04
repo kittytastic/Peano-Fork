@@ -1,8 +1,8 @@
 import math
 from typing import Dict
 import unittest
-from compute_graph.examples.Euler import *
-from compute_graph.examples.Euler_test_extra import *
+from compute_graph.examples.Euler.Euler import *
+from compute_graph.examples.Euler.Euler_test_extra import *
 
 def assert_float_array_equal(obj: unittest.TestCase, a: List[float], b: List[float]):
     obj.assertEqual(len(a), len(b))
@@ -179,7 +179,7 @@ class Test_Rusanov(unittest.TestCase):
         return f
 
     def test_1(self):
-        g = rusanov(max_eigen_x, flux_x)
+        g = rusanov_neat(max_eigen_x, flux_x)
         input_data = [8.0, 2.0, 3.0, 15.0, 9.0, 6.0, 7.0, 100.0]
         expected_data = self.rusanov(input_data, Test_Flux_X.flux_formula_x, Test_Eigen_X.eigen_formula_x)
 
@@ -187,7 +187,7 @@ class Test_Rusanov(unittest.TestCase):
         assert_float_array_equal(self, result, expected_data)
     
     def test_2(self):
-        g = rusanov(max_eigen_x, flux_x)
+        g = rusanov_neat(max_eigen_x, flux_x)
         input_data = [7.0, 5.0, 8.0, 101.0, 9.0, 1.0, 4.0, 16.0]
         expected_data = self.rusanov(input_data, Test_Flux_X.flux_formula_x, Test_Eigen_X.eigen_formula_x)
 
@@ -195,7 +195,7 @@ class Test_Rusanov(unittest.TestCase):
         assert_float_array_equal(self, result, expected_data)
     
     def test_3(self):
-        g = rusanov(max_eigen_y, flux_y)
+        g = rusanov_neat(max_eigen_y, flux_y)
         input_data = [7.0, 5.0, 8.0, 101.0, 9.0, 1.0, 4.0, 16.0]
         expected_data = self.rusanov(input_data, Test_Flux_Y.flux_formula_y, Test_Eigen_Y.eigen_formula_y)
 
@@ -218,9 +218,9 @@ class Test_PatchUpdate(unittest.TestCase):
         return Qin + [extras["t"], extras["dt"], extras["pos0"], extras["pos1"], extras["size0"], extras["size1"]]
 
     def test_1(self):
-        make_rus_x:Callable[[str], Graph] = lambda x: rusanov(max_eigen_x, flux_x, friendly_name=x)
-        make_rus_y:Callable[[str], Graph] = lambda x: rusanov(max_eigen_y, flux_y, friendly_name=x)
-        g = patchUpdate(3, 2, 4, make_rus_x, make_rus_y)
+        make_rus_x:Callable[[str], Graph] = lambda x: rusanov_neat(max_eigen_x, flux_x, friendly_name=x)
+        make_rus_y:Callable[[str], Graph] = lambda x: rusanov_neat(max_eigen_y, flux_y, friendly_name=x)
+        g = patchUpdate_neat(3, 2, 4, make_rus_x, make_rus_y)
 
         input_data = self.pack_input(patch_update_in_1, patch_update_extra_1)
         expected_data = patch_update_out_1
@@ -236,7 +236,7 @@ class Test_PatchUpdate(unittest.TestCase):
         assert_float_array_equal(self, result, expected_data)
     
     def test_1_cell_1_unknown_1(self):
-        g = patchUpdate(1, 2, 1, self.mock_rusanov_1_unknown, self.mock_rusanov_1_unknown)
+        g = patchUpdate_neat(1, 2, 1, self.mock_rusanov_1_unknown, self.mock_rusanov_1_unknown)
 
         dt,size, cells_per_patch = 0.1, 1.0, 1
         input_data = [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0] + [0.0, dt, 0.0, 0.0, size, size]

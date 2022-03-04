@@ -1,13 +1,11 @@
 from typing import Callable, List
 from compute_graph.DAG import *
-from compute_graph.DAG.graph import DAG_Message
 from compute_graph.DAG.ops import Divide, Sqrt
-from compute_graph.DAG.primitive_node import Constant, DebugNode
-from compute_graph.DAG.transform import DAG_Flatten, DAG_TransformChain, DAG_Viz
-from compute_graph.DAG.visualize import visualize_graph
-from compute_graph.IR.symbols.variables import IR_SingleVariable, IR_Variable
+from compute_graph.DAG.primitive_node import Constant
+from compute_graph.DAG.transform import DAG_Flatten, DAG_TransformChain
+from compute_graph.IR.symbols.variables import IR_SingleVariable
 from compute_graph.IR.transform import IR_TransformChain
-from compute_graph.IR.misc import IR_TF_STOP, DefineAllVars, FileApplyCallStencil, FilterApply, FunctionStencil,  RemoveAllTemp, RemoveBackwardsAlias, RemoveForwardAlias
+from compute_graph.IR.misc import  DefineAllVars, FileApplyCallStencil, FilterApply, FunctionStencil,  RemoveAllTemp, RemoveBackwardsAlias, RemoveForwardAlias
 from compute_graph.IR.symbols import IR_Array,  UniqueVariableName
 from compute_graph.IR.symbols.functions import  IR_LooseFunction, IR_TightFunction
 from compute_graph.language_backend.c import C_Backend
@@ -199,8 +197,11 @@ def max_eigen_x():
 def max_eigen_y():
    return _eigen_base("y")
 
+def proper_flux_x()->Graph:
+    g = Graph(1,1, "proper-flux-x")
+    return g
 
-def rusanov(max_eigen_builder: Callable[[], Graph], flux_builder: Callable[[], Graph], friendly_name:str="rusanov")->Graph:
+def rusanov_neat(max_eigen_builder: Callable[[], Graph], flux_builder: Callable[[], Graph], friendly_name:str="rusanov")->Graph:
     g = Graph(8, 4, friendly_name)
     flux_l = flux_builder()
     flux_r = flux_builder()
@@ -260,7 +261,7 @@ def rusanov(max_eigen_builder: Callable[[], Graph], flux_builder: Callable[[], G
     
     return g
 
-def patchUpdate(patch_len: int, dim: int, unknowns: int, rusanov_x:Callable[[str], Graph], rusanov_y:Callable[[str], Graph])->Graph:
+def patchUpdate_neat(patch_len: int, dim: int, unknowns: int, rusanov_x:Callable[[str], Graph], rusanov_y:Callable[[str], Graph])->Graph:
     Qins:int = (patch_len+2)**dim * unknowns
     Qout:int = (patch_len)**dim * unknowns
 
@@ -359,9 +360,9 @@ def voxelInPreimage(x: int, y:int, patch_len: int): return x+1 + (y+1) * (2+patc
 def voxelInImage(x: int, y:int, patch_len: int): return x + y * patch_len
 
 if __name__=="__main__":
-    make_rus_x:Callable[[str], Graph] = lambda x: rusanov(max_eigen_x, flux_x, friendly_name=x)
-    make_rus_y:Callable[[str], Graph] = lambda x: rusanov(max_eigen_y, flux_y, friendly_name=x)
-    g = patchUpdate(3, 2, 4, make_rus_x, make_rus_y)
+    make_rus_x:Callable[[str], Graph] = lambda x: rusanov_neat(max_eigen_x, flux_x, friendly_name=x)
+    make_rus_y:Callable[[str], Graph] = lambda x: rusanov_neat(max_eigen_y, flux_y, friendly_name=x)
+    g = patchUpdate_neat(3, 2, 4, make_rus_x, make_rus_y)
     #g = rusanov(max_eigen_x, flux_x)
     #g=irho_graph()
     #g=p_graph()
