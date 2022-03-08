@@ -24,7 +24,8 @@ def _check_if_acyclic_r(cur_node_port:OutPort, edges: GraphEdges, visited: Set[D
     visited.add(cur_node)
 
     errors:List[ErrorMessage] = []
-    for n,_ in edges[cur_node_port]:
+    node_edges:Set[InPort] = edges[cur_node_port] if cur_node_port in edges else set() 
+    for n,_ in node_edges:
         if n in cs_copy:
             errors.append(f"Cycle: {cs_copy[cs_copy.index(n):]}->{cur_node}->{n}")
 

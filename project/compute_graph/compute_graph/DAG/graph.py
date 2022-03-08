@@ -3,7 +3,7 @@ from typing import Set, List, Any, Dict, Tuple, Optional, Union
 
 
 from compute_graph.DAG.node import DAG_Node, GraphEdges, InPort, OutPort, NodePort
-from compute_graph.DAG.helpers import assert_in_port_exists,  assert_out_port_exists
+from compute_graph.DAG.helpers import assert_in_port_exists,  assert_out_port_exists, check_if_acyclic
 from compute_graph.DAG.primitive_node import PassThroughNode
 
 class DAG_MessageType(Enum):
@@ -134,18 +134,30 @@ class Graph(DAG_Node):
         msgs:List[DAG_Message] = []
 
         sub_nodes, sub_graph = self.get_categoriesed_sub_nodes()
+        if self in sub_graph:
+            msgs.append(DAG_Message(DAG_MessageType.ERROR, stack_trace, f"Graph contains a reference to its self, check you haven't connected to an external port when you meant to connect to an internal port"))
+            sub_graph.discard(self)
 
         all_sub_nodes = sub_nodes.union(sub_graph)
         
         outport_tracker: Dict[OutPort, int] = {OutPort((n,i)): 0 for n in all_sub_nodes for i in range(n.num_outputs)}
-        inport_tracker: Dict[InPort, Set[OutPort]] = {ip:set() for ip,_ in self.inverse_edges().items()}
+        inport_tracker: Dict[InPort, Set[OutPort]] = {InPort((n,i)):set() for n in all_sub_nodes if n not in self.input_interface for i in range(n.num_inputs)}
+
+        
+
 
         for op, ips in self._edges.items():
+            if op[0]==self:
+                continue
+            
             if op not in outport_tracker:
                 msgs.append(DAG_Message(DAG_MessageType.ERROR, stack_trace, f"Outport {op} is used in graph, but not a subnode?!"))
             else:
                 outport_tracker[op] += len(self._edges[op])
+            
             for ip in ips:
+                if ip[0]==self:
+                    continue
                 inport_tracker[ip].add(op)
 
         for op, count in outport_tracker.items():
