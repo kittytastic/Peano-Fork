@@ -5,6 +5,7 @@ from compute_graph.DAG import Graph, OutPort, InPort
 
 class DAG_Flatten(DAG_Transfrom):
     def __init__(self, max_depth:Optional[int]=None):
+        super().__init__()
         self.max_depth = max_depth
     
     def tf(self, in_DAG: Graph) -> Graph:

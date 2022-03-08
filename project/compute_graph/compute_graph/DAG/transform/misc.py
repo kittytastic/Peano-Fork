@@ -7,6 +7,7 @@ from compute_graph.DAG.visualize import visualize_graph
 
 class DAG_Viz(DAG_Transfrom):
     def __init__(self, file_name:str = "tmp", max_depth:Optional[int] = None, out_dir:str="../../Artifacts", format:str="png"):
+        super().__init__()
         self.file_name =  file_name
         self.max_depth = max_depth
         self.out_dir = out_dir
