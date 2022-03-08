@@ -474,13 +474,12 @@ def make_proper_euler():
         C_Backend(
             extra_headers=["../../stdlibs.h", "kernel_3_base.h"],
             namespace="kernels::k3"),
-        verbose=True
+        verbose=True,
+        output_file="../../Artifacts/out-code.cpp"
     )
     
-    code = tf_stack.tf(g)
+    tf_stack.tf(g)
 
-    with open("../../Artifacts/out-code.cpp", "w+") as f:
-        f.write(code)
 
 if __name__=="__main__":
     #make_neat_euler()
