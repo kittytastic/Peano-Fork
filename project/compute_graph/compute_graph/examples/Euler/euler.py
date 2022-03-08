@@ -2,7 +2,7 @@ from typing import Callable, List
 from compute_graph.DAG import *
 from compute_graph.DAG.ops import Divide, Sqrt
 from compute_graph.DAG.primitive_node import Constant
-from compute_graph.DAG.transform import DAG_Flatten, DAG_TransformChain
+from compute_graph.DAG.transform import DAG_Flatten, DAG_TransformChain, DAG_Viz
 from compute_graph.IR.symbols.variables import IR_SingleVariable
 from compute_graph.IR.transform import IR_TransformChain
 from compute_graph.IR.misc import  DefineAllVars, FileApplyCallStencil, FilterApply, FunctionStencil,  RemoveAllTemp, RemoveBackwardsAlias, RemoveForwardAlias
@@ -10,6 +10,9 @@ from compute_graph.IR.symbols import IR_Array,  UniqueVariableName
 from compute_graph.IR.symbols.functions import  IR_LooseFunction, IR_TightFunction
 from compute_graph.language_backend.c import C_Backend
 from compute_graph.transform import FullStackTransform
+from compute_graph.examples.General.general import *
+from compute_graph.examples.Euler.proper_euler import *
+
 
 def irho_graph()->Graph:
     g = Graph(1,1, "irho")
@@ -357,7 +360,7 @@ def patchUpdate_neat(patch_len: int, dim: int, unknowns: int, rusanov_x:Callable
 def voxelInPreimage(x: int, y:int, patch_len: int): return x+1 + (y+1) * (2+patch_len)
 def voxelInImage(x: int, y:int, patch_len: int): return x + y * patch_len
 
-if __name__=="__main__":
+def make_neat_euler():
     make_rus_x:Callable[[str], Graph] = lambda x: rusanov_neat(max_eigen_x, flux_x, friendly_name=x)
     make_rus_y:Callable[[str], Graph] = lambda x: rusanov_neat(max_eigen_y, flux_y, friendly_name=x)
     g = patchUpdate_neat(3, 2, 4, make_rus_x, make_rus_y)
@@ -422,11 +425,60 @@ if __name__=="__main__":
             FilterApply(IR_TightFunction, DefineAllVars()),
         ],
         verbose=True,
-        large_output_mode="../Artifacts"),
+        large_output_mode="../../Artifacts"),
         C_Backend()
     )
     
     code = tf_stack.tf(g)
 
-    with open("../Artifacts/out-code.cpp", "w+") as f:
+    with open("../../Artifacts/out-code.cpp", "w+") as f:
         f.write(code)
+
+def make_proper_euler():
+    make_rus_x:Callable[[str], Graph] = lambda x: rusanov(4, proper_max_eigen_x, proper_flux_x, friendly_name=x)
+    make_rus_y:Callable[[str], Graph] = lambda x: rusanov(4, proper_max_eigen_y, proper_flux_y, friendly_name=x)
+    g = patchUpdate_2D(3, 4, make_rus_x, make_rus_y, source_term)
+    #g = make_rus_x("hello")
+
+    in8 = IR_Array(UniqueVariableName("in_patch"), 100)
+    in9 = IR_SingleVariable(UniqueVariableName("t"), False)
+    in10 = IR_SingleVariable(UniqueVariableName("dt"), False)
+    in11 = IR_SingleVariable(UniqueVariableName("patch_center_0"), False)
+    in12 = IR_SingleVariable(UniqueVariableName("patch_center_1"), False)
+    in13 = IR_SingleVariable(UniqueVariableName("patch_size_0"), False)
+    in14 = IR_SingleVariable(UniqueVariableName("patch_size_1"), False)
+    
+    out8 = IR_Array(UniqueVariableName("out_patch"), 36)
+    
+    func_stencil:FunctionStencil = {
+        'PatchUpdate': ([in9, in10, in11, in12, in13, in14, in8, out8], in8.all_ref()+[in9, in10, in11, in12, in13, in14], out8.all_ref()),
+    }
+
+    
+    tf_stack = FullStackTransform(
+        DAG_TransformChain([
+            #DAG_Viz(file_name = "before", max_depth=1),
+            #DAG_Viz(file_name = "before_flat", max_depth=None),
+            DAG_Flatten(),
+            #DAG_Viz(file_name = "after", max_depth=1),
+        ]),
+        IR_TransformChain([
+            FilterApply(IR_LooseFunction, RemoveForwardAlias()),
+            FilterApply(IR_LooseFunction, RemoveBackwardsAlias()),
+            FileApplyCallStencil(func_stencil),
+            FilterApply(IR_TightFunction, RemoveAllTemp()),
+            FilterApply(IR_TightFunction, DefineAllVars()),
+        ],
+        verbose=True,
+        large_output_mode="../../Artifacts"),
+        C_Backend()
+    )
+    
+    code = tf_stack.tf(g)
+
+    with open("../../Artifacts/out-code.cpp", "w+") as f:
+        f.write(code)
+
+if __name__=="__main__":
+    #make_neat_euler()
+    make_proper_euler()
