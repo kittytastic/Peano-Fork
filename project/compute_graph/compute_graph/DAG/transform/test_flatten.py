@@ -1,5 +1,5 @@
 import unittest
-from compute_graph.DAG.graph import Graph
+from compute_graph.DAG import Graph
 from compute_graph.DAG.transform import DAG_Flatten
 
 class TestFlatten(unittest.TestCase):
