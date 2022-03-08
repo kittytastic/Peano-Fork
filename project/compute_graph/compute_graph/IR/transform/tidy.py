@@ -4,6 +4,9 @@ from compute_graph.IR.transform.base import IR_Transfrom
 
 
 class RemoveForwardAlias(IR_Transfrom):
+    def __init__(self):
+        super().__init__()
+
     def tf(self, in_IR: IR_Symbol)->IR_Symbol:
         working_ir = self.assert_and_cast_symbol_type(in_IR, IR_LooseFunction) 
 
@@ -37,6 +40,9 @@ class RemoveForwardAlias(IR_Transfrom):
 
 
 class RemoveBackwardsAlias(IR_Transfrom):
+    def __init__(self):
+        super().__init__()
+
     def tf(self, in_IR: IR_Symbol)->IR_Symbol:
         working_ir = self.assert_and_cast_symbol_type(in_IR, IR_LooseFunction) 
 

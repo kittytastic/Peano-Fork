@@ -7,10 +7,10 @@ from compute_graph.IR.transform.base import IR_Transfrom
 
 class ApplyCallStencil(IR_Transfrom):
     def __init__(self, target_args: List[IR_Variable], in_map: List[IR_Variable], out_map: List[IR_Variable]):
+        super().__init__()
         self.target_args = target_args
         self.in_map = in_map
         self.out_map = out_map
-        super().__init__()
 
     def tf(self, in_IR: IR_Symbol)->IR_Symbol:
         working_ir = self.assert_and_cast_symbol_type(in_IR, IR_LooseFunction) 
@@ -28,7 +28,8 @@ class ApplyCallStencil(IR_Transfrom):
 FunctionStencil =  Dict[str, Tuple[List[IR_Variable], List[IR_Variable], List[IR_Variable]]]
 class FileApplyCallStencil(IR_Transfrom):
     def __init__(self, func_stencils: FunctionStencil):
-         self.func_stencil = func_stencils
+        super().__init__()
+        self.func_stencil = func_stencils
     
     def tf(self, in_IR: IR_Symbol)->IR_Symbol:
         all_sub_funcs = in_IR.get_instances(IR_LooseFunction)        
@@ -74,6 +75,9 @@ class FileApplyCallStencil(IR_Transfrom):
 
 
 class RemoveAllTemp(IR_Transfrom):
+    def __init__(self):
+        super().__init__()
+    
     def tf(self, in_IR: IR_Symbol)->IR_Symbol:
         working_ir = self.assert_and_cast_symbol_type(in_IR, IR_TightFunction)
         
@@ -85,6 +89,9 @@ class RemoveAllTemp(IR_Transfrom):
         return working_ir
 
 class DefineAllVars(IR_Transfrom):
+    def __init__(self):
+        super().__init__()
+    
     def tf(self, in_IR: IR_Symbol)-> IR_Symbol:
         working_ir = self.assert_and_cast_symbol_type(in_IR, IR_TightFunction)
         symbol_table:Set[IR_Variable] = set()
