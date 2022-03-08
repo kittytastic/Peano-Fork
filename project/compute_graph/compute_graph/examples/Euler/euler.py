@@ -4,8 +4,7 @@ from compute_graph.DAG.ops import Divide, Sqrt
 from compute_graph.DAG.primitive_node import Constant
 from compute_graph.DAG.transform import DAG_Flatten, DAG_TransformChain, DAG_Viz
 from compute_graph.IR.symbols.variables import IR_SingleVariable
-from compute_graph.IR.transform import IR_TransformChain
-from compute_graph.IR.misc import  DefineAllVars, FileApplyCallStencil, FilterApply, FunctionStencil,  RemoveAllTemp, RemoveBackwardsAlias, RemoveForwardAlias
+from compute_graph.IR.transform import IR_TransformChain, DefineAllVars, FileApplyCallStencil, FilterApply, FunctionStencil,  RemoveAllTemp, RemoveBackwardsAlias, RemoveForwardAlias
 from compute_graph.IR.symbols import IR_Array,  UniqueVariableName
 from compute_graph.IR.symbols.functions import  IR_LooseFunction, IR_TightFunction
 from compute_graph.language_backend.c import C_Backend
@@ -424,11 +423,11 @@ def make_neat_euler():
             FilterApply(IR_TightFunction, RemoveAllTemp()),
             FilterApply(IR_TightFunction, DefineAllVars()),
         ],
-        verbose=True,
         large_output_mode="../../Artifacts"),
         C_Backend(
             extra_headers=["../../stdlibs.h", "kernel_3_base.h"],
-            namespace="kernels::k3")
+            namespace="kernels::k3"),
+        verbose=True
     )
     
     code = tf_stack.tf(g)
@@ -471,17 +470,16 @@ def make_proper_euler():
             FilterApply(IR_TightFunction, RemoveAllTemp()),
             FilterApply(IR_TightFunction, DefineAllVars()),
         ],
-        verbose=True,
         large_output_mode="../../Artifacts"),
         C_Backend(
             extra_headers=["../../stdlibs.h", "kernel_3_base.h"],
-            namespace="kernels::k3")
+            namespace="kernels::k3"),
+        verbose=True,
+        output_file="../../Artifacts/out-code.cpp"
     )
     
-    code = tf_stack.tf(g)
+    tf_stack.tf(g)
 
-    with open("../../Artifacts/out-code.cpp", "w+") as f:
-        f.write(code)
 
 if __name__=="__main__":
     #make_neat_euler()

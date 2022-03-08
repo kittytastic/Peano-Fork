@@ -3,7 +3,7 @@ from compute_graph.DAG.IR_tf import DAG_GatherSubgraphVisitor, DAGToIRVisitor
 from compute_graph.DAG.graph import *
 from compute_graph.DAG.ops import *
 from compute_graph.DAG.visualize import visualize_graph
-from compute_graph.IR.misc import ApplyCallStencil, DefineAllVars, FileApplyCallStencil, FilterApply, FunctionStencil, InlineInOut, RemoveAllTemp
+from compute_graph.IR.transform import DefineAllVars, FileApplyCallStencil, FilterApply, FunctionStencil,  RemoveAllTemp 
 from compute_graph.IR.symbols import IR_Array, IR_SingleVariable, UniqueVariableName
 from compute_graph.IR.symbols.functions import IR_File, IR_LooseFunction, IR_TightFunction
 from compute_graph.language_backend.c import C_Backend

@@ -1,38 +1,11 @@
-from typing import List, Optional, Dict
-from abc import ABC, abstractmethod
-from compute_graph.DAG import Graph
-from compute_graph.DAG.node import DAG_Node, InPort, OutPort
-from compute_graph.DAG.visualize import visualize_graph
-
-
-class DAG_Transfrom(ABC):
-    def __init__(self):
-        pass
-
-    @abstractmethod
-    def tf(self, in_DAG: Graph)->Graph:
-        pass
-
-class DAG_TransformChain(DAG_Transfrom):
-    def __init__(self, transforms:List[DAG_Transfrom], verbose:bool=False) -> None:
-        self.transforms = transforms
-        self.verbose = verbose
-
-
-    def tf(self, in_DAG: Graph) -> Graph:
-        working_DAG = in_DAG
-        for tf in self.transforms:
-            working_DAG = tf.tf(working_DAG)
-            if self.verbose:
-                print(f"---------- tf {type(tf).__name__} -----------")
-                print(working_DAG)
-                print()
-            
-        return working_DAG
+from typing import Optional
+from compute_graph.DAG.transform.base import DAG_Transfrom
+from compute_graph.DAG import Graph, OutPort, InPort
 
 
 class DAG_Flatten(DAG_Transfrom):
     def __init__(self, max_depth:Optional[int]=None):
+        super().__init__()
         self.max_depth = max_depth
     
     def tf(self, in_DAG: Graph) -> Graph:
@@ -71,14 +44,4 @@ class DAG_Flatten(DAG_Transfrom):
             new_edges[key].add(InPort((flat_sub_g.input_interface[p], 0)))
 
         in_DAG.set_edges(new_edges)
-        return in_DAG
-
-class DAG_Viz(DAG_Transfrom):
-    def __init__(self, file_name:str = "tmp", max_depth:Optional[int] = None):
-        self.file_name =  file_name
-        self.max_depth = max_depth
-    
-    def tf(self, in_DAG: Graph) -> Graph:
-        
-        visualize_graph(in_DAG, out_path="../../Artifacts", out_file_name=self.file_name, max_depth=self.max_depth, format="png")
         return in_DAG

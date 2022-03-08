@@ -276,5 +276,14 @@ class Graph(DAG_Node):
     def inverse_edges(self)->Dict[InPort, OutPort]:
         inverse_edges = {ip: op for op, ips in self._edges.items() for ip in ips}
         return inverse_edges
+    
+    def stats(self)->Tuple[int, int]:
+        node, g = self.get_categoriesed_sub_nodes()
+        sub_stat = [sg.stats() for sg in g]
+
+        total_nodes = len(node)+sum([ss[0] for ss in sub_stat])
+        total_graphs = len(g) + sum([ss[1] for ss in sub_stat])
+
+        return total_nodes, total_graphs
 
 
