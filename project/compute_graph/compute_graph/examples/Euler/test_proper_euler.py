@@ -4,6 +4,7 @@ from compute_graph.DAG.visualize import visualize_graph
 from compute_graph.examples.Euler.proper_euler import *
 from compute_graph.examples.Euler.euler import *
 from compute_graph.examples.Euler.test_euler import *
+from compute_graph.examples.General.general import volumeX_2D
 
 class Test_Proper_Flux_X(unittest.TestCase):
     def test_1(self):
