@@ -423,11 +423,11 @@ def make_neat_euler():
             FilterApply(IR_TightFunction, RemoveAllTemp()),
             FilterApply(IR_TightFunction, DefineAllVars()),
         ],
-        verbose=True,
         large_output_mode="../../Artifacts"),
         C_Backend(
             extra_headers=["../../stdlibs.h", "kernel_3_base.h"],
-            namespace="kernels::k3")
+            namespace="kernels::k3"),
+        verbose=True
     )
     
     code = tf_stack.tf(g)
@@ -470,11 +470,11 @@ def make_proper_euler():
             FilterApply(IR_TightFunction, RemoveAllTemp()),
             FilterApply(IR_TightFunction, DefineAllVars()),
         ],
-        verbose=True,
         large_output_mode="../../Artifacts"),
         C_Backend(
             extra_headers=["../../stdlibs.h", "kernel_3_base.h"],
-            namespace="kernels::k3")
+            namespace="kernels::k3"),
+        verbose=True
     )
     
     code = tf_stack.tf(g)

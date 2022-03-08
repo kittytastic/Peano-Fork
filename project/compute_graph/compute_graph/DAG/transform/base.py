@@ -1,7 +1,7 @@
 from typing import List, Optional
 from abc import ABC, abstractmethod
+import time
 from compute_graph.DAG import Graph
-
 
 class DAG_Transfrom(ABC):
     def __init__(self, name:Optional[str] = None):
@@ -19,11 +19,20 @@ class DAG_TransformChain(DAG_Transfrom):
 
     def tf(self, in_DAG: Graph) -> Graph:
         working_DAG = in_DAG
+        if self.verbose:
+                outS = f"Inital DAG: "
+                stats = working_DAG.stats()
+                outS += f" {stats[1]} graphs  {stats[0]} nodes"
+                print(outS)
+        
         for tf in self.transforms:
+            start = time.time()
             working_DAG = tf.tf(working_DAG)
+            end = time.time()
             if self.verbose:
-                print(f"---------- tf {type(tf).__name__} -----------")
-                print(working_DAG)
-                print()
+                outS = f"({end-start:.2f}s) {tf.name}: "
+                stats = working_DAG.stats()
+                outS += f" {stats[1]} graphs  {stats[0]} nodes"
+                print(outS)
             
         return working_DAG
