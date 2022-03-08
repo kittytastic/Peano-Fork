@@ -54,3 +54,18 @@ class IR_TransformChain(IR_Transfrom):
                 print(f"Elapsed: {end-start:.2f}s")
             
         return working_IR
+
+class FilterApply(IR_Transfrom):
+    def __init__(self, filter_type: Type[IR_Symbol], apply_tf:IR_Transfrom):
+        self.filter_type = filter_type
+        self.apply_tf = apply_tf
+
+    def tf(self, in_IR: IR_Symbol)->IR_Symbol:
+        expr = in_IR.get_instances(self.filter_type)
+        list_expr = list(expr)
+        tf_expr = [self.apply_tf.tf(ep) for ep in expr]
+
+        for original, new_expr in zip(list_expr, tf_expr):
+            in_IR.replace(original, new_expr)
+    
+        return in_IR
