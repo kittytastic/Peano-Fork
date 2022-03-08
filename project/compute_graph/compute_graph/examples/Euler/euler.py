@@ -426,7 +426,9 @@ def make_neat_euler():
         ],
         verbose=True,
         large_output_mode="../../Artifacts"),
-        C_Backend()
+        C_Backend(
+            extra_headers=["../../stdlibs.h", "kernel_3_base.h"],
+            namespace="kernels::k3")
     )
     
     code = tf_stack.tf(g)
@@ -471,7 +473,9 @@ def make_proper_euler():
         ],
         verbose=True,
         large_output_mode="../../Artifacts"),
-        C_Backend()
+        C_Backend(
+            extra_headers=["../../stdlibs.h", "kernel_3_base.h"],
+            namespace="kernels::k3")
     )
     
     code = tf_stack.tf(g)

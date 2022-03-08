@@ -1,4 +1,5 @@
-from typing import Any, Dict
+from tkinter.messagebox import NO
+from typing import Any, Dict, List, Optional
 from compute_graph.IR.symbols.functions import IR_BasicLibCall, IR_CallTightFunction, IR_File
 from compute_graph.IR.symbols.variables import IR_DefineOnly
 from compute_graph.IR.visitor import IR_Visitor
@@ -14,12 +15,15 @@ C_DATA_TYPE_MAP = {IR_DataTypes.VOID: 'void', IR_DataTypes.FP64: 'double'}
 
 _NO_OP = ID("no_op") 
 class IR_To_C_TF(IR_Visitor[Any]):
-    def __init__(self, data_type_map: Dict[IR_DataTypes, str]):
+    def __init__(self, data_type_map: Dict[IR_DataTypes, str], function_namespace:Optional[str]):
         self.data_type_map = data_type_map
         self.required_preprocessor_statements:set[str] = set()
+        self.function_namespace = function_namespace
         
     def visit_IR_TightFunction(self, node:IR_TightFunction)->Any:
         function_name = node.name
+        if self.function_namespace is not None:
+            function_name = f"{self.function_namespace}::{function_name}"
 
         # Head
         identifier_type = IdentifierType(names=[self.data_type_map[node.data_type]])
@@ -103,9 +107,9 @@ class IR_To_C_TF(IR_Visitor[Any]):
         
         elif isinstance(var, IR_Array):
             id_type = IdentifierType(['double'])
-            type_dec = TypeDecl(var.name, [], None, id_type) 
+            type_dec = TypeDecl(f"@@__restrict__@@{var.name}", [], None, id_type) 
             ptr_dec = PtrDecl([], type_dec)
-            out_ast = Decl(var.name, [], [], [], [], ptr_dec, None, None)
+            out_ast = Decl(f"@@__restrict__@@{var.name}", [], [], [], [], ptr_dec, None, None)
             return out_ast
 
         else:
@@ -138,18 +142,26 @@ class IR_To_C_TF(IR_Visitor[Any]):
 
 
 class C_Backend(LanguageBackend):
+    def __init__(self, extra_headers:List[str]=[], namespace:Optional[str]=None) -> None:
+        super().__init__()
+        self.extra_headers = extra_headers
+        self.function_namespace = namespace
+
     def code_gen(self, ir: IR_Symbol) -> str:
-        ast_builder = IR_To_C_TF(C_DATA_TYPE_MAP)
+        ast_builder = IR_To_C_TF(C_DATA_TYPE_MAP, self.function_namespace)
         inner = ast_builder.visit(ir)
         return_ast = FileAST([inner])
         generator:Any = c_generator.CGenerator()
 
         code = generator.visit(return_ast)
-        preproc = "".join([f"#include <{h}>\n" for h in ast_builder.required_preprocessor_statements])
+        code = code.replace("@@__restrict__@@", "__restrict__ ")
+        preproc = "".join([f"#include \"{h}\"\n" for h in self.extra_headers])
+        preproc += "\n"
+        preproc += "".join([f"#include <{h}>\n" for h in ast_builder.required_preprocessor_statements])
         return preproc+"\n"+code
 
     def DEBUG_code_gen(self, ir: IR_Symbol)-> str:
-        ast_builder = IR_To_C_TF(C_DATA_TYPE_MAP)
+        ast_builder = IR_To_C_TF(C_DATA_TYPE_MAP, self.function_namespace)
         inner = ast_builder.visit(ir)
         return_ast = FileAST([inner])
 
