@@ -64,7 +64,7 @@ class TestPatchUpdate2D(unittest.TestCase):
     def test_1(self):
         make_rus_x:Callable[[str], Graph] = lambda x: rusanov(4, proper_max_eigen_x, proper_flux_x, friendly_name=x)
         make_rus_y:Callable[[str], Graph] = lambda x: rusanov(4, proper_max_eigen_y, proper_flux_y, friendly_name=x)
-        g = patchUpdate_2D(3, 4, make_rus_x, make_rus_y)
+        g = patchUpdate_2D(3, 4, make_rus_x, make_rus_y, source_term)
 
         input_data = self.pack_input(patch_update_in_1, patch_update_extra_1)
         expected_data = patch_update_out_1

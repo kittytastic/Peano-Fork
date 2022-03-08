@@ -1,4 +1,4 @@
-from typing import Callable, List
+from typing import Callable, List, Optional
 
 from compute_graph.DAG import *
 
@@ -106,7 +106,7 @@ def volumeX_2D(axis:str)->Graph:
     return g
 
 
-def patchUpdate_2D(cells_per_axis: int, unknowns: int, rusanov_x:Callable[[str], Graph], rusanov_y:Callable[[str], Graph])->Graph:
+def patchUpdate_2D(cells_per_axis: int, unknowns: int, rusanov_x:Callable[[str], Graph], rusanov_y:Callable[[str], Graph], source_term:Callable[[], Graph])->Graph:
     dim = 2
     Qins:int = (cells_per_axis+2)**dim * unknowns
     Qout:int = (cells_per_axis)**dim * unknowns
@@ -123,6 +123,7 @@ def patchUpdate_2D(cells_per_axis: int, unknowns: int, rusanov_x:Callable[[str],
 
     Q_out_pos_contrib:List[List[OutPort]] = [[] for _ in range(Qout)]
     Q_out_neg_contrib:List[List[OutPort]] = [[] for _ in range(Qout)]
+    Q_source_terms: List[Optional[OutPort]]= [None] * Qout
 
 
     symNumPatches = Constant(cells_per_axis) 
@@ -131,6 +132,43 @@ def patchUpdate_2D(cells_per_axis: int, unknowns: int, rusanov_x:Callable[[str],
 
     dt_div_size = Divide()
     g.fill_node_inputs([g.get_internal_input(dt_loc), vol_h], dt_div_size)
+    
+    # Source Terms
+    for x in range(cells_per_axis):
+        for y in range(cells_per_axis):
+            voxelInPreImage = voxelInPreimage_2D(x-1, y, cells_per_axis)
+            voxelInImage = voxelInImage_2D(x-1, y, cells_per_axis)
+
+            c_x = Constant(x)    
+            c_y = Constant(y)    
+            volX = volumeX_2D("x")
+            g.fill_node_inputs([
+                g.get_internal_input(patch_center_loc),
+                g.get_internal_input(patch_center_loc+1),
+                g.get_internal_input(patch_size_loc),
+                g.get_internal_input(patch_size_loc+1),
+                vol_h,
+                c_x,
+                c_y
+                ], volX)
+
+            # Rusanov
+            st = source_term()
+            for u in range(unknowns): g.add_edge(g.get_internal_input(Q_in_loc + voxelInPreImage*unknowns + u), (st, u))
+            g.add_edge((volX,0), (st, unknowns))
+            g.add_edge((volX,1), (st, unknowns+1))
+            g.add_edge((vol_h, 0), (st, unknowns+2))
+            g.add_edge(g.get_internal_input(t_loc), (st, unknowns+3))
+            g.add_edge(g.get_internal_input(dt_loc), (st, unknowns+4))
+
+            for u in range(unknowns):
+                mul_dt = Multiply(2)
+                g.fill_node_inputs([(st, u), g.get_internal_input(dt_loc)], mul_dt)
+                Q_source_terms[voxelInImage*unknowns +u] = OutPort((mul_dt, 0))
+
+
+
+
 
     # Flux x
     for x in range(cells_per_axis+1):
@@ -227,14 +265,18 @@ def patchUpdate_2D(cells_per_axis: int, unknowns: int, rusanov_x:Callable[[str],
                 add_neg = Add(len(Q_out_neg_contrib[image_voxel*unknowns+u]))
                 diff = Subtract()
                 scale = Multiply(2)
-                add_input = Add(2) 
+                add_input1 = Add(2) 
+                add_input2 = Add(2) 
 
                 g.fill_node_inputs(Q_out_pos_contrib[image_voxel*unknowns+u], add_pos) # type:ignore
                 g.fill_node_inputs(Q_out_neg_contrib[image_voxel*unknowns+u], add_neg) # type:ignore
                 g.fill_node_inputs([add_pos, add_neg], diff)
                 g.fill_node_inputs([diff, dt_div_size], scale)
-                g.fill_node_inputs([scale, g.get_internal_input(Q_in_loc+ pre_image_voxel*unknowns+u)], add_input)
-                g.add_edge((add_input, 0), g.get_internal_output(image_voxel*unknowns+u))
+                st = Q_source_terms[image_voxel*unknowns+u]
+                assert(st is not None)
+                g.fill_node_inputs([scale, st], add_input1)
+                g.fill_node_inputs([add_input1, g.get_internal_input(Q_in_loc+ pre_image_voxel*unknowns+u)], add_input2)
+                g.add_edge((add_input2, 0), g.get_internal_output(image_voxel*unknowns+u))
     
     return g
 

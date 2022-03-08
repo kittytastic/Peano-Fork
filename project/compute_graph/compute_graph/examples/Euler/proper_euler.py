@@ -44,7 +44,7 @@ def proper_max_eigen_y()->Graph:
     return g
 
 def source_term()->Graph:
-    g = Graph(4+2+1+1+1, 4, "proper-max-eigen-y")
+    g = Graph(4+2+1+1+1, 4, "source term")
     c1 = Constant(0)
     for u in range(4):
         g.add_edge((c1,0), g.get_internal_output(u))
