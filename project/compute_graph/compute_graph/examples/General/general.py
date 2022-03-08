@@ -29,10 +29,10 @@ def rusanov(
         g.add_edge(g.get_internal_input(unknowns + u), eigen_r.get_external_input(u))
 
     for e in range(2+1+1+1):
-        g.add_edge(g.get_internal_input(unknowns+e), flux_l.get_external_input(unknowns+e))
-        g.add_edge(g.get_internal_input(unknowns+e), eigen_l.get_external_input(unknowns+e))
-        g.add_edge(g.get_internal_input(unknowns+e), flux_r.get_external_input(unknowns+e))
-        g.add_edge(g.get_internal_input(unknowns+e), eigen_r.get_external_input(unknowns+e))
+        g.add_edge(g.get_internal_input(unknowns*2+e), flux_l.get_external_input(unknowns+e))
+        g.add_edge(g.get_internal_input(unknowns*2+e), eigen_l.get_external_input(unknowns+e))
+        g.add_edge(g.get_internal_input(unknowns*2+e), flux_r.get_external_input(unknowns+e))
+        g.add_edge(g.get_internal_input(unknowns*2+e), eigen_r.get_external_input(unknowns+e))
 
     l_max = Max(2)
     g.fill_node_inputs([eigen_l, eigen_r], l_max)
