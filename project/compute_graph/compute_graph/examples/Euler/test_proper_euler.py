@@ -9,7 +9,7 @@ class Test_Proper_Flux_X(unittest.TestCase):
     def test_1(self):
         g = proper_flux_x()
         input_data = [1.0, 2.0, 3.0, 4.0]
-        full_input = input_data + [-10.0, -12.0, -13.0, -14.0]
+        full_input = input_data + [-10.0, -11.00, -12.0, -13.0, -14.0]
         expected_data = Test_Flux_X.flux_formula_x(input_data)
 
         result = g.eval(full_input)
@@ -19,7 +19,7 @@ class Test_Proper_Flux_Y(unittest.TestCase):
     def test_1(self):
         g = proper_flux_y()
         input_data = [1.0, 2.0, 3.0, 4.0]
-        full_input = input_data + [-10.0, -12.0, -13.0, -14.0]
+        full_input = input_data + [-10.0, -11.0, -12.0, -13.0, -14.0]
         expected_data = Test_Flux_Y.flux_formula_y(input_data)
 
         result = g.eval(full_input)
@@ -30,7 +30,7 @@ class Test_Proper_Eigen_X(unittest.TestCase):
         g = proper_max_eigen_x()
         input_data = [8.0, 2.0, 3.0, 15.0]
 
-        full_input = input_data + [-10.0, -12.0, -13.0, -14.0]
+        full_input = input_data + [-10.0, -11.0, -12.0, -13.0, -14.0]
         expected_data = [Test_Eigen_X.eigen_formula_x(input_data)]
 
         result = g.eval(full_input)
@@ -41,7 +41,7 @@ class Test_Proper_Eigen_Y(unittest.TestCase):
         g = proper_max_eigen_y()
         input_data = [8.0, 2.0, 3.0, 15.0]
 
-        full_input = input_data + [-10.0, -12.0, -13.0, -14.0]
+        full_input = input_data + [-10.0, -11.0, -12.0, -13.0, -14.0]
         expected_data = [Test_Eigen_Y.eigen_formula_y(input_data)]
 
         result = g.eval(full_input)

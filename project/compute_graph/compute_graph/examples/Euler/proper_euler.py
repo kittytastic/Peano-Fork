@@ -2,9 +2,14 @@ from compute_graph.DAG import *
 from compute_graph.DAG.primitive_node import Constant
 from compute_graph.examples.Euler.euler import flux_x, flux_y, max_eigen_x, max_eigen_y
 
+# Q            (unknowns)
+# patch center (2)
+# patch dx     (1)
+# t            (1)
+# dt           (1)
 
 def proper_flux_x()->Graph:
-    g = Graph(4+2+1+1, 4, "proper-flux-x")
+    g = Graph(4+2+1+1+1, 4, "proper-flux-x")
     euler = flux_x()
     for u in range(4): 
         g.add_edge(g.get_internal_input(u), euler.get_external_input(u))
@@ -12,7 +17,7 @@ def proper_flux_x()->Graph:
     return g
 
 def proper_flux_y()->Graph:
-    g = Graph(4+2+1+1, 4, "proper-flux-y")
+    g = Graph(4+2+1+1+1, 4, "proper-flux-y")
     euler = flux_y()
     for u in range(4): 
         g.add_edge(g.get_internal_input(u), euler.get_external_input(u))
@@ -21,7 +26,7 @@ def proper_flux_y()->Graph:
 
 
 def proper_max_eigen_x()->Graph:
-    g = Graph(4+2+1+1, 1, "proper-max-eigen-x")
+    g = Graph(4+2+1+1+1, 1, "proper-max-eigen-x")
     eigen = max_eigen_x()
     for u in range(4): 
         g.add_edge(g.get_internal_input(u), eigen.get_external_input(u))
@@ -30,7 +35,7 @@ def proper_max_eigen_x()->Graph:
     return g
 
 def proper_max_eigen_y()->Graph:
-    g = Graph(4+2+1+1, 1, "proper-max-eigen-y")
+    g = Graph(4+2+1+1+1, 1, "proper-max-eigen-y")
     eigen = max_eigen_y()
     for u in range(4): 
         g.add_edge(g.get_internal_input(u), eigen.get_external_input(u))

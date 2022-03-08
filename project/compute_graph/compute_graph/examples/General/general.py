@@ -8,7 +8,13 @@ def rusanov(
     flux_builder: Callable[[], Graph],
     friendly_name:str="rusanov")->Graph:
 
-    g = Graph(unknowns*2 + 2+1+1, unknowns*2, friendly_name)
+    # Q left (unknowns)
+    # Q right (unknowns)
+    # patch center (2)
+    # patch dx     (1)
+    # t            (1)
+    # dt           (1)
+    g = Graph(unknowns*2 + 2+1+1+1, unknowns*2, friendly_name)
     flux_l = flux_builder()
     flux_r = flux_builder()
 
@@ -22,7 +28,7 @@ def rusanov(
         g.add_edge(g.get_internal_input(u), eigen_l.get_external_input(u))
         g.add_edge(g.get_internal_input(unknowns + u), eigen_r.get_external_input(u))
 
-    for e in range(2+1+1):
+    for e in range(2+1+1+1):
         g.add_edge(g.get_internal_input(unknowns+e), flux_l.get_external_input(unknowns+e))
         g.add_edge(g.get_internal_input(unknowns+e), eigen_l.get_external_input(unknowns+e))
         g.add_edge(g.get_internal_input(unknowns+e), flux_r.get_external_input(unknowns+e))
