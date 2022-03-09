@@ -5,7 +5,7 @@ from compute_graph.DAG.node import DAG_Node, InPort, OutPort
 from compute_graph.DAG.ops import Add
 from compute_graph.DAG.transform import DAG_Flatten
 from compute_graph.DAG.transform.tidy import DAG_RemovePassThrough, DAG_RemoveUnusedComp
-from compute_graph.DAG.visualize import visualize_graph
+from compute_graph.DAG.visualize import visualize_graph #type: ignore
 
 
 def basic_g_1()->Tuple[Graph, Graph]:

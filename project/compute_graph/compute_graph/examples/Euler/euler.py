@@ -3,6 +3,7 @@ from compute_graph.DAG import *
 from compute_graph.DAG.ops import Divide, Sqrt
 from compute_graph.DAG.primitive_node import Constant
 from compute_graph.DAG.transform import DAG_Flatten, DAG_TransformChain, DAG_Viz, DAG_RemovePassThrough, DAG_RemoveUnusedComp
+from compute_graph.DAG.transform.simplify import DAG_RemoveArithmeticNoOps
 from compute_graph.IR.symbols.variables import IR_SingleVariable
 from compute_graph.IR.transform import IR_TransformChain, DefineAllVars, FileApplyCallStencil, FilterApply, FunctionStencil,  RemoveAllTemp, RemoveBackwardsAlias, RemoveForwardAlias
 from compute_graph.IR.symbols import IR_Array,  UniqueVariableName
@@ -462,8 +463,10 @@ def make_proper_euler():
             #DAG_Viz(file_name = "before_flat", max_depth=None),
             DAG_Flatten(),
             DAG_RemovePassThrough(),
-            DAG_RemoveUnusedComp()
-            # DAG_Viz(file_name = "after", max_depth=1),
+            DAG_RemoveUnusedComp(),
+            DAG_RemoveArithmeticNoOps(),
+            DAG_RemovePassThrough(),
+            DAG_Viz(file_name = "after", max_depth=1),
         ]),
         IR_TransformChain([
             FilterApply(IR_LooseFunction, RemoveForwardAlias()),

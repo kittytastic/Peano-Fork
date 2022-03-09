@@ -1,6 +1,7 @@
 from typing import Dict, Set
 from compute_graph.DAG.graph import InputInterface, OutputInterface
 from compute_graph.DAG.node import DAG_Node
+from compute_graph.DAG.primitive_node import PassThroughNode
 from compute_graph.DAG.transform.base import DAG_Transfrom
 from compute_graph.DAG import Graph, OutPort, InPort
 
@@ -18,7 +19,7 @@ class DAG_RemovePassThrough(DAG_Transfrom):
         subnode-=set(in_DAG.output_interface)
 
         for n in subnode:
-            if isinstance(n, InputInterface) or isinstance(n, OutputInterface):
+            if isinstance(n, InputInterface) or isinstance(n, OutputInterface) or isinstance(n, PassThroughNode):
                 node_ip = InPort((n,0))
                 node_op = OutPort((n,0))
                 before_op = inverse_edges[node_ip]
