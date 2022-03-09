@@ -1,5 +1,5 @@
 from typing import FrozenSet, List, Set, Tuple, Dict, Union
-from compute_graph.DAG.node import DAG_Node
+from compute_graph.DAG.node import DAG_Node, GraphEdges
 from compute_graph.DAG.ops import Add
 from compute_graph.DAG.primitive_node import Constant, PassThroughNode
 from compute_graph.DAG.transform.base import DAG_Transfrom
@@ -56,14 +56,71 @@ class DAG_RemoveArithmeticNoOps(DAG_Transfrom):
         in_DAG.set_edges(edges)
         return in_DAG
 
+_DepMap = Dict[Union[Tuple[type, Tuple[OutPort, ...]], Tuple[type, FrozenSet[OutPort]]], Set[DAG_Node]]
 class DAG_RemoveDuplicatedArithmetic(DAG_Transfrom):
     def __init__(self):
         super().__init__()
     
     def tf(self, in_DAG: Graph) -> Graph:
-
-        req_map: Dict[Union[Tuple[OutPort, ...], FrozenSet[OutPort]], DAG_Node]    = {} 
-
         
+        dup_arithmetic = self._get_duplicates(in_DAG)
+        while len(dup_arithmetic)>0:
+            in_DAG = self._condense_nodes_round(in_DAG, dup_arithmetic)
+            dup_arithmetic = self._get_duplicates(in_DAG)
 
         return in_DAG
+    
+    def _condense_nodes_round(self, in_DAG: Graph, dup_arithmetic:_DepMap)->Graph:
+        edges = in_DAG.get_edges()
+        
+        for type_and_deps, nodes in dup_arithmetic.items():
+            _, deps = type_and_deps
+            nodes_iter = iter(nodes) 
+            keep_node = next(nodes_iter)
+
+            for node in nodes_iter:
+                print(f"Condensing: {node} into {keep_node}")
+                assert(keep_node.num_outputs == node.num_outputs)
+                for i in range(keep_node.num_outputs): # Move outputs over
+                    edges[OutPort((keep_node, i))] = edges[OutPort((keep_node, i))].union(edges[OutPort((node, i))])
+                    edges.pop(OutPort((node, i)))
+                
+                
+                assert(keep_node.num_inputs == node.num_inputs)
+                for d in deps: # Move inputs over
+                    ip = self._get_inport(edges, d, node) 
+                    edges[d].remove(ip)
+                
+        in_DAG.set_edges(edges)
+        return in_DAG
+
+    def _get_inport(self, edges:GraphEdges, search_out_port: OutPort, target_node: DAG_Node)->InPort:
+        return [ip for ip in edges[search_out_port] if ip[0]==target_node][0]
+
+    
+    def _get_duplicates(self, in_DAG:Graph)->_DepMap:
+        inverse_edges = in_DAG.inverse_edges()
+        sub_nodes, _ = in_DAG.get_categoriesed_sub_nodes()
+        sub_nodes-=set(in_DAG.input_interface)
+
+        dep_map: _DepMap  = {}
+
+        for n in sub_nodes:
+            if isinstance(n, Constant):
+                continue
+
+            port_deps:List[OutPort] = [inverse_edges[InPort((n,i))] for i in range(n.num_inputs)]
+
+            if n.commutative:
+                dep_key = (type(n), frozenset(port_deps))
+            else:
+                dep_key = (type(n), tuple(port_deps))
+            
+            if dep_key not in dep_map:
+                dep_map[dep_key] = set()
+            
+            dep_map[dep_key].add(n)
+
+        duplicated_arith = {k: v for k,v in dep_map.items() if len(v)>1}
+
+        return duplicated_arith
