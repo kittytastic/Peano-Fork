@@ -2,6 +2,7 @@
 #include "kernels/k1/kernel_1.h"
 #include "kernels/k2/kernel_2.h"
 #include "kernels/k3/kernel_3.h"
+#include "kernels/swe1/swe_1.h"
 #include "../benchmark/benchmark.h"
 
 
@@ -91,6 +92,7 @@ int main(){
     //benchmark::benchmark(doKernelStuff, benchmark::NONE, 5);
 
     std::vector<Kernel> allKernels = {
+        kernels::swe1::swe1,
         kernels::k1::k1,
         kernels::k2::k2,
         kernels::k3::k3
