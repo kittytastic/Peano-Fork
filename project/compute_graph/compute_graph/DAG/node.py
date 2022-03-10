@@ -13,14 +13,15 @@ GraphEdges = Dict[OutPort, Set[InPort]]
 class DAG_Node(ABC):
     next_global_id = 0
 
-    def __init__(self, num_inputs:int, num_outputs:int, type_name:str="unknown", friendly_name:Optional[str]=None):
+    def __init__(self, num_inputs:int, num_outputs:int, type_name:str="unknown", friendly_name:Optional[str]=None, commutative:bool = False):
         self.id = DAG_Node.next_global_id
         DAG_Node.next_global_id +=1
         
         self.num_inputs = num_inputs
         self.num_outputs = num_outputs
         self.type_name = type_name
-        self.friendly_name = friendly_name     
+        self.friendly_name = friendly_name
+        self.commutative = commutative  
 
     @abstractmethod
     def _eval(self, inputs:List[Any])->List[Any]:

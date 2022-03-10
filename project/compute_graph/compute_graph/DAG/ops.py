@@ -5,7 +5,7 @@ from compute_graph.DAG.node import DAG_Node
 
 class Add(DAG_Node):
     def __init__(self, num_inputs: int, friendly_name:Optional[str]=None):
-        super().__init__(num_inputs, 1, type_name="Add", friendly_name=friendly_name)
+        super().__init__(num_inputs, 1, type_name="Add", friendly_name=friendly_name, commutative=True)
 
     def _eval(self, inputs: List[Any])->List[Any]:
         return [sum(inputs)]
@@ -21,7 +21,7 @@ class Subtract(DAG_Node):
 
 class Multiply(DAG_Node):
     def __init__(self, num_inputs:int, friendly_name:Optional[str]=None):
-        super().__init__(num_inputs, 1, type_name="Mul", friendly_name=friendly_name)
+        super().__init__(num_inputs, 1, type_name="Mul", friendly_name=friendly_name, commutative=True)
 
     def _eval(self, inputs: List[Any])->List[Any]:
         total = 1
@@ -39,7 +39,7 @@ class Divide(DAG_Node):
 
 class Max(DAG_Node):
     def __init__(self,  arg_no:int, friendly_name:Optional[str]=None):
-        super().__init__(arg_no, 1, type_name="Max", friendly_name=friendly_name)
+        super().__init__(arg_no, 1, type_name="Max", friendly_name=friendly_name, commutative=True)
 
     def _eval(self, inputs: List[Any])->List[Any]:
         return [max(inputs)]
