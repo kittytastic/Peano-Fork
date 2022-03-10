@@ -96,6 +96,19 @@ def basic_g_6()->Tuple[Graph, DAG_Node, DAG_Node, DAG_Node, DAG_Node, DAG_Node]:
         return  g_bottom, add1, add2, add3, add4, add5
  #  visualize_graph(g_flat, out_path="../../Artifacts", out_file_name="before")
 
+def basic_g_7()->Tuple[Graph, DAG_Node, DAG_Node, DAG_Node]:
+        g_bottom = Graph(1, 1, "bottom")
+        
+        add1 = Add(2)
+        add2 = Add(2)
+        add3 = Add(2)
+        
+        g_bottom.fill_node_inputs([g_bottom.get_internal_input(0), g_bottom.get_internal_input(0)], add1)
+        g_bottom.fill_node_inputs([g_bottom.get_internal_input(0), g_bottom.get_internal_input(0)], add2)
+        g_bottom.fill_node_inputs([add1, add2], add3)
+        g_bottom.add_edge((add3, 0), g_bottom.get_internal_output(0))
+
+        return  g_bottom, add1, add2, add3
 class TestRemoveArithmeticNoOp(unittest.TestCase):
     def xtest_1(self):
         tf = DAG_RemoveArithmeticNoOps()
@@ -125,9 +138,7 @@ class TestRemoveDuplicatedArithmetic(unittest.TestCase):
         tf = DAG_RemoveDuplicatedArithmetic()
         g, add1, add2, add3 = basic_g_3()
         
-        visualize_graph(g, out_path="../../Artifacts", out_file_name="a_before")
         g_tf = tf.tf(g)
-        visualize_graph(g, out_path="../../Artifacts", out_file_name="after")
         
         sub_n, _ = g_tf.get_categoriesed_sub_nodes()
 
@@ -168,9 +179,7 @@ class TestRemoveDuplicatedArithmetic(unittest.TestCase):
         
         g_tf = tf.tf(g)
         
-        visualize_graph(g, out_path="../../Artifacts", out_file_name="a_before")
         sub_n, _ = g_tf.get_categoriesed_sub_nodes()
-        visualize_graph(g, out_path="../../Artifacts", out_file_name="after")
 
         self.assertNotIn(add2, sub_n) 
         self.assertNotIn(add4, sub_n) 
@@ -178,7 +187,19 @@ class TestRemoveDuplicatedArithmetic(unittest.TestCase):
         self.assertIn(add3, sub_n) 
         self.assertIn(add5, sub_n) 
         for og in g.input_interface+g.input_interface: self.assertIn(og, sub_n)
+    
+    def test_5_dupe_deps(self):
+        tf = DAG_RemoveDuplicatedArithmetic()
+        g, add1, add2, add3 = basic_g_7()
+        
+        g_tf = tf.tf(g)
+        
+        sub_n, _ = g_tf.get_categoriesed_sub_nodes()
 
+        self.assertNotIn(add2, sub_n) 
+        self.assertIn(add1, sub_n) 
+        self.assertIn(add3, sub_n) 
+        for og in g.input_interface+g.input_interface: self.assertIn(og, sub_n)
 
 
 if __name__=="__main__":

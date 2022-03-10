@@ -1,5 +1,6 @@
 from typing import FrozenSet, List, Set, Tuple, Dict, Union
-from compute_graph.DAG.node import DAG_Node, GraphEdges
+from compute_graph.DAG.graph import DAG_Message
+from compute_graph.DAG.node import DAG_Node, GraphEdges, NodePort
 from compute_graph.DAG.ops import Add
 from compute_graph.DAG.primitive_node import Constant, PassThroughNode
 from compute_graph.DAG.transform.base import DAG_Transfrom
@@ -72,6 +73,7 @@ class DAG_RemoveDuplicatedArithmetic(DAG_Transfrom):
     
     def _condense_nodes_round(self, in_DAG: Graph, dup_arithmetic:_DepMap)->Graph:
         edges = in_DAG.get_edges()
+        moved_deps:Dict[DAG_Node, DAG_Node]={}
         
         for type_and_deps, nodes in dup_arithmetic.items():
             _, deps = type_and_deps
@@ -79,7 +81,6 @@ class DAG_RemoveDuplicatedArithmetic(DAG_Transfrom):
             keep_node = next(nodes_iter)
 
             for node in nodes_iter:
-                print(f"Condensing: {node} into {keep_node}")
                 assert(keep_node.num_outputs == node.num_outputs)
                 for i in range(keep_node.num_outputs): # Move outputs over
                     edges[OutPort((keep_node, i))] = edges[OutPort((keep_node, i))].union(edges[OutPort((node, i))])
@@ -88,14 +89,24 @@ class DAG_RemoveDuplicatedArithmetic(DAG_Transfrom):
                 
                 assert(keep_node.num_inputs == node.num_inputs)
                 for d in deps: # Move inputs over
-                    ip = self._get_inport(edges, d, node) 
-                    edges[d].remove(ip)
+                    safe_d = OutPort(self._map_moved_dep(d, moved_deps))
+                    ips = self._get_inport(edges, safe_d, node) 
+                    edges[safe_d]-=ips
+                
+                moved_deps[node] = keep_node
                 
         in_DAG.set_edges(edges)
         return in_DAG
+    
+    def _map_moved_dep(self, arg_port: NodePort, map: Dict[DAG_Node, DAG_Node])->NodePort:
+        if arg_port[0] in map:
+            return (map[arg_port[0]], arg_port[1])
+        
+        return arg_port
 
-    def _get_inport(self, edges:GraphEdges, search_out_port: OutPort, target_node: DAG_Node)->InPort:
-        return [ip for ip in edges[search_out_port] if ip[0]==target_node][0]
+
+    def _get_inport(self, edges:GraphEdges, search_out_port: OutPort, target_node: DAG_Node)->Set[InPort]:
+        return set([ip for ip in edges[search_out_port] if ip[0]==target_node])
 
     
     def _get_duplicates(self, in_DAG:Graph)->_DepMap:
