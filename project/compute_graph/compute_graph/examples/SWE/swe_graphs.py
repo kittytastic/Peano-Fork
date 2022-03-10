@@ -1,7 +1,7 @@
 from typing import Callable, List
 from compute_graph.DAG import *
 from compute_graph.DAG.ops import Divide, Sqrt
-from compute_graph.DAG.primitive_node import Constant
+from compute_graph.DAG.primitive_node import Constant, DebugNode
 
 # NCP
 # Q            (unknowns+aux)
@@ -21,8 +21,37 @@ from compute_graph.DAG.primitive_node import Constant
 # OUT:         (unknowns)
 
 def swe_ncp_x()->Graph:
-    g = Graph(3+1  +2+1+1, 3, "swe ncp")
+    g = Graph(3+1 + 3+1 + 2+1+1, 3, "swe ncp x")
+
+    grav = Constant(9.81)
+    add1 = Add(2)
+    mul1 = Multiply(3)
+
+    g.fill_node_inputs([g.get_internal_input(4+0), g.get_internal_input(4+3)], add1)
+    g.fill_node_inputs([grav, g.get_internal_input(0), add1], mul1)
+    g.add_edge((mul1, 0), g.get_internal_output(1))
+
+    zero = Constant(0.0)
+    g.add_edge((zero, 0), g.get_internal_output(0))
+    g.add_edge((zero, 0), g.get_internal_output(2))
     return g
+
+def swe_ncp_y()->Graph:
+    g = Graph(3+1 + 3+1 + 2+1+1, 3, "swe ncp x")
+
+    grav = Constant(9.81)
+    add1 = Add(2)
+    mul1 = Multiply(3)
+
+    g.fill_node_inputs([g.get_internal_input(4+0), g.get_internal_input(4+3)], add1)
+    g.fill_node_inputs([grav, g.get_internal_input(0), add1], mul1)
+    g.add_edge((mul1, 0), g.get_internal_output(2))
+
+    zero = Constant(0.0)
+    g.add_edge((zero, 0), g.get_internal_output(0))
+    g.add_edge((zero, 0), g.get_internal_output(1))
+    return g
+
 
 def swe_flux_x()->Graph:
     g = Graph(3+1  +2+1+1+1, 3, "swe flux x")
