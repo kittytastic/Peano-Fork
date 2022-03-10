@@ -33,10 +33,11 @@ void testKernel(const Kernel* k){
 
     const int lfw = 20;
     const int rfw = 10;
+    int passed = 0;
     
-    std::cout << "Runing test cases...\n";
+    //std::cout << "Runing test cases...\n";
     for(const auto& tc: k->testCases) {
-        std::cout << std::setw(lfw) << std::left << tc.name;
+        //std::cout << std::setw(lfw) << std::left << tc.name;
 
         for(int x=0; x<3; x++){
             for(int y=0; y<3; y++){
@@ -60,12 +61,23 @@ void testKernel(const Kernel* k){
             allClose &= isClose(outVec[i], tc.expected[i]);
         }
 
-        std::cout  << std::setw(rfw) << std::right;
+        /*std::cout  << std::setw(rfw) << std::right;
         if (allClose){
         std::cout << "✔️\n"; }
          else{
              std::cout << "❌\n";
-         }
+         }*/
+         if (allClose){passed++;}
+    }
+    
+    std::ostringstream out_str;
+    out_str<<passed<<"/"<<k->testCases.size()<<" Tests passed";
+    std::cout << std::setw(lfw) << std::left<<out_str.str();
+    std::cout  << std::setw(rfw) << std::right;
+    if (passed == k->testCases.size()){
+        std::cout << "✔️\n"; }
+    else{
+        std::cout << "❌\n";
     }
 
     free(outVec);
