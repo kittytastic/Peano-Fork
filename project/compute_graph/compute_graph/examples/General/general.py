@@ -1,3 +1,4 @@
+from optparse import Option
 from typing import Callable, List, Optional
 
 from compute_graph.DAG import *
@@ -5,8 +6,13 @@ from compute_graph.DAG import *
 def rusanov(
     unknowns:int,
     max_eigen_builder: Callable[[], Graph],
-    flux_builder: Callable[[], Graph],
+    flux_builder: Optional[Callable[[], Graph]],
+    ncp_builder: Optional[Callable[[], Graph]],
     friendly_name:str="rusanov")->Graph:
+    
+    use_flux = flux_builder is not None
+    use_ncp = ncp_builder is not None
+    assert(use_flux or use_ncp)
 
     # Q left (unknowns)
     # Q right (unknowns)
@@ -15,23 +21,33 @@ def rusanov(
     # t            (1)
     # dt           (1)
     g = Graph(unknowns*2 + 2+1+1+1, unknowns*2, friendly_name)
-    flux_l = flux_builder()
-    flux_r = flux_builder()
+    flux_r:Optional[Graph] = flux_builder() if flux_builder is not None else None
+    flux_l:Optional[Graph] = flux_builder() if flux_builder is not None else None
 
+    ncp:Optional[Graph] = ncp_builder() if ncp_builder is not None else None
+    
     eigen_l = max_eigen_builder()
     eigen_r = max_eigen_builder()
 
-    # Flux and Eigen
+    
+    # Flux
+    if flux_l is not None and flux_r is not None:
+        for u in range(unknowns):
+            g.add_edge(g.get_internal_input(u), flux_l.get_external_input(u))
+            g.add_edge(g.get_internal_input(unknowns + u), flux_r.get_external_input(u))
+
+        for e in range(2+1+1+1):
+            g.add_edge(g.get_internal_input(unknowns*2+e), flux_l.get_external_input(unknowns+e))
+            g.add_edge(g.get_internal_input(unknowns*2+e), flux_r.get_external_input(unknowns+e))
+    
+
+    # Eigen Value
     for u in range(unknowns):
-        g.add_edge(g.get_internal_input(u), flux_l.get_external_input(u))
-        g.add_edge(g.get_internal_input(unknowns + u), flux_r.get_external_input(u))
         g.add_edge(g.get_internal_input(u), eigen_l.get_external_input(u))
         g.add_edge(g.get_internal_input(unknowns + u), eigen_r.get_external_input(u))
 
     for e in range(2+1+1+1):
-        g.add_edge(g.get_internal_input(unknowns*2+e), flux_l.get_external_input(unknowns+e))
         g.add_edge(g.get_internal_input(unknowns*2+e), eigen_l.get_external_input(unknowns+e))
-        g.add_edge(g.get_internal_input(unknowns*2+e), flux_r.get_external_input(unknowns+e))
         g.add_edge(g.get_internal_input(unknowns*2+e), eigen_r.get_external_input(unknowns+e))
 
     l_max = Max(2)
@@ -39,27 +55,48 @@ def rusanov(
 
     for i in range(unknowns):
         h = Constant(0.5)
-        mul1 = Multiply(2)
-        mul2 = Multiply(2)
-        mul3 = Multiply(3)
-        sub1 = Subtract()
-        sub2 = Subtract()
-        add1 = Add(2)
+        zero = Constant(0)
+        eigen_contrib = Subtract()
+        flux_contrib = Add(2)
+        ncp_contrib = Multiply(2)
 
-        # QR - QL
-        g.fill_node_inputs([g.get_internal_input(i+unknowns), g.get_internal_input(i)], sub1)
-        # 0.5 * lmax * (...)
-        g.fill_node_inputs([h, l_max, sub1], mul3)
 
-        # 0.5 * FL + 0.5 * FR
-        g.fill_node_inputs([h, (flux_l, i)], mul1)
-        g.fill_node_inputs([h, (flux_r, i)], mul2)
-        g.fill_node_inputs([mul1, mul2], add1)
+        if True:
+            sub1 = Subtract()
+            mul1 = Multiply(3)
+            # 0.5 * lmax * (QR - QL)
+            g.fill_node_inputs([g.get_internal_input(i+unknowns), g.get_internal_input(i)], sub1)
+            g.fill_node_inputs([h, l_max, sub1], mul1)
+            g.fill_node_inputs([zero, mul1], eigen_contrib)
 
-        g.fill_node_inputs([add1, mul3], sub2)
+        next_node_l = eigen_contrib
+        next_node_r = eigen_contrib
 
-        g.add_edge((sub2, 0), g.get_internal_output(i))
-        g.add_edge((sub2, 0), g.get_internal_output(i+unknowns))
+        if flux_l is not None and flux_r is not None:
+            # 0.5 * FL + 0.5 * FR
+            mul1 = Multiply(2)
+            mul2 = Multiply(2)
+            add1 = Add(2)
+            g.fill_node_inputs([h, (flux_l, i)], mul1)
+            g.fill_node_inputs([h, (flux_r, i)], mul2)
+            g.fill_node_inputs([mul1, mul2], flux_contrib)
+            g.fill_node_inputs([next_node_l, flux_contrib], add1)
+            next_node_l = add1
+            next_node_r = add1
+
+        if ncp is not None:
+            add1 = Add(2)
+            sub1 = Subtract()
+            g.fill_node_inputs([h, (ncp, i)], ncp_contrib)
+            g.fill_node_inputs([next_node_l, ncp_contrib], add1)
+            g.fill_node_inputs([next_node_r, ncp_contrib], sub1)
+            next_node_l = add1
+            next_node_r = sub1
+
+
+
+        g.add_edge((next_node_l, 0), g.get_internal_output(i))
+        g.add_edge((next_node_r, 0), g.get_internal_output(i+unknowns))
     
     return g
 
@@ -152,7 +189,6 @@ def patchUpdate_2D(cells_per_axis: int, unknowns: int, rusanov_x:Callable[[str],
                 c_y
                 ], volX)
 
-            # Rusanov
             st = source_term()
             for u in range(unknowns): g.add_edge(g.get_internal_input(Q_in_loc + voxelInPreImage*unknowns + u), (st, u))
             g.add_edge((volX,0), (st, unknowns))
@@ -209,7 +245,7 @@ def patchUpdate_2D(cells_per_axis: int, unknowns: int, rusanov_x:Callable[[str],
                     Q_out_neg_contrib[leftVoxelInImage*unknowns+u].append(OutPort((rus, u)))
 
                 if x<cells_per_axis:
-                    Q_out_pos_contrib[rightVoxelInImage*unknowns+u].append(OutPort((rus,u)))
+                    Q_out_pos_contrib[rightVoxelInImage*unknowns+u].append(OutPort((rus,u+unknowns)))
 
 
     
@@ -252,7 +288,7 @@ def patchUpdate_2D(cells_per_axis: int, unknowns: int, rusanov_x:Callable[[str],
                     Q_out_neg_contrib[leftVoxelInImage*unknowns+u].append(OutPort((rus, u)))
 
                 if y<cells_per_axis:
-                    Q_out_pos_contrib[rightVoxelInImage*unknowns+u].append(OutPort((rus, u)))
+                    Q_out_pos_contrib[rightVoxelInImage*unknowns+u].append(OutPort((rus, u+unknowns)))
 
     # Sum all contributions
     for x in range(cells_per_axis):

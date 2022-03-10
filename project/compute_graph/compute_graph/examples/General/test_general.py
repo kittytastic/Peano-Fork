@@ -8,7 +8,7 @@ from compute_graph.examples.Euler.euler_test_extra import *
 
 class Test_Proper_Rusanov(unittest.TestCase):
     def test_1(self):
-        g = rusanov(4, proper_max_eigen_x, proper_flux_x)
+        g = rusanov(4, proper_max_eigen_x, proper_flux_x, None)
         input_data = [8.0, 2.0, 3.0, 15.0, 9.0, 6.0, 7.0, 100.0]
         full_input = input_data + [-10.0, -11.0, -12.0, -13.0, -14.0]
         expected_data = Test_Rusanov.rusanov(input_data, Test_Flux_X.flux_formula_x, Test_Eigen_X.eigen_formula_x)
@@ -62,8 +62,8 @@ class TestPatchUpdate2D(unittest.TestCase):
         return Qin + [extras["t"], extras["dt"], extras["pos0"], extras["pos1"], extras["size0"], extras["size1"]]
 
     def test_1(self):
-        make_rus_x:Callable[[str], Graph] = lambda x: rusanov(4, proper_max_eigen_x, proper_flux_x, friendly_name=x)
-        make_rus_y:Callable[[str], Graph] = lambda x: rusanov(4, proper_max_eigen_y, proper_flux_y, friendly_name=x)
+        make_rus_x:Callable[[str], Graph] = lambda x: rusanov(4, proper_max_eigen_x, proper_flux_x, None, friendly_name=x)
+        make_rus_y:Callable[[str], Graph] = lambda x: rusanov(4, proper_max_eigen_y, proper_flux_y, None, friendly_name=x)
         g = patchUpdate_2D(3, 4, make_rus_x, make_rus_y, source_term)
 
         input_data = self.pack_input(patch_update_in_1, patch_update_extra_1)
