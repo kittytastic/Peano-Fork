@@ -1,3 +1,4 @@
+import math
 import unittest
 from compute_graph.examples.SWE.swe_graphs import *
 
@@ -134,6 +135,67 @@ class Test_SWE_NCP_Y(unittest.TestCase):
 
         g.assert_valid()
         result = g.eval(Q+dQ+extra_data)
+        assert_float_array_equal(self, result, expected_data)
+
+
+class Test_SWE_MaxEigen_X(unittest.TestCase):
+    @staticmethod
+    def max_eigen_x(Q:List[float])->List[float]:
+        ih = 1/Q[0]
+        g = 9.81
+        c = math.sqrt(g*(Q[0]+Q[3]))
+        u = ih * Q[1]
+        result = max(u-c, u+c)
+        return [result]
+
+    def test_1(self):
+        g = swe_max_eigen_x()
+        Q = [1.0, 2.0, 3.0, 4.0]
+        extra_data = [-11.0, -12.0, -13.0, -14.0, -15.0]
+        expected_data = self.max_eigen_x(Q)
+
+        g.assert_valid()
+        result = g.eval(Q+extra_data)
+        assert_float_array_equal(self, result, expected_data)
+    
+    def test_2(self):
+        g = swe_max_eigen_x()
+        Q = [5.0, 6.0, 7.0, 8.0]
+        extra_data = [-11.0, -12.0, -13.0, -14.0, -15.0]
+        expected_data = self.max_eigen_x(Q)
+
+        g.assert_valid()
+        result = g.eval(Q+extra_data)
+        assert_float_array_equal(self, result, expected_data)
+
+class Test_SWE_MaxEigen_Y(unittest.TestCase):
+    @staticmethod
+    def max_eigen_y(Q:List[float])->List[float]:
+        ih = 1/Q[0]
+        g = 9.81
+        c = math.sqrt(g*(Q[0]+Q[3]))
+        u = ih * Q[2]
+        result = max(u-c, u+c)
+        return [result]
+
+    def test_1(self):
+        g = swe_max_eigen_y()
+        Q = [1.0, 2.0, 3.0, 4.0]
+        extra_data = [-11.0, -12.0, -13.0, -14.0, -15.0]
+        expected_data = self.max_eigen_y(Q)
+
+        g.assert_valid()
+        result = g.eval(Q+extra_data)
+        assert_float_array_equal(self, result, expected_data)
+    
+    def test_2(self):
+        g = swe_max_eigen_y()
+        Q = [5.0, 6.0, 7.0, 8.0]
+        extra_data = [-11.0, -12.0, -13.0, -14.0, -15.0]
+        expected_data = self.max_eigen_y(Q)
+
+        g.assert_valid()
+        result = g.eval(Q+extra_data)
         assert_float_array_equal(self, result, expected_data)
 
 if __name__ == "__main__":

@@ -99,6 +99,45 @@ def swe_flux_y()->Graph:
 
     return g
 
-def swe_max_eigen_x()->Graph:
-    g = Graph(3+1  +2+1+1+1, 3, "swe max eigen")
+def swe_max_eigen_base(normal: str)->Graph:
+    assert(normal=="x" or normal=="y")
+    if normal=="x":
+        u_input = 1
+    else:
+        u_input = 2
+    
+    g = Graph(3+1  +2+1+1+1, 1, f"swe max eigen {normal}")
+    one = Constant(1.0)
+    ih = Divide()
+    grav = Constant(9.81)
+    c = Sqrt()
+    u = Multiply(2)
+    result = Max(2)
+
+    add1 = Add(2)
+    add2 = Add(2)
+    sub1 = Subtract()
+    mul1 = Multiply(2)
+
+    g.fill_node_inputs([one, g.get_internal_input(0)], ih)
+
+    g.fill_node_inputs([g.get_internal_input(0), g.get_internal_input(3)], add1)
+    g.fill_node_inputs([grav, add1], mul1)
+    g.fill_node_inputs([mul1], c)
+
+    g.fill_node_inputs([ih, g.get_internal_input(u_input)], u)
+
+    g.fill_node_inputs([u,c], sub1)
+    g.fill_node_inputs([u,c], add2)
+    g.fill_node_inputs([sub1,add2], result)
+
+    g.add_edge((result,0), g.get_internal_output(0))
     return g
+
+def swe_max_eigen_x()->Graph:
+    return swe_max_eigen_base("x")
+
+def swe_max_eigen_y()->Graph:
+    return swe_max_eigen_base("y")
+
+   
