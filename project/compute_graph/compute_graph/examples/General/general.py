@@ -67,7 +67,7 @@ def rusanov(
             sub1 = Subtract()
             mul1 = Multiply(3)
             # 0.5 * lmax * (QR - QL)
-            g.fill_node_inputs([g.get_internal_input(i+total_var), g.get_internal_input(i)], sub1)
+            g.fill_node_inputs([g.get_internal_input(i+unknowns), g.get_internal_input(i)], sub1)
             g.fill_node_inputs([h, l_max, sub1], mul1)
             g.fill_node_inputs([zero, mul1], eigen_contrib)
 
@@ -248,7 +248,7 @@ def patchUpdate_2D(cells_per_axis: int, unknowns: int, auxiliary:int, rusanov_x:
                     Q_out_neg_contrib[leftVoxelInImage*total_var+u].append(OutPort((rus, u)))
 
                 if x<cells_per_axis:
-                    Q_out_pos_contrib[rightVoxelInImage*total_var+u].append(OutPort((rus,u+total_var)))
+                    Q_out_pos_contrib[rightVoxelInImage*total_var+u].append(OutPort((rus,u+unknowns)))
 
 
     
@@ -291,7 +291,7 @@ def patchUpdate_2D(cells_per_axis: int, unknowns: int, auxiliary:int, rusanov_x:
                     Q_out_neg_contrib[leftVoxelInImage*total_var+u].append(OutPort((rus, u)))
 
                 if y<cells_per_axis:
-                    Q_out_pos_contrib[rightVoxelInImage*total_var+u].append(OutPort((rus, u+total_var)))
+                    Q_out_pos_contrib[rightVoxelInImage*total_var+u].append(OutPort((rus, u+unknowns)))
 
     # Sum all contributions
     for x in range(cells_per_axis):
@@ -321,3 +321,12 @@ def patchUpdate_2D(cells_per_axis: int, unknowns: int, auxiliary:int, rusanov_x:
 
 def voxelInPreimage_2D(x: int, y:int, patch_len: int): return x+1 + (y+1) * (2+patch_len)
 def voxelInImage_2D(x: int, y:int, patch_len: int): return x + y * patch_len
+
+
+def source_term_zeros(unknowns: int, auxiliary: int)->Graph:
+    g = Graph(unknowns+auxiliary+2+1+1+1, 4, "source term zeros")
+    c1 = Constant(0)
+    for u in range(4):
+        g.add_edge((c1,0), g.get_internal_output(u))
+
+    return g

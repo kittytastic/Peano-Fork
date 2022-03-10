@@ -124,6 +124,11 @@ class Graph(DAG_Node):
 
         return sub_nodes, sub_graphs
        
+    def assert_valid(self):
+        msg = self.validate()
+        stats = DAG_Message.get_stats(msg)
+        if stats[0]>0:
+            raise Exception(f"DAG validate failed with {stats[0]} errors")
 
     def validate(self) -> List[DAG_Message]:
         # TODO check for cycles
