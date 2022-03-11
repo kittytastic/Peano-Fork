@@ -1,7 +1,6 @@
-from typing import Callable, List
 from compute_graph.DAG import *
 from compute_graph.DAG.ops import Divide, Sqrt
-from compute_graph.DAG.primitive_node import Constant, DebugNode
+from compute_graph.DAG.primitive_node import Constant
 
 # NCP
 # Q            (unknowns+aux)
