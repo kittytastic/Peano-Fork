@@ -1,6 +1,4 @@
-from optparse import Option
 from typing import Callable, List, Optional
-
 from compute_graph.DAG import *
 
 def rusanov(
@@ -82,7 +80,7 @@ def rusanov(
             sub1 = Subtract()
             mul1 = Multiply(3)
             # 0.5 * lmax * (QR - QL)
-            g.fill_node_inputs([g.get_internal_input(i+unknowns), g.get_internal_input(i)], sub1)
+            g.fill_node_inputs([g.get_internal_input(i+total_var), g.get_internal_input(i)], sub1)
             g.fill_node_inputs([h, l_max, sub1], mul1)
             g.fill_node_inputs([zero, mul1], eigen_contrib)
 

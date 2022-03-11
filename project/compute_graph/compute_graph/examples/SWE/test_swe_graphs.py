@@ -215,7 +215,6 @@ class SWE_IntergrationTest(unittest.TestCase):
         input_data = self.pack_input(swe_test_case_in, swe_test_case_extra)
         expected_data = swe_test_case_out
 
-        DAG_Message.print_summary(g.validate(), max_msg=0)
         g.assert_valid()
         result = g.eval(input_data)
         assert_float_array_equal(self, result, expected_data)
