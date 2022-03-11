@@ -24,9 +24,9 @@ class DAG_Message():
         else: level="ERROR"
         
         st = [str(g) for g in self.stack_trace]
-        st = " > ".join(st)
+        st = " --> ".join(st)
 
-        return f"[{level}] {self.message}     ({st})"
+        return f"[{level}] {self.message}     {st}"
 
     @staticmethod
     def print_summary(messages: List['DAG_Message'], max_msg:Optional[int]=None, min_level:DAG_MessageType = DAG_MessageType.INFO, exit_if_error:bool=True):

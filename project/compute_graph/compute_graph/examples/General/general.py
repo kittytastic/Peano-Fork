@@ -22,7 +22,7 @@ def rusanov(
     # patch dx     (1)
     # t            (1)
     # dt           (1)
-    g = Graph(unknowns*2 + 2+1+1+1, unknowns*2, friendly_name)
+    g = Graph(total_var*2 + 2+1+1+1, unknowns*2, friendly_name)
     flux_r:Optional[Graph] = flux_builder() if flux_builder is not None else None
     flux_l:Optional[Graph] = flux_builder() if flux_builder is not None else None
 
@@ -31,12 +31,27 @@ def rusanov(
     eigen_l = max_eigen_builder()
     eigen_r = max_eigen_builder()
 
+    if ncp:
+        for v in range(total_var): 
+            add1 = Add(2)
+            h = Constant(0.5)
+            Q = Multiply(2)
+            deltaQ = Subtract()
+            g.fill_node_inputs([g.get_internal_input(v), g.get_internal_input(total_var+v)], add1)
+            g.fill_node_inputs([h, add1], Q)
+            g.fill_node_inputs([g.get_internal_input(total_var+v), g.get_internal_input(v)], deltaQ)
+            g.add_edge((Q,0), ncp.get_external_input(v))
+            g.add_edge((deltaQ,0), ncp.get_external_input(total_var+v))
+        
+        for e in range(2+1+1+1): 
+            g.add_edge(g.get_internal_input(2*total_var+e), ncp.get_external_input(2*total_var+e))
+
     
     # Flux
     if flux_l is not None and flux_r is not None:
-        for u in range(unknowns):
-            g.add_edge(g.get_internal_input(u), flux_l.get_external_input(u))
-            g.add_edge(g.get_internal_input(total_var + u), flux_r.get_external_input(u))
+        for v in range(total_var):
+            g.add_edge(g.get_internal_input(v), flux_l.get_external_input(v))
+            g.add_edge(g.get_internal_input(total_var + v), flux_r.get_external_input(v))
 
         for e in range(2+1+1+1):
             g.add_edge(g.get_internal_input(total_var*2+e), flux_l.get_external_input(total_var+e))
@@ -44,9 +59,9 @@ def rusanov(
     
 
     # Eigen Value
-    for u in range(unknowns):
-        g.add_edge(g.get_internal_input(u), eigen_l.get_external_input(u))
-        g.add_edge(g.get_internal_input(total_var + u), eigen_r.get_external_input(u))
+    for v in range(total_var):
+        g.add_edge(g.get_internal_input(v), eigen_l.get_external_input(v))
+        g.add_edge(g.get_internal_input(total_var + v), eigen_r.get_external_input(v))
 
     for e in range(2+1+1+1):
         g.add_edge(g.get_internal_input(total_var*2+e), eigen_l.get_external_input(total_var+e))
@@ -193,12 +208,12 @@ def patchUpdate_2D(cells_per_axis: int, unknowns: int, auxiliary:int, rusanov_x:
                 ], volX)
 
             st = source_term()
-            for u in range(unknowns): g.add_edge(g.get_internal_input(Q_in_loc + voxelInPreImage*total_var + u), (st, u))
-            g.add_edge((volX,0), (st, unknowns))
-            g.add_edge((volX,1), (st, unknowns+1))
-            g.add_edge((vol_h, 0), (st, unknowns+2))
-            g.add_edge(g.get_internal_input(t_loc), (st, unknowns+3))
-            g.add_edge(g.get_internal_input(dt_loc), (st, unknowns+4))
+            for v in range(total_var): g.add_edge(g.get_internal_input(Q_in_loc + voxelInPreImage*total_var + v), (st, v))
+            g.add_edge((volX,0), (st, total_var))
+            g.add_edge((volX,1), (st, total_var+1))
+            g.add_edge((vol_h, 0), (st, total_var+2))
+            g.add_edge(g.get_internal_input(t_loc), (st, total_var+3))
+            g.add_edge(g.get_internal_input(dt_loc), (st, total_var+4))
 
             for u in range(unknowns):
                 mul_dt = Multiply(2)
@@ -233,9 +248,9 @@ def patchUpdate_2D(cells_per_axis: int, unknowns: int, auxiliary:int, rusanov_x:
 
             # Rusanov
             rus = rusanov_x(f"rusanov-x ({x}, {y})")
-            for u in range(unknowns):
-                g.add_edge(g.get_internal_input(Q_in_loc + leftVoxelInPreImage*total_var + u), (rus, u))
-                g.add_edge(g.get_internal_input(Q_in_loc + rightVoxelInPreImage*total_var + u), (rus, u+total_var))
+            for v in range(total_var):
+                g.add_edge(g.get_internal_input(Q_in_loc + leftVoxelInPreImage*total_var + v), (rus, v))
+                g.add_edge(g.get_internal_input(Q_in_loc + rightVoxelInPreImage*total_var + v), (rus, v+total_var))
             g.add_edge((volX,0), (rus, 2*total_var))
             g.add_edge((volX,1), (rus, 2*total_var+1))
             g.add_edge((vol_h, 0), (rus, 2*total_var+2))
@@ -276,9 +291,9 @@ def patchUpdate_2D(cells_per_axis: int, unknowns: int, auxiliary:int, rusanov_x:
 
             # Rusanov
             rus = rusanov_y(f"rusanov-y ({x}, {y})")
-            for u in range(unknowns):
-                g.add_edge(g.get_internal_input(Q_in_loc + leftVoxelInPreImage*total_var + u), (rus, u))
-                g.add_edge(g.get_internal_input(Q_in_loc + rightVoxelInPreImage*total_var + u), (rus, u+total_var))
+            for v in range(total_var):
+                g.add_edge(g.get_internal_input(Q_in_loc + leftVoxelInPreImage*total_var + v), (rus, v))
+                g.add_edge(g.get_internal_input(Q_in_loc + rightVoxelInPreImage*total_var + v), (rus, v+total_var))
             g.add_edge((volX,0), (rus, 2*total_var))
             g.add_edge((volX,1), (rus, 2*total_var+1))
             g.add_edge((vol_h, 0), (rus, 2*total_var+2))
@@ -316,6 +331,9 @@ def patchUpdate_2D(cells_per_axis: int, unknowns: int, auxiliary:int, rusanov_x:
                 g.fill_node_inputs([scale, st], add_input1)
                 g.fill_node_inputs([add_input1, g.get_internal_input(Q_in_loc+ pre_image_voxel*total_var+u)], add_input2)
                 g.add_edge((add_input2, 0), g.get_internal_output(image_voxel*total_var+u))
+            
+            for a in range(auxiliary):
+                g.add_edge(g.get_internal_input(Q_in_loc + pre_image_voxel*total_var+unknowns+a), g.get_internal_output(Q_in_loc+image_voxel*total_var+unknowns+a))
     
     return g
 

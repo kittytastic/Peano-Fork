@@ -21,7 +21,7 @@ from compute_graph.DAG.primitive_node import Constant, DebugNode
 # OUT:         (unknowns)
 
 def swe_ncp_x()->Graph:
-    g = Graph(3+1 + 3+1 + 2+1+1, 3, "swe ncp x")
+    g = Graph(3+1 + 3+1 + 2+1+1+1, 3, "swe ncp x")
 
     grav = Constant(9.81)
     add1 = Add(2)
@@ -37,7 +37,7 @@ def swe_ncp_x()->Graph:
     return g
 
 def swe_ncp_y()->Graph:
-    g = Graph(3+1 + 3+1 + 2+1+1, 3, "swe ncp x")
+    g = Graph(3+1 + 3+1 + 2+1+1+1, 3, "swe ncp x")
 
     grav = Constant(9.81)
     add1 = Add(2)
