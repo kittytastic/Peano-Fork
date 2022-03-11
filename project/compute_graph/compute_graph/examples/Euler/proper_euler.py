@@ -1,6 +1,6 @@
 from compute_graph.DAG import *
 from compute_graph.DAG.primitive_node import Constant
-from compute_graph.examples.Euler.euler import flux_x, flux_y, max_eigen_x, max_eigen_y
+from compute_graph.examples.Euler.neat_euler import flux_x, flux_y, max_eigen_x, max_eigen_y
 
 # Q            (unknowns)
 # patch center (2)

@@ -24,9 +24,9 @@ class DAG_Message():
         else: level="ERROR"
         
         st = [str(g) for g in self.stack_trace]
-        st = " > ".join(st)
+        st = " --> ".join(st)
 
-        return f"[{level}] {self.message}     ({st})"
+        return f"[{level}] {self.message}     {st}"
 
     @staticmethod
     def print_summary(messages: List['DAG_Message'], max_msg:Optional[int]=None, min_level:DAG_MessageType = DAG_MessageType.INFO, exit_if_error:bool=True):
@@ -124,6 +124,11 @@ class Graph(DAG_Node):
 
         return sub_nodes, sub_graphs
        
+    def assert_valid(self):
+        msg = self.validate()
+        stats = DAG_Message.get_stats(msg)
+        if stats[0]>0:
+            raise Exception(f"DAG validate failed with {stats[0]} errors")
 
     def validate(self) -> List[DAG_Message]:
         # TODO check for cycles

@@ -6,14 +6,13 @@
 #include "tarch/la/la.h"
 
 #include "exahype2/NonCriticalAssertions.h"
-#include "kernel_1_base.h"
+#include "swe_1_base.h"
 #include "../shared.h"
 
 
-void kernels::k1::kernelLambda(tarch::la::Vector<2,double> patchCenter, tarch::la::Vector<2,double> patchSize, double t, double dt, double * Qin, double * Qout){
+void kernels::swe1::kernelLambda(tarch::la::Vector<2,double> patchCenter, tarch::la::Vector<2,double> patchSize, double t, double dt, double * Qin, double * Qout){
     const int Dimensions = 2; 
-   kernels::shared::dim2::applySplit1DRiemannToPatch_Overlap1AoS2d(
-    
+    kernels::shared::dim2::applySplit1DRiemannToPatch_Overlap1AoS2d(
         [&](
           const double * __restrict__                  QL,
           const double * __restrict__                  QR,
@@ -26,7 +25,7 @@ void kernels::k1::kernelLambda(tarch::la::Vector<2,double> patchCenter, tarch::l
           double                                       FR[]
         ) -> void {
           
-       kernels::shared::dim2::splitRusanov1d(
+        kernels::shared::dim2::splitRusanov1d(
           [] (
             const double * __restrict__                  Q,
             const tarch::la::Vector<Dimensions,double>&  faceCentre,
@@ -37,7 +36,7 @@ void kernels::k1::kernelLambda(tarch::la::Vector<2,double> patchCenter, tarch::l
             double                                       F[]
           ) -> void {
             
-           kernels::k1::flux( Q, faceCentre, volumeH, t, normal, F );
+            kernels::swe1::flux( Q, faceCentre, volumeH, t, normal, F );
             
           },
           [] (
@@ -51,7 +50,7 @@ void kernels::k1::kernelLambda(tarch::la::Vector<2,double> patchCenter, tarch::l
             double                                       BgradQ[]
           ) -> void {
             
-           std::fill_n(BgradQ,4,0.0);
+            kernels::swe1::nonconservativeProduct( Q, deltaQ, faceCentre, volumeH, t, normal, BgradQ );
             
           },
           [] (
@@ -62,17 +61,17 @@ void kernels::k1::kernelLambda(tarch::la::Vector<2,double> patchCenter, tarch::l
             double                                       dt,
             int                                          normal
           ) -> double {
-            return kernels::k1::maxEigenvalue( Q, faceCentre, volumeH, t, normal);
+            return kernels::swe1::maxEigenvalue( Q, faceCentre, volumeH, t, normal);
           },
           QL, QR, x, dx, t, dt, normal,
-          4,
-          0,
+          3,
+          1,
           FL,FR,
           
           false,
           
           
-          true
+          false
           
         );
         },
@@ -85,44 +84,44 @@ void kernels::k1::kernelLambda(tarch::la::Vector<2,double> patchCenter, tarch::l
           double * __restrict__                        S
         ) -> void {
           
-  std::fill_n(S,4,0.0);
+  std::fill_n(S,3,0.0);
         },
         patchCenter,
         patchSize,
         t,
         dt,
         3,
-        4,
-        0,
+        3,
+        1,
         Qin,
         Qout
     );
+   
 }
 
 
-double kernels::k1::maxEigenvalue(
-  const double * __restrict__ Q, // Q[4+0],
-  const tarch::la::Vector<2,double>&  faceCentre,
-  const tarch::la::Vector<2,double>&  volumeH,
+double kernels::swe1::maxEigenvalue(
+  const double * __restrict__ Q, // Q[3+1],
+  const tarch::la::Vector<Dimensions,double>&  faceCentre,
+  const tarch::la::Vector<Dimensions,double>&  volumeH,
   double                                       t,
   int                                          normal
 )  {
   logTraceInWith4Arguments( "maxEigenvalue(...)", faceCentre, volumeH, t, normal );
-  const double irho = 1.0/Q[0];
+  double result = 1.0;
+	  double ih = 1/Q[0];
+	  double g = 9.81;
+	  double c = std::sqrt( g * (Q[0]+Q[3]) );
+	  double u = 0.0;
 	  
-	  // based on the assumption that the fluid is an ideal gas, gamma chosen for dry air
-	  const double gamma = 1.4;  
-	  const double p = (gamma-1) * (Q[3] - 0.5*irho*(Q[1]*Q[1]+Q[2]*Q[2]));
-	  
-	  const double c   = std::sqrt(gamma * p * irho);
-
-	  double result = 1.0;
 	  switch(normal){
 	  case 0: //x
-		  result = std::max( std::abs(Q[1] * irho - c), std::abs(Q[1] * irho + c) );
+		  u = ih * Q[1];
+		  result = std::max(u-c, u+c);
 		  break;
 	  case 1: //y
-		  result = std::max( std::abs(Q[2] * irho - c), std::abs(Q[2] * irho + c) );
+		  u = ih * Q[2];
+		  result = std::max(u-c, u+c);
 		  break;
 	  }
 	  
@@ -133,34 +132,58 @@ double kernels::k1::maxEigenvalue(
 
 
 
-void kernels::k1::flux(
-  const double * __restrict__ Q, // Q[4+0],
-  const tarch::la::Vector<2,double>&  faceCentre,
-  const tarch::la::Vector<2,double>&  volumeH,
+void kernels::swe1::flux(
+  const double * __restrict__ Q, // Q[3+1],
+  const tarch::la::Vector<Dimensions,double>&  faceCentre,
+  const tarch::la::Vector<Dimensions,double>&  volumeH,
   double                                       t,
   int                                          normal,
-  double * __restrict__ F // F[4]
+  double * __restrict__ F // F[3]
 )  {
   logTraceInWith4Arguments( "flux(...)", faceCentre, volumeH, t, normal );
-  const double irho = 1.0/Q[0];
-
-  // based on the assumption that the fluid is an ideal gas, gamma chosen for dry air
-  const double gamma = 1.4;
-  const double p = (gamma-1) * (Q[3] - 0.5*irho*(Q[1]*Q[1]+Q[2]*Q[2]));
-  
-  switch(normal){  
-  case 0: //in x direction
-	  F[0] = Q[1]; //rho
-	  F[1] = irho * Q[1] * Q[1] + p; 
-	  F[2] = irho * Q[1] * Q[2];
-	  F[3] = irho * Q[1] *(Q[3] + p);
-	  break;
-  case 1: //in y direction
-	  F[0] = Q[2];
-	  F[1] = irho * Q[2] * Q[1];
-	  F[2] = irho * Q[2] * Q[2] + p;
-	  F[3] = irho * Q[2] *(Q[3] + p);
-	  break;
-  }  
+  double ih = 1.0/Q[0];
+	  
+	  switch(normal){
+	  case 0:
+		  F[0] = Q[1];
+		  F[1] = ih * Q[1] * Q[1];
+		  F[2] = ih * Q[1] * Q[2];
+		  break;
+	  case 1:
+		  F[0] = Q[2];
+		  F[1] = ih * Q[2] * Q[1];
+		  F[2] = ih * Q[2] * Q[2];
+		  break;
+	  }
   logTraceOut( "flux(...)" );
+}
+
+
+
+
+void kernels::swe1::nonconservativeProduct(
+  const double * __restrict__ Q, // Q[3+1],
+  const double * __restrict__             deltaQ, // [3+1]
+  const tarch::la::Vector<Dimensions,double>&  faceCentre,
+  const tarch::la::Vector<Dimensions,double>&  volumeH,
+  double                                       t,
+  int                                          normal,
+  double * __restrict__ BgradQ // BgradQ[3]
+)  {
+  logTraceInWith4Arguments( "nonconservativeProduct(...)", faceCentre, volumeH, t, normal );
+  double g = 9.81;
+	  
+	  switch(normal){
+	  case 0: //x
+		  BgradQ[0] = 0.0;
+		  BgradQ[1] = g * Q[0] * (deltaQ[0] + deltaQ[3]);
+		  BgradQ[2] = 0.0;
+		  break;
+	  case 1: //y
+		  BgradQ[0] = 0.0;
+		  BgradQ[1] = 0.0;
+		  BgradQ[2] = g * Q[0] * (deltaQ[0] + deltaQ[3]);
+		  break;
+	  }
+  logTraceOut( "nonconservativeProduct(...)" );
 }

@@ -49,6 +49,25 @@ std::string smart_print_time(long long time_ns){
     return out_str.str();
 }
 
+std::string smart_num_string(long long num){
+    std::ostringstream out_str;
+    std::vector<long long> str_parts;
+    while (num>0)
+    {
+        long long rem = num%1000;
+        num = num/1000;
+        str_parts.push_back(rem);
+
+    }
+
+    for (int i = str_parts.size() - 1; i >= 0; --i) {
+        out_str << str_parts[i]; 
+        if(i!=0){out_str<< ",";}
+    }
+    
+    return out_str.str();
+}
+
 int by_trials(std::function<void()> func, int trials, std::vector<long long> &out){
     int done_trials = 0;
     while(done_trials<trials){
@@ -124,7 +143,7 @@ void benchmark(std::function<void()> func, std::optional<int> trials, std::optio
 
     const int lfw = 20;
     const int rfw = 10;
-    std::cout << std::setw(lfw) << std::left << "Trials:" << std::setw(rfw) << std::right << done_trials << std::endl; 
+    std::cout << std::setw(lfw) << std::left << "Trials:" << std::setw(rfw) << std::right << core::smart_num_string(done_trials) << std::endl; 
     std::cout << std::setw(lfw) << std::left<< "Total run time:"<< std::setw(rfw) << std::right<<core::smart_print_time(global_run_time)<< std::endl;
     std::cout << std::setw(lfw) << std::left<< "Mean run time:"<< std::setw(rfw) << std::right << core::smart_print_time((long long)mean) << std::endl;
     std::cout << std::setw(lfw) << std::left<< "STD:"<< std::setw(rfw) << std::right << core::smart_print_time((long long)std)<< std::endl;
