@@ -1,5 +1,99 @@
 #include "TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5.h"
+/******************* Run Peak ********************/
+#include  <iomanip>
+#include <iostream>
+#include <fstream>
+#include <string>
+#define DO_TEST_PRINT 
 
+const int TARGET_TEST_CASES = 10;
+const int p_patchSize = 3;
+const int p_QVars = 5;
+const int p_inVars = (2+p_patchSize)*(2+p_patchSize)*(2+p_patchSize)*p_QVars;
+const int p_outVars = (p_patchSize)*(p_patchSize)*(p_patchSize)*p_QVars;
+int current_test_case = 0;
+std::string problem_name = "euler_3d";
+
+bool hasInitialised = false;
+
+std::string format_vector(const double* vec, int length, int precision){
+  std::ostringstream out_str;
+    for(int i=0; i<length; i++){
+            
+        out_str <<std::scientific<< std::setprecision(precision)<< vec[i];
+        if (i<length-1){
+            out_str<< ", ";
+        }
+    }
+    return out_str.str();
+}
+
+void print_vector(const double* vec, int length){
+      std::cout << "[" << format_vector(vec, length, 2) << "]" << std::endl;
+}
+
+std::ofstream testCaseFile;
+
+void initialise(){
+  testCaseFile.open ("testCases.txt");
+}
+
+//double time_between_tc = 100000;
+//double time_c = 0;
+double next_t_target = 0.001;
+double end_t_target = 0.18;
+double step_ttt = (end_t_target-step_ttt)/TARGET_TEST_CASES; 
+void should_print(const double* Qin, const double *Qout, tarch::la::Vector<3, double> pos, tarch::la::Vector<3, double> size, double t, double ts, bool* shouldPrint, bool* shouldKill){
+if(Qin[30]>next_t_target){
+  next_t_target+=step_ttt;
+//  if(time_c>time_between_tc){
+    //time_c = 0;
+    *shouldPrint=true;
+    *shouldKill=current_test_case>=TARGET_TEST_CASES;
+  }
+  //time_c++;
+}
+
+
+void preprint(const double* Qin, const double *Qout, tarch::la::Vector<3, double> pos, tarch::la::Vector<3, double> size, double t, double ts){
+      std::cout << "\n\nCell Pos: ("<< pos(0) << ", "<<  pos(1)<< ")\n";
+      std::cout << "Cell size: ("<< size(0) << ", "<<  size(1)<< ")\n";
+      std::cout << "Time: " << t << "\n";
+      std::cout << "dt: " << ts << "\n"; 
+}
+
+void postprint(const double* Qin, const double *Qout, tarch::la::Vector<3, double> pos, tarch::la::Vector<3, double> size, double t, double ts){
+  
+  std::string in_vec = format_vector(Qin, p_inVars, 17);
+  std::string out_vec = format_vector(Qout, p_outVars, 17);
+  
+  testCaseFile << std::setprecision(17) << std::scientific;
+  testCaseFile << "\ndouble "<<problem_name<<"_in_vec"<<current_test_case<<"["<<p_inVars<<"]={"<<in_vec<<"};\n";
+  testCaseFile << "\ndouble "<<problem_name<<"_out_vec"<<current_test_case<<"["<<p_outVars<<"]={"<<out_vec<<"};\n";
+
+  testCaseFile << std::setprecision(17) << std::scientific << 
+  "\n\ntestCase "<<problem_name<<"TC_"<<current_test_case<<" = testCase(\"TC "<<current_test_case<<"\", "<< pos(0) <<", "<< pos(1) << ", " <<pos(2)<<", " << size(0) << ", " << size(1) << ", "<<size(2)<< ", " << t<< ", "<<ts << ", "<< problem_name <<"_in_vec"<<current_test_case<<", "<<problem_name<<"_out_vec"<<current_test_case<<");\n\n";
+  
+  
+  std::cout << std::setprecision(17)<< "TEST CASE "<<current_test_case<< "/"<<TARGET_TEST_CASES<<"\n\n";
+
+  current_test_case++;
+}
+
+void finalise(){
+  testCaseFile<< "\n\n\nstd::vector<testCase> "<<problem_name<<"_test_cases = {";
+  for(int i=0; i<=TARGET_TEST_CASES; i++){
+    testCaseFile << problem_name <<"TC_"<<i;
+    if(i<TARGET_TEST_CASES){
+      testCaseFile << ", ";
+    }
+  }
+  testCaseFile <<"};";
+  testCaseFile.close();
+  assert(false);
+}
+
+/**********************************************************/
 
 tarch::logging::Log project::euler_3d::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::_log( "project::euler_3d::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5");
 
@@ -311,7 +405,20 @@ void project::euler_3d::observers::TimeStep2peano4_toolbox_blockstructured_Recon
         3,
         1 // halo size
     );
+    
+    #ifdef DO_TEST_PRINT
+    if(!hasInitialised){
+      initialise();
+      hasInitialised=true;
+    }
+    bool print_round = false;
+    bool kill_run = false;
+    should_print(reconstructedPatch, targetPatch, marker.x(), marker.h(), cellTimeStamp, cellTimeStepSize, &print_round, &kill_run);
 
+    if(print_round){
+     preprint(reconstructedPatch, targetPatch, marker.x(), marker.h(), cellTimeStamp, cellTimeStepSize); 
+    }
+    #endif
     
     #if Dimensions==2
     ::exahype2::fv::applySplit1DRiemannToPatch_Overlap1AoS2d(
@@ -403,7 +510,12 @@ void project::euler_3d::observers::TimeStep2peano4_toolbox_blockstructured_Recon
         targetPatch
     );
   
-    
+    #ifdef DO_TEST_PRINT
+    if(print_round){
+      postprint(reconstructedPatch, targetPatch, marker.x(), marker.h(), cellTimeStamp, cellTimeStepSize); 
+      if(kill_run){finalise();}
+    }
+    #endif
     
     fineGridCelleuler3DCellLabel.setTimeStamp(cellTimeStamp + usedTimeStepSize);
     fineGridCelleuler3DCellLabel.setTimeStepSize(cellTimeStepSize);
