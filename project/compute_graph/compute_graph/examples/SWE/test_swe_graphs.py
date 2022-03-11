@@ -1,5 +1,5 @@
 import math
-from typing import Dict
+from typing import Dict, List, Callable
 import unittest
 from compute_graph.DAG.graph import DAG_Message
 from compute_graph.examples.SWE.swe_graphs import *
