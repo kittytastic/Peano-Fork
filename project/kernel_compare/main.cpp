@@ -4,6 +4,7 @@
 #include "kernels/k3/kernel_3.h"
 #include "kernels/swe1/swe_1.h"
 #include "kernels/swe2/swe_2.h"
+#include "kernels/euler3d1/euler3d_1.h"
 #include "../benchmark/benchmark.h"
 
 
@@ -105,6 +106,7 @@ int main(){
     //benchmark::benchmark(doKernelStuff, benchmark::NONE, 5);
 
     std::vector<Kernel> allKernels = {
+        kernels::euler3d1::euler3d_1,
         kernels::swe2::swe2,
         kernels::swe1::swe1,
         kernels::k1::k1,

@@ -1,0 +1,178 @@
+#include "../../stdlibs.h"
+
+#include "tarch/la/Vector.h"
+#include "tarch/Assertions.h"
+#include "tarch/logging/Log.h"
+#include "tarch/la/la.h"
+
+#include "exahype2/NonCriticalAssertions.h"
+#include "euler3d_1_base.h"
+#include "../shared.h"
+
+
+void kernels::euler3d1::kernelLambda(tarch::la::Vector<3,double> patchCenter, tarch::la::Vector<3,double> patchSize, double t, double dt, double * Qin, double * Qout){
+    const int Dimensions = 3; 
+   kernels::shared::dim3::applySplit1DRiemannToPatch_Overlap1AoS3d(
+    [&](
+          const double * __restrict__                  QL,
+          const double * __restrict__                  QR,
+          const tarch::la::Vector<Dimensions,double>&  x,
+          double                                       dx,
+          double                                       t,
+          double                                       dt,
+          int                                          normal,
+          double                                       FL[],
+          double                                       FR[]
+        ) -> void {
+          
+        kernels::shared::dim3::splitRusanov1d(
+          [] (
+            const double * __restrict__                  Q,
+            const tarch::la::Vector<Dimensions,double>&  faceCentre,
+            const tarch::la::Vector<Dimensions,double>&  volumeH,
+            double                                       t,
+            double                                       dt,
+            int                                          normal,
+            double                                       F[]
+          ) -> void {
+            
+            kernels::euler3d1::flux( Q, faceCentre, volumeH, t, normal, F );
+            
+          },
+          [] (
+            const double * __restrict__                  Q,
+            const double * __restrict__                  deltaQ,
+            const tarch::la::Vector<Dimensions,double>&  faceCentre,
+            const tarch::la::Vector<Dimensions,double>&  volumeH,
+            double                                       t,
+            double                                       dt,
+            int                                          normal,
+            double                                       BgradQ[]
+          ) -> void {
+            
+            std::fill_n(BgradQ,5,0.0);
+            
+          },
+          [] (
+            const double * __restrict__                  Q,
+            const tarch::la::Vector<Dimensions,double>&  faceCentre,
+            const tarch::la::Vector<Dimensions,double>&  volumeH,
+            double                                       t,
+            double                                       dt,
+            int                                          normal
+          ) -> double {
+            return kernels::euler3d1::maxEigenvalue( Q, faceCentre, volumeH, t, normal);
+          },
+          QL, QR, x, dx, t, dt, normal,
+          5,
+          0,
+          FL,FR,
+          
+          false,
+          
+          
+          true
+          
+        );
+        },
+        [&](
+          const double * __restrict__                  Q,
+          const tarch::la::Vector<Dimensions,double>&  x,
+          double                                       dx,
+          double                                       t,
+          double                                       dt,
+          double * __restrict__                        S
+        ) -> void {
+          
+  std::fill_n(S,5,0.0);
+        },
+        patchCenter,
+        patchSize,
+        t,
+        dt,
+        3,
+        5,
+        0,
+        Qin,
+        Qout
+    );
+}
+
+
+double kernels::euler3d1::maxEigenvalue(
+  const double * __restrict__ Q, // Q[5+0],
+  const tarch::la::Vector<3,double>&  faceCentre,
+  const tarch::la::Vector<3,double>&  volumeH,
+  double                                       t,
+  int                                          normal
+)  {
+  logTraceInWith4Arguments( "maxEigenvalue(...)", faceCentre, volumeH, t, normal );
+  const double irho = 1./Q[0];
+  
+  // based on the assumption that the fluid is an ideal gas, gamma chosen for dry air
+  const double gamma = 1.4;  
+  const double p = (gamma-1) * (Q[4] - 0.5*irho*(Q[1]*Q[1]+Q[2]*Q[2]+Q[3]*Q[3]));
+  
+  const double c   = std::sqrt(gamma * p * irho);
+
+  double result = 1.0;
+  switch(normal){
+  case 0: //x
+	  result = std::max( std::abs(Q[1] * irho - c), std::abs(Q[1] * irho + c) );
+	  break;
+  case 1: //y
+	  result = std::max( std::abs(Q[2] * irho - c), std::abs(Q[2] * irho + c) );
+	  break;
+  case 2: //z
+	  result = std::max( std::abs(Q[3] * irho - c), std::abs(Q[3] * irho + c) );
+	  break;
+  }
+  
+  logTraceOut( "maxEigenvalue(...)" );
+  
+  return result;
+}
+
+
+
+
+void kernels::euler3d1::flux(
+  const double * __restrict__ Q, // Q[5+0],
+  const tarch::la::Vector<3,double>&  faceCentre,
+  const tarch::la::Vector<3,double>&  volumeH,
+  double                                       t,
+  int                                          normal,
+  double * __restrict__ F // F[5]
+)  {
+  logTraceInWith4Arguments( "flux(...)", faceCentre, volumeH, t, normal );
+  const double irho = 1.0/Q[0];
+
+	  // based on the assumption that the fluid is an ideal gas, gamma chosen for dry air
+	  const double gamma = 1.4;
+	  const double p = (gamma-1) * (Q[4] - 0.5*irho*(Q[1]*Q[1]+Q[2]*Q[2]+Q[3]*Q[3]));
+	  
+	  switch(normal){
+	  
+	  case 0: //in x direction
+		  F[0] = Q[1]; //rho
+		  F[1] = irho * Q[1] * Q[1] + p; 
+		  F[2] = irho * Q[1] * Q[2];
+		  F[3] = irho * Q[1] * Q[3];
+		  F[4] = irho * Q[1] *(Q[4] + p);
+		  break;
+	  case 1: //in y direction
+		  F[0] = Q[2];
+		  F[1] = irho * Q[2] * Q[1];
+		  F[2] = irho * Q[2] * Q[2] + p;
+		  F[3] = irho * Q[2] * Q[3];
+		  F[4] = irho * Q[2] *(Q[4] + p);
+		  break;
+	  case 2: // in z direction
+		  F[0] = Q[3];
+		  F[1] = irho * Q[3] * Q[1];
+		  F[2] = irho * Q[3] * Q[2];
+		  F[3] = irho * Q[3] * Q[3] + p;
+		  F[4] = irho * Q[3] *(Q[4] + p);
+		  break;
+	  }
+}
