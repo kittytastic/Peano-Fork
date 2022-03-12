@@ -40,10 +40,9 @@ void euler3d1_runKernel(const testCase* tc, double* output){
 
 Kernel euler3d_1(
     "Euler 3D: default",
-    k1_getdata,
     euler3d1_runKernel,
-    5*5*5* 5,
-    3*3*3* 5,
+    3,3,
+    5,0,
     euler_3d_test_cases
     );
 };

@@ -29,10 +29,9 @@ namespace kernels::swe2{
 
     Kernel swe2(
         "SWE 2: Compiled",
-        swe2_getdata,
         swe2_runKernel,
-        5*5*4,
-        3*3*4,
+        2,3,
+        3,1,
         swe_2d_test_cases
     );
 };

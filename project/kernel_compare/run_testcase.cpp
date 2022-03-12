@@ -1,17 +1,37 @@
 #include "run_testcase.h"
 
 void load_out_vector(const Kernel* k, const testCase& tc, double* outVec){
-    for(int x=0; x<3; x++){
-            for(int y=0; y<3; y++){
-                const int voxelInPreImage  = x+1 + (y+1) * (3+2);
-                const int voxelInImage     = x+ y * 3;
-                for(int u=0; u<4; u++){
-                    const int locationInPreimage = voxelInPreImage*4 + u;
-                    const int locationInImage = voxelInImage*4 + u;
-                    outVec[locationInImage]=tc.input[locationInPreimage];
+    if(k->dim == 2){
+        for(int x=0; x<k->cellsPerAxis; x++){
+                for(int y=0; y<k->cellsPerAxis; y++){
+                    const int voxelInPreImage  = x+1 + (y+1) * (k->cellsPerAxis+2);
+                    const int voxelInImage     = x+ y * k->cellsPerAxis;
+                    for(int u=0; u<(k->unknowns + k->auxiliary); u++){
+                        const int locationInPreimage = voxelInPreImage*(k->unknowns+k->auxiliary) + u;
+                        const int locationInImage = voxelInImage*(k->unknowns+k->auxiliary) + u;
+                        outVec[locationInImage]=tc.input[locationInPreimage];
+                    }
                 }
-            }
-    } 
+        } 
+    }else if (k->dim==3){
+        for(int x=0; x<k->cellsPerAxis; x++){
+                for(int y=0; y<k->cellsPerAxis; y++){
+                    for(int z=0; z<k->cellsPerAxis; z++){
+                        const int voxelInPreImage  = x+1 + (y+1) * (k->cellsPerAxis+2) + (z+1) * (k->cellsPerAxis+2)*(k->cellsPerAxis+2);
+                        const int voxelInImage     = x+ y * k->cellsPerAxis + z * k->cellsPerAxis* k->cellsPerAxis;
+                        
+                        for(int u=0; u<(k->unknowns + k->auxiliary); u++){
+                            const int locationInPreimage = voxelInPreImage*(k->unknowns+k->auxiliary) + u;
+                            const int locationInImage = voxelInImage*(k->unknowns+k->auxiliary) + u;
+                            outVec[locationInImage]=tc.input[locationInPreimage];
+                        }
+                    }
+                }
+        } 
+    }else{
+        std::cout << "Illegal dim: "<< k->dim << "\n";
+        assert(false);
+    }
 }
 
 
@@ -19,35 +39,46 @@ bool isClose(double a, double b){
     return std::abs(a-b)<0.00000001;
 }
 
+int pow(int num, int pow){
+    int out_n = 1;
+    for(int i=0; i<pow; i++){
+        out_n *= num;
+    }
+    return out_n;
+}
+
 void testKernel(const Kernel* k){
-    double* outVec = (double*) malloc(k->outputVectorLength*sizeof(double));
+    int outputVectorLength = pow(k->cellsPerAxis, k->dim) * (k->unknowns + k->auxiliary);
+
+    double* outVec = (double*) malloc(outputVectorLength*sizeof(double));
 
     const int lfw = 20;
     const int rfw = 10;
     int passed = 0;
     
-    //std::cout << "Runing test cases...\n";
+    std::ostringstream detailed_report;
+    detailed_report << "Runing test cases...\n";
     for(const auto& tc: k->testCases) {
-        //std::cout << std::setw(lfw) << std::left << tc.name;
+        detailed_report << std::setw(lfw) << std::left << tc.name;
         load_out_vector(k, tc, outVec);
         
 
         k->runKernel(&tc, outVec);
 
         bool allClose = true;
-        for(int i=0; i<k->outputVectorLength; i++){
+        for(int i=0; i<outputVectorLength; i++){
             if(!isClose(outVec[i], tc.expected[i])){
                 //std::cout << "[" << i <<"] Expected: " << tc.expected[i] << " Recived: "<< outVec[i]<<std::endl;
             }
             allClose &= isClose(outVec[i], tc.expected[i]);
         }
 
-        /*std::cout  << std::setw(rfw) << std::right;
+        detailed_report  << std::setw(rfw) << std::right;
         if (allClose){
-        std::cout << "✔️\n"; }
+        detailed_report << "✔️\n"; }
          else{
-             std::cout << "❌\n";
-         }*/
+             detailed_report << "❌\n";
+         }
          if (allClose){passed++;}
     }
     
@@ -59,6 +90,9 @@ void testKernel(const Kernel* k){
         std::cout << "✔️\n"; }
     else{
         std::cout << "❌\n";
+        if(passed!=0){
+            std::cout << detailed_report.str();
+        }
     }
 
     free(outVec);

@@ -37,21 +37,23 @@ struct testCase{
 
 class Kernel {
     public:
-        Kernel(std::string name, std::function<void(int, double*)> prepData, std::function<void(const testCase*, double *)> runKernel, int inVecLen, int outVecLen
+        Kernel(std::string name, std::function<void(const testCase*, double *)> runKernel, int dim, int cellsPerAxis, int unknowns, int auxiliary
         , std::vector<testCase> testCases
         ):
             name(name),
-            prepareData(prepData),
             runKernel(runKernel),
-            inputVectorLength(inVecLen),
-            outputVectorLength(outVecLen),
+            dim(dim),
+            cellsPerAxis(cellsPerAxis),
+            unknowns(unknowns),
+            auxiliary(auxiliary),
             testCases(testCases)
         {}
         std::string name;
-        std::function<void(int, double *)> prepareData;
         std::function<void(const testCase*, double *)> runKernel;
-        int inputVectorLength; 
-        int outputVectorLength;
+        int dim;
+        int cellsPerAxis;
+        int unknowns;
+        int auxiliary;
         std::vector<testCase> testCases;
         void addTestCase(std::string name, double * input, double * expected);
 

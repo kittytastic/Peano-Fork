@@ -27,7 +27,7 @@ void print_vector(double* vec, int length){
     std::cout << "]" << std::endl;
 }
 
-void benchMarkKernel(const Kernel* k){
+/*void benchMarkKernel(const Kernel* k){
     double* inVec = (double*) malloc(k->inputVectorLength*sizeof(double));
     double* outVec = (double*) malloc(k->outputVectorLength*sizeof(double));
 
@@ -41,7 +41,7 @@ void benchMarkKernel(const Kernel* k){
     //print_vector(outVec, k.outputVectorLength);
     free(inVec);
     free(outVec);
-}
+}*/
 
 int main(){
     std::cout << "------------ Kernel Compare -----------" << std::endl;
