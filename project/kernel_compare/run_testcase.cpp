@@ -39,13 +39,6 @@ bool isClose(double a, double b){
     return std::abs(a-b)<0.00000001;
 }
 
-int pow(int num, int pow){
-    int out_n = 1;
-    for(int i=0; i<pow; i++){
-        out_n *= num;
-    }
-    return out_n;
-}
 
 void testKernel(const Kernel* k){
     int outputVectorLength = pow(k->cellsPerAxis, k->dim) * (k->unknowns + k->auxiliary);

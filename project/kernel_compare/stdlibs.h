@@ -7,3 +7,6 @@
 #include <vector>
 #include <utility>
 #include <assert.h>
+
+
+int pow(int num, int pow);

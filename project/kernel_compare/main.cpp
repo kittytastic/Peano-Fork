@@ -27,25 +27,20 @@ void print_vector(double* vec, int length){
     std::cout << "]" << std::endl;
 }
 
-/*void benchMarkKernel(const Kernel* k){
-    double* inVec = (double*) malloc(k->inputVectorLength*sizeof(double));
-    double* outVec = (double*) malloc(k->outputVectorLength*sizeof(double));
+void benchMarkKernel(const Kernel* k){
+    int inputVectorLength = pow(k->cellsPerAxis+2, k->dim) * (k->unknowns + k->auxiliary);
+    int outputVectorLength = pow(k->cellsPerAxis, k->dim) * (k->unknowns + k->auxiliary);
+    double* inVec = (double*) malloc(inputVectorLength*sizeof(double));
+    double* outVec = (double*) malloc(outputVectorLength*sizeof(double));
 
-    //k->prepareData(k->inputVectorLength, inVec);
-    //std::cout << "In before:  ";
-    //print_vector(inVec, k.inputVectorLength);
-    //std::cout << "Out before: ";
-    //print_vector(outVec, k.outputVectorLength);
-    benchmark::benchmark([&](){k->runKernel(&k->testCases[0], outVec);}, benchmark::NONE, 5);
-    //std::cout << "Out after:  ";
-    //print_vector(outVec, k.outputVectorLength);
+    benchmark::benchmark([&](){k->runKernel(&k->testCases[0], outVec);}, benchmark::NONE, 5);    
+    
     free(inVec);
     free(outVec);
-}*/
+}
 
 int main(){
     std::cout << "------------ Kernel Compare -----------" << std::endl;
-    //benchmark::benchmark(doKernelStuff, benchmark::NONE, 5);
 
     std::vector<Kernel> allKernels = {
         kernels::euler3d1::euler3d_1,
@@ -59,7 +54,7 @@ int main(){
     for(const auto &k: allKernels){
         std::cout << std::endl<< k.name << std::endl;
         testKernel(&k);
-        //benchMarkKernel(&k);
+        benchMarkKernel(&k);
     }
 }
 
