@@ -12,9 +12,9 @@ from compute_graph.examples.General.general import rusanov, patchUpdate_2D, sour
 from compute_graph.examples.SWE.swe_graphs import swe_flux_x, swe_flux_y, swe_max_eigen_x, swe_max_eigen_y, swe_ncp_x, swe_ncp_y
 
 def make_swe():
-    make_rus_x:Callable[[str], Graph] = lambda x: rusanov(3,1, swe_max_eigen_x, swe_flux_x, swe_ncp_x, friendly_name=x)
-    make_rus_y:Callable[[str], Graph] = lambda x: rusanov(3,1, swe_max_eigen_y, swe_flux_y, swe_ncp_y, friendly_name=x)
-    g = patchUpdate_2D(3, 3, 1, make_rus_x, make_rus_y, lambda: source_term_zeros(3, 1))
+    make_rus_x:Callable[[str], Graph] = lambda x: rusanov(3,1, 2, swe_max_eigen_x, swe_flux_x, swe_ncp_x, friendly_name=x)
+    make_rus_y:Callable[[str], Graph] = lambda x: rusanov(3,1, 2, swe_max_eigen_y, swe_flux_y, swe_ncp_y, friendly_name=x)
+    g = patchUpdate_2D(3, 3, 1, make_rus_x, make_rus_y, lambda: source_term_zeros(3, 1, 2))
 
     in8 = IR_Array(UniqueVariableName("in_patch"), 100)
     in9 = IR_SingleVariable(UniqueVariableName("t"), False)

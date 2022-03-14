@@ -4,6 +4,7 @@ from compute_graph.DAG import *
 def rusanov(
     unknowns:int,
     auxiliarys:int,
+    dims: int,
     max_eigen_builder: Callable[[], Graph],
     flux_builder: Optional[Callable[[], Graph]],
     ncp_builder: Optional[Callable[[], Graph]],
@@ -20,7 +21,7 @@ def rusanov(
     # patch dx     (1)
     # t            (1)
     # dt           (1)
-    g = Graph(total_var*2 + 2+1+1+1, unknowns*2, friendly_name)
+    g = Graph(total_var*2 + dims+1+1+1, unknowns*2, friendly_name)
     flux_r:Optional[Graph] = flux_builder() if flux_builder is not None else None
     flux_l:Optional[Graph] = flux_builder() if flux_builder is not None else None
 
@@ -41,7 +42,7 @@ def rusanov(
             g.add_edge((Q,0), ncp.get_external_input(v))
             g.add_edge((deltaQ,0), ncp.get_external_input(total_var+v))
         
-        for e in range(2+1+1+1): 
+        for e in range(dims+1+1+1): 
             g.add_edge(g.get_internal_input(2*total_var+e), ncp.get_external_input(2*total_var+e))
 
     
@@ -61,7 +62,7 @@ def rusanov(
         g.add_edge(g.get_internal_input(v), eigen_l.get_external_input(v))
         g.add_edge(g.get_internal_input(total_var + v), eigen_r.get_external_input(v))
 
-    for e in range(2+1+1+1):
+    for e in range(dims+1+1+1):
         g.add_edge(g.get_internal_input(total_var*2+e), eigen_l.get_external_input(total_var+e))
         g.add_edge(g.get_internal_input(total_var*2+e), eigen_r.get_external_input(total_var+e))
 
@@ -339,10 +340,11 @@ def voxelInPreimage_2D(x: int, y:int, patch_len: int): return x+1 + (y+1) * (2+p
 def voxelInImage_2D(x: int, y:int, patch_len: int): return x + y * patch_len
 
 
-def source_term_zeros(unknowns: int, auxiliary: int)->Graph:
-    g = Graph(unknowns+auxiliary+2+1+1+1, 4, "source term zeros")
+def source_term_zeros(unknowns: int, auxiliary: int, dims: int)->Graph:
+    total_var = unknowns+auxiliary
+    g = Graph(total_var+dims+1+1+1, total_var, "source term zeros")
     c1 = Constant(0)
-    for u in range(4):
+    for u in range(total_var):
         g.add_edge((c1,0), g.get_internal_output(u))
 
     return g
