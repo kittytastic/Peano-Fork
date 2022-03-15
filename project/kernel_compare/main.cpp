@@ -6,6 +6,7 @@
 #include "kernels/swe1/swe_1.h"
 #include "kernels/swe2/swe_2.h"
 #include "kernels/euler3d1/euler3d_1.h"
+#include "kernels/euler3d2/euler3d_2.h"
 #include "../benchmark/benchmark.h"
 
 
@@ -43,6 +44,7 @@ int main(){
     std::cout << "------------ Kernel Compare -----------" << std::endl;
 
     std::vector<Kernel> allKernels = {
+        kernels::euler3d2::euler3d2,
         kernels::euler3d1::euler3d_1,
         kernels::swe2::swe2,
         kernels::swe1::swe1,

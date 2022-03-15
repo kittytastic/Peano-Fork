@@ -22,13 +22,15 @@ def make_euler3d():
     in10 = IR_SingleVariable(UniqueVariableName("dt"), False)
     in11 = IR_SingleVariable(UniqueVariableName("patch_center_0"), False)
     in12 = IR_SingleVariable(UniqueVariableName("patch_center_1"), False)
+    in125 = IR_SingleVariable(UniqueVariableName("patch_center_2"), False)
     in13 = IR_SingleVariable(UniqueVariableName("patch_size_0"), False)
     in14 = IR_SingleVariable(UniqueVariableName("patch_size_1"), False)
+    in15 = IR_SingleVariable(UniqueVariableName("patch_size_2"), False)
     
     out8 = IR_Array(UniqueVariableName("out_patch"), 135)
     
     func_stencil:FunctionStencil = {
-        'PatchUpdate': ([in9, in10, in11, in12, in13, in14, in8, out8], in8.all_ref()+[in9, in10, in11, in12, in13, in14], out8.all_ref()),
+        'PatchUpdate': ([in9, in10, in11, in12, in125, in13, in14, in15, in8, out8], in8.all_ref()+[in9, in10, in11, in12, in125, in13, in14, in15], out8.all_ref()),
     }
 
     
