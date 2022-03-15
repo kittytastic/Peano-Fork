@@ -348,3 +348,64 @@ def source_term_zeros(unknowns: int, auxiliary: int, dims: int)->Graph:
         g.add_edge((c1,0), g.get_internal_output(u))
 
     return g
+
+
+
+def volumeX_3D(axis:str)->Graph:
+    assert(axis=="x" or axis == "y" or axis=="z" or axis=="no_face")
+    # 0,1,2 patchCenter
+    # 3,4,5 patchSize
+    # 6   volH
+    # 7   x
+    # 8   y
+    # 8   z
+    volH = 6
+    
+    g = Graph(10, 3, f"volumeX - {axis}")
+    half = Constant(0.5)
+    mul1 = Multiply(2)
+    mul2 = Multiply(2)
+    mul3 = Multiply(2)
+    sub1, sub2, sub3 = Subtract(), Subtract(), Subtract()
+
+    g.fill_node_inputs([half, g.get_internal_input(3)], mul1)
+    g.fill_node_inputs([half, g.get_internal_input(4)], mul2)
+    g.fill_node_inputs([half, g.get_internal_input(5)], mul3)
+    g.fill_node_inputs([g.get_internal_input(0), mul1], sub1)
+    g.fill_node_inputs([g.get_internal_input(1), mul2], sub2)
+    g.fill_node_inputs([g.get_internal_input(2), mul2], sub3)
+
+    x_defalt = g.get_internal_input(7)
+    y_defalt = g.get_internal_input(8)
+    z_defalt = g.get_internal_input(9)
+
+    if axis!="x":
+        tmp_add = Add(2)
+        g.fill_node_inputs([x_defalt, half], tmp_add)
+        x_defalt = tmp_add
+
+    if axis!="y":
+        tmp_add = Add(2)
+        g.fill_node_inputs([y_defalt, half], tmp_add)
+        y_defalt = tmp_add
+
+    if axis!="z":
+        tmp_add = Add(2)
+        g.fill_node_inputs([z_defalt, half], tmp_add)
+        z_defalt = tmp_add
+
+    mul4, mul5, mul6 = Multiply(2), Multiply(2), Multiply(3)
+    g.fill_node_inputs([x_defalt, g.get_internal_input(volH)], mul4)
+    g.fill_node_inputs([y_defalt, g.get_internal_input(volH)], mul5)
+    g.fill_node_inputs([z_defalt, g.get_internal_input(volH)], mul6)
+
+
+    add1, add2, add3 = Add(2), Add(2), Add(3)
+    g.fill_node_inputs([mul4, sub1], add1)
+    g.fill_node_inputs([mul5, sub2], add2)
+    g.fill_node_inputs([mul6, sub3], add3)
+    g.add_edge((add1, 0), g.get_internal_output(0))
+    g.add_edge((add2, 0), g.get_internal_output(1))
+    g.add_edge((add3, 0), g.get_internal_output(2))
+
+    return g
