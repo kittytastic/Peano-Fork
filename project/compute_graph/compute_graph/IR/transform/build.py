@@ -1,4 +1,6 @@
 from typing import Dict, List, Set, Tuple
+
+from graphviz import set_default_format
 from compute_graph.IR.symbols import IR_Array, IR_LooseFunction, IR_MultiAssign, IR_NoReturn, IR_SingleAssign, IR_Symbol, IR_TempVariable, IR_TightFunction, IR_VarArgDefine, IR_VarBodyDefine, IR_Variable, IR_SingleVariable
 from compute_graph.IR.symbols.functions import IR_CallLooseFunction, IR_CallTightFunction
 from compute_graph.IR.symbols.variables import  IR_Assign, IR_DefineOnly
@@ -80,12 +82,24 @@ class RemoveAllTemp(IR_Transfrom):
     
     def tf(self, in_IR: IR_Symbol)->IR_Symbol:
         working_ir = self.assert_and_cast_symbol_type(in_IR, IR_TightFunction)
-        
+        for a in working_ir.args:
+            assert(len(a.get_instances(IR_TempVariable))==0)
+
         temp_vars = working_ir.get_instances(IR_TempVariable)
-        new_vars = [IR_SingleVariable(tv.name, False) for tv in temp_vars]
-        for nv, tv in zip(new_vars, temp_vars):
-            working_ir.replace(tv, nv)
+        new_vars_dict = {tv:IR_SingleVariable(tv.name, False) for tv in temp_vars}
         
+        line_var_cache = [l.get_instances(IR_TempVariable) for l in working_ir.body]
+        tmp_var_line_lookup:Dict[IR_TempVariable, Set[int]] = {tv:set() for tv in temp_vars}
+
+        for idx, line in enumerate(line_var_cache):
+            for var in line:
+                tmp_var_line_lookup[var].add(idx)
+
+
+        for tmp_var, lines in tmp_var_line_lookup.items():
+            for l in lines:
+                working_ir.body[l].replace(tmp_var, new_vars_dict[tmp_var]) 
+
         return working_ir
 
 class DefineAllVars(IR_Transfrom):
