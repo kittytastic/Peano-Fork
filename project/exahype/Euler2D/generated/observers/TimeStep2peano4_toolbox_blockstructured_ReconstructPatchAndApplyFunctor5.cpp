@@ -1,5 +1,5 @@
 #include "TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5.h"
-
+#include "../euler2d.g.h"
 
 tarch::logging::Log project::exahype::Euler2D::generated::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::_log( "project::exahype::Euler2D::generated::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5");
 
@@ -313,96 +313,16 @@ void project::exahype::Euler2D::generated::observers::TimeStep2peano4_toolbox_bl
     );
 
     
-    #if Dimensions==2
-    ::exahype2::fv::applySplit1DRiemannToPatch_Overlap1AoS2d(
-    #else
-    ::exahype2::fv::applySplit1DRiemannToPatch_Overlap1AoS3d(
-    #endif
-    
-        [&](
-          const double * __restrict__                  QL,
-          const double * __restrict__                  QR,
-          const tarch::la::Vector<Dimensions,double>&  x,
-          double                                       dx,
-          double                                       t,
-          double                                       dt,
-          int                                          normal,
-          double                                       FL[],
-          double                                       FR[]
-        ) -> void {
-          
-        ::exahype2::fv::splitRusanov1d(
-          [] (
-            const double * __restrict__                  Q,
-            const tarch::la::Vector<Dimensions,double>&  faceCentre,
-            const tarch::la::Vector<Dimensions,double>&  volumeH,
-            double                                       t,
-            double                                       dt,
-            int                                          normal,
-            double                                       F[]
-          ) -> void {
-            
-            repositories::InstanceOfeuler2D.flux( Q, faceCentre, volumeH, t, normal, F );
-            
-          },
-          [] (
-            const double * __restrict__                  Q,
-            const double * __restrict__                  deltaQ,
-            const tarch::la::Vector<Dimensions,double>&  faceCentre,
-            const tarch::la::Vector<Dimensions,double>&  volumeH,
-            double                                       t,
-            double                                       dt,
-            int                                          normal,
-            double                                       BgradQ[]
-          ) -> void {
-            
-            std::fill_n(BgradQ,4,0.0);
-            
-          },
-          [] (
-            const double * __restrict__                  Q,
-            const tarch::la::Vector<Dimensions,double>&  faceCentre,
-            const tarch::la::Vector<Dimensions,double>&  volumeH,
-            double                                       t,
-            double                                       dt,
-            int                                          normal
-          ) -> double {
-            return repositories::InstanceOfeuler2D.maxEigenvalue( Q, faceCentre, volumeH, t, normal);
-          },
-          QL, QR, x, dx, t, dt, normal,
-          4,
-          0,
-          FL,FR,
-          
-          false,
-          
-          
-          true
-          
-        );
-        },
-        [&](
-          const double * __restrict__                  Q,
-          const tarch::la::Vector<Dimensions,double>&  x,
-          double                                       dx,
-          double                                       t,
-          double                                       dt,
-          double * __restrict__                        S
-        ) -> void {
-          
-  std::fill_n(S,4,0.0);
-        },
-        marker.x(),
-        marker.h(),
-        cellTimeStamp,
-        cellTimeStepSize,
-        3,
-        4,
-        0,
-        reconstructedPatch,
-        targetPatch
-    );
-  
+    kernels::k3::PatchUpdate(
+      cellTimeStamp,
+      cellTimeStepSize,
+      marker.x()(0),
+      marker.x()(1),
+      marker.h()(0),
+      marker.h()(1),
+      reconstructedPatch,
+      targetPatch
+    )
     
     
     fineGridCelleuler2DCellLabel.setTimeStamp(cellTimeStamp + usedTimeStepSize);
