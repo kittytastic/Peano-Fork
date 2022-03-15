@@ -1,6 +1,4 @@
 !*Makefile
-base_2d_euler/Euler2D
-basic_2d_euler_inline/Euler2DBaseInline
 **/Artifacts/*
 
 

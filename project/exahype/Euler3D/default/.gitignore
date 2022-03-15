@@ -6,9 +6,8 @@
 observers/*
 
 # Dont ignore these
-!euler2D.py
-!euler2D.cpp
-!euler2D.h
+!euler3D.py
+!euler3D.cpp
+!euler3D.h
 !observers/TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5.cpp
-!MockKernel.cpp
-!MockKernel.h
+!.gitignore
