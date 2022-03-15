@@ -19,7 +19,7 @@ import exahype2
 import argparse
 
 
-project = exahype2.Project( ["project", "euler_3d"], "euler3D", ".", executable="Euler3D" )
+project = exahype2.Project( ["project", "exahype", "Euler3D", "default"], "euler3D", ".", executable="Euler3D" )
 
 
 #
@@ -81,7 +81,7 @@ project.set_global_simulation_parameters(
 # prototype we did start off with.
 #
 project.set_load_balancing( "toolbox::loadbalancing::RecursiveSubdivision", "new ::exahype2::LoadBalancingConfiguration()" )
-project.set_Peano4_installation( "../../", build_mode )
+project.set_Peano4_installation( "../../../../", build_mode )
 peano4_project = project.generate_Peano4_project(False)
 
 peano4_project.build(make_clean_first=True, number_of_parallel_builds=12)
