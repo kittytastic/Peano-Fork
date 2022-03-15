@@ -1,8 +1,10 @@
 import math
-from typing import List
+from typing import Dict, List
 import unittest
 from compute_graph.DAG.graph import DAG_Message
 from compute_graph.examples.Euler3D.euler3d_graphs import *
+from compute_graph.examples.Euler3D.data import *
+from compute_graph.examples.General.general import rusanov, patchUpdate_3D, source_term_zeros
 
 def assert_float_array_equal(obj: unittest.TestCase, a: List[float], b: List[float]):
     obj.assertEqual(len(a), len(b))
@@ -196,6 +198,26 @@ class Test_Eigen_Z(unittest.TestCase):
 
         g.assert_valid()
         result = g.eval(full_data)
+        assert_float_array_equal(self, result, expected_data)
+
+
+class Euler3D_IntergrationTest(unittest.TestCase):
+    @staticmethod
+    def pack_input(Qin: List[float], extras: Dict[str,float]):
+        return Qin + [extras["t"], extras["dt"], extras["pos0"], extras["pos1"], extras["pos2"], extras["size0"], extras["size1"], extras["size2"]]
+
+    def test_1(self):
+        make_rus_x:Callable[[str], Graph] = lambda x: rusanov(5,0, 3, max_eigen_x, flux_x, None, friendly_name=x)
+        make_rus_y:Callable[[str], Graph] = lambda x: rusanov(5,0, 3, max_eigen_y, flux_y, None, friendly_name=x)
+        make_rus_z:Callable[[str], Graph] = lambda x: rusanov(5,0, 3, max_eigen_z, flux_z, None, friendly_name=x)
+        g = patchUpdate_3D(3, 5, 0, make_rus_x, make_rus_y, make_rus_z, lambda: source_term_zeros(5, 0, 3))
+
+        input_data = self.pack_input(euler_3d_in_vec7, euler3d_test_case_extra7)
+        expected_data = euler_3d_out_vec7
+
+
+        g.assert_valid()
+        result = g.eval(input_data)
         assert_float_array_equal(self, result, expected_data)
 
 if __name__=="__main__":

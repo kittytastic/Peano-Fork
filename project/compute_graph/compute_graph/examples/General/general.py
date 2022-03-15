@@ -52,7 +52,7 @@ def rusanov(
             g.add_edge(g.get_internal_input(v), flux_l.get_external_input(v))
             g.add_edge(g.get_internal_input(total_var + v), flux_r.get_external_input(v))
 
-        for e in range(2+1+1+1):
+        for e in range(dims+1+1+1):
             g.add_edge(g.get_internal_input(total_var*2+e), flux_l.get_external_input(total_var+e))
             g.add_edge(g.get_internal_input(total_var*2+e), flux_r.get_external_input(total_var+e))
     
@@ -373,7 +373,7 @@ def volumeX_3D(axis:str)->Graph:
     g.fill_node_inputs([half, g.get_internal_input(5)], mul3)
     g.fill_node_inputs([g.get_internal_input(0), mul1], sub1)
     g.fill_node_inputs([g.get_internal_input(1), mul2], sub2)
-    g.fill_node_inputs([g.get_internal_input(2), mul2], sub3)
+    g.fill_node_inputs([g.get_internal_input(2), mul3], sub3)
 
     x_defalt = g.get_internal_input(7)
     y_defalt = g.get_internal_input(8)
@@ -394,13 +394,13 @@ def volumeX_3D(axis:str)->Graph:
         g.fill_node_inputs([z_defalt, half], tmp_add)
         z_defalt = tmp_add
 
-    mul4, mul5, mul6 = Multiply(2), Multiply(2), Multiply(3)
+    mul4, mul5, mul6 = Multiply(2), Multiply(2), Multiply(2)
     g.fill_node_inputs([x_defalt, g.get_internal_input(volH)], mul4)
     g.fill_node_inputs([y_defalt, g.get_internal_input(volH)], mul5)
     g.fill_node_inputs([z_defalt, g.get_internal_input(volH)], mul6)
 
 
-    add1, add2, add3 = Add(2), Add(2), Add(3)
+    add1, add2, add3 = Add(2), Add(2), Add(2)
     g.fill_node_inputs([mul4, sub1], add1)
     g.fill_node_inputs([mul5, sub2], add2)
     g.fill_node_inputs([mul6, sub3], add3)
@@ -408,4 +408,254 @@ def volumeX_3D(axis:str)->Graph:
     g.add_edge((add2, 0), g.get_internal_output(1))
     g.add_edge((add3, 0), g.get_internal_output(2))
 
+    return g
+
+
+def voxelInPreimage_3D(x: int, y:int, z:int, cells_per_axis: int): return x+1 + (y+1) * (2+cells_per_axis) + (z+1) * (2+cells_per_axis)**2
+def voxelInImage_3D(x: int, y:int, z:int, cells_per_axis: int): return x + y * cells_per_axis + z*cells_per_axis**2
+
+
+
+def patchUpdate_3D(cells_per_axis: int, unknowns: int, auxiliary:int, rusanov_x:Callable[[str], Graph], rusanov_y:Callable[[str], Graph], rusanov_z:Callable[[str], Graph], source_term:Callable[[], Graph])->Graph:
+    total_var = unknowns+auxiliary
+    dim = 3
+    Qins:int = (cells_per_axis+2)**dim * total_var
+    Qout:int = (cells_per_axis)**dim * total_var
+
+
+    Q_in_loc = 0
+    t_loc = Q_in_loc + Qins
+    dt_loc = t_loc+1
+    patch_center_loc = dt_loc + 1
+    patch_size_loc = patch_center_loc + dim
+    total_inputs = patch_size_loc+dim
+
+    g=Graph(total_inputs, Qout, "PatchUpdate")
+
+    Q_out_pos_contrib:List[List[OutPort]] = [[] for _ in range(Qout)]
+    Q_out_neg_contrib:List[List[OutPort]] = [[] for _ in range(Qout)]
+    Q_source_terms: List[Optional[OutPort]]= [None] * Qout
+
+
+    symNumPatches = Constant(cells_per_axis) 
+    vol_h = Divide()
+    g.fill_node_inputs([g.get_internal_input(patch_size_loc), symNumPatches], vol_h)
+
+    dt_div_size = Divide()
+    g.fill_node_inputs([g.get_internal_input(dt_loc), vol_h], dt_div_size)
+    
+    # Source Terms
+    for x in range(cells_per_axis):
+        for y in range(cells_per_axis):
+            for z in range(cells_per_axis):
+                voxelInPreImage = voxelInPreimage_3D(x-1, y, z, cells_per_axis)
+                voxelInImage = voxelInImage_3D(x-1, y, z, cells_per_axis)
+
+                c_x = Constant(x)    
+                c_y = Constant(y)    
+                c_z = Constant(z)    
+                volX = volumeX_3D("no_face")
+                g.fill_node_inputs([
+                    g.get_internal_input(patch_center_loc),
+                    g.get_internal_input(patch_center_loc+1),
+                    g.get_internal_input(patch_center_loc+2),
+                    g.get_internal_input(patch_size_loc),
+                    g.get_internal_input(patch_size_loc+1),
+                    g.get_internal_input(patch_size_loc+2),
+                    vol_h,
+                    c_x,
+                    c_y,
+                    c_z
+                    ], volX)
+
+                st = source_term()
+                for v in range(total_var): g.add_edge(g.get_internal_input(Q_in_loc + voxelInPreImage*total_var + v), (st, v))
+                g.add_edge((volX,0), (st, total_var))
+                g.add_edge((volX,1), (st, total_var+1))
+                g.add_edge((volX,2), (st, total_var+2))
+                g.add_edge((vol_h, 0), (st, total_var+3))
+                g.add_edge(g.get_internal_input(t_loc), (st, total_var+4))
+                g.add_edge(g.get_internal_input(dt_loc), (st, total_var+5))
+
+                for u in range(unknowns):
+                    mul_dt = Multiply(2)
+                    g.fill_node_inputs([(st, u), g.get_internal_input(dt_loc)], mul_dt)
+                    Q_source_terms[voxelInImage*total_var +u] = OutPort((mul_dt, 0))
+
+
+
+
+
+    # Flux x
+    for x in range(cells_per_axis+1):
+        for y in range(cells_per_axis):
+            for z in range(cells_per_axis):
+                leftVoxelInPreImage = voxelInPreimage_3D(x-1, y, z, cells_per_axis)
+                rightVoxelInPreImage = voxelInPreimage_3D(x, y, z, cells_per_axis)
+
+                leftVoxelInImage = voxelInImage_3D(x-1, y, z, cells_per_axis)
+                rightVoxelInImage = voxelInImage_3D(x, y, z, cells_per_axis)
+
+                c_x = Constant(x)    
+                c_y = Constant(y)    
+                c_z = Constant(y)    
+                volX = volumeX_3D("x")
+                g.fill_node_inputs([
+                    g.get_internal_input(patch_center_loc),
+                    g.get_internal_input(patch_center_loc+1),
+                    g.get_internal_input(patch_center_loc+2),
+                    g.get_internal_input(patch_size_loc),
+                    g.get_internal_input(patch_size_loc+1),
+                    g.get_internal_input(patch_size_loc+2),
+                    vol_h,
+                    c_x,
+                    c_y,
+                    c_z
+                    ], volX)
+
+                # Rusanov
+                rus = rusanov_x(f"rusanov-x ({x}, {y}, {z})")
+                for v in range(total_var):
+                    g.add_edge(g.get_internal_input(Q_in_loc + leftVoxelInPreImage*total_var + v), (rus, v))
+                    g.add_edge(g.get_internal_input(Q_in_loc + rightVoxelInPreImage*total_var + v), (rus, v+total_var))
+                g.add_edge((volX,0), (rus, 2*total_var))
+                g.add_edge((volX,1), (rus, 2*total_var+1))
+                g.add_edge((volX,2), (rus, 2*total_var+2))
+                g.add_edge((vol_h, 0), (rus, 2*total_var+3))
+                g.add_edge(g.get_internal_input(t_loc), (rus, 2*total_var+4))
+                g.add_edge(g.get_internal_input(dt_loc), (rus, 2*total_var+5))
+
+                # Update out
+                for u in range(unknowns):
+                    if x>0:
+                        Q_out_neg_contrib[leftVoxelInImage*total_var+u].append(OutPort((rus, u)))
+
+                    if x<cells_per_axis:
+                        Q_out_pos_contrib[rightVoxelInImage*total_var+u].append(OutPort((rus,u+unknowns)))
+
+
+    
+    # Flux y
+    for x in range(cells_per_axis):
+        for y in range(cells_per_axis+1):
+            for z in range(cells_per_axis):
+                leftVoxelInPreImage = voxelInPreimage_3D(x, y-1, z, cells_per_axis)
+                rightVoxelInPreImage = voxelInPreimage_3D(x, y, z, cells_per_axis)
+
+                leftVoxelInImage = voxelInImage_3D(x, y-1, z, cells_per_axis)
+                rightVoxelInImage = voxelInImage_3D(x, y, z, cells_per_axis)
+
+                c_x = Constant(x)    
+                c_y = Constant(y)    
+                c_z = Constant(z)    
+                volX = volumeX_3D("y")
+                g.fill_node_inputs([
+                    g.get_internal_input(patch_center_loc),
+                    g.get_internal_input(patch_center_loc+1),
+                    g.get_internal_input(patch_center_loc+2),
+                    g.get_internal_input(patch_size_loc),
+                    g.get_internal_input(patch_size_loc+1),
+                    g.get_internal_input(patch_size_loc+2),
+                    vol_h,
+                    c_x,
+                    c_y,
+                    c_z
+                    ], volX)
+
+                # Rusanov
+                rus = rusanov_y(f"rusanov-y ({x}, {y}, {z})")
+                for v in range(total_var):
+                    g.add_edge(g.get_internal_input(Q_in_loc + leftVoxelInPreImage*total_var + v), (rus, v))
+                    g.add_edge(g.get_internal_input(Q_in_loc + rightVoxelInPreImage*total_var + v), (rus, v+total_var))
+                g.add_edge((volX,0), (rus, 2*total_var))
+                g.add_edge((volX,1), (rus, 2*total_var+1))
+                g.add_edge((volX,2), (rus, 2*total_var+2))
+                g.add_edge((vol_h, 0), (rus, 2*total_var+3))
+                g.add_edge(g.get_internal_input(t_loc), (rus, 2*total_var+4))
+                g.add_edge(g.get_internal_input(dt_loc), (rus, 2*total_var+5))
+
+                # Update out
+                for u in range(unknowns):
+                    if y>0:
+                        Q_out_neg_contrib[leftVoxelInImage*total_var+u].append(OutPort((rus, u)))
+
+                    if y<cells_per_axis:
+                        Q_out_pos_contrib[rightVoxelInImage*total_var+u].append(OutPort((rus, u+unknowns)))
+
+    # Flux z
+    for x in range(cells_per_axis):
+        for y in range(cells_per_axis):
+            for z in range(cells_per_axis+1):
+                leftVoxelInPreImage = voxelInPreimage_3D(x, y, z-1, cells_per_axis)
+                rightVoxelInPreImage = voxelInPreimage_3D(x, y, z, cells_per_axis)
+
+                leftVoxelInImage = voxelInImage_3D(x, y, z-1, cells_per_axis)
+                rightVoxelInImage = voxelInImage_3D(x, y, z, cells_per_axis)
+
+                c_x = Constant(x)    
+                c_y = Constant(y)    
+                c_z = Constant(z)    
+                volX = volumeX_3D("z")
+                g.fill_node_inputs([
+                    g.get_internal_input(patch_center_loc),
+                    g.get_internal_input(patch_center_loc+1),
+                    g.get_internal_input(patch_center_loc+2),
+                    g.get_internal_input(patch_size_loc),
+                    g.get_internal_input(patch_size_loc+1),
+                    g.get_internal_input(patch_size_loc+2),
+                    vol_h,
+                    c_x,
+                    c_y,
+                    c_z
+                    ], volX)
+
+                # Rusanov
+                rus = rusanov_z(f"rusanov-z ({x}, {y}, {z})")
+                for v in range(total_var):
+                    g.add_edge(g.get_internal_input(Q_in_loc + leftVoxelInPreImage*total_var + v), (rus, v))
+                    g.add_edge(g.get_internal_input(Q_in_loc + rightVoxelInPreImage*total_var + v), (rus, v+total_var))
+                g.add_edge((volX,0), (rus, 2*total_var))
+                g.add_edge((volX,1), (rus, 2*total_var+1))
+                g.add_edge((volX,2), (rus, 2*total_var+2))
+                g.add_edge((vol_h, 0), (rus, 2*total_var+3))
+                g.add_edge(g.get_internal_input(t_loc), (rus, 2*total_var+4))
+                g.add_edge(g.get_internal_input(dt_loc), (rus, 2*total_var+5))
+
+                # Update out
+                for u in range(unknowns):
+                    if z>0:
+                        Q_out_neg_contrib[leftVoxelInImage*total_var+u].append(OutPort((rus, u)))
+
+                    if z<cells_per_axis:
+                        Q_out_pos_contrib[rightVoxelInImage*total_var+u].append(OutPort((rus, u+unknowns)))
+
+
+    # Sum all contributions
+    for x in range(cells_per_axis):
+        for y in range(cells_per_axis):
+            for z in range(cells_per_axis):
+
+                image_voxel = voxelInImage_3D(x, y, z, cells_per_axis)
+                pre_image_voxel = voxelInPreimage_3D(x, y, z, cells_per_axis)
+                for u in range(unknowns):
+                    add_pos = Add(len(Q_out_pos_contrib[image_voxel*total_var+u]))
+                    add_neg = Add(len(Q_out_neg_contrib[image_voxel*total_var+u]))
+                    diff = Subtract()
+                    scale = Multiply(2)
+                    add_input1 = Add(2) 
+                    add_input2 = Add(2) 
+
+                    g.fill_node_inputs(Q_out_pos_contrib[image_voxel*total_var+u], add_pos) # type:ignore
+                    g.fill_node_inputs(Q_out_neg_contrib[image_voxel*total_var+u], add_neg) # type:ignore
+                    g.fill_node_inputs([add_pos, add_neg], diff)
+                    g.fill_node_inputs([diff, dt_div_size], scale)
+                    st = Q_source_terms[image_voxel*total_var+u]
+                    assert(st is not None)
+                    g.fill_node_inputs([scale, st], add_input1)
+                    g.fill_node_inputs([add_input1, g.get_internal_input(Q_in_loc+ pre_image_voxel*total_var+u)], add_input2)
+                    g.add_edge((add_input2, 0), g.get_internal_output(image_voxel*total_var+u))
+                
+                for a in range(auxiliary):
+                    g.add_edge(g.get_internal_input(Q_in_loc + pre_image_voxel*total_var+unknowns+a), g.get_internal_output(Q_in_loc+image_voxel*total_var+unknowns+a))
+    
     return g
