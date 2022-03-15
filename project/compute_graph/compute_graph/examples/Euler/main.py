@@ -131,7 +131,7 @@ def make_proper_euler():
             extra_headers=["../../stdlibs.h", "kernel_3_base.h"],
             namespace="kernels::k3"),
         verbose=True,
-        output_file="../../Artifacts/out-code.cpp"
+        output_file="../../Artifacts/euler2d.g.cpp"
     )
     
     tf_stack.tf(g)
