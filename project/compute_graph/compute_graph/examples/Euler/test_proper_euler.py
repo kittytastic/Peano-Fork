@@ -2,7 +2,6 @@ import unittest
 from compute_graph.DAG.graph import DAG_Message
 from compute_graph.DAG.visualize import visualize_graph
 from compute_graph.examples.Euler.proper_euler import *
-from compute_graph.examples.Euler.euler import *
 from compute_graph.examples.Euler.test_euler import *
 from compute_graph.examples.General.general import volumeX_2D
 
