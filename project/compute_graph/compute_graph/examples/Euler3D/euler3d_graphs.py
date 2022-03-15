@@ -66,7 +66,7 @@ def p_graph()->Graph:
 
 
 def flux_x()->Graph:
-    g = Graph(5+5,5, "flux_x")
+    g = Graph(5+6,5, "flux_x")
     p = p_graph()
     irho = irho_graph()
 
@@ -109,7 +109,7 @@ def flux_x()->Graph:
 
 def flux_y()->Graph:
     common_fact = 2
-    g = Graph(5+5,5, "flux_y")
+    g = Graph(5+6,5, "flux_y")
     p = p_graph()
     irho = irho_graph()
 
@@ -152,7 +152,7 @@ def flux_y()->Graph:
 
 def flux_z()->Graph:
     common_fact = 3
-    g = Graph(5+5,5, "flux_z")
+    g = Graph(5+6,5, "flux_z")
     p = p_graph()
     irho = irho_graph()
 
@@ -195,7 +195,7 @@ def flux_z()->Graph:
 
 def _eigen_base(dir:str):
     assert(dir=="x" or dir=="y" or dir=="z")
-    g = Graph(5+5,1, f"max_eigen_{dir}")
+    g = Graph(5+6,1, f"max_eigen_{dir}")
     p = p_graph()
     irho = irho_graph()
 

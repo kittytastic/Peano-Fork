@@ -55,7 +55,7 @@ class Test_Flux_X(unittest.TestCase):
     def test_1(self):
         g = flux_x()
         input_data = [1.0, 2.0, 3.0, 4.0, 5.0]
-        full_data = input_data + [-10.0, -11.0, -12.0, -13.0, -14.0]
+        full_data = input_data + [-10.0, -11.0, -12.0, -13.0, -14.0, -15.0]
         expected_data = self.flux_formula_x(input_data)
 
         g.assert_valid()
@@ -65,7 +65,7 @@ class Test_Flux_X(unittest.TestCase):
     def test_2(self):
         g = flux_x()
         input_data = [5.0, 6.0, 7.0, 8.0, 9.0]
-        full_data = input_data + [-10.0, -11.0, -12.0, -13.0, -14.0]
+        full_data = input_data + [-10.0, -11.0, -12.0, -13.0, -14.0, -15.0]
         expected_data = self.flux_formula_x(input_data)
 
         g.assert_valid()
@@ -89,7 +89,7 @@ class Test_Flux_Y(unittest.TestCase):
     def test_1(self):
         g = flux_y()
         input_data = [1.0, 2.0, 3.0, 4.0, 5.0]
-        full_data = input_data + [-10.0, -11.0, -12.0, -13.0, -14.0]
+        full_data = input_data + [-10.0, -11.0, -12.0, -13.0, -14.0, -15.0]
         expected_data = self.flux_formula_y(input_data)
 
         g.assert_valid()
@@ -99,7 +99,7 @@ class Test_Flux_Y(unittest.TestCase):
     def test_2(self):
         g = flux_y()
         input_data = [5.0, 6.0, 7.0, 8.0, 9.0]
-        full_data = input_data + [-10.0, -11.0, -12.0, -13.0, -14.0]
+        full_data = input_data + [-10.0, -11.0, -12.0, -13.0, -14.0, -15.0]
         expected_data = self.flux_formula_y(input_data)
 
         g.assert_valid()
@@ -123,7 +123,7 @@ class Test_Flux_Z(unittest.TestCase):
     def test_1(self):
         g = flux_z()
         input_data = [1.0, 2.0, 3.0, 4.0, 5.0]
-        full_data = input_data + [-10.0, -11.0, -12.0, -13.0, -14.0]
+        full_data = input_data + [-10.0, -11.0, -12.0, -13.0, -14.0, -15.0]
         expected_data = self.flux_formula_z(input_data)
 
         g.assert_valid()
@@ -133,7 +133,7 @@ class Test_Flux_Z(unittest.TestCase):
     def test_2(self):
         g = flux_z()
         input_data = [5.0, 6.0, 7.0, 8.0, 9.0]
-        full_data = input_data + [-10.0, -11.0, -12.0, -13.0, -14.0]
+        full_data = input_data + [-10.0, -11.0, -12.0, -13.0, -14.0, -15.0]
         expected_data = self.flux_formula_z(input_data)
 
         g.assert_valid()
@@ -153,7 +153,7 @@ class Test_Eigen_X(unittest.TestCase):
     def test_1(self):
         g = max_eigen_x()
         input_data = [8.0, 2.0, 3.0, 4.0, 15.0]
-        full_data = input_data + [-10.0, -11.0, -12.0, -13.0, -14.0]
+        full_data = input_data + [-10.0, -11.0, -12.0, -13.0, -14.0, -15.0]
         expected_data = self.eigen_formula_x(input_data)
 
         g.assert_valid()
@@ -172,7 +172,7 @@ class Test_Eigen_Y(unittest.TestCase):
     def test_1(self):
         g = max_eigen_y()
         input_data = [8.0, 2.0, 3.0, 4.0, 15.0]
-        full_data = input_data + [-10.0, -11.0, -12.0, -13.0, -14.0]
+        full_data = input_data + [-10.0, -11.0, -12.0, -13.0, -14.0, -15.0]
         expected_data = self.eigen_formula_y(input_data)
 
         g.assert_valid()
@@ -191,7 +191,7 @@ class Test_Eigen_Z(unittest.TestCase):
     def test_1(self):
         g = max_eigen_z()
         input_data = [8.0, 2.0, 3.0, 4.0, 15.0]
-        full_data = input_data + [-10.0, -11.0, -12.0, -13.0, -14.0]
+        full_data = input_data + [-10.0, -11.0, -12.0, -13.0, -14.0, -15.0]
         expected_data = self.eigen_formula_z(input_data)
 
         g.assert_valid()
