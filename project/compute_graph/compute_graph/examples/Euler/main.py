@@ -88,9 +88,9 @@ def make_neat_euler():
 
 
 def make_proper_euler():
-    make_rus_x:Callable[[str], Graph] = lambda x: rusanov(4, proper_max_eigen_x, proper_flux_x, friendly_name=x)
-    make_rus_y:Callable[[str], Graph] = lambda x: rusanov(4, proper_max_eigen_y, proper_flux_y, friendly_name=x)
-    g = patchUpdate_2D(3, 4, make_rus_x, make_rus_y, source_term)
+    make_rus_x:Callable[[str], Graph] = lambda x: rusanov(4, 0, 2, proper_max_eigen_x, proper_flux_x, None, friendly_name=x)
+    make_rus_y:Callable[[str], Graph] = lambda x: rusanov(4, 0, 2, proper_max_eigen_y, proper_flux_y, None, friendly_name=x)
+    g = patchUpdate_2D(3, 4, 0, make_rus_x, make_rus_y, source_term)
 
     in8 = IR_Array(UniqueVariableName("in_patch"), 100)
     in9 = IR_SingleVariable(UniqueVariableName("t"), False)
@@ -117,7 +117,7 @@ def make_proper_euler():
             DAG_RemoveArithmeticNoOps(),
             DAG_RemovePassThrough(),
             DAG_RemoveDuplicatedArithmetic(),
-            DAG_Viz(file_name = "after", max_depth=1),
+            #DAG_Viz(file_name = "after", max_depth=1),
         ]),
         IR_TransformChain([
             FilterApply(IR_LooseFunction, RemoveForwardAlias()),
