@@ -56,7 +56,7 @@ def make_euler3d():
         large_output_mode="../../Artifacts"),
         C_Backend(
             extra_headers=["../../stdlibs.h", "euler3d_2_base.h"],
-            namespace="kernels::euler3d_2"),
+            namespace="kernels::euler3d2"),
         verbose=True,
         output_file="../../Artifacts/euler3d.g.cpp"
     )
