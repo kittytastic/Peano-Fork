@@ -38,10 +38,9 @@ void swe1_runKernel(const testCase* tc, double* output){
 
 Kernel swe1(
     "SWE 1: Default SWE",
-    swe1_getdata,
     swe1_runKernel,
-    5*5*4,
-    3*3*4,
+    2, 3,
+    3, 1,
     swe_2d_test_cases
     );
 };

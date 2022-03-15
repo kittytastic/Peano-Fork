@@ -208,9 +208,9 @@ class SWE_IntergrationTest(unittest.TestCase):
         return Qin + [extras["t"], extras["dt"], extras["pos0"], extras["pos1"], extras["size0"], extras["size1"]]
 
     def test_1(self):
-        make_rus_x:Callable[[str], Graph] = lambda x: rusanov(3,1, swe_max_eigen_x, swe_flux_x, swe_ncp_x, friendly_name=x)
-        make_rus_y:Callable[[str], Graph] = lambda x: rusanov(3,1, swe_max_eigen_y, swe_flux_y, swe_ncp_y, friendly_name=x)
-        g = patchUpdate_2D(3, 3, 1, make_rus_x, make_rus_y, lambda: source_term_zeros(3, 1))
+        make_rus_x:Callable[[str], Graph] = lambda x: rusanov(3,1, 2, swe_max_eigen_x, swe_flux_x, swe_ncp_x, friendly_name=x)
+        make_rus_y:Callable[[str], Graph] = lambda x: rusanov(3,1, 2, swe_max_eigen_y, swe_flux_y, swe_ncp_y, friendly_name=x)
+        g = patchUpdate_2D(3, 3, 1, make_rus_x, make_rus_y, lambda: source_term_zeros(3, 1, 2))
 
         input_data = self.pack_input(swe_test_case_in, swe_test_case_extra)
         expected_data = swe_test_case_out

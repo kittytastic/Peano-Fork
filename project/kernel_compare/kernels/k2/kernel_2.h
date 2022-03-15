@@ -39,10 +39,11 @@ namespace kernels::k2{
 
     Kernel k2(
         "Kernel 2: Basic Inline",
-        k2_getdata,
         k2_runKernel,
-        5*5*4,
-        3*3*4,
+        2,
+        3,
+        4,
+        0,
         euler_2d_test_cases
     );
 };

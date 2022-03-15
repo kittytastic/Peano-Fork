@@ -33,10 +33,11 @@ namespace kernels::k3{
 
     Kernel k3(
         "Kernel 3: Compiled",
-        k3_getdata,
         k3_runKernel,
-        5*5*4,
-        3*3*4,
+        2,
+        3,
+        4,
+        0,
         euler_2d_test_cases
     );
 };

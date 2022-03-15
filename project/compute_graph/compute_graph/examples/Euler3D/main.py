@@ -8,26 +8,29 @@ from compute_graph.IR.symbols import IR_Array,  UniqueVariableName
 from compute_graph.IR.symbols.functions import  IR_LooseFunction, IR_TightFunction
 from compute_graph.language_backend.c import C_Backend
 from compute_graph.transform import FullStackTransform
-from compute_graph.examples.General.general import rusanov, patchUpdate_2D, source_term_zeros
-from compute_graph.examples.SWE.swe_graphs import swe_flux_x, swe_flux_y, swe_max_eigen_x, swe_max_eigen_y, swe_ncp_x, swe_ncp_y
+from compute_graph.examples.General.general import rusanov, patchUpdate_3D, source_term_zeros
+from compute_graph.examples.Euler3D.euler3d_graphs import *
 
-def make_swe():
-    make_rus_x:Callable[[str], Graph] = lambda x: rusanov(3,1, 2, swe_max_eigen_x, swe_flux_x, swe_ncp_x, friendly_name=x)
-    make_rus_y:Callable[[str], Graph] = lambda x: rusanov(3,1, 2, swe_max_eigen_y, swe_flux_y, swe_ncp_y, friendly_name=x)
-    g = patchUpdate_2D(3, 3, 1, make_rus_x, make_rus_y, lambda: source_term_zeros(3, 1, 2))
+def make_euler3d():
+    make_rus_x:Callable[[str], Graph] = lambda x: rusanov(5,0, 3, max_eigen_x, flux_x, None, friendly_name=x)
+    make_rus_y:Callable[[str], Graph] = lambda x: rusanov(5,0, 3, max_eigen_y, flux_y, None, friendly_name=x)
+    make_rus_z:Callable[[str], Graph] = lambda x: rusanov(5,0, 3, max_eigen_z, flux_z, None, friendly_name=x)
+    g = patchUpdate_3D(3, 5, 0, make_rus_x, make_rus_y, make_rus_z, lambda: source_term_zeros(5, 0, 3))
 
-    in8 = IR_Array(UniqueVariableName("in_patch"), 100)
+    in8 = IR_Array(UniqueVariableName("in_patch"), 625)
     in9 = IR_SingleVariable(UniqueVariableName("t"), False)
     in10 = IR_SingleVariable(UniqueVariableName("dt"), False)
     in11 = IR_SingleVariable(UniqueVariableName("patch_center_0"), False)
     in12 = IR_SingleVariable(UniqueVariableName("patch_center_1"), False)
+    in125 = IR_SingleVariable(UniqueVariableName("patch_center_2"), False)
     in13 = IR_SingleVariable(UniqueVariableName("patch_size_0"), False)
     in14 = IR_SingleVariable(UniqueVariableName("patch_size_1"), False)
+    in15 = IR_SingleVariable(UniqueVariableName("patch_size_2"), False)
     
-    out8 = IR_Array(UniqueVariableName("out_patch"), 36)
+    out8 = IR_Array(UniqueVariableName("out_patch"), 135)
     
     func_stencil:FunctionStencil = {
-        'PatchUpdate': ([in9, in10, in11, in12, in13, in14, in8, out8], in8.all_ref()+[in9, in10, in11, in12, in13, in14], out8.all_ref()),
+        'PatchUpdate': ([in9, in10, in11, in12, in125, in13, in14, in15, in8, out8], in8.all_ref()+[in9, in10, in11, in12, in125, in13, in14, in15], out8.all_ref()),
     }
 
     
@@ -52,14 +55,14 @@ def make_swe():
         ],
         large_output_mode="../../Artifacts"),
         C_Backend(
-            extra_headers=["../../stdlibs.h", "swe_2_base.h"],
-            namespace="kernels::swe2"),
+            extra_headers=["../../stdlibs.h", "euler3d_2_base.h"],
+            namespace="kernels::euler3d_2"),
         verbose=True,
-        output_file="../../Artifacts/swe.g.cpp"
+        output_file="../../Artifacts/euler3d.g.cpp"
     )
     
     tf_stack.tf(g)
 
 
 if __name__=="__main__":
-    make_swe()
+    make_euler3d()
