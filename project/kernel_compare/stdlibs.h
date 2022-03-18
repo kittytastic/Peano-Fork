@@ -8,6 +8,7 @@
 #include <utility>
 #include <assert.h>
 #include <fstream>
+#include <algorithm>
 
 
 int pow(int num, int pow);

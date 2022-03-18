@@ -33,22 +33,22 @@ void print_vector(double* vec, int length){
     std::cout << "]" << std::endl;
 }
 
-void benchMarkKernel(const Kernel* k, benchmark::BenchmarkResults* results){
+void benchMarkKernel(const Kernel* k, benchmark::BenchmarkResults* results, float target_time){
     int inputVectorLength = pow(k->cellsPerAxis+2, k->dim) * (k->unknowns + k->auxiliary);
     int outputVectorLength = pow(k->cellsPerAxis, k->dim) * (k->unknowns + k->auxiliary);
     double* inVec = (double*) malloc(inputVectorLength*sizeof(double));
     double* outVec = (double*) malloc(outputVectorLength*sizeof(double));
 
-    benchmark::benchmark([&](){k->runKernel(&k->testCases[0], outVec);}, results, benchmark::NONE, 0.5);    
+    benchmark::benchmark([&](){k->runKernel(&k->testCases[0], outVec);}, results, benchmark::NONE, target_time);    
     
     free(inVec);
     free(outVec);
 }
 
-void saveResults(std::vector<RunResults*> *results){
+void saveResults(std::vector<RunResults*> *results, std::string filename){
 
     std::ofstream resultFile;
-    resultFile.open ("results.csv");
+    resultFile.open(filename);
     resultFile << "name, tests_passed, num_trials, total_time";
     for(const auto &r: *results){
         resultFile << r->name << ", " <<  (r->tests_passed?"true":"false") <<", " << r->benchmark_results->trials << ", " << r->benchmark_results->total_run_time<<std::endl;
@@ -58,8 +58,46 @@ void saveResults(std::vector<RunResults*> *results){
 
 }
 
-int main(){
+
+
+char* getCmdOption(char ** begin, char ** end, const std::string & option)
+{
+    char ** itr = std::find(begin, end, option);
+    if (itr != end && ++itr != end)
+    {
+        return *itr;
+    }
+    return 0;
+}
+
+bool cmdOptionExists(char** begin, char** end, const std::string& option)
+{
+    return std::find(begin, end, option) != end;
+}
+
+int main(int argc, char * argv[]){
     std::cout << "------------ Kernel Compare -----------" << std::endl;
+
+    if(cmdOptionExists(argv, argv+argc, "-h"))
+    {
+        std::cout<<"-t target_time_float [default 5.0]\n-f file_name_str [default 'results.csv'}";
+    }
+
+    std::string resultsFileName="results.csv";
+
+    char * filename = getCmdOption(argv, argv + argc, "-f");
+    if (filename)
+    {
+        resultsFileName = std::string(filename);
+    }
+    
+    float target_time = 5.0;
+    char * target_time_str = getCmdOption(argv, argv + argc, "-t");
+    if (target_time_str)
+    {
+        target_time = std::stof(target_time_str);
+    }
+
 
     std::vector<Kernel> allKernels = {
         kernels::euler3d2::euler3d2,
@@ -81,9 +119,9 @@ int main(){
         all_results.push_back(full_res);
         std::cout << std::endl<< k.name << std::endl;
         full_res->tests_passed=testKernel(&k);
-        benchMarkKernel(&k, res);
+        benchMarkKernel(&k, res, target_time);
     }
 
-    saveResults(&all_results);
+    saveResults(&all_results, filename);
 }
 
