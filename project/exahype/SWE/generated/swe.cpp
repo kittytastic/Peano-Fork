@@ -134,7 +134,7 @@ void ::project::exahype::SWE::generated::swe::flux(
 
 
 
-void ::project::swe::swe::nonconservativeProduct(
+void ::project::exahype::SWE::generated::swe::nonconservativeProduct(
   const double * __restrict__ Q, // Q[3+1],
   const double * __restrict__             deltaQ, // [3+1]
   const tarch::la::Vector<Dimensions,double>&  faceCentre,
