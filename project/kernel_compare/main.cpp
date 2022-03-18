@@ -122,6 +122,7 @@ int main(int argc, char * argv[]){
         benchMarkKernel(&k, res, target_time);
     }
 
-    saveResults(&all_results, filename);
+    std::cout << "\n\nSaving results to: "<<resultsFileName<<std::endl;
+    saveResults(&all_results, resultsFileName);
 }
 
