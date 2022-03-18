@@ -61,6 +61,9 @@ std::string smart_num_string(long long num){
     }
 
     for (int i = str_parts.size() - 1; i >= 0; --i) {
+        if( i!=str_parts.size() - 1){
+            out_str << std::setfill('0') << std::setw(3);
+        }
         out_str << str_parts[i]; 
         if(i!=0){out_str<< ",";}
     }
@@ -106,6 +109,10 @@ int by_time(std::function<void()> func, double target_dur_s , std::vector<long l
     return done_trials;
 }
 }
+struct BenchmarkResults {
+    long long trials;
+    long long total_run_time;
+};
 /**
  * @brief Benchmark the runtime of a function.
  * 
@@ -113,7 +120,7 @@ int by_time(std::function<void()> func, double target_dur_s , std::vector<long l
  * @param trials [Optional] The number of trials 
  * @param target_dur_s [Optional] The target test duration (in s)
  */
-void benchmark(std::function<void()> func, std::optional<int> trials, std::optional<double> target_dur_s){
+void benchmark(std::function<void()> func, BenchmarkResults* results, std::optional<int> trials, std::optional<double> target_dur_s){
     
     if(!trials.has_value() && !target_dur_s.has_value()){
         std::cout << "Failed to run benchmark. Please provide a number of trails or target length."<<std::endl;
@@ -147,6 +154,8 @@ void benchmark(std::function<void()> func, std::optional<int> trials, std::optio
     std::cout << std::setw(lfw) << std::left<< "Total run time:"<< std::setw(rfw) << std::right<<core::smart_print_time(global_run_time)<< std::endl;
     std::cout << std::setw(lfw) << std::left<< "Mean run time:"<< std::setw(rfw) << std::right << core::smart_print_time((long long)mean) << std::endl;
     std::cout << std::setw(lfw) << std::left<< "STD:"<< std::setw(rfw) << std::right << core::smart_print_time((long long)std)<< std::endl;
+    results->trials = done_trials;
+    results->total_run_time = global_run_time;
 }
 
 const auto NONE = std::nullopt;

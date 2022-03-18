@@ -1,7 +1,7 @@
 .PHONY = all clean
 
 CXX = g++
-CXXFLAGS = -g3 -std=c++17
+CXXFLAGS = -g3 -std=c++17 -march=native
 OPTIMISE_CXX_FLAGS = -O3
  
 FAST_FILES = kernels/shared.cpp kernels/k1/kernel_1_base.cpp kernels/k2/kernel_2_base.cpp kernels/k3/out-code.cpp kernels/swe1/swe_1_base.cpp kernels/swe2/swe.g.cpp kernels/euler3d1/euler3d_1_base.cpp kernels/euler3d2/euler3d.g.cpp
