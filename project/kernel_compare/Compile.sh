@@ -15,6 +15,12 @@ case $preset in
     hal-intel)
         MAKE_ARGS="CXX=icpx"
         ;;
+    ham-amd)
+        MAKE_ARGS="CXX='clang++' OPTIMISE_CXX_FLAGS='-Ofast'"
+        ;;
+    ham-intel)
+        MAKE_ARGS="CXX='icpx' OPTIMISE_CXX_FLAGS='-Ofast'"
+        ;;
     g++)
         MAKE_ARGS="CXX=g++"
         ;;

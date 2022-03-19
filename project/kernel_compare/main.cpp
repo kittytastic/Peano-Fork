@@ -49,7 +49,7 @@ void saveResults(std::vector<RunResults*> *results, std::string filename){
 
     std::ofstream resultFile;
     resultFile.open(filename);
-    resultFile << "name, tests_passed, num_trials, total_time";
+    resultFile << "name, tests_passed, num_trials, total_time"<<std::endl;
     for(const auto &r: *results){
         resultFile << r->name << ", " <<  (r->tests_passed?"true":"false") <<", " << r->benchmark_results->trials << ", " << r->benchmark_results->total_run_time<<std::endl;
     }
