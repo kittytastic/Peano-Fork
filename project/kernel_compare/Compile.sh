@@ -21,6 +21,9 @@ case $preset in
     ham-intel)
         MAKE_ARGS="CXX='icpx' OPTIMISE_CXX_FLAGS='-Ofast'"
         ;;
+    ham7-intel)
+        MAKE_ARGS="CXX='icpx' OPTIMISE_CXX_FLAGS='-Ofast'"
+        ;;
     g++)
         MAKE_ARGS="CXX=g++"
         ;;
