@@ -2,13 +2,14 @@
 \usepackage{biblatex}
 \usepackage{times}
 \usepackage{durhampaper}
+\usepackage{amssymb}
 %\usepackage{harvard}
 
 
 %\newcommand{\testingbreak}{\pagebreak}%
 
 \newif\iftesting
-\testingtrue
+%\testingtrue
 
 \newcommand{\testingbreak}{\iftesting \pagebreak \fi}%
 
@@ -113,6 +114,7 @@ ExaHyPE
 
 \testingbreak
 \section{Results}
+\input{Sections/results.tex}
 %\ornamentbreak
 
 \section{Evaluation}

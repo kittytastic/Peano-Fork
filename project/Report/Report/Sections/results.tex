@@ -1,0 +1,35 @@
+\subsection{Testing Methodology}
+% Test methodology
+% [ ] Problems
+% [ ] Kernel Validity
+% [ ] Exahype results
+% [ ] Kernel Compare results
+
+\begin{tabular}{ccccccccc}
+Problem & Unknowns+Auxillary & Dim & Patch size & Uses Flux & Uses NCP\\
+\hline
+
+Euler 2D & 4+0 & 2 & 3x3 & \checkmark & \xmark \\
+Euler 3D & 5+0 & 3 & 3x3x3 & \checkmark & \xmark \\
+SWE & 3+1 & 2 & 3x3 & \checkmark & \checkmark \\
+
+\end{tabular}
+
+\subsection{Performance of Generated Kernels}
+% Default vs generated 
+% [ ] kernel compare results 
+% [ ] exahype results 
+
+\subsection{Exploring Generated Kernels Advantage}
+% Diving into why - vs hand optimized kernels
+% [ ] Introduce hand optimized kernels
+% [ ] Results vs hand optimised kernels
+% [ ] Talk about compiler flag result
+
+\subsection{Further Optimisations}
+% Effect of computation reduction
+% [ ] Adding comp dedup speed
+
+\subsection{Compiler Practicalities}
+% [ ] Compiler speed
+% [ ] Input interface practicalities
