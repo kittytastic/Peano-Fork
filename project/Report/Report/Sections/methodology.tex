@@ -57,6 +57,55 @@ This will not be supported by the compiler.
 % What is a DAG - chip model
 % [ ] Explain chip model
 % [ ] Show example
+% [ ] Control flow hoisting
+
+Our compiler will begin with a Directed Acyclic Graph (DAG).
+Currently it is the responsibility of a user to create such a DAG, however it would be entirely possible to generate a DAG using a user friendly format such as from a SymPy [REF] formula.
+The DAG model we propose takes inspiration from hardware design and languages such a VDHL.
+
+In a hardware design language you define electrical components.
+Each component has input and output ports and its output is a function of its input.
+Furthermore, it is common place to see specifications and test cases along side a component to be used in verification.
+
+In our DAG every node has a set of input and output ports.
+Every input port must receive single value and every output port can transmit a copies of a single value.
+Every a node $n$ in our graph can be describes a function: $\vecc{out ports}=n(\vecc{in ports})$ with the number of inputs and outputs being of a fixed length.
+
+A node may be primitive and directly map to a primitive code operation, for example an addition node maps to $out_1 = in_1 + in_2$ (see Figure \ref{fig:bin_add}).
+Or a node may be composite, where it is a DAG itself.
+Composite nodes would map to functions in the final code output.
+Figure \ref{fig:bn} demonstrates composite nodes with the calculation $out_0 = (in_0)^3 + in_1$ where the function \textit{cubed} has been implemented as a subgraph.
+
+
+\begin{figure}[h!]
+    \begin{center}
+        \includegraphics[width=.15\textwidth]{binary_add.png}
+        \caption{Example of binary addition as a DAG node.}
+        \label{fig:bin_add}
+    \end{center}
+\end{figure}
+
+\begin{figure}[h!]
+    \begin{center}
+        \begin{subfigure}{.2\textwidth}
+            \begin{center}
+                \includegraphics[width=.95\textwidth]{basic-nested-part1.png}
+                \caption{Top level}
+                \label{fig:bn1}
+            \end{center}
+        \end{subfigure}%
+        \begin{subfigure}{.2\textwidth}
+            \begin{center}
+                \includegraphics[width=.95\textwidth]{basic-nested-part0.png}
+                \caption{Exploded view}
+                \label{fig:bn0}
+            \end{center}
+        \end{subfigure}%
+        \caption{Example of a nested DAG that calculates $out_0 = (in_0)^3 + in_1$. NOTE the visualisation displays a node's input edges in a random order.}
+        \label{fig:bn}
+    \end{center}
+\end{figure}
+
 
 \subsection{IR}
 % What is the IR - llvm inspired
