@@ -19,7 +19,7 @@ import exahype2
 import argparse
 
 
-project = exahype2.Project( ["project", "exahype", "Euler3D", "default_kernel"], "euler3D", ".", executable="Euler3D_Generated" )
+project = exahype2.Project( ["project", "exahype", "Euler3D", "default_kernel"], "euler3D", ".", executable="Euler3D_Default" )
 
 
 #
