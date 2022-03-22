@@ -19,7 +19,7 @@ import exahype2
 import argparse
 
 
-project = exahype2.Project( ["project", "exahype", "Euler3D", "default"], "euler3D", ".", executable="Euler3D" )
+project = exahype2.Project( ["project", "exahype", "Euler3D", "default_kernel"], "euler3D", ".", executable="Euler3D_Generated" )
 
 
 #
@@ -70,7 +70,7 @@ project.set_global_simulation_parameters(
   size = [0.5, 0.5, 0.5],
   end_time = 1.0,
   first_plot_time_stamp = 0.0,
-  time_in_between_plots = 0.05,      # snapshots
+  time_in_between_plots = 0,      # snapshots
   #periodic_BC = [False, False, False]
 )
 

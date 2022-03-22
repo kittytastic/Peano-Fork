@@ -2,7 +2,7 @@
 #include "exahype2/RefinementControl.h"
 
 
-tarch::logging::Log   project::euler_3d::euler3D::_log( "project::euler_3d::euler3D" );
+tarch::logging::Log   project::exahype::Euler3D::default_kernel::euler3D::_log( "project::exahype::Euler3D::default_kernel::euler3D" );
 
 
 
@@ -10,7 +10,7 @@ tarch::logging::Log   project::euler_3d::euler3D::_log( "project::euler_3d::eule
 
 
 
-void project::euler_3d::euler3D::initialCondition(
+void project::exahype::Euler3D::default_kernel::euler3D::initialCondition(
   double * __restrict__ Q,
   const tarch::la::Vector<Dimensions,double>&  volumeCentre,
   const tarch::la::Vector<Dimensions,double>&  volumeH,
@@ -35,7 +35,7 @@ void project::euler_3d::euler3D::initialCondition(
 
 
 
-void project::euler_3d::euler3D::boundaryConditions(
+void project::exahype::Euler3D::default_kernel::euler3D::boundaryConditions(
   const double * __restrict__                  Qinside, // Qinside[5+0]
   double * __restrict__                        Qoutside, // Qoutside[5+0]
   const tarch::la::Vector<Dimensions,double>&  faceCentre,
@@ -56,7 +56,7 @@ void project::euler_3d::euler3D::boundaryConditions(
 
 
 
-double ::project::euler_3d::euler3D::maxEigenvalue(
+double ::project::exahype::Euler3D::default_kernel::euler3D::maxEigenvalue(
   const double * __restrict__ Q, // Q[5+0],
   const tarch::la::Vector<Dimensions,double>&  faceCentre,
   const tarch::la::Vector<Dimensions,double>&  volumeH,
@@ -93,7 +93,7 @@ double ::project::euler_3d::euler3D::maxEigenvalue(
 
 
 
-void ::project::euler_3d::euler3D::flux(
+void ::project::exahype::Euler3D::default_kernel::euler3D::flux(
   const double * __restrict__ Q, // Q[5+0],
   const tarch::la::Vector<Dimensions,double>&  faceCentre,
   const tarch::la::Vector<Dimensions,double>&  volumeH,

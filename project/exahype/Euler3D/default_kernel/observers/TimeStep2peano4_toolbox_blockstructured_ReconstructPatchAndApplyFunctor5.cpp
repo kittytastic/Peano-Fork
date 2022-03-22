@@ -4,7 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#define DO_TEST_PRINT 
+//#define DO_TEST_PRINT 
 
 const int TARGET_TEST_CASES = 10;
 const int p_patchSize = 3;
@@ -42,7 +42,7 @@ void initialise(){
 //double time_c = 0;
 double next_t_target = 0.001;
 double end_t_target = 0.18;
-double step_ttt = (end_t_target-step_ttt)/TARGET_TEST_CASES; 
+double step_ttt = (end_t_target-next_t_target)/TARGET_TEST_CASES; 
 void should_print(const double* Qin, const double *Qout, tarch::la::Vector<3, double> pos, tarch::la::Vector<3, double> size, double t, double ts, bool* shouldPrint, bool* shouldKill){
 if(Qin[30]>next_t_target){
   next_t_target+=step_ttt;
@@ -95,195 +95,189 @@ void finalise(){
 
 /**********************************************************/
 
-tarch::logging::Log project::euler_3d::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::_log( "project::euler_3d::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5");
-
-
-
-
-
-project::euler_3d::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5(int treeNumber) {
+project::exahype::Euler3D::default_kernel::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5(int treeNumber) {
   _treeNumber = treeNumber;
 }
 
 
-project::euler_3d::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::~TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5() {
+project::exahype::Euler3D::default_kernel::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::~TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5() {
 // @todo Should be overwritten
 }
 
 
-std::vector< peano4::grid::GridControlEvent > project::euler_3d::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::getGridControlEvents() const {
+std::vector< peano4::grid::GridControlEvent > project::exahype::Euler3D::default_kernel::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::getGridControlEvents() const {
 return std::vector< peano4::grid::GridControlEvent >();
 }
 
 
-void project::euler_3d::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::beginTraversal(
+void project::exahype::Euler3D::default_kernel::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::beginTraversal(
       ) {
 
 
 }
 
 
-void project::euler_3d::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::endTraversal(
+void project::exahype::Euler3D::default_kernel::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::endTraversal(
       ) {
 
 
 }
 
 
-void project::euler_3d::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::createPersistentFace(
+void project::exahype::Euler3D::default_kernel::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::createPersistentFace(
       const peano4::datamanagement::FaceMarker& marker,
-      project::euler_3d::facedata::euler3DQOld& fineGridFaceeuler3DQOld,
-      project::euler_3d::facedata::euler3DQNew& fineGridFaceeuler3DQNew,
-      project::euler_3d::facedata::euler3DQUpdate& fineGridFaceeuler3DQUpdate,
-      project::euler_3d::facedata::euler3DFaceLabel& fineGridFaceeuler3DFaceLabel,
-      peano4::datamanagement::FaceEnumerator<project::euler_3d::facedata::euler3DQOld> coarseGridFaceseuler3DQOld,
-      peano4::datamanagement::FaceEnumerator<project::euler_3d::facedata::euler3DQNew> coarseGridFaceseuler3DQNew,
-      peano4::datamanagement::FaceEnumerator<project::euler_3d::facedata::euler3DQUpdate> coarseGridFaceseuler3DQUpdate,
-      peano4::datamanagement::FaceEnumerator<project::euler_3d::facedata::euler3DFaceLabel> coarseGridFaceseuler3DFaceLabel,
-      project::euler_3d::celldata::euler3DQ& coarseGridCelleuler3DQ,
-      project::euler_3d::celldata::euler3DCellLabel& coarseGridCelleuler3DCellLabel) {
+      project::exahype::Euler3D::default_kernel::facedata::euler3DQOld& fineGridFaceeuler3DQOld,
+      project::exahype::Euler3D::default_kernel::facedata::euler3DQNew& fineGridFaceeuler3DQNew,
+      project::exahype::Euler3D::default_kernel::facedata::euler3DQUpdate& fineGridFaceeuler3DQUpdate,
+      project::exahype::Euler3D::default_kernel::facedata::euler3DFaceLabel& fineGridFaceeuler3DFaceLabel,
+      peano4::datamanagement::FaceEnumerator<project::exahype::Euler3D::default_kernel::facedata::euler3DQOld> coarseGridFaceseuler3DQOld,
+      peano4::datamanagement::FaceEnumerator<project::exahype::Euler3D::default_kernel::facedata::euler3DQNew> coarseGridFaceseuler3DQNew,
+      peano4::datamanagement::FaceEnumerator<project::exahype::Euler3D::default_kernel::facedata::euler3DQUpdate> coarseGridFaceseuler3DQUpdate,
+      peano4::datamanagement::FaceEnumerator<project::exahype::Euler3D::default_kernel::facedata::euler3DFaceLabel> coarseGridFaceseuler3DFaceLabel,
+      project::exahype::Euler3D::default_kernel::celldata::euler3DQ& coarseGridCelleuler3DQ,
+      project::exahype::Euler3D::default_kernel::celldata::euler3DCellLabel& coarseGridCelleuler3DCellLabel) {
 
 
 }
 
 
-void project::euler_3d::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::destroyPersistentFace(
+void project::exahype::Euler3D::default_kernel::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::destroyPersistentFace(
       const peano4::datamanagement::FaceMarker& marker,
-      project::euler_3d::facedata::euler3DQOld& fineGridFaceeuler3DQOld,
-      project::euler_3d::facedata::euler3DQNew& fineGridFaceeuler3DQNew,
-      project::euler_3d::facedata::euler3DQUpdate& fineGridFaceeuler3DQUpdate,
-      project::euler_3d::facedata::euler3DFaceLabel& fineGridFaceeuler3DFaceLabel,
-      peano4::datamanagement::FaceEnumerator<project::euler_3d::facedata::euler3DQOld> coarseGridFaceseuler3DQOld,
-      peano4::datamanagement::FaceEnumerator<project::euler_3d::facedata::euler3DQNew> coarseGridFaceseuler3DQNew,
-      peano4::datamanagement::FaceEnumerator<project::euler_3d::facedata::euler3DQUpdate> coarseGridFaceseuler3DQUpdate,
-      peano4::datamanagement::FaceEnumerator<project::euler_3d::facedata::euler3DFaceLabel> coarseGridFaceseuler3DFaceLabel,
-      project::euler_3d::celldata::euler3DQ& coarseGridCelleuler3DQ,
-      project::euler_3d::celldata::euler3DCellLabel& coarseGridCelleuler3DCellLabel) {
+      project::exahype::Euler3D::default_kernel::facedata::euler3DQOld& fineGridFaceeuler3DQOld,
+      project::exahype::Euler3D::default_kernel::facedata::euler3DQNew& fineGridFaceeuler3DQNew,
+      project::exahype::Euler3D::default_kernel::facedata::euler3DQUpdate& fineGridFaceeuler3DQUpdate,
+      project::exahype::Euler3D::default_kernel::facedata::euler3DFaceLabel& fineGridFaceeuler3DFaceLabel,
+      peano4::datamanagement::FaceEnumerator<project::exahype::Euler3D::default_kernel::facedata::euler3DQOld> coarseGridFaceseuler3DQOld,
+      peano4::datamanagement::FaceEnumerator<project::exahype::Euler3D::default_kernel::facedata::euler3DQNew> coarseGridFaceseuler3DQNew,
+      peano4::datamanagement::FaceEnumerator<project::exahype::Euler3D::default_kernel::facedata::euler3DQUpdate> coarseGridFaceseuler3DQUpdate,
+      peano4::datamanagement::FaceEnumerator<project::exahype::Euler3D::default_kernel::facedata::euler3DFaceLabel> coarseGridFaceseuler3DFaceLabel,
+      project::exahype::Euler3D::default_kernel::celldata::euler3DQ& coarseGridCelleuler3DQ,
+      project::exahype::Euler3D::default_kernel::celldata::euler3DCellLabel& coarseGridCelleuler3DCellLabel) {
 
 
 }
 
 
-void project::euler_3d::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::createHangingFace(
+void project::exahype::Euler3D::default_kernel::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::createHangingFace(
       const peano4::datamanagement::FaceMarker& marker,
-      project::euler_3d::facedata::euler3DQOld& fineGridFaceeuler3DQOld,
-      project::euler_3d::facedata::euler3DQNew& fineGridFaceeuler3DQNew,
-      project::euler_3d::facedata::euler3DQUpdate& fineGridFaceeuler3DQUpdate,
-      project::euler_3d::facedata::euler3DFaceLabel& fineGridFaceeuler3DFaceLabel,
-      peano4::datamanagement::FaceEnumerator<project::euler_3d::facedata::euler3DQOld> coarseGridFaceseuler3DQOld,
-      peano4::datamanagement::FaceEnumerator<project::euler_3d::facedata::euler3DQNew> coarseGridFaceseuler3DQNew,
-      peano4::datamanagement::FaceEnumerator<project::euler_3d::facedata::euler3DQUpdate> coarseGridFaceseuler3DQUpdate,
-      peano4::datamanagement::FaceEnumerator<project::euler_3d::facedata::euler3DFaceLabel> coarseGridFaceseuler3DFaceLabel,
-      project::euler_3d::celldata::euler3DQ& coarseGridCelleuler3DQ,
-      project::euler_3d::celldata::euler3DCellLabel& coarseGridCelleuler3DCellLabel) {
+      project::exahype::Euler3D::default_kernel::facedata::euler3DQOld& fineGridFaceeuler3DQOld,
+      project::exahype::Euler3D::default_kernel::facedata::euler3DQNew& fineGridFaceeuler3DQNew,
+      project::exahype::Euler3D::default_kernel::facedata::euler3DQUpdate& fineGridFaceeuler3DQUpdate,
+      project::exahype::Euler3D::default_kernel::facedata::euler3DFaceLabel& fineGridFaceeuler3DFaceLabel,
+      peano4::datamanagement::FaceEnumerator<project::exahype::Euler3D::default_kernel::facedata::euler3DQOld> coarseGridFaceseuler3DQOld,
+      peano4::datamanagement::FaceEnumerator<project::exahype::Euler3D::default_kernel::facedata::euler3DQNew> coarseGridFaceseuler3DQNew,
+      peano4::datamanagement::FaceEnumerator<project::exahype::Euler3D::default_kernel::facedata::euler3DQUpdate> coarseGridFaceseuler3DQUpdate,
+      peano4::datamanagement::FaceEnumerator<project::exahype::Euler3D::default_kernel::facedata::euler3DFaceLabel> coarseGridFaceseuler3DFaceLabel,
+      project::exahype::Euler3D::default_kernel::celldata::euler3DQ& coarseGridCelleuler3DQ,
+      project::exahype::Euler3D::default_kernel::celldata::euler3DCellLabel& coarseGridCelleuler3DCellLabel) {
 
 
 }
 
 
-void project::euler_3d::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::destroyHangingFace(
+void project::exahype::Euler3D::default_kernel::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::destroyHangingFace(
       const peano4::datamanagement::FaceMarker& marker,
-      project::euler_3d::facedata::euler3DQOld& fineGridFaceeuler3DQOld,
-      project::euler_3d::facedata::euler3DQNew& fineGridFaceeuler3DQNew,
-      project::euler_3d::facedata::euler3DQUpdate& fineGridFaceeuler3DQUpdate,
-      project::euler_3d::facedata::euler3DFaceLabel& fineGridFaceeuler3DFaceLabel,
-      peano4::datamanagement::FaceEnumerator<project::euler_3d::facedata::euler3DQOld> coarseGridFaceseuler3DQOld,
-      peano4::datamanagement::FaceEnumerator<project::euler_3d::facedata::euler3DQNew> coarseGridFaceseuler3DQNew,
-      peano4::datamanagement::FaceEnumerator<project::euler_3d::facedata::euler3DQUpdate> coarseGridFaceseuler3DQUpdate,
-      peano4::datamanagement::FaceEnumerator<project::euler_3d::facedata::euler3DFaceLabel> coarseGridFaceseuler3DFaceLabel,
-      project::euler_3d::celldata::euler3DQ& coarseGridCelleuler3DQ,
-      project::euler_3d::celldata::euler3DCellLabel& coarseGridCelleuler3DCellLabel) {
+      project::exahype::Euler3D::default_kernel::facedata::euler3DQOld& fineGridFaceeuler3DQOld,
+      project::exahype::Euler3D::default_kernel::facedata::euler3DQNew& fineGridFaceeuler3DQNew,
+      project::exahype::Euler3D::default_kernel::facedata::euler3DQUpdate& fineGridFaceeuler3DQUpdate,
+      project::exahype::Euler3D::default_kernel::facedata::euler3DFaceLabel& fineGridFaceeuler3DFaceLabel,
+      peano4::datamanagement::FaceEnumerator<project::exahype::Euler3D::default_kernel::facedata::euler3DQOld> coarseGridFaceseuler3DQOld,
+      peano4::datamanagement::FaceEnumerator<project::exahype::Euler3D::default_kernel::facedata::euler3DQNew> coarseGridFaceseuler3DQNew,
+      peano4::datamanagement::FaceEnumerator<project::exahype::Euler3D::default_kernel::facedata::euler3DQUpdate> coarseGridFaceseuler3DQUpdate,
+      peano4::datamanagement::FaceEnumerator<project::exahype::Euler3D::default_kernel::facedata::euler3DFaceLabel> coarseGridFaceseuler3DFaceLabel,
+      project::exahype::Euler3D::default_kernel::celldata::euler3DQ& coarseGridCelleuler3DQ,
+      project::exahype::Euler3D::default_kernel::celldata::euler3DCellLabel& coarseGridCelleuler3DCellLabel) {
 
 
 }
 
 
-void project::euler_3d::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::touchFaceFirstTime(
+void project::exahype::Euler3D::default_kernel::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::touchFaceFirstTime(
       const peano4::datamanagement::FaceMarker& marker,
-      project::euler_3d::facedata::euler3DQOld& fineGridFaceeuler3DQOld,
-      project::euler_3d::facedata::euler3DQNew& fineGridFaceeuler3DQNew,
-      project::euler_3d::facedata::euler3DQUpdate& fineGridFaceeuler3DQUpdate,
-      project::euler_3d::facedata::euler3DFaceLabel& fineGridFaceeuler3DFaceLabel,
-      peano4::datamanagement::FaceEnumerator<project::euler_3d::facedata::euler3DQOld> coarseGridFaceseuler3DQOld,
-      peano4::datamanagement::FaceEnumerator<project::euler_3d::facedata::euler3DQNew> coarseGridFaceseuler3DQNew,
-      peano4::datamanagement::FaceEnumerator<project::euler_3d::facedata::euler3DQUpdate> coarseGridFaceseuler3DQUpdate,
-      peano4::datamanagement::FaceEnumerator<project::euler_3d::facedata::euler3DFaceLabel> coarseGridFaceseuler3DFaceLabel,
-      project::euler_3d::celldata::euler3DQ& coarseGridCelleuler3DQ,
-      project::euler_3d::celldata::euler3DCellLabel& coarseGridCelleuler3DCellLabel) {
+      project::exahype::Euler3D::default_kernel::facedata::euler3DQOld& fineGridFaceeuler3DQOld,
+      project::exahype::Euler3D::default_kernel::facedata::euler3DQNew& fineGridFaceeuler3DQNew,
+      project::exahype::Euler3D::default_kernel::facedata::euler3DQUpdate& fineGridFaceeuler3DQUpdate,
+      project::exahype::Euler3D::default_kernel::facedata::euler3DFaceLabel& fineGridFaceeuler3DFaceLabel,
+      peano4::datamanagement::FaceEnumerator<project::exahype::Euler3D::default_kernel::facedata::euler3DQOld> coarseGridFaceseuler3DQOld,
+      peano4::datamanagement::FaceEnumerator<project::exahype::Euler3D::default_kernel::facedata::euler3DQNew> coarseGridFaceseuler3DQNew,
+      peano4::datamanagement::FaceEnumerator<project::exahype::Euler3D::default_kernel::facedata::euler3DQUpdate> coarseGridFaceseuler3DQUpdate,
+      peano4::datamanagement::FaceEnumerator<project::exahype::Euler3D::default_kernel::facedata::euler3DFaceLabel> coarseGridFaceseuler3DFaceLabel,
+      project::exahype::Euler3D::default_kernel::celldata::euler3DQ& coarseGridCelleuler3DQ,
+      project::exahype::Euler3D::default_kernel::celldata::euler3DCellLabel& coarseGridCelleuler3DCellLabel) {
 
 
 }
 
 
-void project::euler_3d::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::touchFaceLastTime(
+void project::exahype::Euler3D::default_kernel::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::touchFaceLastTime(
       const peano4::datamanagement::FaceMarker& marker,
-      project::euler_3d::facedata::euler3DQOld& fineGridFaceeuler3DQOld,
-      project::euler_3d::facedata::euler3DQNew& fineGridFaceeuler3DQNew,
-      project::euler_3d::facedata::euler3DQUpdate& fineGridFaceeuler3DQUpdate,
-      project::euler_3d::facedata::euler3DFaceLabel& fineGridFaceeuler3DFaceLabel,
-      peano4::datamanagement::FaceEnumerator<project::euler_3d::facedata::euler3DQOld> coarseGridFaceseuler3DQOld,
-      peano4::datamanagement::FaceEnumerator<project::euler_3d::facedata::euler3DQNew> coarseGridFaceseuler3DQNew,
-      peano4::datamanagement::FaceEnumerator<project::euler_3d::facedata::euler3DQUpdate> coarseGridFaceseuler3DQUpdate,
-      peano4::datamanagement::FaceEnumerator<project::euler_3d::facedata::euler3DFaceLabel> coarseGridFaceseuler3DFaceLabel,
-      project::euler_3d::celldata::euler3DQ& coarseGridCelleuler3DQ,
-      project::euler_3d::celldata::euler3DCellLabel& coarseGridCelleuler3DCellLabel) {
+      project::exahype::Euler3D::default_kernel::facedata::euler3DQOld& fineGridFaceeuler3DQOld,
+      project::exahype::Euler3D::default_kernel::facedata::euler3DQNew& fineGridFaceeuler3DQNew,
+      project::exahype::Euler3D::default_kernel::facedata::euler3DQUpdate& fineGridFaceeuler3DQUpdate,
+      project::exahype::Euler3D::default_kernel::facedata::euler3DFaceLabel& fineGridFaceeuler3DFaceLabel,
+      peano4::datamanagement::FaceEnumerator<project::exahype::Euler3D::default_kernel::facedata::euler3DQOld> coarseGridFaceseuler3DQOld,
+      peano4::datamanagement::FaceEnumerator<project::exahype::Euler3D::default_kernel::facedata::euler3DQNew> coarseGridFaceseuler3DQNew,
+      peano4::datamanagement::FaceEnumerator<project::exahype::Euler3D::default_kernel::facedata::euler3DQUpdate> coarseGridFaceseuler3DQUpdate,
+      peano4::datamanagement::FaceEnumerator<project::exahype::Euler3D::default_kernel::facedata::euler3DFaceLabel> coarseGridFaceseuler3DFaceLabel,
+      project::exahype::Euler3D::default_kernel::celldata::euler3DQ& coarseGridCelleuler3DQ,
+      project::exahype::Euler3D::default_kernel::celldata::euler3DCellLabel& coarseGridCelleuler3DCellLabel) {
 
 
 }
 
 
-void project::euler_3d::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::createCell(
+void project::exahype::Euler3D::default_kernel::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::createCell(
       const peano4::datamanagement::CellMarker& marker,
-      peano4::datamanagement::FaceEnumerator<project::euler_3d::facedata::euler3DQOld> fineGridFaceseuler3DQOld,
-      peano4::datamanagement::FaceEnumerator<project::euler_3d::facedata::euler3DQNew> fineGridFaceseuler3DQNew,
-      peano4::datamanagement::FaceEnumerator<project::euler_3d::facedata::euler3DQUpdate> fineGridFaceseuler3DQUpdate,
-      peano4::datamanagement::FaceEnumerator<project::euler_3d::facedata::euler3DFaceLabel> fineGridFaceseuler3DFaceLabel,
-      project::euler_3d::celldata::euler3DQ& fineGridCelleuler3DQ,
-      project::euler_3d::celldata::euler3DCellLabel& fineGridCelleuler3DCellLabel,
-      peano4::datamanagement::FaceEnumerator<project::euler_3d::facedata::euler3DQOld> coarseGridFaceseuler3DQOld,
-      peano4::datamanagement::FaceEnumerator<project::euler_3d::facedata::euler3DQNew> coarseGridFaceseuler3DQNew,
-      peano4::datamanagement::FaceEnumerator<project::euler_3d::facedata::euler3DQUpdate> coarseGridFaceseuler3DQUpdate,
-      peano4::datamanagement::FaceEnumerator<project::euler_3d::facedata::euler3DFaceLabel> coarseGridFaceseuler3DFaceLabel,
-      project::euler_3d::celldata::euler3DQ& coarseGridCelleuler3DQ,
-      project::euler_3d::celldata::euler3DCellLabel& coarseGridCelleuler3DCellLabel) {
+      peano4::datamanagement::FaceEnumerator<project::exahype::Euler3D::default_kernel::facedata::euler3DQOld> fineGridFaceseuler3DQOld,
+      peano4::datamanagement::FaceEnumerator<project::exahype::Euler3D::default_kernel::facedata::euler3DQNew> fineGridFaceseuler3DQNew,
+      peano4::datamanagement::FaceEnumerator<project::exahype::Euler3D::default_kernel::facedata::euler3DQUpdate> fineGridFaceseuler3DQUpdate,
+      peano4::datamanagement::FaceEnumerator<project::exahype::Euler3D::default_kernel::facedata::euler3DFaceLabel> fineGridFaceseuler3DFaceLabel,
+      project::exahype::Euler3D::default_kernel::celldata::euler3DQ& fineGridCelleuler3DQ,
+      project::exahype::Euler3D::default_kernel::celldata::euler3DCellLabel& fineGridCelleuler3DCellLabel,
+      peano4::datamanagement::FaceEnumerator<project::exahype::Euler3D::default_kernel::facedata::euler3DQOld> coarseGridFaceseuler3DQOld,
+      peano4::datamanagement::FaceEnumerator<project::exahype::Euler3D::default_kernel::facedata::euler3DQNew> coarseGridFaceseuler3DQNew,
+      peano4::datamanagement::FaceEnumerator<project::exahype::Euler3D::default_kernel::facedata::euler3DQUpdate> coarseGridFaceseuler3DQUpdate,
+      peano4::datamanagement::FaceEnumerator<project::exahype::Euler3D::default_kernel::facedata::euler3DFaceLabel> coarseGridFaceseuler3DFaceLabel,
+      project::exahype::Euler3D::default_kernel::celldata::euler3DQ& coarseGridCelleuler3DQ,
+      project::exahype::Euler3D::default_kernel::celldata::euler3DCellLabel& coarseGridCelleuler3DCellLabel) {
 
 
 }
 
 
-void project::euler_3d::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::destroyCell(
+void project::exahype::Euler3D::default_kernel::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::destroyCell(
       const peano4::datamanagement::CellMarker& marker,
-      peano4::datamanagement::FaceEnumerator<project::euler_3d::facedata::euler3DQOld> fineGridFaceseuler3DQOld,
-      peano4::datamanagement::FaceEnumerator<project::euler_3d::facedata::euler3DQNew> fineGridFaceseuler3DQNew,
-      peano4::datamanagement::FaceEnumerator<project::euler_3d::facedata::euler3DQUpdate> fineGridFaceseuler3DQUpdate,
-      peano4::datamanagement::FaceEnumerator<project::euler_3d::facedata::euler3DFaceLabel> fineGridFaceseuler3DFaceLabel,
-      project::euler_3d::celldata::euler3DQ& fineGridCelleuler3DQ,
-      project::euler_3d::celldata::euler3DCellLabel& fineGridCelleuler3DCellLabel,
-      peano4::datamanagement::FaceEnumerator<project::euler_3d::facedata::euler3DQOld> coarseGridFaceseuler3DQOld,
-      peano4::datamanagement::FaceEnumerator<project::euler_3d::facedata::euler3DQNew> coarseGridFaceseuler3DQNew,
-      peano4::datamanagement::FaceEnumerator<project::euler_3d::facedata::euler3DQUpdate> coarseGridFaceseuler3DQUpdate,
-      peano4::datamanagement::FaceEnumerator<project::euler_3d::facedata::euler3DFaceLabel> coarseGridFaceseuler3DFaceLabel,
-      project::euler_3d::celldata::euler3DQ& coarseGridCelleuler3DQ,
-      project::euler_3d::celldata::euler3DCellLabel& coarseGridCelleuler3DCellLabel) {
+      peano4::datamanagement::FaceEnumerator<project::exahype::Euler3D::default_kernel::facedata::euler3DQOld> fineGridFaceseuler3DQOld,
+      peano4::datamanagement::FaceEnumerator<project::exahype::Euler3D::default_kernel::facedata::euler3DQNew> fineGridFaceseuler3DQNew,
+      peano4::datamanagement::FaceEnumerator<project::exahype::Euler3D::default_kernel::facedata::euler3DQUpdate> fineGridFaceseuler3DQUpdate,
+      peano4::datamanagement::FaceEnumerator<project::exahype::Euler3D::default_kernel::facedata::euler3DFaceLabel> fineGridFaceseuler3DFaceLabel,
+      project::exahype::Euler3D::default_kernel::celldata::euler3DQ& fineGridCelleuler3DQ,
+      project::exahype::Euler3D::default_kernel::celldata::euler3DCellLabel& fineGridCelleuler3DCellLabel,
+      peano4::datamanagement::FaceEnumerator<project::exahype::Euler3D::default_kernel::facedata::euler3DQOld> coarseGridFaceseuler3DQOld,
+      peano4::datamanagement::FaceEnumerator<project::exahype::Euler3D::default_kernel::facedata::euler3DQNew> coarseGridFaceseuler3DQNew,
+      peano4::datamanagement::FaceEnumerator<project::exahype::Euler3D::default_kernel::facedata::euler3DQUpdate> coarseGridFaceseuler3DQUpdate,
+      peano4::datamanagement::FaceEnumerator<project::exahype::Euler3D::default_kernel::facedata::euler3DFaceLabel> coarseGridFaceseuler3DFaceLabel,
+      project::exahype::Euler3D::default_kernel::celldata::euler3DQ& coarseGridCelleuler3DQ,
+      project::exahype::Euler3D::default_kernel::celldata::euler3DCellLabel& coarseGridCelleuler3DCellLabel) {
 
 
 }
 
 
-void project::euler_3d::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::touchCellFirstTime(
+void project::exahype::Euler3D::default_kernel::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::touchCellFirstTime(
       const peano4::datamanagement::CellMarker& marker,
-      peano4::datamanagement::FaceEnumerator<project::euler_3d::facedata::euler3DQOld> fineGridFaceseuler3DQOld,
-      peano4::datamanagement::FaceEnumerator<project::euler_3d::facedata::euler3DQNew> fineGridFaceseuler3DQNew,
-      peano4::datamanagement::FaceEnumerator<project::euler_3d::facedata::euler3DQUpdate> fineGridFaceseuler3DQUpdate,
-      peano4::datamanagement::FaceEnumerator<project::euler_3d::facedata::euler3DFaceLabel> fineGridFaceseuler3DFaceLabel,
-      project::euler_3d::celldata::euler3DQ& fineGridCelleuler3DQ,
-      project::euler_3d::celldata::euler3DCellLabel& fineGridCelleuler3DCellLabel,
-      peano4::datamanagement::FaceEnumerator<project::euler_3d::facedata::euler3DQOld> coarseGridFaceseuler3DQOld,
-      peano4::datamanagement::FaceEnumerator<project::euler_3d::facedata::euler3DQNew> coarseGridFaceseuler3DQNew,
-      peano4::datamanagement::FaceEnumerator<project::euler_3d::facedata::euler3DQUpdate> coarseGridFaceseuler3DQUpdate,
-      peano4::datamanagement::FaceEnumerator<project::euler_3d::facedata::euler3DFaceLabel> coarseGridFaceseuler3DFaceLabel,
-      project::euler_3d::celldata::euler3DQ& coarseGridCelleuler3DQ,
-      project::euler_3d::celldata::euler3DCellLabel& coarseGridCelleuler3DCellLabel) {
+      peano4::datamanagement::FaceEnumerator<project::exahype::Euler3D::default_kernel::facedata::euler3DQOld> fineGridFaceseuler3DQOld,
+      peano4::datamanagement::FaceEnumerator<project::exahype::Euler3D::default_kernel::facedata::euler3DQNew> fineGridFaceseuler3DQNew,
+      peano4::datamanagement::FaceEnumerator<project::exahype::Euler3D::default_kernel::facedata::euler3DQUpdate> fineGridFaceseuler3DQUpdate,
+      peano4::datamanagement::FaceEnumerator<project::exahype::Euler3D::default_kernel::facedata::euler3DFaceLabel> fineGridFaceseuler3DFaceLabel,
+      project::exahype::Euler3D::default_kernel::celldata::euler3DQ& fineGridCelleuler3DQ,
+      project::exahype::Euler3D::default_kernel::celldata::euler3DCellLabel& fineGridCelleuler3DCellLabel,
+      peano4::datamanagement::FaceEnumerator<project::exahype::Euler3D::default_kernel::facedata::euler3DQOld> coarseGridFaceseuler3DQOld,
+      peano4::datamanagement::FaceEnumerator<project::exahype::Euler3D::default_kernel::facedata::euler3DQNew> coarseGridFaceseuler3DQNew,
+      peano4::datamanagement::FaceEnumerator<project::exahype::Euler3D::default_kernel::facedata::euler3DQUpdate> coarseGridFaceseuler3DQUpdate,
+      peano4::datamanagement::FaceEnumerator<project::exahype::Euler3D::default_kernel::facedata::euler3DFaceLabel> coarseGridFaceseuler3DFaceLabel,
+      project::exahype::Euler3D::default_kernel::celldata::euler3DQ& coarseGridCelleuler3DQ,
+      project::exahype::Euler3D::default_kernel::celldata::euler3DCellLabel& coarseGridCelleuler3DCellLabel) {
 
   fineGridCelleuler3DCellLabel.setHasUpdated(false);
 
@@ -555,20 +549,20 @@ void project::euler_3d::observers::TimeStep2peano4_toolbox_blockstructured_Recon
 }
 
 
-void project::euler_3d::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::touchCellLastTime(
+void project::exahype::Euler3D::default_kernel::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::touchCellLastTime(
       const peano4::datamanagement::CellMarker& marker,
-      peano4::datamanagement::FaceEnumerator<project::euler_3d::facedata::euler3DQOld> fineGridFaceseuler3DQOld,
-      peano4::datamanagement::FaceEnumerator<project::euler_3d::facedata::euler3DQNew> fineGridFaceseuler3DQNew,
-      peano4::datamanagement::FaceEnumerator<project::euler_3d::facedata::euler3DQUpdate> fineGridFaceseuler3DQUpdate,
-      peano4::datamanagement::FaceEnumerator<project::euler_3d::facedata::euler3DFaceLabel> fineGridFaceseuler3DFaceLabel,
-      project::euler_3d::celldata::euler3DQ& fineGridCelleuler3DQ,
-      project::euler_3d::celldata::euler3DCellLabel& fineGridCelleuler3DCellLabel,
-      peano4::datamanagement::FaceEnumerator<project::euler_3d::facedata::euler3DQOld> coarseGridFaceseuler3DQOld,
-      peano4::datamanagement::FaceEnumerator<project::euler_3d::facedata::euler3DQNew> coarseGridFaceseuler3DQNew,
-      peano4::datamanagement::FaceEnumerator<project::euler_3d::facedata::euler3DQUpdate> coarseGridFaceseuler3DQUpdate,
-      peano4::datamanagement::FaceEnumerator<project::euler_3d::facedata::euler3DFaceLabel> coarseGridFaceseuler3DFaceLabel,
-      project::euler_3d::celldata::euler3DQ& coarseGridCelleuler3DQ,
-      project::euler_3d::celldata::euler3DCellLabel& coarseGridCelleuler3DCellLabel) {
+      peano4::datamanagement::FaceEnumerator<project::exahype::Euler3D::default_kernel::facedata::euler3DQOld> fineGridFaceseuler3DQOld,
+      peano4::datamanagement::FaceEnumerator<project::exahype::Euler3D::default_kernel::facedata::euler3DQNew> fineGridFaceseuler3DQNew,
+      peano4::datamanagement::FaceEnumerator<project::exahype::Euler3D::default_kernel::facedata::euler3DQUpdate> fineGridFaceseuler3DQUpdate,
+      peano4::datamanagement::FaceEnumerator<project::exahype::Euler3D::default_kernel::facedata::euler3DFaceLabel> fineGridFaceseuler3DFaceLabel,
+      project::exahype::Euler3D::default_kernel::celldata::euler3DQ& fineGridCelleuler3DQ,
+      project::exahype::Euler3D::default_kernel::celldata::euler3DCellLabel& fineGridCelleuler3DCellLabel,
+      peano4::datamanagement::FaceEnumerator<project::exahype::Euler3D::default_kernel::facedata::euler3DQOld> coarseGridFaceseuler3DQOld,
+      peano4::datamanagement::FaceEnumerator<project::exahype::Euler3D::default_kernel::facedata::euler3DQNew> coarseGridFaceseuler3DQNew,
+      peano4::datamanagement::FaceEnumerator<project::exahype::Euler3D::default_kernel::facedata::euler3DQUpdate> coarseGridFaceseuler3DQUpdate,
+      peano4::datamanagement::FaceEnumerator<project::exahype::Euler3D::default_kernel::facedata::euler3DFaceLabel> coarseGridFaceseuler3DFaceLabel,
+      project::exahype::Euler3D::default_kernel::celldata::euler3DQ& coarseGridCelleuler3DQ,
+      project::exahype::Euler3D::default_kernel::celldata::euler3DCellLabel& coarseGridCelleuler3DCellLabel) {
 
 
 }

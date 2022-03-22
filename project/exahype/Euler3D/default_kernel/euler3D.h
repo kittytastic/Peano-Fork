@@ -6,19 +6,19 @@
 // This is generated. If you change fundamental properties, you will have to 
 // generate this file. Backup your manual changes before you do so.
 //
-#ifndef _project_euler_3d_euler3D_H_
-#define _project_euler_3d_euler3D_H_
+#ifndef _project_exahype_Euler3D_default_kernel_euler3D_H_
+#define _project_exahype_Euler3D_default_kernel_euler3D_H_
 
 #include "Abstracteuler3D.h"
 #include "tarch/logging/Log.h"
 
-namespace project {namespace euler_3d {
+namespace project {namespace exahype {namespace Euler3D {namespace default_kernel {
   class euler3D;
 
-}}
+}}}}
 
 
-class project::euler_3d::euler3D: public Abstracteuler3D {
+class project::exahype::Euler3D::default_kernel::euler3D: public Abstracteuler3D {
   private:
     static tarch::logging::Log   _log;
 
