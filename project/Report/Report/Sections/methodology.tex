@@ -160,6 +160,34 @@ def build_flux_DAG(normal:int)->DAG:
 % [ ] Explain IR
 % [ ] Show example
 
+
+DAGs are an powerful and expressive way to represent an input problem, however code generation directly from a DAG is challenging.
+To overcome this issue we introduce an intermediate representation (IR).
+The goals of the IR are to offer a middle ground between the DAG and output code.
+It should be easy to transform the DAG into an IR, and it should be easy to transform this IR into code.
+The IR we created takes inspiration from llvm.
+It is a set of function definitions, and within each function definition there is a linear sequence of instructions.
+
+One of the main challenges we came across during the code generation process was variable management.
+Firstly, in C++ (our primary target language) we need to declare variables.
+This may seem like a simple task on the surface, you just need to declare a variable if it's the first time you see it.
+However, behavior around arrays and function arguments add additional complication, making it a non trial operation.
+Secondly, different variables have different purposes.
+For example in C a function may take 2 double pointers, one of which corresponds to the beginning of an input array and the other the memory location a single output double should be stored.
+This further compounds the complexity of variable management.
+And finally, when you have tackled the first 2 problems any transform on your IR risks invalidating your code.
+
+To combat these issues we create 2 standards for our IR.
+The IR can be loose, and the IR can be tight.
+When we transform our DAG we transform it into a loose IR.
+A loose IR doesn't worry about variable declaration or complicated function arguments.
+The arguments to a loose function is simply a list of (possibility hundreds) of unique input variables and a list of (possibly hundreds) of unique output variables.
+The relaxed nature of the loose IR makes it ideal for preforming optimisation transforms as there are few ways to invalidate a loose IR.
+On the other hand, a tight IR is much stricter.
+In a tight IR all variable must be declared and a tight function call must be a single list which can contain a mixture of input and output variables and arrays.
+The tight IR is much closer to output code, and hence we use it in code generation.
+
+
 \subsection{Compiler Architecture}
 \subsubsection{Input}
 % User provides a DAG
