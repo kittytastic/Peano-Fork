@@ -4,7 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#define DO_TEST_PRINT 
+//#define DO_TEST_PRINT 
 
 const int TARGET_TEST_CASES = 10;
 const int p_patchSize = 3;
@@ -86,197 +86,192 @@ void finalise(){
   assert(false);
 }
 
-/**********************************************************/
-
-tarch::logging::Log project::swe::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::_log( "project::swe::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5");
+tarch::logging::Log project::exahype::SWE::default_kernel::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::_log( "project::exahype::SWE::default_kernel::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5");
 
 
-
-
-
-project::swe::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5(int treeNumber) {
+project::exahype::SWE::default_kernel::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5(int treeNumber) {
   _treeNumber = treeNumber;
 }
 
 
-project::swe::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::~TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5() {
+project::exahype::SWE::default_kernel::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::~TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5() {
 // @todo Should be overwritten
 }
 
 
-std::vector< peano4::grid::GridControlEvent > project::swe::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::getGridControlEvents() const {
+std::vector< peano4::grid::GridControlEvent > project::exahype::SWE::default_kernel::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::getGridControlEvents() const {
 return std::vector< peano4::grid::GridControlEvent >();
 }
 
 
-void project::swe::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::beginTraversal(
+void project::exahype::SWE::default_kernel::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::beginTraversal(
       ) {
 
 
 }
 
 
-void project::swe::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::endTraversal(
+void project::exahype::SWE::default_kernel::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::endTraversal(
       ) {
 
 
 }
 
 
-void project::swe::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::createPersistentFace(
+void project::exahype::SWE::default_kernel::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::createPersistentFace(
       const peano4::datamanagement::FaceMarker& marker,
-      project::swe::facedata::sweQOld& fineGridFacesweQOld,
-      project::swe::facedata::sweQNew& fineGridFacesweQNew,
-      project::swe::facedata::sweQUpdate& fineGridFacesweQUpdate,
-      project::swe::facedata::sweFaceLabel& fineGridFacesweFaceLabel,
-      peano4::datamanagement::FaceEnumerator<project::swe::facedata::sweQOld> coarseGridFacessweQOld,
-      peano4::datamanagement::FaceEnumerator<project::swe::facedata::sweQNew> coarseGridFacessweQNew,
-      peano4::datamanagement::FaceEnumerator<project::swe::facedata::sweQUpdate> coarseGridFacessweQUpdate,
-      peano4::datamanagement::FaceEnumerator<project::swe::facedata::sweFaceLabel> coarseGridFacessweFaceLabel,
-      project::swe::celldata::sweQ& coarseGridCellsweQ,
-      project::swe::celldata::sweCellLabel& coarseGridCellsweCellLabel) {
+      project::exahype::SWE::default_kernel::facedata::sweQOld& fineGridFacesweQOld,
+      project::exahype::SWE::default_kernel::facedata::sweQNew& fineGridFacesweQNew,
+      project::exahype::SWE::default_kernel::facedata::sweQUpdate& fineGridFacesweQUpdate,
+      project::exahype::SWE::default_kernel::facedata::sweFaceLabel& fineGridFacesweFaceLabel,
+      peano4::datamanagement::FaceEnumerator<project::exahype::SWE::default_kernel::facedata::sweQOld> coarseGridFacessweQOld,
+      peano4::datamanagement::FaceEnumerator<project::exahype::SWE::default_kernel::facedata::sweQNew> coarseGridFacessweQNew,
+      peano4::datamanagement::FaceEnumerator<project::exahype::SWE::default_kernel::facedata::sweQUpdate> coarseGridFacessweQUpdate,
+      peano4::datamanagement::FaceEnumerator<project::exahype::SWE::default_kernel::facedata::sweFaceLabel> coarseGridFacessweFaceLabel,
+      project::exahype::SWE::default_kernel::celldata::sweQ& coarseGridCellsweQ,
+      project::exahype::SWE::default_kernel::celldata::sweCellLabel& coarseGridCellsweCellLabel) {
 
 
 }
 
 
-void project::swe::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::destroyPersistentFace(
+void project::exahype::SWE::default_kernel::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::destroyPersistentFace(
       const peano4::datamanagement::FaceMarker& marker,
-      project::swe::facedata::sweQOld& fineGridFacesweQOld,
-      project::swe::facedata::sweQNew& fineGridFacesweQNew,
-      project::swe::facedata::sweQUpdate& fineGridFacesweQUpdate,
-      project::swe::facedata::sweFaceLabel& fineGridFacesweFaceLabel,
-      peano4::datamanagement::FaceEnumerator<project::swe::facedata::sweQOld> coarseGridFacessweQOld,
-      peano4::datamanagement::FaceEnumerator<project::swe::facedata::sweQNew> coarseGridFacessweQNew,
-      peano4::datamanagement::FaceEnumerator<project::swe::facedata::sweQUpdate> coarseGridFacessweQUpdate,
-      peano4::datamanagement::FaceEnumerator<project::swe::facedata::sweFaceLabel> coarseGridFacessweFaceLabel,
-      project::swe::celldata::sweQ& coarseGridCellsweQ,
-      project::swe::celldata::sweCellLabel& coarseGridCellsweCellLabel) {
+      project::exahype::SWE::default_kernel::facedata::sweQOld& fineGridFacesweQOld,
+      project::exahype::SWE::default_kernel::facedata::sweQNew& fineGridFacesweQNew,
+      project::exahype::SWE::default_kernel::facedata::sweQUpdate& fineGridFacesweQUpdate,
+      project::exahype::SWE::default_kernel::facedata::sweFaceLabel& fineGridFacesweFaceLabel,
+      peano4::datamanagement::FaceEnumerator<project::exahype::SWE::default_kernel::facedata::sweQOld> coarseGridFacessweQOld,
+      peano4::datamanagement::FaceEnumerator<project::exahype::SWE::default_kernel::facedata::sweQNew> coarseGridFacessweQNew,
+      peano4::datamanagement::FaceEnumerator<project::exahype::SWE::default_kernel::facedata::sweQUpdate> coarseGridFacessweQUpdate,
+      peano4::datamanagement::FaceEnumerator<project::exahype::SWE::default_kernel::facedata::sweFaceLabel> coarseGridFacessweFaceLabel,
+      project::exahype::SWE::default_kernel::celldata::sweQ& coarseGridCellsweQ,
+      project::exahype::SWE::default_kernel::celldata::sweCellLabel& coarseGridCellsweCellLabel) {
 
 
 }
 
 
-void project::swe::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::createHangingFace(
+void project::exahype::SWE::default_kernel::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::createHangingFace(
       const peano4::datamanagement::FaceMarker& marker,
-      project::swe::facedata::sweQOld& fineGridFacesweQOld,
-      project::swe::facedata::sweQNew& fineGridFacesweQNew,
-      project::swe::facedata::sweQUpdate& fineGridFacesweQUpdate,
-      project::swe::facedata::sweFaceLabel& fineGridFacesweFaceLabel,
-      peano4::datamanagement::FaceEnumerator<project::swe::facedata::sweQOld> coarseGridFacessweQOld,
-      peano4::datamanagement::FaceEnumerator<project::swe::facedata::sweQNew> coarseGridFacessweQNew,
-      peano4::datamanagement::FaceEnumerator<project::swe::facedata::sweQUpdate> coarseGridFacessweQUpdate,
-      peano4::datamanagement::FaceEnumerator<project::swe::facedata::sweFaceLabel> coarseGridFacessweFaceLabel,
-      project::swe::celldata::sweQ& coarseGridCellsweQ,
-      project::swe::celldata::sweCellLabel& coarseGridCellsweCellLabel) {
+      project::exahype::SWE::default_kernel::facedata::sweQOld& fineGridFacesweQOld,
+      project::exahype::SWE::default_kernel::facedata::sweQNew& fineGridFacesweQNew,
+      project::exahype::SWE::default_kernel::facedata::sweQUpdate& fineGridFacesweQUpdate,
+      project::exahype::SWE::default_kernel::facedata::sweFaceLabel& fineGridFacesweFaceLabel,
+      peano4::datamanagement::FaceEnumerator<project::exahype::SWE::default_kernel::facedata::sweQOld> coarseGridFacessweQOld,
+      peano4::datamanagement::FaceEnumerator<project::exahype::SWE::default_kernel::facedata::sweQNew> coarseGridFacessweQNew,
+      peano4::datamanagement::FaceEnumerator<project::exahype::SWE::default_kernel::facedata::sweQUpdate> coarseGridFacessweQUpdate,
+      peano4::datamanagement::FaceEnumerator<project::exahype::SWE::default_kernel::facedata::sweFaceLabel> coarseGridFacessweFaceLabel,
+      project::exahype::SWE::default_kernel::celldata::sweQ& coarseGridCellsweQ,
+      project::exahype::SWE::default_kernel::celldata::sweCellLabel& coarseGridCellsweCellLabel) {
 
 
 }
 
 
-void project::swe::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::destroyHangingFace(
+void project::exahype::SWE::default_kernel::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::destroyHangingFace(
       const peano4::datamanagement::FaceMarker& marker,
-      project::swe::facedata::sweQOld& fineGridFacesweQOld,
-      project::swe::facedata::sweQNew& fineGridFacesweQNew,
-      project::swe::facedata::sweQUpdate& fineGridFacesweQUpdate,
-      project::swe::facedata::sweFaceLabel& fineGridFacesweFaceLabel,
-      peano4::datamanagement::FaceEnumerator<project::swe::facedata::sweQOld> coarseGridFacessweQOld,
-      peano4::datamanagement::FaceEnumerator<project::swe::facedata::sweQNew> coarseGridFacessweQNew,
-      peano4::datamanagement::FaceEnumerator<project::swe::facedata::sweQUpdate> coarseGridFacessweQUpdate,
-      peano4::datamanagement::FaceEnumerator<project::swe::facedata::sweFaceLabel> coarseGridFacessweFaceLabel,
-      project::swe::celldata::sweQ& coarseGridCellsweQ,
-      project::swe::celldata::sweCellLabel& coarseGridCellsweCellLabel) {
+      project::exahype::SWE::default_kernel::facedata::sweQOld& fineGridFacesweQOld,
+      project::exahype::SWE::default_kernel::facedata::sweQNew& fineGridFacesweQNew,
+      project::exahype::SWE::default_kernel::facedata::sweQUpdate& fineGridFacesweQUpdate,
+      project::exahype::SWE::default_kernel::facedata::sweFaceLabel& fineGridFacesweFaceLabel,
+      peano4::datamanagement::FaceEnumerator<project::exahype::SWE::default_kernel::facedata::sweQOld> coarseGridFacessweQOld,
+      peano4::datamanagement::FaceEnumerator<project::exahype::SWE::default_kernel::facedata::sweQNew> coarseGridFacessweQNew,
+      peano4::datamanagement::FaceEnumerator<project::exahype::SWE::default_kernel::facedata::sweQUpdate> coarseGridFacessweQUpdate,
+      peano4::datamanagement::FaceEnumerator<project::exahype::SWE::default_kernel::facedata::sweFaceLabel> coarseGridFacessweFaceLabel,
+      project::exahype::SWE::default_kernel::celldata::sweQ& coarseGridCellsweQ,
+      project::exahype::SWE::default_kernel::celldata::sweCellLabel& coarseGridCellsweCellLabel) {
 
 
 }
 
 
-void project::swe::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::touchFaceFirstTime(
+void project::exahype::SWE::default_kernel::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::touchFaceFirstTime(
       const peano4::datamanagement::FaceMarker& marker,
-      project::swe::facedata::sweQOld& fineGridFacesweQOld,
-      project::swe::facedata::sweQNew& fineGridFacesweQNew,
-      project::swe::facedata::sweQUpdate& fineGridFacesweQUpdate,
-      project::swe::facedata::sweFaceLabel& fineGridFacesweFaceLabel,
-      peano4::datamanagement::FaceEnumerator<project::swe::facedata::sweQOld> coarseGridFacessweQOld,
-      peano4::datamanagement::FaceEnumerator<project::swe::facedata::sweQNew> coarseGridFacessweQNew,
-      peano4::datamanagement::FaceEnumerator<project::swe::facedata::sweQUpdate> coarseGridFacessweQUpdate,
-      peano4::datamanagement::FaceEnumerator<project::swe::facedata::sweFaceLabel> coarseGridFacessweFaceLabel,
-      project::swe::celldata::sweQ& coarseGridCellsweQ,
-      project::swe::celldata::sweCellLabel& coarseGridCellsweCellLabel) {
+      project::exahype::SWE::default_kernel::facedata::sweQOld& fineGridFacesweQOld,
+      project::exahype::SWE::default_kernel::facedata::sweQNew& fineGridFacesweQNew,
+      project::exahype::SWE::default_kernel::facedata::sweQUpdate& fineGridFacesweQUpdate,
+      project::exahype::SWE::default_kernel::facedata::sweFaceLabel& fineGridFacesweFaceLabel,
+      peano4::datamanagement::FaceEnumerator<project::exahype::SWE::default_kernel::facedata::sweQOld> coarseGridFacessweQOld,
+      peano4::datamanagement::FaceEnumerator<project::exahype::SWE::default_kernel::facedata::sweQNew> coarseGridFacessweQNew,
+      peano4::datamanagement::FaceEnumerator<project::exahype::SWE::default_kernel::facedata::sweQUpdate> coarseGridFacessweQUpdate,
+      peano4::datamanagement::FaceEnumerator<project::exahype::SWE::default_kernel::facedata::sweFaceLabel> coarseGridFacessweFaceLabel,
+      project::exahype::SWE::default_kernel::celldata::sweQ& coarseGridCellsweQ,
+      project::exahype::SWE::default_kernel::celldata::sweCellLabel& coarseGridCellsweCellLabel) {
 
 
 }
 
 
-void project::swe::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::touchFaceLastTime(
+void project::exahype::SWE::default_kernel::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::touchFaceLastTime(
       const peano4::datamanagement::FaceMarker& marker,
-      project::swe::facedata::sweQOld& fineGridFacesweQOld,
-      project::swe::facedata::sweQNew& fineGridFacesweQNew,
-      project::swe::facedata::sweQUpdate& fineGridFacesweQUpdate,
-      project::swe::facedata::sweFaceLabel& fineGridFacesweFaceLabel,
-      peano4::datamanagement::FaceEnumerator<project::swe::facedata::sweQOld> coarseGridFacessweQOld,
-      peano4::datamanagement::FaceEnumerator<project::swe::facedata::sweQNew> coarseGridFacessweQNew,
-      peano4::datamanagement::FaceEnumerator<project::swe::facedata::sweQUpdate> coarseGridFacessweQUpdate,
-      peano4::datamanagement::FaceEnumerator<project::swe::facedata::sweFaceLabel> coarseGridFacessweFaceLabel,
-      project::swe::celldata::sweQ& coarseGridCellsweQ,
-      project::swe::celldata::sweCellLabel& coarseGridCellsweCellLabel) {
+      project::exahype::SWE::default_kernel::facedata::sweQOld& fineGridFacesweQOld,
+      project::exahype::SWE::default_kernel::facedata::sweQNew& fineGridFacesweQNew,
+      project::exahype::SWE::default_kernel::facedata::sweQUpdate& fineGridFacesweQUpdate,
+      project::exahype::SWE::default_kernel::facedata::sweFaceLabel& fineGridFacesweFaceLabel,
+      peano4::datamanagement::FaceEnumerator<project::exahype::SWE::default_kernel::facedata::sweQOld> coarseGridFacessweQOld,
+      peano4::datamanagement::FaceEnumerator<project::exahype::SWE::default_kernel::facedata::sweQNew> coarseGridFacessweQNew,
+      peano4::datamanagement::FaceEnumerator<project::exahype::SWE::default_kernel::facedata::sweQUpdate> coarseGridFacessweQUpdate,
+      peano4::datamanagement::FaceEnumerator<project::exahype::SWE::default_kernel::facedata::sweFaceLabel> coarseGridFacessweFaceLabel,
+      project::exahype::SWE::default_kernel::celldata::sweQ& coarseGridCellsweQ,
+      project::exahype::SWE::default_kernel::celldata::sweCellLabel& coarseGridCellsweCellLabel) {
 
 
 }
 
 
-void project::swe::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::createCell(
+void project::exahype::SWE::default_kernel::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::createCell(
       const peano4::datamanagement::CellMarker& marker,
-      peano4::datamanagement::FaceEnumerator<project::swe::facedata::sweQOld> fineGridFacessweQOld,
-      peano4::datamanagement::FaceEnumerator<project::swe::facedata::sweQNew> fineGridFacessweQNew,
-      peano4::datamanagement::FaceEnumerator<project::swe::facedata::sweQUpdate> fineGridFacessweQUpdate,
-      peano4::datamanagement::FaceEnumerator<project::swe::facedata::sweFaceLabel> fineGridFacessweFaceLabel,
-      project::swe::celldata::sweQ& fineGridCellsweQ,
-      project::swe::celldata::sweCellLabel& fineGridCellsweCellLabel,
-      peano4::datamanagement::FaceEnumerator<project::swe::facedata::sweQOld> coarseGridFacessweQOld,
-      peano4::datamanagement::FaceEnumerator<project::swe::facedata::sweQNew> coarseGridFacessweQNew,
-      peano4::datamanagement::FaceEnumerator<project::swe::facedata::sweQUpdate> coarseGridFacessweQUpdate,
-      peano4::datamanagement::FaceEnumerator<project::swe::facedata::sweFaceLabel> coarseGridFacessweFaceLabel,
-      project::swe::celldata::sweQ& coarseGridCellsweQ,
-      project::swe::celldata::sweCellLabel& coarseGridCellsweCellLabel) {
+      peano4::datamanagement::FaceEnumerator<project::exahype::SWE::default_kernel::facedata::sweQOld> fineGridFacessweQOld,
+      peano4::datamanagement::FaceEnumerator<project::exahype::SWE::default_kernel::facedata::sweQNew> fineGridFacessweQNew,
+      peano4::datamanagement::FaceEnumerator<project::exahype::SWE::default_kernel::facedata::sweQUpdate> fineGridFacessweQUpdate,
+      peano4::datamanagement::FaceEnumerator<project::exahype::SWE::default_kernel::facedata::sweFaceLabel> fineGridFacessweFaceLabel,
+      project::exahype::SWE::default_kernel::celldata::sweQ& fineGridCellsweQ,
+      project::exahype::SWE::default_kernel::celldata::sweCellLabel& fineGridCellsweCellLabel,
+      peano4::datamanagement::FaceEnumerator<project::exahype::SWE::default_kernel::facedata::sweQOld> coarseGridFacessweQOld,
+      peano4::datamanagement::FaceEnumerator<project::exahype::SWE::default_kernel::facedata::sweQNew> coarseGridFacessweQNew,
+      peano4::datamanagement::FaceEnumerator<project::exahype::SWE::default_kernel::facedata::sweQUpdate> coarseGridFacessweQUpdate,
+      peano4::datamanagement::FaceEnumerator<project::exahype::SWE::default_kernel::facedata::sweFaceLabel> coarseGridFacessweFaceLabel,
+      project::exahype::SWE::default_kernel::celldata::sweQ& coarseGridCellsweQ,
+      project::exahype::SWE::default_kernel::celldata::sweCellLabel& coarseGridCellsweCellLabel) {
 
 
 }
 
 
-void project::swe::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::destroyCell(
+void project::exahype::SWE::default_kernel::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::destroyCell(
       const peano4::datamanagement::CellMarker& marker,
-      peano4::datamanagement::FaceEnumerator<project::swe::facedata::sweQOld> fineGridFacessweQOld,
-      peano4::datamanagement::FaceEnumerator<project::swe::facedata::sweQNew> fineGridFacessweQNew,
-      peano4::datamanagement::FaceEnumerator<project::swe::facedata::sweQUpdate> fineGridFacessweQUpdate,
-      peano4::datamanagement::FaceEnumerator<project::swe::facedata::sweFaceLabel> fineGridFacessweFaceLabel,
-      project::swe::celldata::sweQ& fineGridCellsweQ,
-      project::swe::celldata::sweCellLabel& fineGridCellsweCellLabel,
-      peano4::datamanagement::FaceEnumerator<project::swe::facedata::sweQOld> coarseGridFacessweQOld,
-      peano4::datamanagement::FaceEnumerator<project::swe::facedata::sweQNew> coarseGridFacessweQNew,
-      peano4::datamanagement::FaceEnumerator<project::swe::facedata::sweQUpdate> coarseGridFacessweQUpdate,
-      peano4::datamanagement::FaceEnumerator<project::swe::facedata::sweFaceLabel> coarseGridFacessweFaceLabel,
-      project::swe::celldata::sweQ& coarseGridCellsweQ,
-      project::swe::celldata::sweCellLabel& coarseGridCellsweCellLabel) {
+      peano4::datamanagement::FaceEnumerator<project::exahype::SWE::default_kernel::facedata::sweQOld> fineGridFacessweQOld,
+      peano4::datamanagement::FaceEnumerator<project::exahype::SWE::default_kernel::facedata::sweQNew> fineGridFacessweQNew,
+      peano4::datamanagement::FaceEnumerator<project::exahype::SWE::default_kernel::facedata::sweQUpdate> fineGridFacessweQUpdate,
+      peano4::datamanagement::FaceEnumerator<project::exahype::SWE::default_kernel::facedata::sweFaceLabel> fineGridFacessweFaceLabel,
+      project::exahype::SWE::default_kernel::celldata::sweQ& fineGridCellsweQ,
+      project::exahype::SWE::default_kernel::celldata::sweCellLabel& fineGridCellsweCellLabel,
+      peano4::datamanagement::FaceEnumerator<project::exahype::SWE::default_kernel::facedata::sweQOld> coarseGridFacessweQOld,
+      peano4::datamanagement::FaceEnumerator<project::exahype::SWE::default_kernel::facedata::sweQNew> coarseGridFacessweQNew,
+      peano4::datamanagement::FaceEnumerator<project::exahype::SWE::default_kernel::facedata::sweQUpdate> coarseGridFacessweQUpdate,
+      peano4::datamanagement::FaceEnumerator<project::exahype::SWE::default_kernel::facedata::sweFaceLabel> coarseGridFacessweFaceLabel,
+      project::exahype::SWE::default_kernel::celldata::sweQ& coarseGridCellsweQ,
+      project::exahype::SWE::default_kernel::celldata::sweCellLabel& coarseGridCellsweCellLabel) {
 
 
 }
 
 
-void project::swe::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::touchCellFirstTime(
+void project::exahype::SWE::default_kernel::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::touchCellFirstTime(
       const peano4::datamanagement::CellMarker& marker,
-      peano4::datamanagement::FaceEnumerator<project::swe::facedata::sweQOld> fineGridFacessweQOld,
-      peano4::datamanagement::FaceEnumerator<project::swe::facedata::sweQNew> fineGridFacessweQNew,
-      peano4::datamanagement::FaceEnumerator<project::swe::facedata::sweQUpdate> fineGridFacessweQUpdate,
-      peano4::datamanagement::FaceEnumerator<project::swe::facedata::sweFaceLabel> fineGridFacessweFaceLabel,
-      project::swe::celldata::sweQ& fineGridCellsweQ,
-      project::swe::celldata::sweCellLabel& fineGridCellsweCellLabel,
-      peano4::datamanagement::FaceEnumerator<project::swe::facedata::sweQOld> coarseGridFacessweQOld,
-      peano4::datamanagement::FaceEnumerator<project::swe::facedata::sweQNew> coarseGridFacessweQNew,
-      peano4::datamanagement::FaceEnumerator<project::swe::facedata::sweQUpdate> coarseGridFacessweQUpdate,
-      peano4::datamanagement::FaceEnumerator<project::swe::facedata::sweFaceLabel> coarseGridFacessweFaceLabel,
-      project::swe::celldata::sweQ& coarseGridCellsweQ,
-      project::swe::celldata::sweCellLabel& coarseGridCellsweCellLabel) {
+      peano4::datamanagement::FaceEnumerator<project::exahype::SWE::default_kernel::facedata::sweQOld> fineGridFacessweQOld,
+      peano4::datamanagement::FaceEnumerator<project::exahype::SWE::default_kernel::facedata::sweQNew> fineGridFacessweQNew,
+      peano4::datamanagement::FaceEnumerator<project::exahype::SWE::default_kernel::facedata::sweQUpdate> fineGridFacessweQUpdate,
+      peano4::datamanagement::FaceEnumerator<project::exahype::SWE::default_kernel::facedata::sweFaceLabel> fineGridFacessweFaceLabel,
+      project::exahype::SWE::default_kernel::celldata::sweQ& fineGridCellsweQ,
+      project::exahype::SWE::default_kernel::celldata::sweCellLabel& fineGridCellsweCellLabel,
+      peano4::datamanagement::FaceEnumerator<project::exahype::SWE::default_kernel::facedata::sweQOld> coarseGridFacessweQOld,
+      peano4::datamanagement::FaceEnumerator<project::exahype::SWE::default_kernel::facedata::sweQNew> coarseGridFacessweQNew,
+      peano4::datamanagement::FaceEnumerator<project::exahype::SWE::default_kernel::facedata::sweQUpdate> coarseGridFacessweQUpdate,
+      peano4::datamanagement::FaceEnumerator<project::exahype::SWE::default_kernel::facedata::sweFaceLabel> coarseGridFacessweFaceLabel,
+      project::exahype::SWE::default_kernel::celldata::sweQ& coarseGridCellsweQ,
+      project::exahype::SWE::default_kernel::celldata::sweCellLabel& coarseGridCellsweCellLabel) {
 
   fineGridCellsweCellLabel.setHasUpdated(false);
 
@@ -572,20 +567,20 @@ void project::swe::observers::TimeStep2peano4_toolbox_blockstructured_Reconstruc
 }
 
 
-void project::swe::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::touchCellLastTime(
+void project::exahype::SWE::default_kernel::observers::TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5::touchCellLastTime(
       const peano4::datamanagement::CellMarker& marker,
-      peano4::datamanagement::FaceEnumerator<project::swe::facedata::sweQOld> fineGridFacessweQOld,
-      peano4::datamanagement::FaceEnumerator<project::swe::facedata::sweQNew> fineGridFacessweQNew,
-      peano4::datamanagement::FaceEnumerator<project::swe::facedata::sweQUpdate> fineGridFacessweQUpdate,
-      peano4::datamanagement::FaceEnumerator<project::swe::facedata::sweFaceLabel> fineGridFacessweFaceLabel,
-      project::swe::celldata::sweQ& fineGridCellsweQ,
-      project::swe::celldata::sweCellLabel& fineGridCellsweCellLabel,
-      peano4::datamanagement::FaceEnumerator<project::swe::facedata::sweQOld> coarseGridFacessweQOld,
-      peano4::datamanagement::FaceEnumerator<project::swe::facedata::sweQNew> coarseGridFacessweQNew,
-      peano4::datamanagement::FaceEnumerator<project::swe::facedata::sweQUpdate> coarseGridFacessweQUpdate,
-      peano4::datamanagement::FaceEnumerator<project::swe::facedata::sweFaceLabel> coarseGridFacessweFaceLabel,
-      project::swe::celldata::sweQ& coarseGridCellsweQ,
-      project::swe::celldata::sweCellLabel& coarseGridCellsweCellLabel) {
+      peano4::datamanagement::FaceEnumerator<project::exahype::SWE::default_kernel::facedata::sweQOld> fineGridFacessweQOld,
+      peano4::datamanagement::FaceEnumerator<project::exahype::SWE::default_kernel::facedata::sweQNew> fineGridFacessweQNew,
+      peano4::datamanagement::FaceEnumerator<project::exahype::SWE::default_kernel::facedata::sweQUpdate> fineGridFacessweQUpdate,
+      peano4::datamanagement::FaceEnumerator<project::exahype::SWE::default_kernel::facedata::sweFaceLabel> fineGridFacessweFaceLabel,
+      project::exahype::SWE::default_kernel::celldata::sweQ& fineGridCellsweQ,
+      project::exahype::SWE::default_kernel::celldata::sweCellLabel& fineGridCellsweCellLabel,
+      peano4::datamanagement::FaceEnumerator<project::exahype::SWE::default_kernel::facedata::sweQOld> coarseGridFacessweQOld,
+      peano4::datamanagement::FaceEnumerator<project::exahype::SWE::default_kernel::facedata::sweQNew> coarseGridFacessweQNew,
+      peano4::datamanagement::FaceEnumerator<project::exahype::SWE::default_kernel::facedata::sweQUpdate> coarseGridFacessweQUpdate,
+      peano4::datamanagement::FaceEnumerator<project::exahype::SWE::default_kernel::facedata::sweFaceLabel> coarseGridFacessweFaceLabel,
+      project::exahype::SWE::default_kernel::celldata::sweQ& coarseGridCellsweQ,
+      project::exahype::SWE::default_kernel::celldata::sweCellLabel& coarseGridCellsweCellLabel) {
 
 
 }
