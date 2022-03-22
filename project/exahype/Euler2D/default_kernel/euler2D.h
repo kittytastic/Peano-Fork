@@ -6,19 +6,19 @@
 // This is generated. If you change fundamental properties, you will have to 
 // generate this file. Backup your manual changes before you do so.
 //
-#ifndef _project_base_2d_euler_euler2D_H_
-#define _project_base_2d_euler_euler2D_H_
+#ifndef _project_exahype_Euler2D_default_kernel_euler2D_H_
+#define _project_exahype_Euler2D_default_kernel_euler2D_H_
 
 #include "Abstracteuler2D.h"
 #include "tarch/logging/Log.h"
 
-namespace project {namespace base_2d_euler {
+namespace project {namespace exahype {namespace Euler2D {namespace default_kernel {
   class euler2D;
 
-}}
+}}}}
 
 
-class project::base_2d_euler::euler2D: public Abstracteuler2D {
+class project::exahype::Euler2D::default_kernel::euler2D: public Abstracteuler2D {
   private:
     static tarch::logging::Log   _log;
 

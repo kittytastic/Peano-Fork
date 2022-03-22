@@ -18,8 +18,8 @@ import peano4
 import exahype2
 
 
-project = exahype2.Project( ["project", "base_2d_euler"],
-                             "euler2D", ".", executable="Euler2D" )
+project = exahype2.Project( ["project", "exahype", "Euler2D", "default_kernel"],
+                             "euler2D", ".", executable="Euler2D_Default" )
 
 
 #
@@ -30,7 +30,7 @@ time_step_size = 0.001
 max_h          = 0.01
 min_h          = 0.01
 
-plot_freq      = 0.01
+plot_freq      = 0
 end_time = 0.1
 
 #
@@ -70,7 +70,7 @@ project.set_global_simulation_parameters(
 # prototype we did start off with.
 #
 project.set_load_balancing( "toolbox::loadbalancing::RecursiveSubdivision", "new ::exahype2::LoadBalancingConfiguration()" )
-project.set_Peano4_installation( "../../", build_mode )
+project.set_Peano4_installation( "../../../../", build_mode )
 peano4_project = project.generate_Peano4_project(False)
 peano4_project.build(make_clean_first=True, number_of_parallel_builds=32)
 

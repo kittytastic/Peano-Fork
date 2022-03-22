@@ -2,7 +2,7 @@
 #include "exahype2/RefinementControl.h"
 
 
-tarch::logging::Log   project::base_2d_euler::euler2D::_log( "project::base_2d_euler::euler2D" );
+tarch::logging::Log   project::exahype::Euler2D::default_kernel::euler2D::_log( "project::exahype::Euler2D::default_kernel::euler2D" );
 
 
 
@@ -10,7 +10,7 @@ tarch::logging::Log   project::base_2d_euler::euler2D::_log( "project::base_2d_e
 
 
 
-void project::base_2d_euler::euler2D::initialCondition(
+void project::exahype::Euler2D::default_kernel::euler2D::initialCondition(
   double * __restrict__ Q,
   const tarch::la::Vector<Dimensions,double>&  volumeCentre,
   const tarch::la::Vector<Dimensions,double>&  volumeH,
@@ -22,16 +22,14 @@ void project::base_2d_euler::euler2D::initialCondition(
 	Q[1] = 0.0;    // momentum in x direction
 	Q[2] = 0.0;    // momentum in y direction
   
-	bool isLeft = (volumeCentre[0] < 0.5);
-	Q[3] = (isLeft ? 1.0 : 0.0);
-
+  logTraceOut( "initialCondition(...)" );
 }
 
 
 
 
 
-void project::base_2d_euler::euler2D::boundaryConditions(
+void project::exahype::Euler2D::default_kernel::euler2D::boundaryConditions(
   const double * __restrict__                  Qinside, // Qinside[4+0]
   double * __restrict__                        Qoutside, // Qoutside[4+0]
   const tarch::la::Vector<Dimensions,double>&  faceCentre,
@@ -51,7 +49,7 @@ void project::base_2d_euler::euler2D::boundaryConditions(
 
 
 
-double ::project::base_2d_euler::euler2D::maxEigenvalue(
+double ::project::exahype::Euler2D::default_kernel::euler2D::maxEigenvalue(
   const double * __restrict__ Q, // Q[4+0],
   const tarch::la::Vector<Dimensions,double>&  faceCentre,
   const tarch::la::Vector<Dimensions,double>&  volumeH,
@@ -84,7 +82,7 @@ double ::project::base_2d_euler::euler2D::maxEigenvalue(
 
 
 
-void ::project::base_2d_euler::euler2D::flux(
+void ::project::exahype::Euler2D::default_kernel::euler2D::flux(
   const double * __restrict__ Q, // Q[4+0],
   const tarch::la::Vector<Dimensions,double>&  faceCentre,
   const tarch::la::Vector<Dimensions,double>&  volumeH,
