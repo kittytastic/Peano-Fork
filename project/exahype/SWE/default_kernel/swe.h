@@ -6,19 +6,19 @@
 // This is generated. If you change fundamental properties, you will have to 
 // generate this file. Backup your manual changes before you do so.
 //
-#ifndef _project_swe_swe_H_
-#define _project_swe_swe_H_
+#ifndef _project_exahype_SWE_default_kernel_swe_H_
+#define _project_exahype_SWE_default_kernel_swe_H_
 
 #include "Abstractswe.h"
 #include "tarch/logging/Log.h"
 
-namespace project {namespace swe {
+namespace project {namespace exahype {namespace SWE {namespace default_kernel {
   class swe;
 
-}}
+}}}}
 
 
-class project::swe::swe: public Abstractswe {
+class project::exahype::SWE::default_kernel::swe: public Abstractswe {
   private:
     static tarch::logging::Log   _log;
 
