@@ -40,7 +40,7 @@ bool isClose(double a, double b){
 }
 
 
-void testKernel(const Kernel* k){
+bool testKernel(const Kernel* k){
     int outputVectorLength = pow(k->cellsPerAxis, k->dim) * (k->unknowns + k->auxiliary);
 
     double* outVec = (double*) malloc(outputVectorLength*sizeof(double));
@@ -89,4 +89,5 @@ void testKernel(const Kernel* k){
     }
 
     free(outVec);
+    return passed == k->testCases.size();
 }

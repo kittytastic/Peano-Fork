@@ -1,0 +1,8 @@
+name, tests_passed, num_trials, total_time
+Euler3D 2: Compiled, true, 24915432, 40000002163
+Euler 3D: default, true, 2029074, 40000003991
+SWE 2: Compiled, true, 92799303, 40000001623
+SWE 1: Default SWE, true, 5975715, 40000005872
+Kernel 1: Base Euler, true, 6190299, 40000001462
+Kernel 2: Basic Inline, true, 34269927, 40000002080
+Kernel 3: Compiled, true, 104812131, 40000001746

@@ -1,5 +1,5 @@
-from tkinter.messagebox import NO
 from typing import Any, Dict, List, Optional
+import datetime
 from compute_graph.IR.symbols.functions import IR_BasicLibCall, IR_CallTightFunction, IR_File
 from compute_graph.IR.symbols.variables import IR_DefineOnly
 from compute_graph.IR.visitor import IR_Visitor
@@ -158,7 +158,10 @@ class C_Backend(LanguageBackend):
         preproc = "".join([f"#include \"{h}\"\n" for h in self.extra_headers])
         preproc += "\n"
         preproc += "".join([f"#include <{h}>\n" for h in ast_builder.required_preprocessor_statements])
-        return preproc+"\n"+code
+
+        time_stamp = datetime.datetime.now()
+
+        return f"// Generated: {time_stamp}\n"+preproc+"\n"+code
 
     def DEBUG_code_gen(self, ir: IR_Symbol)-> str:
         ast_builder = IR_To_C_TF(C_DATA_TYPE_MAP, self.function_namespace)

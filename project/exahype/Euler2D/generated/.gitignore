@@ -10,5 +10,7 @@ observers/*
 !euler2D.cpp
 !euler2D.h
 !observers/TimeStep2peano4_toolbox_blockstructured_ReconstructPatchAndApplyFunctor5.cpp
-!MockKernel.cpp
-!MockKernel.h
+!euler2d.g.cpp
+!euler2d.g.h
+!maqao.lua
+!.gitignore
