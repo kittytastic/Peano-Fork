@@ -13,7 +13,8 @@ echo "Euler 3D - default: DONE"
 echo "Euler 3D - generated: DONE"
 
 
-echo "\n------ Making projects ------"
+echo ""
+echo "------ Making projects ------"
 (cd Euler2D/default_kernel; make -j$1)>>/dev/null
 echo "Euler 2D - default: DONE"
 (cd Euler2D/generated; make -j$1)>>/dev/null

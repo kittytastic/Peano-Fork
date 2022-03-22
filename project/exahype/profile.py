@@ -8,14 +8,15 @@ def info(problem:str, kernel_type:str):
     return {"problem":problem, "type":kernel_type}
 
 KERNELS = {
+    
+    
+    "SWE/default_kernel/SWE_Default":info("SWE", "default"),
+    "SWE/generated/SWE_Generated":info("SWE", "generated"),
+    
     "Euler2D/default_kernel/Euler2D_Default":info("Euler 2D", "default"),
-    "Euler2D/generated/Euler2D_Generated":info("Euler 2D", "generated"),
-    
-    "Euler3D/default/Euler3D_Default":info("Euler 3D", "default"),
+    "Euler2D/generated/Euler2DGenerated":info("Euler 2D", "generated"),
+    "Euler3D/default_kernel/Euler3D_Default":info("Euler 3D", "default"),
     "Euler3D/generated/Euler3D_Generated":info("Euler 3D", "generated"),
-    
-    "SWE/default/SWE_Generated":info("SWE", "default"),
-    "SWE/generated/SWE_Generated":info("SWE", "generated")
 }
 
 
