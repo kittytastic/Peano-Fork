@@ -59,7 +59,7 @@ This will not be supported by the compiler.
 % [ ] Show example
 % [ ] Control flow hoisting
 
-Our compiler will begin with a Directed Acyclic Graph (DAG).
+Our compiler will begin with a Directed Acyclic Graph (DAG) as an input.
 Currently it is the responsibility of a user to create such a DAG, however it would be entirely possible to generate a DAG using a user friendly format such as from a SymPy [REF] formula.
 The DAG model we propose takes inspiration from hardware design and languages such a VDHL.
 
@@ -68,13 +68,15 @@ Each component has input and output ports and its output is a function of its in
 Furthermore, it is common place to see specifications and test cases along side a component to be used in verification.
 
 In our DAG every node has a set of input and output ports.
-Every input port must receive single value and every output port can transmit a copies of a single value.
-Every a node $n$ in our graph can be describes a function: $\vecc{out ports}=n(\vecc{in ports})$ with the number of inputs and outputs being of a fixed length.
+Every input port must receive single value and every output port can transmit copies of a single value.
+Every node $n$ in our graph describes a function: $\vecc{out ports}=n(\vecc{in ports})$ with the number of inputs and outputs being of a fixed length.
 
 A node may be primitive and directly map to a primitive code operation, for example an addition node maps to $out_1 = in_1 + in_2$ (see Figure \ref{fig:bin_add}).
 Or a node may be composite, where it is a DAG itself.
 Composite nodes would map to functions in the final code output.
 Figure \ref{fig:bn} demonstrates composite nodes with the calculation $out_0 = (in_0)^3 + in_1$ where the function \textit{cubed} has been implemented as a subgraph.
+The nested structure that composite nodes create provides a lot of expressive power.
+For example, a user can create Problem Definition DAGs, then hand those DAGs to pre-made Patch Update and Numerical Ingredient DAG builders to create a DAG that describes the full Patch Update process.
 
 
 \begin{figure}[h!]
@@ -105,6 +107,52 @@ Figure \ref{fig:bn} demonstrates composite nodes with the calculation $out_0 = (
         \label{fig:bn}
     \end{center}
 \end{figure}
+
+Provided that the graph is acyclic we can always find an order to evaluate every node in the graph for some given input.
+In our compiler every DAG node implements an \texttt{eval} function which takes its inputs as a list and returns the outputs as a list.
+The \texttt{eval} function allows us to test every DAG we define using unit and integration tests.
+
+DAGs are created in python.
+Every node type is a class.
+To create a node you create an object from the class of node you desire.
+Graph nodes are a special class of Node that implement additional functions.
+Namely, graph nodes store a sparse definition of the graph they represent and provide an interface for users to add edges to the graph.
+The \texttt{eval} functions of all the primitive nodes are simple, often only preforming one operation.
+The \texttt{eval} function for a DAG node is more complex, first calculating a valid traversal order of the DAG.
+Then following this traversal order, the DAG node calls the \texttt{eval} function on each subnode, forwarding the output of completed \texttt{eval} to the input of nodes yet to be processed.
+This process repeats until the entire DAG has been traversed.
+
+Using python to create DAGs allows for the hoisting of control flow.
+For example, take the a flux function used in an ExaHyPE project:
+\begin{lstlisting}[language=c]
+void flux(
+  const double * __restrict__ Q, // input
+  ...
+  int normal,
+  double * __restrict__ F // output
+)  {
+  switch(normal){  
+  case 0: //in x direction
+	  F = flux_x(Q, ...)
+	  break;
+  case 1: //in y direction
+	  F = flux_y(Q, ...)
+	  break;
+  }  
+}
+\end{lstlisting}
+The switch control flow is run every evaluation of flux and depends on the value of the normal.
+However, in Patch Update the value the normal is known at compile time.
+Therefore, we can use a builder patten in python to hoist this control flow out of the flux function.
+\begin{lstlisting}[language=python]
+def build_flux_DAG(normal:int)->DAG:
+    if normal==0:
+        return build_flux_x()
+    else:
+        return build_flux_y()
+\end{lstlisting}
+
+
 
 
 \subsection{IR}
