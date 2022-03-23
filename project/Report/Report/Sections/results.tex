@@ -5,6 +5,9 @@
 % [ ] Exahype results
 % [ ] Kernel Compare results
 
+We will use the Euler equations in 2D and 3D, along with the shallow water equations to test our compiler. 
+A summary of these problems can be found bellow.
+
 \begin{tabular}{ccccccccc}
 Problem & Unknowns+Auxillary & Dim & Patch size & Uses Flux & Uses NCP\\
 \hline
@@ -14,6 +17,37 @@ Euler 3D & 5+0 & 3 & 3x3x3 & \checkmark & \xmark \\
 SWE & 3+1 & 2 & 3x3 & \checkmark & \checkmark \\
 
 \end{tabular}
+
+These problems were chosen as they are both prototypical hyperbolic PDE test problems, and exhibit a wide range of features, such as the use of 2D and 3D along with the use of NCP and auxiliary variables.
+None of these test problems are compute bound problems, they are all memory bound problems.
+This means that within the an ExaHyPE program we would not expect increasing the speed of the kernel to have a large effect on the total runtime of the program, as the program is bottle necked by memory throughput.
+
+As will be discussed in Section \ref{sec:practical} creating input DAGs in a non-trivial job, and the size DAGs that compute bound problems such as the CCZ4 equations would require are infeasible to create with the current tooling.
+Hence this seminal work will seek to verify the applicability of our compiler based approach on smaller problems, before improving tooling to make larger problems tractable.
+
+Given the use of memory bound problems, testing the performance of kernels within ExaHyPE alone will not help analyse the relative speed of generated and default kernels.
+Therefore, we will also test each kernel by running it numerous times on some fixed test data.
+This will mimic what happens within ExaHyPE, but removes all the overhead experienced by the engine, such as memory copies.
+This will be our primary metric to compare kernels.
+As such we use a small tester program to do this.
+This test program creates an input data from test cases and creates an output array.
+Then the program repeatedly calls the kernel with the same input and output data, until some time limit is reached e.g..
+We can then use the number of iterations preformed within this time limit to inspect the performance of a kernel.
+To ensure the compiler doesn't introduce any unexpected behaviour the control half of the program is compiled without any optimisation flags, whereas all compute kernels are compiled with optimisation flags.
+
+Each of the selected test problems are given as example within the ExaHyPE repository.
+These example solutions will be treated as our control test that compiled kernels are compared with.
+We will refer to these kernels as default kernels. 
+
+Kernel comparison extend beyond performance, it is also important to verify the validity of the compiled kernels.
+To do so we will also use the default kernels.
+Taking the default kernels as ground truth we desire that the generated kernels produce equivalent numerical results.
+To test this we probe a run of an example problem and record the inputs and outputs before and after patch update is preformed.
+These results can be used to create integration tests for the generated kernels.
+To ensure variety in the integration tests we assert that some component on the input state vector is larger than a target value. 
+This ensures that our test data wont just be repeats of an empty patch.
+
+Every kernel mentioned in our results underwent validity testing using 10 integration tests and passed each one.
 
 \subsection{Performance of Generated Kernels}
 % Default vs generated 
@@ -30,6 +64,6 @@ SWE & 3+1 & 2 & 3x3 & \checkmark & \checkmark \\
 % Effect of computation reduction
 % [ ] Adding comp dedup speed
 
-\subsection{Compiler Practicalities}
+\subsection{Compiler Practicalities} \label{sec:practical}
 % [ ] Compiler speed
 % [ ] Input interface practicalities
