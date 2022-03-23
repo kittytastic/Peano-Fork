@@ -186,27 +186,58 @@ On the other hand, a tight IR is much stricter.
 In a tight IR all variable must be named and declared.
 And a tight function signature mirrors that of the target output code, containing a mixture of input and output variable that can be single values or arrays.
 
-
+TODO figure
 
 \subsection{Compiler Architecture}
-\subsubsection{Input}
-% User provides a DAG
+Our compiler consists of 3 stages.
+Firstly the DAG transform stage, then the IR transform stage and finally code generation stage.
 
-\subsubsection{DAG Transforms}
-% [ ] DAG flatten
-% 
+% DAG Transforms
+In the DAG transform stage a series of user specified transforms are applied to the DAG.
+The most useful of these transforms is the flatten transform.
+% FIG?
+This transform takes a nested DAG (i.e. a DAG containing composite nodes) and copies the sub-DAG in its composite nodes into the current DAG.
+Applied recursively a highly nested DAG can be reduced to only contain primitive nodes.
+This transform causes the final output code to be a single monolithic function, as opposed to a function containing many function calls.
+Another notable transform investigated removed duplicated computation.
+Within a DAG duplicate computation manifests its self as 2 equivalent nodes (e.g. 2 addition nodes) that share the same inputs.
+Once 2 such nodes are identified one can be deleted, and its output edges copied over to the node that remains.
+Some care has to be taken if an operations is commutative (e.g. addition and max) or not (e.g. subtraction and division).
 
-\subsubsection{DAG to IR}
 % DAG -> IR
+Once all DAG transforms are complete the DAG is then transformed into IR.
+To do so every DAG and sub-DAG is identified and processed separately to create a set of loose functions.
+When processing a DAG we create a valid traversal order, much like DAG \texttt{eval} does.
+Then following this order, every node in the DAG is transformed into an IR symbol.
+Primitive nodes map to equivalent primitive IR Symbols and composite nodes map to loose IR function calls.
+The output of a every port of a node is stored as a new temporary variable, and these temporary variables are passed as the input to other nodes.
+At the end of the transform we have an IR in loose form.
 
-\subsection{IR Transforms}
-% Le none
+% IR Transforms 
+The second stage of the compiler are IR transforms.
+Much like we apply a series of user defined DAG transforms so to do we apply a series of user defined IR transforms.
+Interestingly there are equivalences between DAG transforms and IR transforms.
+For example, the DAG transform \texttt{Remove Passthrough Nodes}, which removes all the primitive nodes that simply pass through a single value, is approximately equivalent to the IR transform \texttt{Remove Forward Aliasing}, which removes all lines that look like \lstinline{%tmp_x=%tmp_y} (i.e. a line that copies a single value).
+However, it is not the case that all transforms share this equivalences.
+In the IR we can create transforms to arrange our programs memory layout, but in our DAG we have no concept of memory layout.
 
-\subsubsection{Loose IR to Tight IR}
 % Loose IR -> Tight IR
 %   - variable model
 %   - function stencil 
+Once the user defined IR transforms are applied we move to transforming the loose IR into a tight IR.
+This process begins by applying user defined function signatures to the loose IR.
+This transforms all loose functions and function calls into tight functions.
+Then we replace every temporary variable with a named variable.
+Often this may appear to be a no-op as we simply create named variables that mirror the temporary variables.
+However, this distinction between named and temporary variables allows for a user to preform their own partial memory layouts and the transform exhibits safe behaviour for any remaining temporary variables.
+For example, a user may decide they want to create a scratchpad array and try and do most of the computation within this array.
+The final transform to take us to a tight IR is defining all the variables.
+For the most part this involves defining a variable the first time it is observed.
+However, special care is required for variables that are defined in the function signature and elements of arrays.
 
-
-\subsection{Code Generation}
 % Tight IR -> Code
+The final step of the compiler is to transform the tight IR into code.
+Out compiler supports interchangeable code generation backends, however we have only implemented a C++ backend.
+Within the C++ code generation backend we use the cparser package, which given a C AST (Abstract Syntax Tree) can generate code.
+This reduces the problem of code generation to transpilation problem from the IR AST to a C AST.
+To do we preform a post order traversal of the IR AST, generating C AST nodes from each of the IR AST nodes.
