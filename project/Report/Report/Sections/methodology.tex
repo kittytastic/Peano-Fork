@@ -204,12 +204,16 @@ define IR_DataTypes.VOID @kernel (new #list(in), new #list(out)):
 \begin{lrbox}{\firstlisting}% Store first listing
 \minipage{.33\textwidth}
 \begin{lstlisting}
-static uint64_t i = 0;
-void every_cycle()
-{
-  if (i > 0)
-  i--;
-}
+define IR_DataTypes.VOID @kernel (%in0, %in1) (%out0, %out1):
+	%tmp1 = %in0
+	%tmp2 = %tmp1 * %tmp1 * %tmp1
+	%tmp3 = %in1
+	%tmp4 = %tmp2 + %tmp3
+	%tmp5 = %tmp4
+	%tmp6 = %tmp2 - %tmp3
+	%tmp7 = %tmp6
+	%out0 = %tmp5
+	%out1 = %tmp7
 \end{lstlisting}
 \endminipage
 \end{lrbox}
@@ -219,12 +223,11 @@ void every_cycle()
     
 \minipage[t]{.33\textwidth}
 \begin{lstlisting}
-static uint64_t i = 0;
-void every_cycle()
-{
-  if (i > 0)
-  i--;
-}
+define IR_DataTypes.VOID @kernel (new #list(in), new #list(out)):
+	new #tmp2 = #in[0] * #in[0] * #in[0]
+	#out[0] = #tmp2 + #in[1]
+	#out[1] = #tmp2 - #in[1]
+	<return nothing>
 \end{lstlisting}
 \endminipage
 \end{lrbox}
@@ -233,18 +236,16 @@ void every_cycle()
 \centering
 
 \sbox{\measurebox}{%
-  \begin{minipage}[b]{.33\textwidth}
-      \fbox{\subfloat[]{\label{fig:figA}\fbox{\includegraphics[width=\textwidth,height=10cm]{tight_vs_loose.png}}}}
+  \begin{minipage}[b]{.33\textwidth} \centering
+        \fbox{\subfloat[]{\label{fig:figB}\fbox{\usebox{\firstlisting}}}}
+        \subfloat[]{\label{fig:figC}\usebox{\secondlisting}}
   \end{minipage}
 }
 
 \usebox{\measurebox}\qquad
     \begin{minipage}[b][\ht\measurebox][s]{.33\textwidth}
-        \centering
-        \fbox{\subfloat[]{\label{fig:figB}\fbox{\usebox{\firstlisting}}}}
- 
-
-        \subfloat[]{\label{fig:figC}\usebox{\secondlisting}}
+      \fbox{\subfloat[]{\label{fig:figA}\fbox{\includegraphics[width=\textwidth]{tight_vs_loose.png}}}}
+       
     \end{minipage}
 \caption{my caption. (a) is .... (b) is .... (c) is ....}
 \label{fig:Test}
