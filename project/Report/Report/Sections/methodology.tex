@@ -88,24 +88,11 @@ For example, a user can create Problem Definition DAGs, then hand those DAGs to 
 \end{figure}
 
 \begin{figure}[h!]
-    \begin{center}
-        \begin{subfigure}{.2\textwidth}
-            \begin{center}
-                \includegraphics[width=.95\textwidth]{basic-nested-part1.png}
-                \caption{Top level}
-                \label{fig:bn1}
-            \end{center}
-        \end{subfigure}%
-        \begin{subfigure}{.2\textwidth}
-            \begin{center}
-                \includegraphics[width=.95\textwidth]{basic-nested-part0.png}
-                \caption{Exploded view}
-                \label{fig:bn0}
-            \end{center}
-        \end{subfigure}%
-        \caption{Example of a nested DAG that calculates $out_0 = (in_0)^3 + in_1$. NOTE the visualisation displays a node's input edges in a random order.}
-        \label{fig:bn}
-    \end{center}
+    \centering
+    \subcaptionbox{Top level\label{fig:bn1}}{\includegraphics[width=.2\textwidth]{basic-nested-part1.png}}
+    \hspace{1em}
+    \subcaptionbox{Exploded view\label{fig:bn0}}{\includegraphics[width=.2\textwidth]{basic-nested-part0.png}}
+    \caption{Example of a nested DAG that calculates $out_0 = (in_0)^3 + in_1$. NOTE the visualisation displays a node's input edges in a random order.}\label{fig:bn}
 \end{figure}
 
 Provided that the graph is acyclic we can always find an order to evaluate every node in the graph for some given input.
@@ -186,7 +173,55 @@ On the other hand, a tight IR is much stricter.
 In a tight IR all variable must be named and declared.
 And a tight function signature mirrors that of the target output code, containing a mixture of input and output variable that can be single values or arrays.
 
-TODO figure
+\begin{figure}[]
+\begin{tabular}{rl}
+     \multirow{2}{*}{\includegraphics[width=0.2\textwidth]{tight_vs_loose.png}}&
+    \begin{lstlisting}[language=c]
+define IR_DataTypes.VOID @kernel (%in0, %in1) (%out0, %out1):
+	%tmp1 = %in0
+	%tmp2 = %tmp1 * %tmp1 * %tmp1
+	%tmp3 = %in1
+	%tmp4 = %tmp2 + %tmp3
+	%tmp5 = %tmp4
+	%tmp6 = %tmp2 - %tmp3
+	%tmp7 = %tmp6
+	%out0 = %tmp5
+	%out1 = %tmp7
+\end{lstlisting}\\
+    & \begin{lstlisting}[language=c]
+define IR_DataTypes.VOID @kernel (new #list(in), new #list(out)):
+	new #tmp2 = #in[0] * #in[0] * #in[0]
+	#out[0] = #tmp2 + #in[1]
+	#out[1] = #tmp2 - #in[1]
+	<return nothing>
+\end{lstlisting} \\
+\end{tabular}
+\caption[My beautiful figure.]{\label{fig:label}My beautiful figure}
+\end{figure}
+
+
+
+\begin{figure}
+\centering
+
+\sbox{\measurebox}{%
+  \begin{minipage}[b]{.33\textwidth}
+      \subfloat[]{\label{fig:figA}\includegraphics[width=\textwidth,height=5cm]{tight_vs_loose.png}}
+  \end{minipage}
+}
+
+\usebox{\measurebox}\qquad
+    \begin{minipage}[b][\ht\measurebox][s]{.33\textwidth}
+        \centering
+        \subfloat[]{\label{fig:figB}\includegraphics[width=\textwidth,height=2cm]{tight_vs_loose.png}}
+
+        \vfill
+
+        \subfloat[]{\label{fig:figC}\includegraphics[width=\textwidth,height=2cm]{tight_vs_loose.png}}
+    \end{minipage}
+\caption{my caption. (a) is .... (b) is .... (c) is ....}
+\label{fig:Test}
+\end{figure}
 
 \subsection{Compiler Architecture}
 Our compiler consists of 3 stages.
