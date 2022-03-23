@@ -172,37 +172,11 @@ The relaxed nature of the loose IR makes it ideal for preforming transforms (suc
 On the other hand, a tight IR is much stricter.
 In a tight IR all variable must be named and declared.
 And a tight function signature mirrors that of the target output code, containing a mixture of input and output variable that can be single values or arrays.
+Figure \ref{fig:tight_loose} provides an example of loose and tight IR. 
 
-\begin{figure}[]
-\begin{tabular}{rl}
-     \multirow{2}{*}{\includegraphics[width=0.2\textwidth]{tight_vs_loose.png}}&
-    \begin{lstlisting}[language=c]
-define IR_DataTypes.VOID @kernel (%in0, %in1) (%out0, %out1):
-	%tmp1 = %in0
-	%tmp2 = %tmp1 * %tmp1 * %tmp1
-	%tmp3 = %in1
-	%tmp4 = %tmp2 + %tmp3
-	%tmp5 = %tmp4
-	%tmp6 = %tmp2 - %tmp3
-	%tmp7 = %tmp6
-	%out0 = %tmp5
-	%out1 = %tmp7
-\end{lstlisting}\\
-    & \begin{lstlisting}[language=c]
-define IR_DataTypes.VOID @kernel (new #list(in), new #list(out)):
-	new #tmp2 = #in[0] * #in[0] * #in[0]
-	#out[0] = #tmp2 + #in[1]
-	#out[1] = #tmp2 - #in[1]
-	<return nothing>
-\end{lstlisting} \\
-\end{tabular}
-\caption[My beautiful figure.]{\label{fig:label}My beautiful figure}
-\end{figure}
-
-
-\newsavebox{\firstlisting}
-\begin{lrbox}{\firstlisting}% Store first listing
-\minipage{.65\textwidth}
+\newsavebox{\looseIRlisting}
+\begin{lrbox}{\looseIRlisting}% Store first listing
+\minipage{.68\textwidth}
 \begin{lstlisting}
 define VOID @kernel (%in0, %in1) (%out0, %out1):
 	%tmp1 = %in0
@@ -218,10 +192,9 @@ define VOID @kernel (%in0, %in1) (%out0, %out1):
 \endminipage
 \end{lrbox}
 
-\newsavebox{\secondlisting}
-\begin{lrbox}{\secondlisting}% Store first listing
-    
-\minipage{.65\textwidth}
+\newsavebox{\tightIRlisting}
+\begin{lrbox}{\tightIRlisting}% Store first listing
+\minipage{.68\textwidth}
 \begin{lstlisting}
 define VOID @kernel (new #list(in), new #list(out)):
 	new #tmp2 = #in[0] * #in[0] * #in[0]
@@ -236,20 +209,20 @@ define VOID @kernel (new #list(in), new #list(out)):
 \centering
 
 \sbox{\measurebox}{%
-  \begin{minipage}{.65\textwidth} \centering
-        \subfloat[]{\label{fig:figB}\usebox{\firstlisting}}
+  \begin{minipage}{.68\textwidth} \centering
+        \subfloat[Loose IR]{\label{fig:figB}\usebox{\looseIRlisting}}
         \vspace{1em}
-        \subfloat[]{\label{fig:figC}\usebox{\secondlisting}}
+        \subfloat[Tight IR]{\label{fig:figC}\usebox{\tightIRlisting}}
   \end{minipage}
 }
 
 \usebox{\measurebox}\qquad
-    \begin{minipage}[][\ht\measurebox][c]{.25\textwidth}
-      \subfloat[]{\label{fig:figA}\includegraphics[width=\textwidth]{tight_vs_loose.png}}
+    \begin{minipage}[][\ht\measurebox][c]{.26\textwidth}
+      \subfloat[Input DAG]{\label{fig:loose_tight_dag}\includegraphics[width=\textwidth]{tight_vs_loose.png}}
        
     \end{minipage}
-\caption{my caption. (a) is .... (b) is .... (c) is ....}
-\label{fig:Test}
+\caption{Example of the difference between a loose IR and tight IR. Figure \ref{fig:loose_tight_dag} shows the corresponding input DAG. }
+\label{fig:tight_loose}
 \end{figure}
 
 
