@@ -1,9 +1,18 @@
 from typing import List, Optional, Tuple
 from compute_graph.DAG import Graph
 from compute_graph.DAG.ops import Add, Multiply, Subtract
+from compute_graph.DAG.transform.base import DAG_TransformChain
+from compute_graph.DAG.transform.flatten import DAG_Flatten
+from compute_graph.DAG.transform.tidy import DAG_RemovePassThrough
 from compute_graph.DAG.visualize import visualize_graph
 import os
 from PIL import Image
+from compute_graph.IR.symbols.functions import IR_LooseFunction, IR_TightFunction
+from compute_graph.IR.symbols.variables import IR_Array, UniqueVariableName
+from compute_graph.IR.transform.base import FilterApply, IR_TransformChain
+from compute_graph.IR.transform.build import DefineAllVars, FileApplyCallStencil, FunctionStencil, RemoveAllTemp
+from compute_graph.IR.transform.tidy import RemoveBackwardsAlias, RemoveForwardAlias
+from compute_graph.main import dag_to_IR
 import numpy as np
 
 
@@ -75,6 +84,57 @@ def basic_nested_example()->Graph:
 
         return g_top
 
+def basic_nested_array_output()->Graph:
+        g_top = Graph(2, 2, "kernel")
+        g_bottom = Graph(1, 1, "cubed")
+        add1 = Add(2)
+        sub1 = Subtract()
+        mul1 = Multiply(3)
+        
+        g_bottom.fill_node_inputs([g_bottom.get_internal_input(0),  g_bottom.get_internal_input(0), g_bottom.get_internal_input(0)], mul1)
+        g_bottom.add_edge((mul1, 0), g_bottom.get_internal_output(0))
+        
+        g_top.add_edge(g_top.get_internal_input(0), g_bottom.get_external_input(0))
+        g_top.fill_node_inputs([g_bottom.get_external_output(0), g_top.get_internal_input(1)], add1)
+        g_top.add_edge((add1, 0), g_top.get_internal_output(0))
+        g_top.fill_node_inputs([g_bottom.get_external_output(0), g_top.get_internal_input(1)], sub1)
+        g_top.add_edge((sub1, 0), g_top.get_internal_output(1))
+
+        return g_top
+
+
+def example_tight_vs_loose_IR():
+    dag_tfs = DAG_TransformChain([
+        DAG_Flatten(),
+        DAG_RemovePassThrough(),
+        ])
+
+    in1 = IR_Array(UniqueVariableName("in"), 2)
+    out1 = IR_Array(UniqueVariableName("out"), 2)
+    
+    func_stencil:FunctionStencil = {
+        'kernel': ([in1, out1], in1.all_ref(), out1.all_ref()),
+    }
+
+    ir_tfs = IR_TransformChain([
+        FilterApply(IR_LooseFunction, RemoveForwardAlias()),
+        FilterApply(IR_LooseFunction, RemoveBackwardsAlias()),
+        FileApplyCallStencil(func_stencil),
+        FilterApply(IR_TightFunction, RemoveAllTemp()),
+        FilterApply(IR_TightFunction, DefineAllVars()),
+    ])
+
+    g = basic_nested_array_output()
+    g = dag_tfs.tf(g)
+    generate_figure(g, "tight_vs_loose")
+    start_ir = dag_to_IR(g)
+    with open("../Artifacts/tight_vs_loose-start.txt", "w+") as f: f.write(str(start_ir))
+    
+    end_ir = ir_tfs.tf(start_ir)
+    with open("../Artifacts/tight_vs_loose-end.txt", "w+") as f: f.write(str(end_ir))
+
+        
+   
 if __name__=="__main__":
     print("--------- Figures -------")
     generate_figure(basic_g_6(), "basic6")
@@ -84,3 +144,5 @@ if __name__=="__main__":
         (basic_nested_example(), None),
         (basic_nested_example(), 1),
         ], "basic-nested")
+    
+    example_tight_vs_loose_IR()

@@ -7,7 +7,8 @@
 \usepackage{graphicx}
 \usepackage{subcaption}
 \graphicspath{ {./Figures/} }
-
+%\usepackage{subfig}
+%\newsavebox{\measurebox}
 %\usepackage{harvard}
 
 
@@ -48,9 +49,9 @@
 \definecolor{codegreen}{rgb}{0,0.6,0}
 \definecolor{codegray}{rgb}{0.5,0.5,0.5}
 \definecolor{codepurple}{rgb}{0.58,0,0.82}
-\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+\definecolor{backcolour}{rgb}{0.98,0.98,0.98}
 
-\lstdefinestyle{mystyle}{
+\lstdefinestyle{default_code}{
     backgroundcolor=\color{backcolour},   
     keywordstyle=\color{magenta},
     numberstyle=\tiny\color{codegray},
@@ -68,9 +69,30 @@
     tabsize=2
 }
 
-\lstset{style=mystyle}
+\lstdefinestyle{min_code}{
+    backgroundcolor=\color{backcolour},   
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
 
-\lstset{language=C, style=mystyle}
+\lstdefinelanguage{none}{
+  identifierstyle=
+}
+
+\lstset{style=default_code}
+
+\lstset{language=C, style=default_code}
+\lstset{language=none, style=min_code}
 
 %\citationmode{abbr}
 %\bibliographystyle{agsm}
