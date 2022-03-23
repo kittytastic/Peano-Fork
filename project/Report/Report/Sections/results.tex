@@ -6,17 +6,17 @@
 % [ ] Kernel Compare results
 
 We will use the Euler equations in 2D and 3D, along with the shallow water equations to test our compiler. 
-A summary of these problems can be found bellow.
+A summary of these problems can be found below.
 
+\vspace{1em}
 \begin{tabular}{ccccccccc}
 Problem & Unknowns+Auxillary & Dim & Patch size & Uses Flux & Uses NCP\\
 \hline
-
 Euler 2D & 4+0 & 2 & 3x3 & \checkmark & \xmark \\
 Euler 3D & 5+0 & 3 & 3x3x3 & \checkmark & \xmark \\
 SWE & 3+1 & 2 & 3x3 & \checkmark & \checkmark \\
-
 \end{tabular}
+\vspace{1em}
 
 These problems were chosen as they are prototypical hyperbolic PDE test problems that exhibit a wide range of features, such as the use of 2D and 3D along with the use of NCP and auxiliary variables.
 Also, each of theses problems are given as example within the ExaHyPE repository.
