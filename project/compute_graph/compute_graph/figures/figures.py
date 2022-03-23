@@ -133,7 +133,19 @@ def example_tight_vs_loose_IR():
     end_ir = ir_tfs.tf(start_ir)
     with open("../Artifacts/tight_vs_loose-end.txt", "w+") as f: f.write(str(end_ir))
 
-        
+def example_flatten():
+    g_before = basic_nested_array_output()
+    g_after = basic_nested_array_output()
+    tf = DAG_Flatten()
+    g_after = tf.tf(g_after)
+
+    generate_multi_fig([
+        (g_before, None),
+        (g_before, 1),
+        (g_after, None),
+        ], "flatten")
+
+
    
 if __name__=="__main__":
     print("--------- Figures -------")
@@ -146,3 +158,4 @@ if __name__=="__main__":
         ], "basic-nested")
     
     example_tight_vs_loose_IR()
+    example_flatten()

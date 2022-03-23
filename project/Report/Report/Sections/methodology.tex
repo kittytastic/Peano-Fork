@@ -233,7 +233,17 @@ The DAG transform stage, the IR transform stage, and the code generation stage.
 % DAG Transforms
 In the DAG transform stage a series of user specified transforms are applied to the DAG.
 The most useful of these transforms is the flatten transform.
-% FIG?
+
+\begin{figure}[h!]
+    \centering
+    \subcaptionbox{Nested DAG}{\includegraphics[width=.2\textwidth]{flatten-part1.png}}
+    \hspace{1em}
+    \subcaptionbox{Exploded view of nested DAG}{\includegraphics[width=.2\textwidth]{flatten-part0.png}}
+    \hspace{1em}
+    \subcaptionbox{Flattened DAG}{\includegraphics[width=.2\textwidth]{flatten-part2.png}}
+    \caption{Example of the DAG flatten operation. Colours are used to indicated depth of nodes. Blue = depth 0, Orange = depth 1}\label{fig:bn}
+\end{figure}
+
 This transform takes a nested DAG (i.e. a DAG containing composite nodes) and for every composite node, the composite node is deleted and replaced by a copy of the DAG contained within the composite node.
 Applied recursively, a highly nested DAG can be reduced to only contain primitive nodes, i.e. it is flattened.
 This transform causes the final output code to be a single monolithic function, as opposed to a function containing many function calls.
