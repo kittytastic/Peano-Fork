@@ -200,28 +200,67 @@ define IR_DataTypes.VOID @kernel (new #list(in), new #list(out)):
 \end{figure}
 
 
+\newsavebox{\firstlisting}
+\begin{lrbox}{\firstlisting}% Store first listing
+\minipage{.33\textwidth}
+\begin{lstlisting}
+static uint64_t i = 0;
+void every_cycle()
+{
+  if (i > 0)
+  i--;
+}
+\end{lstlisting}
+\endminipage
+\end{lrbox}
+
+\newsavebox{\secondlisting}
+\begin{lrbox}{\secondlisting}% Store first listing
+    
+\minipage[t]{.33\textwidth}
+\begin{lstlisting}
+static uint64_t i = 0;
+void every_cycle()
+{
+  if (i > 0)
+  i--;
+}
+\end{lstlisting}
+\endminipage
+\end{lrbox}
 
 \begin{figure}
 \centering
 
 \sbox{\measurebox}{%
   \begin{minipage}[b]{.33\textwidth}
-      \subfloat[]{\label{fig:figA}\includegraphics[width=\textwidth,height=5cm]{tight_vs_loose.png}}
+      \fbox{\subfloat[]{\label{fig:figA}\fbox{\includegraphics[width=\textwidth,height=10cm]{tight_vs_loose.png}}}}
   \end{minipage}
 }
 
 \usebox{\measurebox}\qquad
     \begin{minipage}[b][\ht\measurebox][s]{.33\textwidth}
         \centering
-        \subfloat[]{\label{fig:figB}\includegraphics[width=\textwidth,height=2cm]{tight_vs_loose.png}}
+        \fbox{\subfloat[]{\label{fig:figB}\fbox{\usebox{\firstlisting}}}}
+ 
 
-        \vfill
-
-        \subfloat[]{\label{fig:figC}\includegraphics[width=\textwidth,height=2cm]{tight_vs_loose.png}}
+        \subfloat[]{\label{fig:figC}\usebox{\secondlisting}}
     \end{minipage}
 \caption{my caption. (a) is .... (b) is .... (c) is ....}
 \label{fig:Test}
 \end{figure}
+
+
+\minipage[b][\ht\measurebox][s]{.33\textwidth}
+\begin{lstlisting}[language=c]
+define IR_DataTypes.VOID @kernel (new #list(in), new #list(out)):
+	new #tmp2 = #in[0] * #in[0] * #in[0]
+	#out[0] = #tmp2 + #in[1]
+	#out[1] = #tmp2 - #in[1]
+	<return nothing>
+\end{lstlisting}
+\endminipage
+
 
 \subsection{Compiler Architecture}
 Our compiler consists of 3 stages.
