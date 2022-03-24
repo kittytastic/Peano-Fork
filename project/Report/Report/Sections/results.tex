@@ -58,6 +58,24 @@ Every kernel mentioned in our results underwent validity testing using 10 integr
 % [ ] Results vs hand optimised kernels
 % [ ] Talk about compiler flag result
 
+We then explored why compiled kernels have a performance advantage over default kernels.
+To do this we focused on the Euler 2D problem, and optimised a kernel by hand.
+We will refer to this hand optimised kernel as handmade.
+The hand optimised had 3 notable changes over the default kernel.
+Firstly, all heap allocation was removed and either completely eliminated or replaced with stack allocation.
+Next, all lambda functions were replaced with direct function calls.
+And finally, all constants known at compile time (e.g. the number of cells per patch) were removed from function signatures and declared directly in the function body as constants.
+
+Table \ref{tab:hand_v_compiled} shows the relative speedup of the handmade kernels and compiled kernels.
+
+\begin{table}
+    \centering
+\input{Tables/hand-made-vs-generated-tab.tex} 
+\caption{Performance of kernel optimised by hand vs compiled kernel}\label{tab:hand_v_compiled}
+\end{table}
+
+During our testing we observed a significant difference
+
 \subsection{Further Optimisations}
 % Effect of computation reduction
 % [ ] Adding comp dedup speed

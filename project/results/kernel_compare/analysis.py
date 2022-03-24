@@ -11,6 +11,8 @@ speedup_pairs = {
 
 
 BASE_DIR = os.path.dirname(os.path.realpath(__file__)) 
+ARTIFACTS = BASE_DIR+"/../Artifacts"
+
 
 def process_file(path: str):
     df = pd.read_csv(path)
@@ -46,22 +48,31 @@ def process_dir(path: str):
 
     for sd in sub_dirs:
         for f in get_sub_files(sd, "csv"):
-            df = df.append(process_file(f))
+            df = pd.concat([df, process_file(f)])
     print(sub_dirs)
 
     return df
 
+def hand_made_comparision(all_results: pd.DataFrame):
+    df = all_results.loc[(all_results["run_time"]==60)&(all_results["group"]=="Euler 2D")&(all_results["sys"]=="ham8")]
+
+    name_map = {"Kernel 1: Base Euler":"default", "Kernel 2: Basic Inline":"handmade", "Kernel 3: Compiled": "compiled"}
+    df = df.replace({"name":name_map})
+    base_value = df.loc[df["name"]=="handmade"].iloc[0].at["trials_norm"]
+    df["hm_speedup"] = df["trials_norm"]/base_value
+    df["iter_per_msec"] = df["trials_norm"]*1e6
+    print(df.head())
+
+    out_df = df[["name", "iter_per_msec", "speedup", "hm_speedup"]]
+    out_df = out_df.rename(columns={"name": "Kernel", "num_trials": "Num. Iterations", "run_time": "Run Time (s)", "iter_per_msec": "Iterations per ms", "speedup":"Speedup vs Default", "hm_speedup": "Speedup vs Handmade"})    
+    s = out_df.style
+    s.format(precision=2)  
+    s.hide(axis="index")
+    file_name = ARTIFACTS+"/hand-made-vs-generated-tab.tex"
+    s.to_latex(file_name, hrules=True)
 
 
 if __name__ == "__main__":
-    print()
-    print(BASE_DIR)
-    df = process_dir(BASE_DIR)
-    print(df.head())
-    exit()
     print("--------- Kernel Compare Analysis ----------")
-    print("Hamilton 7")
-    process_file("ham7/ham7-intel-60s.csv")
-    print("Hamilton 8")
-    process_file("ham8/ham8-amd-60s.csv")
-
+    df = process_dir(BASE_DIR)
+    hand_made_comparision(df)
