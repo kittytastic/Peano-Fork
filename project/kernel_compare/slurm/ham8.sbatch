@@ -4,7 +4,7 @@
 #SBATCH -n 1          # 1 CPU core
 #SBATCH --time=1:0:0  # 6 hours (hours:minutes:seconds)
 #SBATCH -p shared
-
+#SBATCH --mem=8GB
 # Commands to be run:
 
 ../KernelCompare -f ham8-amd-5s.csv -t 5.0
