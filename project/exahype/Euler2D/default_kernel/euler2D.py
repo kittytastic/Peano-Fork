@@ -13,23 +13,25 @@
 # We import Peano4 as project. If this step fails, ensure that your environment
 # variable PYTHONPATH points to Peano4's python directory.
 #
-import os, sys
+
 import peano4
 import exahype2
-import argparse
 
 
-project = exahype2.Project( ["project", "exahype", "Euler3D", "default"], "euler3D", ".", executable="Euler3D" )
+project = exahype2.Project( ["project", "exahype", "Euler2D", "default_kernel"],
+                             "euler2D", ".", executable="Euler2D_Default" )
 
 
 #
 # Add the Finite Volumes solver
 #
-unknowns       = 5
+unknowns       = 4
 time_step_size = 0.001
-max_h          = 0.03
-min_h          = 0.0
+max_h          = 0.01
+min_h          = 0.01
 
+plot_freq      = 0
+end_time = 0.1
 
 #
 # Still the same solver, but this time we use named arguments. This is the way
@@ -40,41 +42,28 @@ min_h          = 0.0
 auxiliary_variables = 0
 
 thesolver = exahype2.solvers.fv.rusanov.GlobalFixedTimeStep(
-  "euler3D",
-  3,
-  unknowns, auxiliary_variables,
-  min_h, max_h,
-  time_step_size,
-  flux = exahype2.solvers.fv.PDETerms.User_Defined_Implementation,
-  eigenvalues = exahype2.solvers.fv.PDETerms.User_Defined_Implementation
+  name="euler2D",
+  patch_size=3,
+  unknowns=unknowns, auxiliary_variables=0,
+  min_volume_h=min_h, max_volume_h=max_h,
+  time_step_size=time_step_size,
+  flux = exahype2.solvers.fv.PDETerms.User_Defined_Implementation
 )
 
-
-#thesolver.set_implementation( refinement_criterion=exahype2.solvers.fv.PDETerms.User_Defined_Implementation )
-
-
 project.add_solver( thesolver )
-
-
-dimensions = 3
-build_mode = peano4.output.CompileMode.Release
-
-
 
 #
 # Lets configure some global parameters
 #
+build_mode = peano4.output.CompileMode.Release
 project.set_global_simulation_parameters(
-  dimensions = 3,
-  offset = [0.0,0.0,0.0],
-  size = [0.5, 0.5, 0.5],
-  end_time = 1.0,
+  dimensions = 2,
+  offset = [0.0,0.0],
+  size = [1.0,1.0],
+  end_time = end_time,
   first_plot_time_stamp = 0.0,
-  time_in_between_plots = 0.05,      # snapshots
-  #periodic_BC = [False, False, False]
+  time_in_between_plots = plot_freq
 )
-
-
 
 #
 # So here's the parallel stuff. This is new compared to the serial
@@ -83,8 +72,9 @@ project.set_global_simulation_parameters(
 project.set_load_balancing( "toolbox::loadbalancing::RecursiveSubdivision", "new ::exahype2::LoadBalancingConfiguration()" )
 project.set_Peano4_installation( "../../../../", build_mode )
 peano4_project = project.generate_Peano4_project(False)
+peano4_project.build(make_clean_first=True, number_of_parallel_builds=32)
 
-peano4_project.build(make_clean_first=True, number_of_parallel_builds=12)
+print("Done. Executable is: Euler2D")
 
-print("Done. Executable is: Euler3D")
-print( "Convert any output via pvpython ~/git/Peano/python/peano4/visualisation/render.py solution-euler3D.peano-patch-file")
+print( "Convert any output via pvpython ~/git/Peano/python/peano4/visualisation/render.py solution-euler2D.peano-patch-file")
+

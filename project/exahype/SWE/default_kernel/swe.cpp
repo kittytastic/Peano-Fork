@@ -2,12 +2,12 @@
 #include "exahype2/RefinementControl.h"
 
 
-tarch::logging::Log   project::swe::swe::_log( "project::swe::swe" );
+tarch::logging::Log   project::exahype::SWE::default_kernel::swe::_log( "project::exahype::SWE::default_kernel::swe" );
 
 
 
 
-::exahype2::RefinementCommand project::swe::swe::refinementCriterion(
+::exahype2::RefinementCommand project::exahype::SWE::default_kernel::swe::refinementCriterion(
   const double * __restrict__ Q, // Q[3+1]
   const tarch::la::Vector<Dimensions,double>&  volumeX,
   const tarch::la::Vector<Dimensions,double>&  volumeH,
@@ -26,7 +26,7 @@ tarch::logging::Log   project::swe::swe::_log( "project::swe::swe" );
 
 
 
-void project::swe::swe::initialCondition(
+void project::exahype::SWE::default_kernel::swe::initialCondition(
   double * __restrict__ Q,
   const tarch::la::Vector<Dimensions,double>&  volumeCentre,
   const tarch::la::Vector<Dimensions,double>&  volumeH,
@@ -53,7 +53,7 @@ void project::swe::swe::initialCondition(
 
 
 
-void project::swe::swe::boundaryConditions(
+void project::exahype::SWE::default_kernel::swe::boundaryConditions(
   const double * __restrict__                  Qinside, // Qinside[3+1]
   double * __restrict__                        Qoutside, // Qoutside[3+1]
   const tarch::la::Vector<Dimensions,double>&  faceCentre,
@@ -73,7 +73,7 @@ void project::swe::swe::boundaryConditions(
 
 
 
-double ::project::swe::swe::maxEigenvalue(
+double ::project::exahype::SWE::default_kernel::swe::maxEigenvalue(
   const double * __restrict__ Q, // Q[3+1],
   const tarch::la::Vector<Dimensions,double>&  faceCentre,
   const tarch::la::Vector<Dimensions,double>&  volumeH,
@@ -105,7 +105,7 @@ double ::project::swe::swe::maxEigenvalue(
 
 
 
-void ::project::swe::swe::flux(
+void ::project::exahype::SWE::default_kernel::swe::flux(
   const double * __restrict__ Q, // Q[3+1],
   const tarch::la::Vector<Dimensions,double>&  faceCentre,
   const tarch::la::Vector<Dimensions,double>&  volumeH,
@@ -134,7 +134,7 @@ void ::project::swe::swe::flux(
 
 
 
-void ::project::swe::swe::nonconservativeProduct(
+void ::project::exahype::SWE::default_kernel::swe::nonconservativeProduct(
   const double * __restrict__ Q, // Q[3+1],
   const double * __restrict__             deltaQ, // [3+1]
   const tarch::la::Vector<Dimensions,double>&  faceCentre,

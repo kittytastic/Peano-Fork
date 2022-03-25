@@ -59,7 +59,7 @@ project.set_global_simulation_parameters(
   size = [1.0,1.0],
   end_time = 0.1,
   first_plot_time_stamp = 0.0,
-  time_in_between_plots = 0.001
+  time_in_between_plots = 0
 )
 
 #

@@ -322,7 +322,7 @@ void project::exahype::Euler2D::generated::observers::TimeStep2peano4_toolbox_bl
       marker.h()(1),
       reconstructedPatch,
       targetPatch
-    )
+    );
     
     
     fineGridCelleuler2DCellLabel.setTimeStamp(cellTimeStamp + usedTimeStepSize);
