@@ -153,7 +153,7 @@ Beyond the performance of compiled kernels, it is also important that our compil
 Firstly, we look at compile times.
 On the AMD system it took approx 2s to compile the SWE and Euler 2D kernels, however it takes approx 40s to compile the Euler 3D kernel.
 This is due to the larger size of the Euler 3D graph to the Euler 2D and SWE graphs, 32091 nodes to 6736 and 5089 nodes, generating 10235, 2090, and 1511 lines of code respectively.
-However, the Euler 3D graph is only $5\times$ larger than Euler 2D graph but takes $~25\times$ longer to compile.
+However, the Euler 3D graph is only $5\times$ larger than Euler 2D graph but takes $\sim 20\times$ longer to compile.
 This illudes to the $O(n^2)$ runtime of parts of the compiler.
 Much of the compiler has run time $O(n)$, however there parts have runtime $O(n^2)$ in particular transforms to the IR.
 By caching the location of variables in the IR the runtime of all standard IR transforms can be reduced to $O(n)$.
