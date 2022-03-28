@@ -100,20 +100,24 @@ def kernel_compare(all_results: pd.DataFrame):
     print("Finished default vs compiled results.")
 
 def ofastmath(all_results: pd.DataFrame):
-    df = all_results.loc[(all_results["run_time"]==60)&(all_results["name"]=="compiled")]
+    df = all_results.loc[(all_results["run_time"]==60)&(all_results["name"]!="default")]
     df = sys_filter(df, ["ham8-o3", "ham8-o3-fastmath", "ham8"])
 
+    hand_made_mask = df["name"]=="handmade"
+    df.loc[hand_made_mask, "group"] = df.loc[hand_made_mask, "group"].apply(lambda x: f"{x} (handmade)")
+
+    print(df.head(12))
     df = df[["group", "sys", "speedup"]]
-    for g in ["Euler 2D", "Euler 3D", "SWE"]:
+    for g in ["Euler 2D", "Euler 2D (handmade)", "Euler 3D", "SWE"]:
         sub_df_mask = df["group"]==g
         sub_df = df[sub_df_mask]
         base_v = sub_df[sub_df["sys"]=="ham8-o3"].loc[:,"speedup"].iloc[0]
         base_v_2 = sub_df[sub_df["sys"]=="ham8-o3-fastmath"].loc[:,"speedup"].iloc[0]
         df.loc[sub_df_mask, "rel_speedup_o3"] = df.loc[sub_df_mask, "speedup"]/base_v
-        df.loc[sub_df_mask, "rel_speedup_o3fast"] = df.loc[sub_df_mask, "speedup"]/base_v_2
+        #df.loc[sub_df_mask, "rel_speedup_o3fast"] = df.loc[sub_df_mask, "speedup"]/base_v_2
 
     df["rel_speedup_o3"] = df["rel_speedup_o3"].mask(np.isclose(df["rel_speedup_o3"].values, 1.0))
-    df["rel_speedup_o3fast"] = df["rel_speedup_o3fast"].mask(np.isclose(df["rel_speedup_o3fast"].values, 1.0))
+    #df["rel_speedup_o3fast"] = df["rel_speedup_o3fast"].mask(np.isclose(df["rel_speedup_o3fast"].values, 1.0))
     
     df = df.replace({"sys":{"ham8": "-Ofast", "ham8-o3-fastmath": "-O3 -ffast-math", "ham8-o3": "-O3"}})
     df = df.sort_values(by=["group", "sys"])

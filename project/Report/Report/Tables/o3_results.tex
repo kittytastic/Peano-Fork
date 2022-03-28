@@ -1,15 +1,18 @@
-\begin{tabular}{llrrr}
+\begin{tabular}{llrr}
 \toprule
-Problem & Compiler Options & Speedup vs Default & Relative Speedup & Relative Speedup \\
+Problem & Compiler Options & Speedup vs Default & Relative Speedup \\
 \midrule
-Euler 2D & -O3 & 3.29 & - & 0.38 \\
-Euler 2D & -O3 -ffast-math & 8.56 & 2.60 & - \\
-Euler 2D & -Ofast & 8.66 & 2.63 & 1.01 \\
-Euler 3D & -O3 & 1.92 & - & 0.22 \\
-Euler 3D & -O3 -ffast-math & 8.60 & 4.49 & - \\
-Euler 3D & -Ofast & 8.62 & 4.50 & 1.00 \\
-SWE & -O3 & 5.67 & - & 0.51 \\
-SWE & -O3 -ffast-math & 11.23 & 1.98 & - \\
-SWE & -Ofast & 11.38 & 2.00 & 1.01 \\
+Euler 2D & -O3 & 3.29 & - \\
+Euler 2D & -O3 -ffast-math & 8.56 & 2.60 \\
+Euler 2D & -Ofast & 8.66 & 2.63 \\
+Euler 2D (handmade) & -O3 & 3.42 & - \\
+Euler 2D (handmade) & -O3 -ffast-math & 3.71 & 1.09 \\
+Euler 2D (handmade) & -Ofast & 3.75 & 1.10 \\
+Euler 3D & -O3 & 1.92 & - \\
+Euler 3D & -O3 -ffast-math & 8.60 & 4.49 \\
+Euler 3D & -Ofast & 8.62 & 4.50 \\
+SWE & -O3 & 5.67 & - \\
+SWE & -O3 -ffast-math & 11.23 & 1.98 \\
+SWE & -Ofast & 11.38 & 2.00 \\
 \bottomrule
 \end{tabular}

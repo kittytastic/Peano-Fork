@@ -110,12 +110,27 @@ This shows us that the compiled kernels advantage must gained by other mechanism
 
 During our testing we observed a significant difference in the performance of compiled kernels when using the \texttt{-O3} and \texttt{-Ofast} compiler flag on both Intel and AMD compilers.
 Exploring this further we found that the \texttt{-ffast-math} was giving us the difference in results.
-Table \ref{tab:ffast_math} shows the effect these compiler flags had on the advantage the compiled kernels had.  
+Table \ref{tab:ffast_math} shows the effect these compiler flags have on the advantage the compiled and handmade kernels had.
+
 \begin{table}
     \centering
 \input{Tables/o3_results.tex} 
 \caption{}\label{tab:ffast_math} 
 \end{table}
+
+The most interesting result from Table \ref{tab:ffast_math} is that the \texttt{-ffast-math} makes very little difference to the Euler 2D handopt kernel, however the compiled kernel experience a $2.6\times$ improvement.
+The \text{ffast-math} option enables 2 main relaxations to floating point arithmetic.
+Firstly it allows the use of faster but less accurate square root and divisions.
+Although our kernels do include both square root and divisions, as the handopt kernel contains an equal number of these as the compiled kernel, we would expect that they both experience similar benefits from this optimisation.
+However, this is not the case, so we can discount this optimisation.
+The second optimisation \texttt{ffast-math} makes is to relax the constraints on reordering floating point operations.
+% ONE OF OUR ASSUMTIONS IS ITS OKAY TO REORDER
+It suspect it is this relaxation that makes the difference in performance, as other optimisations can now be more aggressive.
+In particular we would expect that allowing the reordering of instructions gives the compiler more scope to preform SIMD vectorisation.
+
+Using the MAQAO static analysis tool we found that the \texttt{ffast-math} flag does indeed open up the door to more aggressive SIMD vectorisation.
+For example, the compiled kernel using \texttt{-O3} uses 0 FMA SIMD instructions, whereas the compiled kernel using \texttt{-O3 -ffast-math} uses 236 FMA SIMD instructions.
+
 \subsection{Further Optimisations}
 % Effect of computation reduction
 % [ ] Adding comp dedup speed
