@@ -74,7 +74,8 @@ def hand_made_comparision(all_results: pd.DataFrame):
     df["iter_per_msec"] = df["trials_norm"]*1e6
 
     out_df = df[["name", "iter_per_msec", "speedup", "hm_speedup"]]
-    out_df = out_df.rename(columns={"name": "Kernel", "num_trials": "Num. Iterations", "run_time": "Run Time (s)", "iter_per_msec": "Iterations per ms", "speedup":"Speedup vs Default", "hm_speedup": "Speedup vs Handmade"})    
+    out_df = out_df.replace({"name":{"handmade": "handopt"}}) 
+    out_df = out_df.rename(columns={"name": "Kernel", "num_trials": "Num. Iterations", "run_time": "Run Time (s)", "iter_per_msec": "Iterations per ms", "speedup":"Speedup vs Default", "hm_speedup": "Speedup vs Handmade"})
     s = out_df.style
     s.format(precision=2)  
     s.hide(axis="index")
@@ -104,11 +105,10 @@ def ofastmath(all_results: pd.DataFrame):
     df = sys_filter(df, ["ham8-o3", "ham8-o3-fastmath", "ham8"])
 
     hand_made_mask = df["name"]=="handmade"
-    df.loc[hand_made_mask, "group"] = df.loc[hand_made_mask, "group"].apply(lambda x: f"{x} (handmade)")
+    df.loc[hand_made_mask, "group"] = df.loc[hand_made_mask, "group"].apply(lambda x: f"{x} (handopt)")
 
-    print(df.head(12))
     df = df[["group", "sys", "speedup"]]
-    for g in ["Euler 2D", "Euler 2D (handmade)", "Euler 3D", "SWE"]:
+    for g in ["Euler 2D", "Euler 2D (handopt)", "Euler 3D", "SWE"]:
         sub_df_mask = df["group"]==g
         sub_df = df[sub_df_mask]
         base_v = sub_df[sub_df["sys"]=="ham8-o3"].loc[:,"speedup"].iloc[0]
