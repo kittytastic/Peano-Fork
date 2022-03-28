@@ -87,7 +87,7 @@ def kernel_compare(all_results: pd.DataFrame):
     df = sys_filter(df, ["ham7", "ham8"])
     df = df.sort_values(by=["sys", "group", "speedup"])
 
-    df = df[["name", "group", "sys", "iter_per_msec", "speedup"]]
+    df = df[["group", "name", "sys", "iter_per_msec", "speedup"]]
     df = df.replace({"sys":{"ham7": "Intel", "ham8": "AMD"}})
     df = df.rename(columns={"name": "Kernel", "group":"Problem", "iter_per_msec": "Iterations per ms", "speedup":"Speedup", "sys": "System"})    
     df["Speedup"] = df["Speedup"].mask(np.isclose(df["Speedup"].values, 1.0))
