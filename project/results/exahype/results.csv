@@ -1,0 +1,121 @@
+time, problem, kernel_type, cmd
+86.35243344306946, SWE, default, SWE/default_kernel/SWE_Default
+77.61299777030945, SWE, generated, SWE/generated/SWE_Generated
+63.38312768936157, Euler 2D, default, Euler2D/default_kernel/Euler2D_Default
+60.42753601074219, Euler 2D, generated, Euler2D/generated/Euler2DGenerated
+111.99806451797485, Euler 3D, default, Euler3D/default_kernel/Euler3D_Default
+97.55015707015991, Euler 3D, generated, Euler3D/generated/Euler3D_Generated
+86.22772598266602, SWE, default, SWE/default_kernel/SWE_Default
+77.30516910552979, SWE, generated, SWE/generated/SWE_Generated
+63.559677839279175, Euler 2D, default, Euler2D/default_kernel/Euler2D_Default
+60.06611204147339, Euler 2D, generated, Euler2D/generated/Euler2DGenerated
+111.53000521659851, Euler 3D, default, Euler3D/default_kernel/Euler3D_Default
+97.95742130279541, Euler 3D, generated, Euler3D/generated/Euler3D_Generated
+86.3534197807312, SWE, default, SWE/default_kernel/SWE_Default
+76.93316602706909, SWE, generated, SWE/generated/SWE_Generated
+63.07855415344238, Euler 2D, default, Euler2D/default_kernel/Euler2D_Default
+60.11919546127319, Euler 2D, generated, Euler2D/generated/Euler2DGenerated
+111.91406321525574, Euler 3D, default, Euler3D/default_kernel/Euler3D_Default
+97.79566884040833, Euler 3D, generated, Euler3D/generated/Euler3D_Generated
+86.4913420677185, SWE, default, SWE/default_kernel/SWE_Default
+76.9496169090271, SWE, generated, SWE/generated/SWE_Generated
+63.53936529159546, Euler 2D, default, Euler2D/default_kernel/Euler2D_Default
+59.33888220787048, Euler 2D, generated, Euler2D/generated/Euler2DGenerated
+112.10681509971619, Euler 3D, default, Euler3D/default_kernel/Euler3D_Default
+97.66684341430664, Euler 3D, generated, Euler3D/generated/Euler3D_Generated
+86.13607120513916, SWE, default, SWE/default_kernel/SWE_Default
+78.56135678291321, SWE, generated, SWE/generated/SWE_Generated
+63.36875247955322, Euler 2D, default, Euler2D/default_kernel/Euler2D_Default
+59.88897919654846, Euler 2D, generated, Euler2D/generated/Euler2DGenerated
+112.13218069076538, Euler 3D, default, Euler3D/default_kernel/Euler3D_Default
+97.41531682014465, Euler 3D, generated, Euler3D/generated/Euler3D_Generated
+86.1067636013031, SWE, default, SWE/default_kernel/SWE_Default
+77.28684544563293, SWE, generated, SWE/generated/SWE_Generated
+63.4860999584198, Euler 2D, default, Euler2D/default_kernel/Euler2D_Default
+59.781891107559204, Euler 2D, generated, Euler2D/generated/Euler2DGenerated
+111.57222032546997, Euler 3D, default, Euler3D/default_kernel/Euler3D_Default
+96.84877610206604, Euler 3D, generated, Euler3D/generated/Euler3D_Generated
+85.9526731967926, SWE, default, SWE/default_kernel/SWE_Default
+77.54438161849976, SWE, generated, SWE/generated/SWE_Generated
+63.54390501976013, Euler 2D, default, Euler2D/default_kernel/Euler2D_Default
+60.13249111175537, Euler 2D, generated, Euler2D/generated/Euler2DGenerated
+111.37137699127197, Euler 3D, default, Euler3D/default_kernel/Euler3D_Default
+97.37264513969421, Euler 3D, generated, Euler3D/generated/Euler3D_Generated
+86.06112575531006, SWE, default, SWE/default_kernel/SWE_Default
+76.83956265449524, SWE, generated, SWE/generated/SWE_Generated
+63.142656087875366, Euler 2D, default, Euler2D/default_kernel/Euler2D_Default
+59.88723659515381, Euler 2D, generated, Euler2D/generated/Euler2DGenerated
+111.60289859771729, Euler 3D, default, Euler3D/default_kernel/Euler3D_Default
+97.47874402999878, Euler 3D, generated, Euler3D/generated/Euler3D_Generated
+87.1256012916565, SWE, default, SWE/default_kernel/SWE_Default
+77.00063920021057, SWE, generated, SWE/generated/SWE_Generated
+63.23814606666565, Euler 2D, default, Euler2D/default_kernel/Euler2D_Default
+59.938669204711914, Euler 2D, generated, Euler2D/generated/Euler2DGenerated
+111.53258466720581, Euler 3D, default, Euler3D/default_kernel/Euler3D_Default
+97.24845170974731, Euler 3D, generated, Euler3D/generated/Euler3D_Generated
+86.41141080856323, SWE, default, SWE/default_kernel/SWE_Default
+77.54870748519897, SWE, generated, SWE/generated/SWE_Generated
+63.63397169113159, Euler 2D, default, Euler2D/default_kernel/Euler2D_Default
+60.20597553253174, Euler 2D, generated, Euler2D/generated/Euler2DGenerated
+111.35761165618896, Euler 3D, default, Euler3D/default_kernel/Euler3D_Default
+97.19137763977051, Euler 3D, generated, Euler3D/generated/Euler3D_Generated
+86.74087262153625, SWE, default, SWE/default_kernel/SWE_Default
+76.70211935043335, SWE, generated, SWE/generated/SWE_Generated
+63.85870313644409, Euler 2D, default, Euler2D/default_kernel/Euler2D_Default
+59.291698694229126, Euler 2D, generated, Euler2D/generated/Euler2DGenerated
+111.39669728279114, Euler 3D, default, Euler3D/default_kernel/Euler3D_Default
+97.37196445465088, Euler 3D, generated, Euler3D/generated/Euler3D_Generated
+86.2957410812378, SWE, default, SWE/default_kernel/SWE_Default
+77.19956827163696, SWE, generated, SWE/generated/SWE_Generated
+63.214133501052856, Euler 2D, default, Euler2D/default_kernel/Euler2D_Default
+60.61267590522766, Euler 2D, generated, Euler2D/generated/Euler2DGenerated
+111.74236750602722, Euler 3D, default, Euler3D/default_kernel/Euler3D_Default
+97.39660739898682, Euler 3D, generated, Euler3D/generated/Euler3D_Generated
+85.89892435073853, SWE, default, SWE/default_kernel/SWE_Default
+76.84191155433655, SWE, generated, SWE/generated/SWE_Generated
+63.51544427871704, Euler 2D, default, Euler2D/default_kernel/Euler2D_Default
+60.23019003868103, Euler 2D, generated, Euler2D/generated/Euler2DGenerated
+112.03683376312256, Euler 3D, default, Euler3D/default_kernel/Euler3D_Default
+97.88391780853271, Euler 3D, generated, Euler3D/generated/Euler3D_Generated
+86.7228786945343, SWE, default, SWE/default_kernel/SWE_Default
+77.09056067466736, SWE, generated, SWE/generated/SWE_Generated
+63.360514640808105, Euler 2D, default, Euler2D/default_kernel/Euler2D_Default
+59.758652448654175, Euler 2D, generated, Euler2D/generated/Euler2DGenerated
+111.81368231773376, Euler 3D, default, Euler3D/default_kernel/Euler3D_Default
+97.20929646492004, Euler 3D, generated, Euler3D/generated/Euler3D_Generated
+86.43460392951965, SWE, default, SWE/default_kernel/SWE_Default
+76.53349685668945, SWE, generated, SWE/generated/SWE_Generated
+63.50943851470947, Euler 2D, default, Euler2D/default_kernel/Euler2D_Default
+60.02025532722473, Euler 2D, generated, Euler2D/generated/Euler2DGenerated
+112.18794775009155, Euler 3D, default, Euler3D/default_kernel/Euler3D_Default
+97.58978343009949, Euler 3D, generated, Euler3D/generated/Euler3D_Generated
+85.87517261505127, SWE, default, SWE/default_kernel/SWE_Default
+77.67170929908752, SWE, generated, SWE/generated/SWE_Generated
+63.6879358291626, Euler 2D, default, Euler2D/default_kernel/Euler2D_Default
+60.243186235427856, Euler 2D, generated, Euler2D/generated/Euler2DGenerated
+111.85696959495544, Euler 3D, default, Euler3D/default_kernel/Euler3D_Default
+97.34525871276855, Euler 3D, generated, Euler3D/generated/Euler3D_Generated
+86.25665831565857, SWE, default, SWE/default_kernel/SWE_Default
+76.33899784088135, SWE, generated, SWE/generated/SWE_Generated
+63.90277433395386, Euler 2D, default, Euler2D/default_kernel/Euler2D_Default
+59.80185508728027, Euler 2D, generated, Euler2D/generated/Euler2DGenerated
+111.97349739074707, Euler 3D, default, Euler3D/default_kernel/Euler3D_Default
+97.61850380897522, Euler 3D, generated, Euler3D/generated/Euler3D_Generated
+86.17443776130676, SWE, default, SWE/default_kernel/SWE_Default
+76.69530892372131, SWE, generated, SWE/generated/SWE_Generated
+66.41964173316956, Euler 2D, default, Euler2D/default_kernel/Euler2D_Default
+68.21963405609131, Euler 2D, generated, Euler2D/generated/Euler2DGenerated
+126.7518892288208, Euler 3D, default, Euler3D/default_kernel/Euler3D_Default
+110.95610332489014, Euler 3D, generated, Euler3D/generated/Euler3D_Generated
+97.59040641784668, SWE, default, SWE/default_kernel/SWE_Default
+87.55320858955383, SWE, generated, SWE/generated/SWE_Generated
+71.62193584442139, Euler 2D, default, Euler2D/default_kernel/Euler2D_Default
+67.7842857837677, Euler 2D, generated, Euler2D/generated/Euler2DGenerated
+126.70161533355713, Euler 3D, default, Euler3D/default_kernel/Euler3D_Default
+110.68958020210266, Euler 3D, generated, Euler3D/generated/Euler3D_Generated
+98.4455213546753, SWE, default, SWE/default_kernel/SWE_Default
+89.37870907783508, SWE, generated, SWE/generated/SWE_Generated
+71.96544146537781, Euler 2D, default, Euler2D/default_kernel/Euler2D_Default
+71.82170748710632, Euler 2D, generated, Euler2D/generated/Euler2DGenerated
+137.34658765792847, Euler 3D, default, Euler3D/default_kernel/Euler3D_Default
+120.77858853340149, Euler 3D, generated, Euler3D/generated/Euler3D_Generated
