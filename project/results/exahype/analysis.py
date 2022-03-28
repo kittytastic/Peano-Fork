@@ -11,18 +11,16 @@ ARTIFACTS = BASE_DIR+"/../Artifacts"
 def pre_proccess(file_name: str):
     df = pd.read_csv(file_name)
     df = df.rename(columns=lambda x: x.strip())
+    df["kernel_type"] = df["kernel_type"].map({" generated":"compiled", " default":"default"})
     return df
 
 def speedup(x:pd.DataFrame):
-    min_el = x[x["kernel_type"]==" default"].loc[:,"time_mean"].iloc[0]
+    min_el = x[x["kernel_type"]=="default"].loc[:,"time_mean"].iloc[0]
     return_val = min_el/x.loc[:, "time_mean"]
     return_val = return_val.rename("speedup")
     return return_val
 
 def analyze(df: pd.DataFrame):
-    peak = df.loc[(df["problem"]==" Euler 2D")&(df["kernel_type"]==" generated")]
-    peak=peak.sort_values(by=['time'])
-
     df_summary = df.groupby(["problem", "kernel_type"]).agg({'time': ['mean', 'min', 'max', 'std']})
     df_summary = df_summary.reset_index()
     df_summary.columns = ['_'.join(col).strip("_") for col in df_summary.columns.values]
