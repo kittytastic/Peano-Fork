@@ -129,9 +129,20 @@ def ofastmath(all_results: pd.DataFrame):
     print("Finished -O3 results.")
 
 
+def our_opts(all_results: pd.DataFrame):
+    df = all_results.loc[(all_results["run_time"]==60)&(all_results["name"]=="compiled")]
+    df = sys_filter(df, ["ham7", "ham7-noopt", "ham8", "ham8-noopt"])
+    
+    
+    df = df[["group", "sys", "speedup", "iter_per_msec"]]
+    df = df.sort_values(by=["group", "sys"])
+    #print(df.head(12))
+    print("Finished our opt ---- No table generated")
+
 if __name__ == "__main__":
     print("--------- Kernel Compare Analysis ----------")
     df = process_dir(BASE_DIR)
     kernel_compare(df)
     hand_made_comparision(df)
     ofastmath(df)
+    our_opts(df)
