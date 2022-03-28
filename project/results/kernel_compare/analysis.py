@@ -17,6 +17,15 @@ BASE_DIR = os.path.dirname(os.path.realpath(__file__))
 ARTIFACTS = BASE_DIR+"/../Artifacts"
 
 
+def sys_filter(df:pd.DataFrame, sys:List[str])->pd.DataFrame:
+    assert(len(sys)>0)
+    mask = (df["sys"]==sys[0])
+    for i in range(1, len(sys)):
+        mask = mask | (df["sys"]==sys[i])
+    
+    return df[mask]
+
+
 def process_file(path: str):
     df = pd.read_csv(path)
     df = df.rename(columns=lambda x: x.strip())
@@ -56,7 +65,8 @@ def process_dir(path: str):
     return df
 
 def hand_made_comparision(all_results: pd.DataFrame):
-    df = all_results.loc[(all_results["run_time"]==60)&(all_results["group"]=="Euler 2D")&(all_results["sys"]=="ham8")]
+    df = all_results.loc[(all_results["run_time"]==60)&(all_results["group"]=="Euler 2D")]
+    df = sys_filter(df, ["ham8"])
     df = df.copy()
 
     base_value = df.loc[df["name"]=="handmade"].iloc[0].at["trials_norm"]
@@ -74,6 +84,7 @@ def hand_made_comparision(all_results: pd.DataFrame):
 
 def kernel_compare(all_results: pd.DataFrame):
     df = all_results.loc[(all_results["run_time"]==60)&(all_results["name"]!="handmade")]
+    df = sys_filter(df, ["ham7", "ham8"])
     df = df.sort_values(by=["sys", "group", "speedup"])
 
     df = df[["name", "group", "sys", "iter_per_msec", "speedup"]]
@@ -88,8 +99,39 @@ def kernel_compare(all_results: pd.DataFrame):
 
     print("Finished default vs compiled results.")
 
+def ofastmath(all_results: pd.DataFrame):
+    df = all_results.loc[(all_results["run_time"]==60)&(all_results["name"]=="compiled")]
+    df = sys_filter(df, ["ham8-o3", "ham8-o3-fastmath", "ham8"])
+
+    df = df[["group", "sys", "speedup"]]
+    for g in ["Euler 2D", "Euler 3D", "SWE"]:
+        sub_df_mask = df["group"]==g
+        sub_df = df[sub_df_mask]
+        base_v = sub_df[sub_df["sys"]=="ham8-o3"].loc[:,"speedup"].iloc[0]
+        base_v_2 = sub_df[sub_df["sys"]=="ham8-o3-fastmath"].loc[:,"speedup"].iloc[0]
+        df.loc[sub_df_mask, "rel_speedup_o3"] = df.loc[sub_df_mask, "speedup"]/base_v
+        df.loc[sub_df_mask, "rel_speedup_o3fast"] = df.loc[sub_df_mask, "speedup"]/base_v_2
+
+    df["rel_speedup_o3"] = df["rel_speedup_o3"].mask(np.isclose(df["rel_speedup_o3"].values, 1.0))
+    df["rel_speedup_o3fast"] = df["rel_speedup_o3fast"].mask(np.isclose(df["rel_speedup_o3fast"].values, 1.0))
+    
+    df = df.replace({"sys":{"ham8": "-Ofast", "ham8-o3-fastmath": "-O3 -ffast-math", "ham8-o3": "-O3"}})
+    df = df.sort_values(by=["group", "sys"])
+    df = df.rename(columns={"group":"Problem", "speedup":"Speedup vs Default", "sys": "Compiler Options", "rel_speedup_o3": "Relative Speedup", "rel_speedup_o3fast": "Relative Speedup"})    
+    
+    s= df.style
+    s.format(precision=2, na_rep="-")  
+    s.hide(axis="index")
+    file_name = ARTIFACTS+"/o3_results.tex"
+    s.to_latex(file_name, hrules=True)
+
+
+    print("Finished -O3 results.")
+
+
 if __name__ == "__main__":
     print("--------- Kernel Compare Analysis ----------")
     df = process_dir(BASE_DIR)
     kernel_compare(df)
     hand_made_comparision(df)
+    ofastmath(df)
