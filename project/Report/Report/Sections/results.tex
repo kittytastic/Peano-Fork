@@ -135,7 +135,36 @@ For example, the compiled kernel using \texttt{-O3} uses 0 FMA SIMD instructions
 % Effect of computation reduction
 % [ ] Adding comp dedup speed
 
+Our compiler supports user transform/optimisation steps.
+We created 2 optimisations to explore their effects on compiled kernels performance.
+The first optimization removed basic arithmetic no-ops from the DAG such as adding 0 or multiplying by 1.
+The second optimization was more complex and removed all repeated computation.
+Any DAG node with equivalent function and inputs were combined into a single node.
+This optimisation removes approx 10\% of nodes in the Euler 3D graph.
+
+We found that neither of these optimisation made a significant difference in the performance of compiled kernels.
+The Intel and AMD compilers likely already preform these simple optimisations, along with many more complex optimisations.
 
 \subsection{Compiler Practicalities} \label{sec:practical}
 % [ ] Compiler speed
 % [ ] Input interface practicalities
+Beyond the performance of compiled kernels, it is also important that our compiler is practical to use.
+
+Firstly, we look at compile times.
+On the AMD system it took approx 2s to compile the SWE and Euler 2D kernels, however it takes approx 40s to compile the Euler 3D kernel.
+This is due to the larger size of the Euler 3D graph to the Euler 2D and SWE graphs, 32091 nodes to 6736 and 5089 nodes, generating 10235, 2090, and 1511 lines of code respectively.
+However, the Euler 3D graph is only $5\times$ larger than Euler 2D graph but takes $~25\times$ longer to compile.
+This illudes to the $O(n^2)$ runtime of parts of the compiler.
+Much of the compiler has run time $O(n)$, however there parts have runtime $O(n^2)$ in particular transforms to the IR.
+By caching the location of variables in the IR the runtime of all standard IR transforms can be reduced to $O(n)$.
+Such optimisation would need to be made if the compiler were to tackle large problems like the CCZ4 equations.
+And potentially a refactor out of python may also be required.
+
+Secondly, we will look at how a user input a problem.
+At the moment to input a problem a user must create a DAG themselves and pass this to the compiler.
+In the DAG creation process the user must manually create ever node e.g an Addition node, then specify every input edge to that node.
+The process is tedious and prone to error.
+The larger a problem gets the harder it is to create a DAG, and problems such as CCZ4 would be bordering impossible to do manually.
+Therefore, more tooling is required to make the compiler practical to use.
+Such tooling may be a SymPy interface that would transforms a SymPy symbolic formula into a DAG.
+Or potentially, DAGs could be generated from code analysis of users existing code.  
