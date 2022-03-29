@@ -126,6 +126,8 @@ Our kernels both include square root and divisions.
 The handopt kernel and compiled kernel use an equal number of these operations, so any benefit from this optimisation will be shared by both kernels.
 Therefore, this optimisation is not responsible for the speedup.
 
+% error no, more vectorization, fewer instructions
+
 The second optimisation \texttt{-ffast-math} makes is to relax the constraints on reordering floating point operations.
 % ONE OF OUR ASSUMTIONS IS ITS OKAY TO REORDER
 It is likely this relaxation that leads to the difference in performance, as other optimisations can now be more aggressive.

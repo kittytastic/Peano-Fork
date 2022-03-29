@@ -1,0 +1,70 @@
+% PDEs - what they are
+
+
+% PDEs - some math, in particular flux
+
+
+
+% Exhaype - what it is
+
+
+% Exahype - benifits of exahype (fast flexible, friendly)
+
+
+
+% Shout out to compilers
+
+
+Many physical phenomena can be described by partial differential equations (PDEs) including:  seismic wave propagation \cite{earthquakePDE}, fluid dynamics \cite{exahype}, or relativistic astrophysics \cite{relativisticPDE}.
+Consequently, solutions to PDEs can have a profounds affects, for example, by improving our understanding of tsunami \cite{tsunamiPDE}.
+
+
+Analytical solutions to PDEs are difficult to produce, and general analytical solutions for PDEs that cover varying initial conditions and boundary conditions do not exist.
+As such, we rely on numerical methods to calculate approximate solutions to PDEs.
+However, numerical methods are computationally intensive - increasing the size of the problem, or the accuracy of the solution, will increase the computational work.
+Many real world problems require billions of degrees of freedom.
+The sheer scale of these computations requires the use of high performance computing (HPC), where algorithmic advances and supercomputers make these problems tractable.
+
+We will focus on using the Finite Volume scheme to solve hyperbolic PDEs (HPDEs)...
+
+
+
+% Why do we use PDE engines
+Implementing a highly scalable FV solver is a non-trivial task, taking research teams months, or even years to create \cite{tensorChemistry}.
+PDE engines offer a solution to this problem, by providing a generalised framework to build solvers for many different problems.
+We will be using ExaHyPE - An Exascale Hyperbolic PDE Engine \cite{exahype}.
+ExaHyPE's domain is linear and non-linear hyperbolic systems of PDEs (HPDEs) written in first order form. 
+ExaHyPE can used both the FV and ADER-DG (Arbitrary high-order using Derivatives - Discontinuous Galerkin) numerical schemes.
+And ExaHyPE uses the Peano framework \cite{PeanoFramework} to divide and distribute the spacial domain into smaller patches to be run across multiple process and compute nodes.
+
+% What does Exhype do, what are the issues
+To use ExaHyPE, a user begins by describing their problem to the ExaHyPE toolkit using a python interface.
+A user will specify things such as: how many unknowns and auxillary variables are used; weather their problem uses a non-conservative product (NCP); what numerical scheme they want to use; if they want to use fix or adaptive time stepping; how frequently should the solution be plotted; and more.
+This is used by the ExaHyPE toolkit to generate a project.
+The project is ready to be compiled, however is missing the numerical problem description.
+The project contains placeholder functions that calculate flux, eigenvalues, initial conditions, boundary conditions and non-conservative products (if applicable).   
+These must be filled in by the user.
+Once these placeholder functions have been filled in, the project can be compiled and will solved the users problem.
+
+
+At ExaHyPEs core it is fast, flexible and user-friendly, allowing users to create fast programs to solve a wide range of problems while requiring minimal effort for a user.
+However, as the quality of tooling increases so to does the ambition of users, who seek to tackle larger and more complex problems.
+Hence, there will always be the desire to further improve the tooling to meet these loftier ambitions.
+This paper will focus on developing a general technique that can be used to accelerate the speed of users code, and reduce the onus for a user to invest time in optimisation.
+We will use a compiler based approach, which in turn leverages the power of conventional compilers such as gcc.
+We will use the terms ``out compiler'' and ``conventional compilers'' to disambiguate the compiler this paper proposes to conventional compilers like \texttt{gcc} \texttt{clang} \texttt{ipcx}.  
+
+Conventional compliers are monstrously complex, and tremendously powerful.
+\texttt{gcc} has over 100 optimisation flags, encompasing a huge variety of optimisations, from loop unrolling to automatic SIMD vectorisation to floating point operation modes.
+The search space for the optimal combination of compiler flags is over $2^{100}\approx 10^30$.
+New techniques are continouly being developed, recently including AI based approaches to select an optimal set of flags [REF].
+Furthermore, new optimisation techniques are continuoly being developed such as techniqies for improving 
+
+
+
+
+
+Fundamentally, we are preforming applying a non-linear vector to vector function to a large input vector.
+As humans we abstract this function into smaller parts, to make it easier for use to understand and maintain our codes.
+However, does a compiler benefit from this abstraction, or can we squeeze out more performance by providing our function in a different form.
+In this paper we will show it is the latter. 

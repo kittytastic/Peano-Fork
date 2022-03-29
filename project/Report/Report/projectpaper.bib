@@ -298,3 +298,60 @@ isbn="978-3-540-69128-0"
    year={2016},
    month={Dec}
 }
+
+
+@misc{codegen_dg_SIMD,
+  doi = {10.48550/ARXIV.1812.08075},
+  
+  url = {https://arxiv.org/abs/1812.08075},
+  
+  author = {Kempf, Dominic and Heß, René and Müthing, Steffen and Bastian, Peter},
+  
+  keywords = {Numerical Analysis (math.NA), FOS: Mathematics, FOS: Mathematics},
+  
+  title = {Automatic Code Generation for High-Performance Discontinuous Galerkin Methods on Modern Architectures},
+  
+  publisher = {arXiv},
+  
+  year = {2018},
+  
+  copyright = {arXiv.org perpetual, non-exclusive license}
+}
+
+@article{IR-survey,
+author = {Stanier, James and Watson, Des},
+title = {Intermediate Representations in Imperative Compilers: A Survey},
+year = {2013},
+issue_date = {June 2013},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+volume = {45},
+number = {3},
+issn = {0360-0300},
+url = {https://doi.org/10.1145/2480741.2480743},
+doi = {10.1145/2480741.2480743},
+abstract = {Compilers commonly translate an input program into an intermediate representation (IR) before optimizing it and generating code. Over time there have been a number of different approaches to designing and implementing IRs. Different IRs have varying benefits and drawbacks. In this survey, we highlight key developments in the area of IR for imperative compilers, group them by a taxonomy and timeline, and comment on the divide between academic research and real-world compiler technology. We conclude that mainstream compilers, especially in the multicore era, could benefit from further IR innovations.},
+journal = {ACM Comput. Surv.},
+month = {jul},
+articleno = {26},
+numpages = {27},
+keywords = {intermediate representations, Compilers, optimization}
+}
+
+@inproceedings{lots-of-compiler-options,
+author = {Hoste, Kenneth and Eeckhout, Lieven},
+title = {Cole: Compiler Optimization Level Exploration},
+year = {2008},
+isbn = {9781595939784},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/1356058.1356080},
+doi = {10.1145/1356058.1356080},
+abstract = {Modern compilers implement a large number of optimizations which all interact in complex ways, and which all have a different impact on code quality, compilation time, code size, energy consumption, etc. For this reason, compilers typically provide a limited number of standard optimization levels, such as -O1, -O2, -O3 and -Os, that combine various optimizations providing a number of trade-offs between multiple objective functions (such as code quality, compilation time and code size). The construction of these optimization levels, i.e., choosing which optimizations to activate at each level, is a manual process typically done using high-level heuristics based on the compiler developer's experience.This paper proposes COLE, Compiler Optimization Level Exploration, a framework for automatically finding Pareto optimal optimization levels through multi-objective evolutionary searching. Our experimental results using GCC and the SPEC CPU benchmarks show that the automatic construction of optimization levels is feasible in practice, and in addition, yields better optimization levels than GCC's manually derived (-Os, -O1, -O2 and -O3) optimization levels, as well as the optimization levels obtained through random sampling. We also demonstrate that COLE can be used to gain insight into the effectiveness of compiler optimizations as well as to better understand a benchmark's sensitivity to compiler optimizations.},
+booktitle = {Proceedings of the 6th Annual IEEE/ACM International Symposium on Code Generation and Optimization},
+pages = {165–174},
+numpages = {10},
+keywords = {compiler optimization, multi-objective search},
+location = {Boston, MA, USA},
+series = {CGO '08}
+}
