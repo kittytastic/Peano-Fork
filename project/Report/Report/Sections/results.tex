@@ -109,7 +109,8 @@ However, the compiled kernel exhibits a $2.31\times$ speedup over the handopt ke
 This shows us that the compiled kernels advantage must gained by other mechanisms beyond removing heap allocation.
 
 During our testing we observed a significant difference in the performance of compiled kernels when using the \texttt{-O3} and \texttt{-Ofast} compiler flag on both Intel and AMD compilers.
-Exploring this further we found that this was caused by the \texttt{-ffast-math} flag, which is present in \texttt{-Ofast} but not in \texttt{-O3}.
+Our investigation found that the \texttt{-ffast-math} flag, which is active in \texttt{-Ofast} but not in \texttt{-O3}, caused this difference.
+In particular the \texttt{-fno-math-errno} flag, which is activated by \texttt{-ffast-math} caused a majority of the improvements.
 Table \ref{tab:ffast_math} shows the effect these compiler flags have on the speed of the compiled and handopt kernels.
 
 \begin{table}
@@ -118,23 +119,18 @@ Table \ref{tab:ffast_math} shows the effect these compiler flags have on the spe
 \caption{}\label{tab:ffast_math} 
 \end{table}
 
-The most interesting result from Table \ref{tab:ffast_math} is that the \texttt{-ffast-math} makes very little difference to the Euler 2D handopt kernel, however the compiled kernel experience a $2.6\times$ improvement.
-The \texttt{-ffast-math} flag enables 2 main relaxations to floating point arithmetic.
+The most interesting result from Table \ref{tab:ffast_math} is that the \texttt{-ffast-math} makes very little difference to the Euler 2D handopt kernel, however the compiled kernel experience a $2.63\times$ improvement.
+A majority of that improvement comes from the \texttt{-fno-math-errno} flag.
 
-Firstly it allows the use of faster, but less accurate, square root and divisions.
-Our kernels both include square root and divisions.
-The handopt kernel and compiled kernel use an equal number of these operations, so any benefit from this optimisation will be shared by both kernels.
-Therefore, this optimisation is not responsible for the speedup.
+The \texttt{-fno-math-errno} flag disables setting the \texttt{errno} variable which can by exception handlers to detect floating point errors.
+Enabling this flag has no effect on our compiled kernels as they do not use any runtime exception handlers, however has large knock on consequences.
+In particular, removing this constraints gives the compiler further freedom to make more aggressive optimisations.
 
-% error no, more vectorization, fewer instructions
+Using the MAQAO assembler analysis tool \cite{MAQAO} we found that the \texttt{-fno-math-errno} allowed the compiler to preform much more aggressive SIMD vectorisation.
+The kernel only using the \texttt{-O3} flag was compiled into 4855 x86 instructions, whereas the kernel using both \texttt{-O3} and \texttt{-fno-math-errno} flags was compiled into 1371 x86 instructions.
+MAQAO reports floating point vectorisation ratios of 60\% for the \texttt{-fno-math-errno} kernel which is almost double that of the \texttt{-O3} kernel at 36\%.
 
-The second optimisation \texttt{-ffast-math} makes is to relax the constraints on reordering floating point operations.
-% ONE OF OUR ASSUMTIONS IS ITS OKAY TO REORDER
-It is likely this relaxation that leads to the difference in performance, as other optimisations can now be more aggressive.
-In particular we would expect that allowing the reordering of instructions gives the compiler more scope to preform SIMD vectorisation.
-
-Using the MAQAO static analysis tool we found that the \texttt{-ffast-math} flag does indeed encourage more aggressive SIMD vectorisation.
-For example, the compiled kernel using \texttt{-O3} uses 0 FMA SIMD instructions, whereas the compiled kernel using \texttt{-O3 -ffast-math} uses 236 FMA SIMD instructions.
+This is in contrast to the effect \texttt{-ffast-math} and \texttt{-fno-math-errno} had on the handopt kernel, which was negligible.
 
 \subsection{Further Optimisations}
 % Effect of computation reduction
