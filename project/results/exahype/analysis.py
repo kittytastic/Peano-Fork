@@ -34,6 +34,11 @@ def analyze(df: pd.DataFrame):
 
 def to_table(df: pd.DataFrame):
     out_df = df[["problem", "kernel_type", "time_mean", "speedup"]]
+    out_df = out_df.copy()
+    out_df["kernel_type"] = pd.Categorical(out_df["kernel_type"],  categories=["default", "compiled"],ordered=True)
+    out_df = out_df.sort_values(by=["problem", "kernel_type"])
+    
+    
     out_df = out_df.rename(columns={"problem": "Problem", "kernel_type": "Kernel Type", "time_mean": "Run Time (s)", "speedup":"Speedup"}) 
 
     out_df["Speedup"] = out_df["Speedup"].mask(np.isclose(out_df["Speedup"].values, 1.0))
