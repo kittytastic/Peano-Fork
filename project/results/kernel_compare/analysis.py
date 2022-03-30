@@ -102,7 +102,7 @@ def kernel_compare(all_results: pd.DataFrame):
 
 def ofastmath(all_results: pd.DataFrame):
     df = all_results.loc[(all_results["run_time"]==60)&(all_results["name"]!="default")]
-    df = sys_filter(df, ["ham8-o3", "ham8-o3-fastmath", "ham8"])
+    df = sys_filter(df, ["ham8-o3", "ham8-o3-fastmath", "ham8", "ham8-o3-fnoerrno"])
 
     hand_made_mask = df["name"]=="handmade"
     df.loc[hand_made_mask, "group"] = df.loc[hand_made_mask, "group"].apply(lambda x: f"{x} (handopt)")
@@ -119,7 +119,11 @@ def ofastmath(all_results: pd.DataFrame):
     df["rel_speedup_o3"] = df["rel_speedup_o3"].mask(np.isclose(df["rel_speedup_o3"].values, 1.0))
     #df["rel_speedup_o3fast"] = df["rel_speedup_o3fast"].mask(np.isclose(df["rel_speedup_o3fast"].values, 1.0))
     
-    df = df.replace({"sys":{"ham8": "-Ofast", "ham8-o3-fastmath": "-O3 -ffast-math", "ham8-o3": "-O3"}})
+    sys_name_map = {"ham8": "-Ofast", "ham8-o3-fastmath": "-O3 -ffast-math", "ham8-o3": "-O3", "ham8-o3-fnoerrno":"-O3 -fno-math-errno"}
+    df = df.replace({"sys":sys_name_map})
+    df["sys"] = pd.Categorical(df["sys"], 
+                      categories=[sys_name_map["ham8-o3"], sys_name_map["ham8-o3-fnoerrno"], sys_name_map["ham8-o3-fastmath"],sys_name_map["ham8"]],
+                      ordered=True)
     df = df.sort_values(by=["group", "sys"])
     df = df.rename(columns={"group":"Problem", "speedup":"Speedup vs Default", "sys": "Compiler Options", "rel_speedup_o3": "Relative Speedup", "rel_speedup_o3fast": "Relative Speedup"})    
     
@@ -128,7 +132,6 @@ def ofastmath(all_results: pd.DataFrame):
     s.hide(axis="index")
     file_name = ARTIFACTS+"/o3_results.tex"
     s.to_latex(file_name, hrules=True)
-
 
     print("Finished -O3 results.")
 
