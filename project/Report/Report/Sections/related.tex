@@ -25,8 +25,28 @@ Our compiler based approach is based off the idea that conventional compilers ar
 
 
 % Yateto used a compiler
-% BLAS - faster, need to make tensor contractions
-\cite{YATeTo}
+YATeTo (Yet Another Tensor Toolbox) \cite{YATeTo}, shares a similar philosophy to this paper, however YATeTo's approach relies on GEMM (General Matrix-Matrix Multiplication) libraries wheras we rely on conventional compilers alone.
+YATeTo operates in the domain of linear hyperbolic PDEs, in partial, it is part of the Seisol project \cite{seisolPFLOP}, which focuses on applying the linear elastic wave HPDE to model seismic activity.
+However, YATeTo is a general Tensor Toolbox and can be used for far more general applications.
+
+The Discontinuous Galerkin method often used to to solve HPDEs can, in the linear case, be discretized into a series of Tensor contractions.
+YATeTo offers a Domain Specific Language (DSL) within python for users to describe their tensor contractions.
+Then through a series of compilation steps outputs C++, which crucially contains many calls to GEMM libraries.
+Highly performant GEMM libraries and BLAS (Basic Linear Algebra Subprograms) libraries are often distributed by system vendors.
+These libraries are optimised for a wie range of input problems sizes, and often include hardware specific optimisations like improved cache usage.
+It is unlikely that a user of these libraries could write code that was more performant than the library, and even if they could they would have to write new code for every system they used.
+Hence, utlizing GEMM libraries in abundence can drastically speedup code.
+
+Furthermore, YATeTo preforms optimisations within its compilation steps, such as strength reduction, sparsity patten exploitation and memory layout optimisation.
+Overall, YATeTo achieved a speedups between $1.1\times$ to $6.5 \times$ within SeiSol, which is impressive.
+YATeTo shows that automation of the optimisation process using a compiler can be very effective.
+Especially while using high performance, system agnostic libraries such as GEMM.
+Unfortunately, the use of tensor contractions cannot be carried over to non-linear HPDEs, due to their non-linearity.
+Hence, we explore the more general technique of leveraging conventional compilers.   
+
+
+
+%DSL, einstien notation, tensors
 
 % firedrake used a compiler
 % Hummm
