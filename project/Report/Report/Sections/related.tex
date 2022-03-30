@@ -1,11 +1,26 @@
 % Exahype templating
 % make mroe systems, less user friendly
-\cite{templateExahype}
-Another possible method is simply acknowledging that a user will always need to make low-level optimisations and make this process easier.
-\citeauthor{templateExahype} introduced such a method for ExaHyPE using the Jinja2 template engine, adding a further level of code generation \cite{templateExahype}.
-Using such a method allows for better separation of interests for a user, who in practice is likely a group of people; allowing application experts, algorithm experts and optimisation experts \cite[defined within]{templateExahype} to focus on their specialities.
-The template engine also affords optimisation experts more expressive power, allowing them to create general optimisations which are built into system specific optimisations by the template engine. 
-Although this method doesn't contribute to the global goal of abstraction it does allow further abstraction within a team. 
+
+
+% Euler 3D SIMD speedup 1.04
+% CCZ4 1.27
+
+Much of ExaHyPE's code generation is preformed via templating.
+Templating is a powerful, yet simple method to generate large sections of glue code.
+Although as discussed in section \ref{sec:problem_statement}, templating along the boundary of user and engine code leaves opportunities for improvements.  
+A solution to this problems was proposed by \citeauthor{templateExahype} by extending the domain of templating to user code \cite{templateExahype}.
+
+\citeauthor{templateExahype} observed that while creating an ExaHyPE projects there are often 3 separable roles preformed by users.
+These were: application experts, who focus on configuration of ExaHyPE; algorithm experts, who understand and implement the PDEs; and optimisation experts, who work at a lower level to increase performance.
+The idea behind further templating is to allow these roles, which may be filled by different people, to operate synergically.
+Increased templating also offers a convenient way to implement architecture aware optimisations, increasing code portability and speed.
+\citeauthor{templateExahype} showed an example use case of their technique that applied a SIMD friendly SoA to AoS transformation to user code.
+This transformation was tested on 2 problems: the Euler equations in 3D, and the Einstein equations from relativistic astrophysics (CCZ4).
+They found that the memory bound Euler 3D problem experienced a $1.05\times$ speedup and the compute bound CCZ4 equations experienced a $1.27\times$ speedup.
+
+While templating serves a vital role within ExaHyPE, we do not believe it to be the best way to optimise user code.
+Templating inherently requires an optimisation expert for any performance improvements to be realized.
+Our compiler based approach is based off the idea that conventional compilers are exceptionally powerful, and they should take the role of optimisation expert, not a person. 
 
 
 
