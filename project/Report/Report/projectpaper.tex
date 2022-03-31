@@ -10,7 +10,7 @@
 
 
 \newif\iftesting
-\testingtrue
+%\testingtrue
 
 \newcommand{\testingbreak}{\iftesting \pagebreak \fi}%
 \newcommand{\phlat}{FLAT\xspace}
@@ -58,17 +58,17 @@ ExaHyPE
 
 \testingbreak
 \section{Solution}
-\input{Sections/methodology}
+\input{Sections/methodology}\label{sec:methodology}
 
-\testingbreak
-\section{Validity}
-\input{Sections/validity}
+%\testingbreak
+%\section{Validity}
+%\input{Sections/validity}
 
 \testingbreak
 \section{Results}
-\input{Sections/results.tex}
+\input{Sections/results.tex}\label{sec:results}
 
-\section{Evaluation}
+%\section{Evaluation}
 
 \testingbreak
 \section{Conclusions}

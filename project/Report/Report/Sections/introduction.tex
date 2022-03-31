@@ -1,40 +1,44 @@
 % PDEs - what they are
 Many physical phenomena can be described by partial differential equations (PDEs) including:  seismic wave propagation \cite{earthquakePDE}, fluid dynamics \cite{exahype}, or relativistic astrophysics \cite{relativisticPDE}.
-Consequently, solutions to PDEs can have a profounds affects, for example, by improving our understanding of tsunami \cite{tsunamiPDE}.
+Consequently, there are many real world situations that benefit from the solutions to these PDEs, such as tsunami modeling \cite{tsunamiPDE}.
 
 
-Analytical solutions to PDEs are difficult to produce, and general analytical solutions for PDEs that cover varying initial conditions and boundary conditions do not exist.
-As such, we rely on numerical methods to calculate approximate solutions to PDEs.
+Analytical solutions to PDEs are difficult to produce, and general analytical solutions for PDEs that cover all initial conditions and boundary conditions do not exist.
+As such, we rely on numerical methods to calculate approximate solutions.
 However, numerical methods are computationally intensive - increasing the size of the problem, or the accuracy of the solution, will increase the computational work.
 Many real world problems require billions of degrees of freedom.
 The sheer scale of these computations requires the use of high performance computing (HPC), where algorithmic advances and supercomputers make these problems tractable.
 
 % PDEs - some math, in particular flux
-Our will be on using the Finite Volume scheme to solve hyperbolic PDEs (HPDEs).
-In FV the spacial domain is decomposed into small volumes called cells.
-Each of these cells has a state, this state mirrors the unknowns of the PDE.
-The state of these cells are effected by source terms, boundary conditions and flux between neighboring cells.
-
+Our focus will be applying the Finite Volume (FV) scheme to solve linear and non-linear hyperbolic PDEs (HPDEs).
+The general formula for a HPDE is:
 % See exahype template
 \begin{equation}
-\frac{\partial \mathbf{Q}}{\partial t}(x,t) + \nabla \cdot \mathbf{F}(\mathbf{Q}) + \mathbf{B}(\mathbf{Q}) \cdot \nabla \mathbf{Q}(x,t) = \mathbf{S}(\mathbf{Q})
+    \frac{\partial \mathbf{Q}}{\partial t}(x,t) + \nabla \cdot \mathbf{F}(\mathbf{Q}) + \mathbf{B}(\mathbf{Q}) \cdot \nabla \mathbf{Q}(x,t) = \mathbf{S}(\mathbf{Q})
 \end{equation}
-$\mathbf{Q}\subset \mathbb{R}^q$ is a time and space dependent state vector for any $x$ in our spatial domain $\Omega\subset \mathbb{R}^{d \in \{2,3\}}$ and $t>0$.
+$\mathbf{Q}(x,t)\subset \mathbb{R}^q$ is a time and space dependent state vector for any $x$ in our spatial domain $\Omega\subset \mathbb{R}^{d \in \{2,3\}}$ and $t>0$.
+The number of conserved state variables, $q$, can vary from $4$ in the 2D Euler Equations, to more than $40$ in the Einstien Relativity equations (CCZ4).
 $\mathbf{F}$ is the conserved flux vector, $\mathbf{B}$ the (system) matrix composing the non-conservative fluxes and $\mathbf{S}(\mathbf{Q})$ the source term.
 
+The FV scheme relies on decomposing the spacial domain into small volumes called cells.
+Each of these cells has a state, and it is the state of every cell that is updated at every timestep.
+The state of a cell is determined by any source terms, any non-conservative products, boundary conditions, and the flux between neighboring cells.
+Our main focus will be on flux effects on a cell, as these constitute a majority of the computational work performed in a FV scheme.
 
 % Exhaype - what it is
-Implementing a highly scalable FV solver is a non-trivial task, taking research teams months, or even years to create \cite{tensorChemistry}.
+Implementing a highly scalable FV solver is a non-trivial task, and can take research teams months, or even years to create \cite{tensorChemistry}.
 PDE engines offer a solution to this problem, by providing a generalised framework to build solvers for many different problems.
 We will be using ExaHyPE - An Exascale Hyperbolic PDE Engine \cite{exahype}.
-ExaHyPE's domain is linear and non-linear hyperbolic systems of PDEs (HPDEs) written in first order form. 
-ExaHyPE can used both the FV and ADER-DG (Arbitrary high-order using Derivatives - Discontinuous Galerkin) numerical schemes.
-And ExaHyPE uses the Peano framework \cite{PeanoFramework} to divide and distribute the spacial domain into smaller patches to be run across multiple process and compute nodes.
+ExaHyPE's domain is linear and non-linear hyperbolic systems of PDEs (HPDEs) written in first order form.
+ExaHyPE has many features.
+ExaHyPE supports both the FV and ADER-DG (Arbitrary high-order using Derivatives - Discontinuous Galerkin) numerical schemes.
+Adaptive timesteping and adaptive meshes can be used, or fixed time stepping can be use. 
+ExaHyPE uses the Peano framework \cite{PeanoFramework} to divide and distribute the spacial domain into smaller patches to be run across multiple process and compute nodes.
 
 To use ExaHyPE, a user begins by describing their problem to the ExaHyPE toolkit using a python interface.
 A user will specify things such as: how many unknowns and auxillary variables are used; weather their problem uses a non-conservative product (NCP); what numerical scheme they want to use; if they want to use fix or adaptive time stepping; how frequently should the solution be plotted; and more.
 This is used by the ExaHyPE toolkit to generate a project.
-The project is ready to be compiled, however is missing the numerical problem description.
+The project is ready to be compiled, however is missing the numerical PDE description.
 The project contains placeholder functions that calculate flux, eigenvalues, initial conditions, boundary conditions and non-conservative products (if applicable).   
 These must be filled in by the user.
 Once these placeholder functions have been filled in, the project can be compiled and will solved the users problem.
@@ -46,19 +50,29 @@ However, as the quality of tooling increases so to does the ambition of users, w
 Hence, there will always be the desire to further improve the tooling to meet these loftier ambitions.
 This paper will focus on developing a general technique that can be used to accelerate the speed of users code, and reduce the onus for a user to invest time in optimisation.
 We will use a compiler based approach, which in turn leverages the power of conventional compilers such as gcc.
-We will use the terms ``out compiler'' and ``conventional compilers'' to disambiguate the compiler this paper proposes to conventional compilers like \texttt{gcc} \texttt{clang} \texttt{ipcx}.  
+The compiler we present is called \phlat, its name reflecting its approach to code generation, producing code that is: Flat Long And potentially Transformed. 
+We will use the terms ``conventional compilers'' refer to compilers like \texttt{gcc}, \texttt{clang}, \texttt{ipcx}.  
 
 
 % Shout out to compilers
-Conventional compliers are very complex, and tremendously powerful.
-\texttt{gcc} has over 100 optimisation flags, encompassing a huge variety of optimisations, from loop unrolling to automatic SIMD vectorisation to switching floating point operation modes.
-There are continuing advances in the field of compiler optimisation spanning topics such as cache allocation and JIT optimisation \cite{weak-compiler-survey}.
-Furthermore, there are recent attempts to use machine learning to improve compilers, where ultimately compiling is just an difficult optimisation problem with a set of constraints (e.g. compiled output must represent the input) \cite{compiler-ml-opt}.
-As the cutting edge of compiler research moves ever forward,we can expect these advancements to make their way into production compilers such as gcc.
-Therefore, a valid strategy for further optimising code can be to simply present your code in a way preferred by your compiler.
+The effect of conventional compliers on HPC codes are often overlooked, and are rarely afforded they deserve.
+It is a given that HPC codes will be compiled with \texttt{-O3} or \texttt{-Ofast} flags.
+However, if we take a step back to appreciate this, by simply adding a single flag to our compiler arguments we have achieved an order (or a few orders) of magnitude speedup.
+This is effectively free performance.
+And the benefits don't stop there, vendor specific compilers like Intel's \texttt{ipcx} and AMD's AOCC, offer hardware specific optimisations.
+So by simply switching compiler you can create a highly efficient binary that targets specific hardware, no coding required.
 
-This is the core idea explored in this paper.
-We propose generating compute kernels as huge monolithic functions, as opposed to hand written code littered with human friendly abstraction.
-And we explore how this change in problem representation effects the performance of code generated by conventional compilers.
+It is possible to beat the compiler with hand optimisation, especially at higher levels of abstraction.
+However, it gets increasingly more challenging (and impractical to try) as we approach assembly.
+And compiler are only getting more advance.   
+Much current research focuses on using Machine learning to improve compilers \cite{compiler-ml-opt,lots-of-compiler-options}.
+And developments such as CompilerGym, an environment for exploring compiler optimisation in AI research \cite{compiler-gym}, are indicators that this field of research will continue to expand. 
+
+As such, we propose that a valid method of HPC codes optimisation is to simply use the compiler better.
+Our \phlat compiler has a simple goal, to transform user codes into compiler friendly codes.    
+In partial we focus on generating monolithic functions.
 
 % what is in each section
+In the next section we will introduce the problem within ExaHyPE that \phlat is used to solve, followed by discussing similar compiler based approaches.
+In section \ref{sec:methodology} we explain the architecture of \phlat and how it is used to generate compute kernels.
+And in section \ref{sec:results} we will discuss the performance of kernels generated by \phlat along with the practicalities of using \phlat. 
