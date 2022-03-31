@@ -37,7 +37,16 @@ Patch sizes are typically 3x3 cells in 2D or 3x3x3 cells in 3D.
 The size of patches can be adjusted by a user, say to 5x5, however a patch size is a constant throughout the runtime of the program.
 \proc{Patch Update} is used to evolve the values of all the cells in a patch by a given timestep.
 This is done by applying source terms to the cells, then calculating flux and non-conservative products (NCP) for every face of a cell and applying it to the cells state.
-As a technical detail, to evaluate every face of every cell in a patch we require a halo of cells as demonstrated in Figure [TODO].
+As a technical detail, to evaluate every face of every cell in a patch we require a halo of cells as demonstrated in Figure \ref{fig:patch}.
+
+\begin{figure}[h!]
+    \begin{center}
+        \includegraphics[width=.2\textwidth]{patch.png}
+        \caption{Example of a 3x3 patch.}
+        \label{fig:patch}
+    \end{center}
+\end{figure}
+
 Within ExaHyPE, patch data is stored in a AoS (Array of Structures) form.
 In summary, \proc{Patch Update} is a function whose input is: a haloed patch; a timestep; and patch meta-data such as its size in space. And whose output is: the patch (without a halo) that has been progressed in time. 
 
