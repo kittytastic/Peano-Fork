@@ -59,44 +59,68 @@ And \proc{Numerical Ingredient} that calls the ncp, flux and max eigen value fun
 A summary of the abstraction hierachy of \proc{Patch Update} can be found in Table \ref{tab:patch_update}
 
 \begin{table}
-\begin{tabular}{llcc}
+\begin{tabular}{lllcc}
     \toprule
-    Process & Uses Functions & Input Size & Output Size\\
+    Process & User/Engine &Uses Functions & Input Size & Output Size\\
     \midrule
-    \proc{Patch Update} & \makecell[l]{\proc{Numerical Ingredient},\\ \proc{Problem Descriptions}\\ (source term)} & $q \cdot (p+2)^d+m$ & $q\cdot p^d$\\
-    \proc{Numerical Ingredient} & \makecell[l]{\proc{Problem Descriptions} \\ (flux, ncp, max eigenvalues)} & $2q+m$ & $2q$\\
-    \proc{Problem Descriptions} & - & $q+m$ & $q$ or $1$\\
+    \proc{Patch Update} (\proc{PU})&Engine& \makecell[l]{\proc{NI}, \proc{PD}\\ (source term)} & $q \cdot (p+2)^d+m$ & $q\cdot p^d$\\
+    \proc{Numerical Ingredient} (\proc{NI}) &\makecell[l]{Engine \\(default),\\ User}& \makecell[l]{\proc{PD} (flux, ncp,\\ max eigenvalues)} & $2q+m$ & $2q$\\
+    \proc{Problem Descriptions} (\proc{PD}) & User& - & $q+m$ & $q$ or $1$\\
     \bottomrule
 \end{tabular}
 \caption{A summary of the level of abstraction within the \proc{Patch Update} function. $p$ is the number of cells along 1 dimension in a patch, $d$ is the dimension of the patch, $q$ are the number of state variables, $m$ is the size of patch/state metadata.}\label{tab:patch_update}
 \end{table}
 
-\newcommand{\func}[1]{\textbf{#1}}
-\newcommand{\var}[1]{\textbf{#1}}
-
-
-The flexible nature of ExaHyPE, along with its use of template driven code generation, experiences performance issues at the interface between the user and engine code.
-Namely, engine code at this interface has to be general to accept a large range user codes, however this comes at the cost of performance.
-
-
-Next we will take an indepth look at where there are potential inefficiencies within the Path Update process.
-We will look at the 2D Euler equations and use the engine provided Rusanov numerical method.
-
-
-\func{Patch update} starts by creating 2 variables \var{tmpA}, \var{tmpB} which are vectors an equal same size as a cell.
-
+Now we have an understanding of \proc{Patch Update} we can investigate some of the potential performance issues it experiences.
+% ISSUE: lambda functions, not inline
+Firstly, as mentioned at the beginning of this section, ExaHyPE implements the function pointer pattern to interface between user and engine code.
+As such, the definition of \proc{Patch Update} looks like this:
 \begin{lstlisting}[language=c]
-double * tmpA = ::tarch::allocateMemory(unknowns, tarch::MemoryLocation::Heap);
-double * tmpB = ::tarch::allocateMemory(unknowns, tarch::MemoryLocation::Heap);
+void full_numerical_ingredient(
+    std::function<...> flux, std::function<...> ncp,
+    /* other args */);
+void full_patch_update(
+    std::function<...> numerical_ingredient, std::function<...> source_term,
+    /* other args */);
+
+void engine_core(){
+    std::function<...> numerical_ingredient = [&](/*other args*/){
+        full_numerical_ingredient(
+            user_land::flux, user_land::ncp, /* other args*/
+        );
+    };
+    std::function patch_update = [&](/*other args*/){
+        full_patch_update(
+            numerical_ingredient, user_land::source_term, /*other args */
+        );
+    };
+
+    patch_update(double * in_patch, double * out_patch, ...);
+}
 \end{lstlisting}
+This is non-trivial to fully inline, hence there is the potential the compiler choices to make function calls.
+However, function calls hinder vectorization, therefore this code may not be vectorized well.
 
-These variables are used to store the return values from calls to the source term function and \func{Numerical Method} steps.
-To provide safe behaviour for any possible problem, these variables are allocated on the heap.
-For many problems, including our example 2D Euler problem, cell sizes are small (e.g. 4 doubles), hence heap allocation is not required. 
-This is our first definite inefficiency.
-This issue also appears again in the Numerical method step which is used many times in \func{Patch update}.
 
-The next step in \func{Patch update} iterates through every cell in the patch, applying the source term.
+% ISSUE: heap allocation
+The next issue we encounter is the use of heap allocation.
+The implementation of \proc{Patch Update} allows us to use a single function for many different user codes.
+However, this also means algorithmic precautions must be take to safely handel any user codes.
+Within both \proc{Patch Update} and \proc{Numerical Ingredient} temporary variables are used to recieve the result of function calls.
+The size of these temporary variables depend on the size of a cells state.
+Hence, safe behaviour dictates that these temporary variables are declared on the heap as opposed to the stack, which is slow. 
+
+
+% ISSUE: branching
+
+
+
+% ISSUE: repeated + unused comp
+
+
+
+
+The next step in Patch update iterates through every cell in the patch, applying the source term.
 \begin{lstlisting}[language=c]
 for(int i=0; i<patchSize; i++){
     for(int j=0; j<patchSize; j++){
@@ -118,10 +142,7 @@ However, patchSize is an argument to patchUpdate and then patch update wrapped i
 Therefore we run the risk of our compiler being unable to spot this optimisation.
 We will label this a possible inefficiency.
 
-This section of code also exhibits a recurring patten of function calls to lambda functions, receiving return values in one of our temporary variables.
-In this case it is likely that the compiler will inline the code.
-However proceeding calls to nested functions such as \func{Numerical Method} are much harder to inline, hence risk limiting the compilers ability to do SIMD operations.    
-This is a second possible inefficiency.
+
 
 After we process the source terms we update each cell by evaluating the flux between cell faces.
 This also uses the double for loop patten in example (REF). %TODO
