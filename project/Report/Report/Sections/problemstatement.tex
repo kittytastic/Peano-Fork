@@ -1,48 +1,79 @@
 % Can we make exahype better
 % while not making it worse
+\newcommand{\proc}[1]{\textbf{#1}}
 
 % we will focus on patch update
+An ExaHyPE project is a majority of engine code, and a small amount of user code which is used to describe the PDE.
+The interface between the engine and user code is built on the patten of passing function pointers of user functions to engine code.
+Here is an example:
+\begin{lstlisting}[language=c]
+void engine_function(std::function<...> user_function){
+    // ... Do something
+    val = user_function();
+    // ... Use the value of the user function 
+}
 
+void engine_core(){
+    auto user_func = project::user_land::foo;
+    engine_function(user_func);
+}
+\end{lstlisting}
 
-The ExaHyPE engine is very flexible, allowing users to model many different problems using a variety of numerical methods, while having to write very little code themselves.
-To achieve this ExaHyPE generates a large amount code.
-A majority of this code is highly optimised engine code that orchestrates solving the PDE over distributed systems.
-The user only needs to provides a minimal amount of code that describes the problem e.g. source terms and fluxes.
-This illudes to the inherent requirement for an interface between user and engine codes.
+This patten is good design practice, as it completely decouples engine functions from user functions, apart from at a single crossover point.
+Thereby allowing the engine to be developed in isolation from user codes, and allowing the engine to support any user codes that respect the required function signatures.
+However, this patten is not without its disadvantages, as we will discuss.
 
-We will focus on this interface.
-Namely, we will be looking at the patch update process.
-This process dominates the time spent in user codes and for compute bound problems dominates the total runtime of program.
-Hence we are interested in evaluating and optimising this process.
+Our focus will be on the \proc{Patch Update} process.
+This process is heavily reliant on user code, and as such dominates the runtime of user code.
+Furthermore, for arithmetic intense PDEs, this process dominates the entire running time of an ExaHyPE program.
+We will begin by explaining the \proc{Patch Update} process.
+Then proceed to highlight inefficiencies within this process, many of which are artifacts of the aforementioned function pointer patten. 
 
-The patch update process updates every cell in our domain.
-Each cell is a vector of doubles that represents the state for a region of space in our FV scheme. 
-A patch is a group of cells.
-The size of a patch is specified by the user and will usually be in the region of 3x3 to 11x11 cells in 2D or 3x3x3 to 7x7x7 cells in 3D. % TODO fact check.
-This process requires the ExaHyPE engine to interface with user codes on many occasions for each patch.
- 
+The smallest unit of space in a FV scheme is a cell.
+Algorithmically a cell is an array of \lstinline{double} that store the state of that cell.
+As mentioned previously the size of the state vector can vary from $4$ values to over $40$.
+Cells are then grouped up into a patch.
+Patch sizes are typically 3x3 cells in 2D or 3x3x3 cells in 3D.
+The size of patches can be adjusted by a user, say to 5x5, however a patch size is a constant throughout the runtime of the program.
+\proc{Patch Update} is used to evolve the values of all the cells in a patch by a given timestep.
+This is done by applying source terms to the cells, then calculating flux and non-conservative products (NCP) for every face of a cell and applying it to the cells state.
+As a technical detail, to evaluate every face of every cell in a patch we require a halo of cells as demonstrated in Figure [TODO].
+Within ExaHyPE, patch data is stored in a AoS (Array of Structures) form.
+In summary, \proc{Patch Update} is a function whose input is: a haloed patch; a timestep; and patch meta-data such as its size in space. And whose output is: the patch (without a halo) that has been progressed in time. 
+
+Calculating the flux and NCP at a shared face between 2 cells a non-trivial task.
+This is because the face is at a discontinuatly between the states of the 2 cells, and is known as the Riemann problem in FV.
+As such, we require a scheme to solve the Riemann problem, which we will call the \proc{Numerical Ingredient}.
+Many such schemes exist, such as Upwind and Downwind schemes, and the correct scheme to depends on the problem at hand.
+Within ExaHyPE the Rusanov scheme \cite{rusanov} is used by default, as it well serves the role of a general \proc{Numerical Ingredient}.
+The \proc{Numerical Ingredient} has an input of 2 cells and meta data about the face (e.g. its position in space).
+And outputs 2 state vectors describing the change of state experienced by each cell.
+
+At the bottom level of this hierachy we have the \proc{Problem Descriptions}.
+These are a collection of user defined functions the calculate: flux, ncp, source terms, and maximum eigen values.
+All this functions share a similar input interface, taking single cell and the meta data for that cell.
+And they output either a state vector or single value, depending on what quantity they are calculating.
+In the default ExaHyPE setup, it will be \proc{Patch Update} that calls the source term function.
+And \proc{Numerical Ingredient} that calls the ncp, flux and max eigen value functions.
+
+A summary of the abstraction hierachy of \proc{Patch Update} can be found in Table \ref{tab:patch_update}
+
+\begin{table}
+\begin{tabular}{llcc}
+    \toprule
+    Process & Uses Functions & Input Size & Output Size\\
+    \midrule
+    \proc{Patch Update} & \makecell[l]{\proc{Numerical Ingredient},\\ \proc{Problem Descriptions}\\ (source term)} & $q \cdot (p+2)^d+m$ & $q\cdot p^d$\\
+    \proc{Numerical Ingredient} & \makecell[l]{\proc{Problem Descriptions} \\ (flux, ncp, max eigenvalues)} & $2q+m$ & $2q$\\
+    \proc{Problem Descriptions} & - & $q+m$ & $q$ or $1$\\
+    \bottomrule
+\end{tabular}
+\caption{A summary of the level of abstraction within the \proc{Patch Update} function. $p$ is the number of cells along 1 dimension in a patch, $d$ is the dimension of the patch, $q$ are the number of state variables, $m$ is the size of patch/state metadata.}\label{tab:patch_update}
+\end{table}
+
 \newcommand{\func}[1]{\textbf{#1}}
 \newcommand{\var}[1]{\textbf{#1}}
 
-We can break patch update into 3 discrete steps.
-\begin{enumerate}
-    \item \func{Patch update} - engine generated code
-    \item  \func{Numerical method} - either engine generated or user code
-    \item \func{Problem forumlation} - user code
-\end{enumerate}
-
-\func{Patch update} updates every cell in the patch by first considering source terms and then iter-cell flux.
-This function takes multiple input arguments.
-Firstly, it receives the current patch surrounded by halo of cells.
-It also receives information about the patch, such as its spacial position and size.
-Finally it receives lambda functions wrapping the \func{Numerical Methods} and \func{Problem formuation}. 
-This function output the updated patch.  
-
-\func{Numerical method} solves the Riemann problem at the shared face of 2 adjacent cells.
-It takes as arguments: the 2 cells in question; information about cell size and position; and lambda functions wrapping the \func{Problem Forumlation}
-
-\func{Problem Formulation} are a set of functions used to describe the problem in question e.g. the Euler equations.
-These function calculate values of numerical flux, eigen values, source terms.
 
 The flexible nature of ExaHyPE, along with its use of template driven code generation, experiences performance issues at the interface between the user and engine code.
 Namely, engine code at this interface has to be general to accept a large range user codes, however this comes at the cost of performance.
