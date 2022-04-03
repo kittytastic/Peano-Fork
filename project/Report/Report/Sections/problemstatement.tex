@@ -115,61 +115,38 @@ However, function calls hinder vectorization, therefore this code may not be vec
 The next issue we encounter is the use of heap allocation.
 The implementation of \proc{Patch Update} allows us to use a single function for many different user codes.
 However, this also means algorithmic precautions must be take to safely handel any user codes.
-Within both \proc{Patch Update} and \proc{Numerical Ingredient} temporary variables are used to recieve the result of function calls.
+Within both \proc{Patch Update} and \proc{Numerical Ingredient} temporary variables are used to receive the result of function calls.
 The size of these temporary variables depend on the size of a cells state.
 Hence, safe behaviour dictates that these temporary variables are declared on the heap as opposed to the stack, which is slow. 
 
 
 % ISSUE: branching
+% MAYBE ISSUE: consts as function arguments
 
 
 
 % ISSUE: repeated + unused comp
+The final issue we will acknowledge is the existence of repeated and unused computations.
+As we saw, every functional call within \proc{Patch Update} takes in some meta data.
+Some of this meta data needs to be calculated for every function call.
+For example, \proc{Numerical Method} requires the coordinates for the center of the face it is processing.
+These coordinates are calculated using the coordinates of the 2 cells that share this face.
+However, \proc{Numerical Ingredients} such as Rusanov do not require this coordinate.
+Hence, we run the risk of the compiler not eliminating this redundant computation, especially as its definition and usage lie across different functions. 
+Beyond unused computation, there can also be repeated computation.
+If we look at using Rusanov as our \proc{Numerical Ingredient} there are many repeated computations.
+To calculate the flux at the shared face of 2 cells $a,b$ Rusanov calculates $flux(a), flux(b), max_eigenvalue(a), max_eigenvalue(b)$.
+The flux at a face is a function of these values.
+If we were to then calculate the flux between $b,c$ note that the computation of $flux(b), max_eigenvalue(b)$ is repeated.
+It may be challenging for the compiler to spot this repetition, especially as it again lies across multiple different functions.
+Furthermore, \proc{Patch Update} cannot be optimised to take advantage of this property of Runsnov, as it would no longer work with any \proc{Numerical Ingredient}.
 
+To summarize, \proc{Patch Update} has the constraint of supporting any \proc{Numerical Ingredient} or \proc{Problem Description}. 
+Within \proc{Patch Update} the function pointer patten and safe behaviour such as heap allocation is used to meet this constraint.
+However, this constraint is in contension with performance.
+Although optimisations can be made for specific pairings of \proc{Numerical Ingredient} and \proc{Problem Description}, there is limited scope for general optimisations. 
+Furthermore, case by case optimisation detracts from the draw of using a PDE engine in the first place.
 
-
-
-The next step in Patch update iterates through every cell in the patch, applying the source term.
-\begin{lstlisting}[language=c]
-for(int i=0; i<patchSize; i++){
-    for(int j=0; j<patchSize; j++){
-        double * cellData = ...
-        double cellCenterX = ...
-        double cellCenterY = ...    
-        sourceTerm(cellData, cellCenterX, cellCenterY, ..., tmpA);
-        for(int k=0; k<unknowns; k++){
-            outCell[...][k] = tmpA[k] * ...
-        }
-    }
-}
-\end{lstlisting}
-
-
-We can observe that these loops are of fixed size, as the patchSize is known at compile time. 
-Hence, they can be unrolled and values such as cellData can be precomputed.   
-However, patchSize is an argument to patchUpdate and then patch update wrapped in a lambda function.
-Therefore we run the risk of our compiler being unable to spot this optimisation.
-We will label this a possible inefficiency.
-
-
-
-After we process the source terms we update each cell by evaluating the flux between cell faces.
-This also uses the double for loop patten in example (REF). %TODO
-This step calls our numerical method on every pair on neighboring cells which we will call left and right.
-In our example we use Rusanov as our numerical method.
-In Rusanov we calculate the eigenvalues for the left cell and the right cell.
-However, if we think about the traversal of cells e.g. [(0,0), (0,1)] [(0,1), (0,2)], .... First (0,1) will be a right cell, and then in the next call to Rusanov it will be the left cell, hence we calculate with eigenvalue for (0,1) twice, even though it hasn't changed.
-This is our 2nd definite inefficiency.
-This issue eludes to a set of definite inefficiencies where there are inter-process optimisation opportunities (e.g. patch update and numerical method can work together to avoid this double eigenvalue issue).   
-
-
-Looking at the inefficiencies we identified we can see that they all stem from the general interface between user and engine code.
-Given time, it is possible for a developer to manually fix these issues.
-For example we took our example and fixed all issues excluding the double eigenvalue issue.
-Doing this we observed a 3x speedup in the runtime of patch update, resulting in a 10\% speedup of the full program.
-
-However these optimisation require a significant amount of manual work to preform, while risking both the introduction of errors and a reduction of readability/usability of users codes.
-
-Therefore we propose creating a domain specific compiler that are make these optimisations automatically.
-
+It is desirable to use a technique that maintains the modularity of \proc{Patch Update} but increases potential for optimisation.
+This is what we will explore, applying a compiler based approach to achieve these goals.
 
