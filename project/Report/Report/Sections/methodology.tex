@@ -297,3 +297,17 @@ This reduces the problem of code generation to a problem of transpilation from t
 This can be achieved with a post order traversal of the IR AST, generating C AST nodes from each of the IR AST nodes.
 Finally, some post processing is preformed to transform the C into C++.
 For example, the required standard library headers are inserted, and variable decorators such as \lstinline{__restrict__} are added.  
+
+\subsection{Using \phlat to Generate Compute Kernel}
+Using \phlat we can generate a compute kernel that preforms \proc{Patch Update}.
+A user begins by creating DAGs of their \proc{Problem Definition}, using the builder patten (creating a function that returns a DAG).
+DAGs can be tested using the \texttt{DAG.eval}, to ensure validity.
+These DAG builders can then be passed to preexisting \proc{Patch Update} and Rusanov DAG builders.
+The \proc{Patch Update} and Rusanov DAG builder will then create a new user DAG for every instance of a call to a user function.
+The final output of the \proc{Patch Update} builder is the compute kernel DAG, which will contain many copies for the \proc{Numerical Ingredient} and \proc{Problem Description} DAGs.
+This DAG is then passed through \phlat, where it undergoes DAG transforms, a DAG to IR transform, IR transforms, and finally code generation.
+Users have the option to provide additional DAG or IR transforms.
+The code is now ready to replace the old \proc{Patch Update} within ExaHyPE.
+The most notable step of the default transform chain is the DAG flatten transform that turns many nested DAGS into a single flat DAG.
+This transform is responsible for \phlat's characteristic compute kernels which are: Flat, Long (And potential Transformed).
+Typically compute kernels will be thousands to tens of thousands of lines long, and contain no function calls.   
