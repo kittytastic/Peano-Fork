@@ -3,7 +3,7 @@ Hyperbolic PDEs can be used to describe many physical phenomena such as earthqua
 This paper explores applying a compiler based approach to generate fast compute kernels for a Finite Volume scheme, used to solve these PDEs within ExaHyPE.
 Our compiler \phlat is used to generate Flat Long And potentially Transformed code.
 Users describe their problem as a DAG (Directed Acyclic Graph), where every node is a primitive operation, or a DAG itself.
-This highly nested structure is then flattened and transformed into code, we target C++.
+This highly nested structure is then flattened and transformed into code; we target C++.
 Generated kernels were typically thousands of lines long.
 We found these kernels out preformed the kernels currently used within ExaHyPE by $9\times$ to $16\times$.
-We explore why conventional compiles, such as gcc, can better optimise our compiled kernels, deducing that our compiled kernels can be better vectorized on SIMD architectures. 
+We explore why conventional compiles, such as \texttt{gcc}, can better optimise our compiled kernels, deducing that our compiled kernels can be better vectorized on SIMD architectures. 
