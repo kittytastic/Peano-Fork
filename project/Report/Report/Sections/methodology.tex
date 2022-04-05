@@ -231,8 +231,16 @@ define VOID @kernel (new #list(in), new #list(out)):
 
 
 \subsection{Compiler Architecture}
-Our compiler consists of 3 stages.
-The DAG transform stage, the IR transform stage, and the code generation stage.
+\phlat consists of 3 stages: the DAG transform stage; the IR transform stage; and the code generation stage.
+An overview of \phlat{}'s architecture can be found in Figure \ref{fig:arch}
+
+\begin{figure}[h!]
+    \begin{center}
+        \includegraphics[width=.9\textwidth]{comp-arch.png}
+        \caption{Overview of \phlat{}'s architecture.}
+        \label{fig:arch}
+    \end{center}
+\end{figure}
 
 % DAG Transforms
 In the DAG transform stage a series of user specified transforms are applied to the DAG.
@@ -313,7 +321,7 @@ These DAG builders can then be passed to pre-existing \proc{Patch Update} and Ru
 A user provides DAG builders instead of DAGs directly for 2 reasons.
 Firstly, it allows them to hoist any control flow.
 Secondly, this allows a new DAG to be built for every use of a user function.
- 
+
 The final output of the \proc{Patch Update} builder is the compute kernel DAG, which will contain many copies for the \proc{Numerical Ingredient} and \proc{Problem Description} DAGs.
 This DAG is then passed through \phlat, where it undergoes DAG transforms, a DAG to IR transform, IR transforms, and finally code generation.
 Users have the option to provide additional DAG or IR transforms.

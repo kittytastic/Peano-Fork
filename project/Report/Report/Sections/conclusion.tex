@@ -1,7 +1,7 @@
-This paper presents using a complier that takes an input problem encoded as a DAG and generating a ``compiled kernel'' which is a single monolithic function.
+This paper presents using a complier that takes an input problem encoded as a DAG and generating a \textit{compiled kernel} which is a single monolithic function.
 After generating a binary with a conventional compiler, the compiled kernel out preforms the default kernels currently used in ExaHyPE by an order of magnitude in synthetic benchmarking.
 This result is entirely a product of conventional compilers being able to preform more optimisation on the monolithic compiled kernel as opposed to the fragmented default kernel.
-In particular conventional compilers, given the freedom of the \texttt{-ffast-math}, are able to increase the SIMD vectorisation of the compiled kernel, likely leading to their large speedup.
+In particular conventional compilers, given the freedom of the \texttt{-ffast-math}, are able to increase the SIMD vectorisation of the compiled kernel, likely leading to their speedup.
 This is in contrast to a hand optimised kernel, that was unable to make such use of the \texttt{-ffast-math} flag and achieved approximately half the speed of the compiled kernels.
 However, performance gains within a ExaHyPE project are limited to $\sim 10\%$ due to our test problems being memory bound.
 
