@@ -1,23 +1,22 @@
- A different kind of highlighted block.
+\begin{table}
+    \centering
+\input{Tables/kernel_compare_results.tex} 
+\caption{Performance of compiled kernels against default kernel in the \texttt{KernelCompare} synthetic benchmark. The speedup column shows the relative speedup of compiled kernels against their default counterpart.}\label{tab:kernel_comapre} 
+\end{table}
 
-    $$
-    \int_{-\infty}^{\infty} e^{-x^2}\,dx = \sqrt{\pi}
-    $$
+In ExaHyPE compiled kernels preformed as expected, see Table \ref{tab:exahype}.
+We observed a 5\%-15\% speedup in total program runtime, with programs limited by memory throughput.
+The Euler 2D kernel improved the least at 5\% and the Euler 3D kernel the most at 15\%.
+This is to be expected as values in the Euler 3D patch experience a slightly higher arithmetic intensity than those in 2D Euler, hence we can consider Euler 3D slightly less memory bound than Euler 2D.
+ 
+\begin{table}
+    \centering
+\input{Tables/exahype_results.tex} 
+\caption{Performance of compiled kernels against default kernels on the runtime of an ExaHyPE program. Data gathered on the AMD system.}\label{tab:exahype} 
+\end{table}
 
-    Interdum et malesuada fames $\{1, 4, 9, \ldots\}$ ac ante ipsum primis in
-    faucibus. Cras eleifend dolor eu nulla suscipit suscipit. Sed lobortis non
-    felis id vulputate.
-
-    \heading{A heading inside a block}
-
-    Praesent consectetur mi $x^2 + y^2$ metus, nec vestibulum justo viverra
-    nec. Proin eget nulla pretium, egestas magna aliquam, mollis neque. Vivamus
-    dictum $\mathbf{u}^\intercal\mathbf{v}$ sagittis odio, vel porta erat
-    congue sed. Maecenas ut dolor quis arcu auctor porttitor.
-
-    \heading{Another heading inside a block}
-
-    Sed augue erat, scelerisque a purus ultricies, placerat porttitor neque.
-    Donec $P(y \mid x)$ fermentum consectetur $\nabla_x P(y \mid x)$ sapien
-    sagittis egestas. Duis eget leo euismod nunc viverra imperdiet nec id
-    justo.
+\begin{table}
+    \centering
+    \input{Tables/hand-made-vs-generated-tab.tex} 
+    \caption{Performance of kernel optimised by hand against compiled kernel. Results we gathered on the AMD system.}\label{tab:hand_v_compiled}
+\end{table}

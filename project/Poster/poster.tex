@@ -18,6 +18,13 @@
 \usepackage{pgfplots}
 \pgfplotsset{compat=1.14}
 
+
+
+\usepackage{subcaption}
+\graphicspath{ {./Figures/} }
+\newsavebox{\measurebox}
+\usepackage{code}
+
 % ====================
 % Lengths
 % ====================
@@ -80,9 +87,15 @@
 
   \end{block}
 
-  \begin{block}{Problem Statement}
+  \begin{block}{Problem}
 
    \input{Sections/problem} 
+
+  \end{block}
+  
+  \begin{block}{Solution Approach}
+
+   \input{Sections/approach} 
 
   \end{block}
 
