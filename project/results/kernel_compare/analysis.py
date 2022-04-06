@@ -75,7 +75,7 @@ def hand_made_comparision(all_results: pd.DataFrame):
 
     out_df = df[["name", "iter_per_msec", "speedup", "hm_speedup"]]
     out_df = out_df.replace({"name":{"handmade": "handopt"}}) 
-    out_df = out_df.rename(columns={"name": "Kernel", "num_trials": "Num. Iterations", "run_time": "Run Time (s)", "iter_per_msec": "Iterations per ms", "speedup":"Speedup vs Default", "hm_speedup": "Speedup vs Handmade"})
+    out_df = out_df.rename(columns={"name": "Kernel", "num_trials": "Num. Iterations", "run_time": "Run Time (s)", "iter_per_msec": "Iterations per ms", "speedup":"Speedup vs Default", "hm_speedup": "Speedup vs Handopt"})
     s = out_df.style
     s.format(precision=2)  
     s.hide(axis="index")
@@ -99,6 +99,23 @@ def kernel_compare(all_results: pd.DataFrame):
     s.to_latex(file_name, hrules=True)
 
     print("Finished default vs compiled results.")
+    
+    kernel_compare_small(df)
+
+
+def kernel_compare_small(kc_results:pd.DataFrame):
+    df = kc_results.copy()
+    df = df.loc[(df["System"]=="Intel")|(df["Kernel"]=="compiled")]
+    
+    s= df.style
+    s.format(precision=2, na_rep="-")  
+    s.hide(axis="index")
+    file_name = ARTIFACTS+"/kernel_compare_results_small.tex"
+    s.to_latex(file_name, hrules=True)
+
+    print("Finished default vs compiled results [small].")
+
+
 
 def ofastmath(all_results: pd.DataFrame):
     df = all_results.loc[(all_results["run_time"]==60)&(all_results["name"]!="default")]
