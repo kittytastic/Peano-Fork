@@ -11,13 +11,8 @@ Our first method for comparison is a simple synthetic benchmark that measured ho
 
 Our compiled kernels preformed well, achieving approximately an order of magnitude speedup over the \textit{default} kernels.
 This translated to a \textbf{speedup of 5\% - 15\% in ExaHyPE}, which was to be expected for our memory bound test problems.
-%\begin{table}
-%    \centering
-%\input{Tables/exahype_results.tex} 
-%\caption{Performance of compiled kernels against default kernels on the runtime of an ExaHyPE program. Data gathered on the AMD system.}\label{tab:exahype} 
-%\end{table}
 
-Our final experiment pitted a hand optimised kernel against a compiled kernel. 
+We also compared a hand optimised kernel against a compiled kernel. 
 \begin{table}
     \centering
     \input{Tables/hand-made-vs-generated-tab.tex} 
@@ -26,4 +21,4 @@ Our final experiment pitted a hand optimised kernel against a compiled kernel.
 
 We found a \textbf{$2.3\times$ speedup of compiled kernels over manual optimisation}.
 This was due to \textbf{increased automatic SIMD vectorization} by the \textit{aocc} and \textit{ipcx} compilers.
-Using the MAQAO static analysis tool we observed a 60\% floating point vectorization ratio which was almost double that of the hand optimised kernels.
+Using the MAQAO static analysis tool \cite{MAQAO}, we observed a 60\% floating point vectorization ratio which was almost double that of the hand optimised kernels.
