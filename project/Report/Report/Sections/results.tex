@@ -1,0 +1,176 @@
+\subsection{Testing Methodology}
+% Test methodology
+% [ ] Problems
+% [ ] Kernel Validity
+% [ ] Exahype results
+% [ ] Kernel Compare results
+
+We will use the Euler equations in 2D and 3D, along with the shallow water equations (SWE) to test \phlat. 
+A summary of these problems can be found below.
+
+\vspace{1em}
+\begin{tabular}{ccccccccc}
+Problem & Unknowns+Auxillary & Dim & Patch size & Uses Flux & Uses NCP\\
+\hline
+Euler 2D & 4+0 & 2 & 3x3 & \checkmark & \xmark \\
+Euler 3D & 5+0 & 3 & 3x3x3 & \checkmark & \xmark \\
+SWE & 3+1 & 2 & 3x3 & \checkmark & \checkmark \\
+\end{tabular}
+\vspace{1em}
+
+These problems were chosen as they are prototypical hyperbolic PDE test problems that exhibit a wide range of features, such as 2D and 3D domains and the use of NCP and auxiliary variables.
+Also, each of theses problems are provided as example within the ExaHyPE repository.
+The kernels from these examples solutions will be treated as a control for the compiled kernels.
+We will refer to these kernels as default kernels. 
+
+None of the test problems are compute bound problems, they are all memory bound problems.
+Consequently, within an ExaHyPE program we would not expect improving kernel speeds to have a large effect on the total runtime of the program, as the program is bottle necked by memory throughput.
+
+As will be discussed in Section \ref{sec:practical}, creating input DAGs in a non-trivial job.
+The size of DAGs that compute bound problems, such as the CCZ4 equations, would require are infeasible to create with the current tooling.
+Hence, this seminal work will seek to verify the applicability of our compiler based approach on smaller problems, before tooling is improved to make larger problems tractable.
+
+Given the use of memory bound problems, only testing the performance of kernels within ExaHyPE will not show us the whole picture.
+Therefore, we will also test each kernel in isolation.
+This testing will repeatedly run a kernel on fixed input data, allowing us to calculate how many iterations per second a kernel can achieve.
+This will mimic what happens within ExaHyPE, but removes all the overhead experienced by the engine, such as memory copies.
+This will be our primary metric to compare kernels.
+
+This testing is preformed by a small program, called \texttt{KernelCompare}, that we created.
+This test program creates input data from test cases and creates an output array.
+Then the program repeatedly calls the kernel with the same input data and output array, until some time limit is reached e.g. 5 seconds.
+We can then use the number of iterations preformed within this time limit to inspect the performance of a kernel.
+To ensure the compiler doesn't introduce any unexpected behaviour the test and benchmark orchestration code is compiled without any optimisation flags, whereas all compute kernels are compiled with optimisation flags.
+
+However, kernel comparison extends beyond performance.
+It is also important to validate each of the compiled kernels against the default kernels.
+This is achieved by probing the control programs, and extracting input and output data around the default kernel call.
+The extracted data is used to create integration tests.
+To ensure a variety in the integration tests we extract data when some component of the input state vector is larger than a target value. 
+This ensures that our test data wont just be repeats of an empty patch.
+Every kernel mentioned in our results underwent validity testing using 10 integration tests and passed each one.
+
+Test results are gathered on 2 systems.
+An older Intel system running Xeon E5-2680 CPUs.
+On this system, unless stated otherwise, all code was compiled with \texttt{icpx} version 2021.1; for the native architecture; using the \texttt{-Ofast} optimisation flag.
+The other system used is a newer AMD system running EPYC 7702 CPUs.
+On this system, unless stated otherwise, all code was compiled with AMD's aocc \texttt{clang++} version 12.0.0; for the native architecture; using the \texttt{-Ofast} optimisation flag. 
+
+\subsection{Performance of Generated Kernels}
+% Default vs generated 
+% [ ] kernel compare results 
+% [ ] exahype results 
+
+We tested our compiled kernels against the default kernels in both the \texttt{KernelCompare} tester and within ExaHyPE.
+The compiled kernels exhibited an impressive speedup over their default counterparts, as seen in Table \ref{tab:kernel_comapre}.
+Over every test we witnessed approximately an order of magnitude speedup of the compiled kernels over the default kernels.
+Compiled kernels preformed better on the Intel system than on the AMD system, likely due to differences between the Intel and AMD compilers. 
+
+\begin{table}
+    \centering
+\input{Tables/kernel_compare_results.tex} 
+\caption{Performance of compiled kernels against default kernel in the \texttt{KernelCompare} synthetic benchmark. The speedup column shows the relative speedup of compiled kernels against their default counterpart.}\label{tab:kernel_comapre} 
+\end{table}
+
+In ExaHyPE compiled kernels preformed as expected, see Table \ref{tab:exahype}.
+We observed a 5\%-15\% speedup in total program runtime, with programs limited by memory throughput.
+The Euler 2D kernel improved the least at 5\% and the Euler 3D kernel the most at 15\%.
+This is to be expected as values in the Euler 3D patch experience a slightly higher arithmetic intensity than those in 2D Euler, hence we can consider Euler 3D slightly less memory bound than Euler 2D.
+ 
+\begin{table}
+    \centering
+\input{Tables/exahype_results.tex} 
+\caption{Performance of compiled kernels against default kernels on the runtime of an ExaHyPE program. Data gathered on the AMD system.}\label{tab:exahype} 
+\end{table}
+
+\subsection{Exploring the Advantage of Generated Kernels}
+% Diving into why - vs hand optimized kernels
+% [ ] Introduce hand optimized kernels
+% [ ] Results vs hand optimised kernels
+% [ ] Talk about compiler flag result
+
+Why do compiled kernels preform better than their default counterpart?
+To explore this we will focus on the Euler 2D problem, and investigate the differences between the compiled kernel and a kernel that was optimised by hand.
+We will refer to this hand optimised kernel as \textit{handopt}.
+The handopt kernel has 3 notable changes over the default kernel.
+Firstly, all heap allocation was either eliminated or replaced with stack allocation.
+Next, all lambda functions were replaced with direct function calls.
+And finally, all constants known at compile time (e.g. the number of cells per patch) were removed from function signatures and declared directly in function bodies as constants.
+
+
+\begin{table}
+    \centering
+    \input{Tables/hand-made-vs-generated-tab.tex} 
+    \caption{Performance of kernel optimised by hand against compiled kernel. Results we gathered on the AMD system.}\label{tab:hand_v_compiled}
+\end{table}
+
+Table \ref{tab:hand_v_compiled} shows the relative speedup of the handopt and compiled kernel.
+The handopt kernel exhibits a $3.75\times$ speedup over the default kernel, owing mostly to the removal of heap allocation.
+However, the compiled kernel exhibits a $2.31\times$ speedup over the handopt kernel.
+This shows us that the compiled kernels advantage must gained by other mechanisms beyond removing heap allocation.
+
+During our testing we observed a significant difference in the performance of compiled kernels when using the \texttt{-O3} and \texttt{-Ofast} compiler flag on both Intel and AMD compilers.
+Our investigation found that the \texttt{-ffast-math} flag, which is active in \texttt{-Ofast} but not in \texttt{-O3}, caused this difference.
+In particular the \texttt{-fno-math-errno} flag, which is activated by \texttt{-ffast-math} caused a majority of the improvements.
+Table \ref{tab:ffast_math} shows the effect these compiler flags have on the speed of the compiled and handopt kernels.
+
+\begin{table}
+    \centering
+\input{Tables/o3_results.tex} 
+\caption{}\label{tab:ffast_math} 
+\end{table}
+
+The most interesting result from Table \ref{tab:ffast_math} is that the \texttt{-ffast-math} makes very little difference to the Euler 2D handopt kernel, however the compiled kernel experience a $2.63\times$ improvement.
+A majority of that improvement comes from the \texttt{-fno-math-errno} flag.
+
+The \texttt{-fno-math-errno} flag disables setting the \texttt{errno} variable which can by exception handlers to detect floating point errors.
+Enabling this flag doesn't have any algorithmic effect, as none of the kernels perform any runtime exception handling.
+However, enabling this flag does has large knock on consequences in performance.
+In particular, removing this constraints gives the compiler further freedom to make more aggressive optimisations.
+
+Using the MAQAO assembler analysis tool \cite{MAQAO} we found that the \texttt{-fno-math-errno} flag allowed the compiler to preform much more aggressive SIMD vectorisation.
+The kernel only using the \texttt{-O3} flag was compiled into 4855 x86 instructions, whereas the kernel using both \texttt{-O3} and \texttt{-fno-math-errno} flags was compiled into 1371 x86 instructions.
+MAQAO reports floating point vectorisation ratios of 60\% for the \texttt{-fno-math-errno} kernel which is almost double that of the \texttt{-O3} kernel at 36\%.
+
+The effect of these flags on the compiled kernels is in contrast to the effect \texttt{-ffast-math} and \texttt{-fno-math-errno} had on the handopt kernel, which was negligible.
+
+\subsection{Further Optimisations}
+% Effect of computation reduction
+% [ ] Adding comp dedup speed
+
+Our compiler supports user transform/optimisation steps.
+We created 2 optimisations to explore their effects on the compiled kernels performance.
+The first optimization removes basic arithmetic no-ops from the DAG such as adding 0 or multiplying by 1.
+The second optimization removes all repeated computation.
+In summary, this optimisation combines any DAG node with an equivalent function and inputs, into a single node.
+This optimisation removes approx 10\% of nodes in the Euler 3D graph.
+
+We found that neither of these optimisation made a significant difference in the performance of the compiled kernels.
+The Intel and AMD compilers likely already preform these simple optimisations, along with many more complex optimisations.
+
+\subsection{Compiler Practicalities} \label{sec:practical}
+% [ ] Compiler speed
+% [ ] Input interface practicalities
+% Einstein equations from relativistic astrophysics (CCZ4)
+Beyond the performance of compiled kernels, it is also important that our compiler is practical to use.
+
+Firstly, we look at compile times.
+On the AMD system it took approx 2s to compile the SWE and Euler 2D kernels, however it takes approx 40s to compile the Euler 3D kernel.
+This is due to the larger size of the Euler 3D graph to the Euler 2D and SWE graphs, 32091 nodes to 6736 and 5089 nodes, generating 10235, 2090, and 1511 lines of code respectively.
+However, the Euler 3D graph is only $5\times$ larger than Euler 2D graph but takes $\sim 20\times$ longer to compile.
+This alludes to the $O(n^2)$ runtime of parts of the compiler.
+Much of the compiler has run time $O(n)$, however numerous IR transforms have a $O(n^2)$ runtime.
+By caching the location of variables in the IR, the runtime of all standard IR transforms can be reduced to $O(n)$.
+Such optimisation would need to be made if the compiler were to tackle large problems like the CCZ4 equations.
+And also for such a large problem, a refactor out of python may be required.
+
+Secondly, we will look at how a user inputs a problem.
+Currently, a user must create a DAG themselves and pass this to the compiler.
+The DAG creation process requires a user to manually create every node (e.g an Addition node), and then specify every input edge to that node.
+The process is tedious, time consuming and prone to error.
+The larger a problem is, the harder it is to create a DAG, and problems such as CCZ4 are totally infeasible.
+Therefore, more tooling is required to make the compiler practical to use.
+Such tooling may be a SymPy interface that would transforms a SymPy symbolic formula into a DAG.
+Or alternatively taking an approach like YATeTo and creating a DSL for DAG creation \cite{YATeTo}.
+Or further still, DAGs could be generated from code analysis of users existing code.
+Any of these solutions could drastically decrease the amount of effort required by a user to input their problem.  

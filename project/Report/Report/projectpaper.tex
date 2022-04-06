@@ -2,77 +2,30 @@
 \usepackage{biblatex}
 \usepackage{times}
 \usepackage{durhampaper}
+\usepackage{report}
+\usepackage{code}
+
+%\newsavebox{\measurebox}
 %\usepackage{harvard}
 
 
-%\newcommand{\testingbreak}{\pagebreak}%
-
 \newif\iftesting
-\testingtrue
+%\testingtrue
 
 \newcommand{\testingbreak}{\iftesting \pagebreak \fi}%
+\newcommand{\phlat}{FLAT\xspace}
 
-\usepackage{psvectorian}
 
-\newcommand{\ornamentleft}{%
-    \psvectorian[width=2em]{2}%
-}
-\newcommand{\ornamentright}{%
-    \psvectorian[width=2em,mirror]{2}%
-}
-\newcommand{\ornamentbreak}{%
-    \begin{center}
-        $\ast$~$\ast$~$\ast$
-    \end{center}
-}
-\usepackage{mathtools}
 
-\usepackage{listings}
-\usepackage{xparse}
 
-\usepackage{xcolor}
-
-\usepackage{pifont}
-\newcommand{\cmark}{\ding{51}}%
-\newcommand{\xmark}{\ding{55}}%
-
-\usepackage{booktabs}
-\usepackage{multirow}
-
-\definecolor{codegreen}{rgb}{0,0.6,0}
-\definecolor{codegray}{rgb}{0.5,0.5,0.5}
-\definecolor{codepurple}{rgb}{0.58,0,0.82}
-\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
-
-\lstdefinestyle{mystyle}{
-    backgroundcolor=\color{backcolour},   
-    keywordstyle=\color{magenta},
-    numberstyle=\tiny\color{codegray},
-    stringstyle=\color{codepurple},
-    basicstyle=\ttfamily\footnotesize,
-    breakatwhitespace=false,         
-    breaklines=true,                 
-    captionpos=b,                    
-    keepspaces=true,                 
-    numbers=left,                    
-    numbersep=5pt,                  
-    showspaces=false,                
-    showstringspaces=false,
-    showtabs=false,                  
-    tabsize=2
-}
-
-\lstset{style=mystyle}
-
-\lstset{language=C, style=mystyle}
 
 %\citationmode{abbr}
 %\bibliographystyle{agsm}
 \addbibresource{projectpaper.bib}
 
-\title{TBD}
+\title{Using a compiler based approach, \phlat, to accelerate Finite Volume kernels within ExaHyPE}
 \author{} % leave; your name goes into \student{}
-\student{qwrx21}
+\student{Jack Slingsby}
 \supervisor{}
 \degree{MEng Computer Science}
 
@@ -87,7 +40,7 @@
 \end{abstract}
 
 \begin{keywords}
-ExaHyPE
+ExaHyPE, Finite Volumes, Optimisation, SIMD
 \end{keywords}
 
 \testingbreak
@@ -95,7 +48,7 @@ ExaHyPE
 \input{Sections/introduction}
 
 \testingbreak
-\section{Problem Statement}
+\section{Problem Statement}\label{sec:problem_statement}
 \input{Sections/problemstatement}
 
 \testingbreak
@@ -104,22 +57,22 @@ ExaHyPE
 
 
 \testingbreak
-\section{Solution}
+\section{Solution}\label{sec:methodology}
 \input{Sections/methodology}
 
-\testingbreak
-\section{Validity}
-\input{Sections/validity}
+%\testingbreak
+%\section{Validity}
+%\input{Sections/validity}
 
 \testingbreak
-\section{Results}
-%\ornamentbreak
+\section{Results}\label{sec:results}
+\input{Sections/results.tex}
 
-\section{Evaluation}
-%\ornamentbreak
+%\section{Evaluation}
 
+\testingbreak
 \section{Conclusions}
-%\ornamentbreak
+\input{Sections/conclusion.tex}
 
 \testingbreak
 %\bibliography{projectpaper}

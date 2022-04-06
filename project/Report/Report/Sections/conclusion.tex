@@ -1,0 +1,15 @@
+This paper presents using a complier that takes an input problem encoded as a DAG and generating a \textit{compiled kernel} which is a single monolithic function.
+After generating a binary with a conventional compiler, the compiled kernel out preforms the default kernels currently used in ExaHyPE by an order of magnitude in synthetic benchmarking.
+This result is entirely a product of conventional compilers being able to preform more optimisation on the monolithic compiled kernel as opposed to the fragmented default kernel.
+In particular conventional compilers, given the freedom of the \texttt{-ffast-math}, are able to increase the SIMD vectorisation of the compiled kernel, likely leading to their speedup.
+This is in contrast to a hand optimised kernel, that was unable to make such use of the \texttt{-ffast-math} flag and achieved approximately half the speed of the compiled kernels.
+However, performance gains within a ExaHyPE project are limited to $\sim 10\%$ due to our test problems being memory bound.
+
+Using our compiler on larger, compute bound, is currently infeasible as we are limited in both compile time and the inconvenience of using DAGs as an input format.
+However, both these problems can be addressed, and in particular the possibility of a SymPy frontend offers an exciting opportunity for users to declare their problem in a convenient way that is used to generated fast code. 
+The results of our compiler on the 3 test problems warrant exploring these avenues and seeing if the observed performance gains also carry over to larger problems.
+
+Furthermore, a compiler based approach offers an interesting way for a user to create reusable optimisations that can be applied to all their kernels.
+However, a user may struggle to create any optimisations that a conventional compiler doesn't already preform.
+
+
