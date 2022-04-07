@@ -1,6 +1,6 @@
 Our approach primarily relies on the optimising power of conventional compilers such as \textit{gcc}.
 If we can \textbf{present the conventional compiler with code that it is better able to optimise}, then our compute kernels will receive a performance increase that is portable across many systems. 
 To do this we created the FLAT compiler.
-FLAT takes problems encoded an Directed Acyclic Graphs, and generates \textbf{Flat Long And potentially Transformed code}.
+FLAT takes problems encoded as a Directed Acyclic Graphs, and generates \textbf{Flat Long And potentially Transformed code}.
 Users are able to implement additional code transforms if they desire, however it is not required.
 The output of FLAT is then passed to a conventional compiler to be optimised.

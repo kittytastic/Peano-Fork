@@ -1,9 +1,9 @@
-A user begins by creating DAGs for the Problem Definition (i.e. flux, ncp, source terms, max eigen values functions).
+A user begins by creating DAGs for the Problem Definition (i.e. flux, ncp, source terms, max eigenvalue functions).
 A user then wraps these DAGs in builder functions (A function that when called returns a new version of their DAG).
-These builder functions are then passed to a Rusanov and Patch Update builder functions, which are provided by the engine.
-Patch Update and Runsaov use the users DAG numerous times, and create a new user DAG for every single use.
+These builder functions are then passed to a \proc{Patch Update} builder function, which is provided by the engine.
+\proc{Patch Update} uses the user's DAGs numerous times, and creates a new user DAG for every single use.
 
-The final Patch Update DAG is passed to the FLAT compiler.
+The final \proc{Patch Update} DAG is passed to the FLAT compiler.
 Here compiler transforms are preformed, and optional user transforms are preformed.
 The final C++ output is typically 1000s to \textbf{10,000s of lines long}, and can be used as a direct replacement in an ExaHyPE project.
 

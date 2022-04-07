@@ -3,7 +3,7 @@ Within ExaHyPE the problem domain is divided into cell, then these cells are gro
 Typical patch sizes are 3x3 in 2D and 3x3x3 in 3D.
 Patches are distributed by the ExaHyPE engine across multiple processing core across multiple compute nodes.
 
-We focus on the \proc{PatchUpdate} process that time steps all the cells in a patch forward.
+We focus on the \proc{PatchUpdate} process that steps all the cells in a patch forward one time step.
 \proc{PatchUpdate} is part of the engine code, however it makes many calls out to the user code that describes the PDE.
 \proc{PatchUpdate} needs to be able to support many different user codes, but this comes at the cost of performance.
 Our approach looks at keeping the generality of \proc{Patch Update}, while tackling its \textbf{performance issues}.  
