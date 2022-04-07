@@ -1,10 +1,9 @@
-Nam vulputate nunc felis, non condimentum lacus porta ultrices. Nullam sed
-    sagittis metus. Etiam consectetur gravida urna quis suscipit.
+We focus on using the \textbf{Finite Volume} scheme within ExaHyPE to solve PDEs.
+Within ExaHyPE the problem domain is divided into cell, then these cells are grouped into patches.
+Typical patch sizes are 3x3 in 2D and 3x3x3 in 3D.
+Patches are distributed by the ExaHyPE engine across multiple processing core across multiple compute nodes.
 
-    \begin{itemize}
-      \item \textbf{Mauris tempor} risus nulla, sed ornare
-      \item \textbf{Libero tincidunt} a duis congue vitae
-      \item \textbf{Dui ac pretium} morbi justo neque, ullamcorper  
-    \end{itemize}
-
-    Eget augue porta, bibendum venenatis tortor.
+We focus on the \proc{PatchUpdate} process that time steps all the cells in a patch forward.
+\proc{PatchUpdate} is part of the engine code, however it makes many calls out to the user code that describes the PDE.
+\proc{PatchUpdate} needs to be able to support many different user codes, but this comes at the cost of performance.
+Our approach looks at keeping the generality of \proc{Patch Update}, while tackling its \textbf{performance issues}.  

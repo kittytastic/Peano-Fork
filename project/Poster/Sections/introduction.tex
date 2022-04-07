@@ -1,17 +1,21 @@
-Some block contents, followed by a diagram, followed by a dummy paragraph. asd asd
+\textbf{Partial Differential Equations (PDEs)}\\
+It is often more natural to describe how a system changes as opposed 
+to a systems absolute state, and this is what PDEs do.
+PDEs are ubiquitous in describing the world around us, describing 
+phenomena such as seismic waves and fluid mechanics.
+However, it is often impossible to find an analytical solution to PDEs, hence we rely 
+on numerical schemes such as Finite Volumes (FV) to calculate approximate 
+solutions.
+Calculating a solution with sufficient accuracy for a large problem is very computationally intensive, requiring billions of degrees of freedom and often requiring on supercomputers
 
-    \begin{figure}
-      \centering
-      \begin{tikzpicture}[scale=6]
-        \draw[step=0.25cm,color=gray] (-1,-1) grid (1,1);
-        \draw (1,0) -- (0.2,0.2) -- (0,1) -- (-0.2,0.2) -- (-1,0)
-          -- (-0.2,-0.2) -- (0,-1) -- (0.2,-0.2) -- cycle;
-      \end{tikzpicture}
-      \caption{A figure caption.}
-    \end{figure}
+\phantom{ }
 
-    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi ultricies
-    eget libero ac ullamcorper. Integer et euismod ante. Aenean vestibulum
-    lobortis augue, ut lobortis turpis rhoncus sed. Proin feugiat nibh a
-    lacinia dignissim. Proin scelerisque, risus eget tempor fermentum, ex
-    turpis condimentum urna, quis malesuada sapien arcu eu purus.
+\textbf{ExaHyPE}\\
+ExaHyPE (``An Exascale Hyperbolic PDE Engine'') is a software engine for solving systems of first-order hyperbolic PDEs \cite{exahype}.
+ExaHyPE enables users to create highly sophisticated PDE solvers with ease, 
+supporting complex features such as adaptive mesh sizing while scaling well across 
+super computing hardware.
+To make an ExaHyPE programs a user describes their problem to the ExaHyPE toolkit, which then generates a template program.
+A user then fills in placeholder functions that calculate problem specific quantities such as eignen values.
+Then the program is ready to be compiled an run, working on hardware ranging from a laptop to exa-scale supercomputers.
+
