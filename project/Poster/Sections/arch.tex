@@ -1,11 +1,13 @@
-    Vivamus congue volutpat elit non semper. Praesent molestie nec erat ac
-    interdum. In quis suscipit erat. \textbf{Phasellus mauris felis, molestie
-    ac pharetra quis}, tempus nec ante. Donec finibus ante vel purus mollis
-    fermentum. Sed felis mi, pharetra eget nibh a, feugiat eleifend dolor. Nam
-    mollis condimentum purus quis sodales. Nullam eu felis eu nulla eleifend
-    bibendum nec eu lorem. Vivamus felis velit, volutpat ut facilisis ac,
-    commodo in metus.
+\textbf{DAG}: Our compiler, FLAT, takes a DAG (Directed Acyclic Graph) as an input.
+Every node in the DAG has input and output ports.
+Nodes are either a primative operation such add addition or subtraction.
+Or nodes are DAGs, allowing a nested structure. 
 
+\textbf{IR}: After applying DAG transforms, FLAT transforms the DAG into a code like Internal Representation (IR).
+It is easier to generate code from this IR than directly from the DAG.
+Our IR comes in 2 flavours, loose and tight.
+The loose IR is much more relaxed, using simple function signatures and allowing special types of temporary variables.
+The tight IR is much stricter and closer to output code and requires the use of features such as complex function signatures.
 
 \newsavebox{\looseIRlisting}
 \begin{lrbox}{\looseIRlisting}% Store first listing
@@ -24,6 +26,8 @@ define VOID @kernel (%in0, %in1) (%out0, %out1):
 \end{lstlisting}
 \endminipage
 \end{lrbox}
+
+
 
 \newsavebox{\tightIRlisting}
 \begin{lrbox}{\tightIRlisting}% Store first listing
