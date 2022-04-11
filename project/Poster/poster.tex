@@ -1,0 +1,153 @@
+% Gemini theme
+% https://github.com/anishathalye/gemini
+
+\documentclass[final]{beamer}
+
+% ====================
+% Packages
+% ====================
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[size=custom,width=120,height=72,scale=1.0]{beamerposter}
+\usetheme{gemini}
+\usecolortheme{durham}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.14}
+
+
+
+\usepackage{subcaption}
+\graphicspath{ {./Figures/} }
+\newsavebox{\measurebox}
+\usepackage{code}
+\usepackage{wrapfig}
+\newcommand{\proc}[1]{\textit{#1}}
+% ====================
+% Lengths
+% ====================
+
+% If you have N columns, choose \sepwidth and \colwidth such that
+% (N+1)*\sepwidth + N*\colwidth = \paperwidth
+\newlength{\sepwidth}
+\newlength{\colwidth}
+\setlength{\sepwidth}{0.025\paperwidth}
+\setlength{\colwidth}{0.3\paperwidth}
+
+\newcommand{\separatorcolumn}{\begin{column}{\sepwidth}\end{column}}
+
+% ====================
+% Title
+% ====================
+
+\title{Using a compiler based approach, FLAT, to accelerate Finite Volume kernels within ExaHyPE}
+
+\author{Jack Slingsby}
+
+%\institute[shortinst]{\inst{1} Some Institute \samelineand \inst{2} Another Institute}
+
+% ====================
+% Footer (optional)
+% ====================
+
+\footercontent{
+  %\href{https://www.example.com}{https://www.example.com} \hfill
+  %Middle Footer \hfill
+  %End footer
+  Durham University
+  }
+% (can be left out to remove footer)
+
+% ====================
+% Logo (optional)
+% ====================
+
+% use this to include logos on the left and/or right side of the header:
+ \logoright{\includegraphics[height=7cm]{Figures/DurhamUniversityLogo_WHITE.png}}
+% \logoleft{\includegraphics[height=7cm]{logo2.pdf}}
+
+% ====================
+% Body
+% ====================
+
+%\begin{alertblock}{Hard Highlighed block}\end{alertblock}
+%\begin{exampleblock}{Soft Highlighted Block} \end{exampleblock}
+
+\begin{document}
+
+\begin{frame}[t]
+\begin{columns}[t]
+\separatorcolumn
+
+\begin{column}{\colwidth}
+
+  \begin{block}{Background}
+
+    \input{Sections/introduction} 
+
+  \end{block}
+
+  \begin{block}{Problem}
+
+   \input{Sections/problem} 
+
+  \end{block}
+  
+  \begin{block}{Solution Approach}
+
+   \input{Sections/approach} 
+
+  \end{block}
+
+\end{column}
+
+\separatorcolumn
+
+\begin{column}{\colwidth}
+
+  \begin{block}{Compiler Architecture}
+
+    \input{Sections/arch}
+
+  \end{block}
+  \begin{block}{Compiling FV Kernels}
+
+   \input{Sections/fv-kernels}
+
+  \end{block}
+
+\end{column}
+
+\separatorcolumn
+
+\begin{column}{\colwidth}
+
+  \begin{block}{Results}
+
+   \input{Sections/results.tex}
+
+  \end{block}
+
+  \begin{block}{Conclusion}
+
+    \input{Sections/conclusion.tex}
+
+  \end{block}
+
+  \begin{block}{References}
+
+    \nocite{*}
+    \footnotesize{\bibliographystyle{plain}\bibliography{poster}}
+
+  \end{block}
+
+\end{column}
+
+\separatorcolumn
+\end{columns}
+\end{frame}
+
+\end{document}

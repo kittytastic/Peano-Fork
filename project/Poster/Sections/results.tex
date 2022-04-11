@@ -1,0 +1,24 @@
+We used 3 test problems: Euler Equations in 2D and 3D (Euler 2D, Euler 3D), and the shallow water equations (SWE).
+These 3 problems are provided as examples within the ExaHyPE repository, and those kernels were used as control kernels which we refer to as \textit{default}.
+We then recreated these kernels as DAGs and used FLAT to compile them into C++.
+Our first method for comparison is a simple synthetic benchmark that measured how many iterations per second a kernel could preform on a fixed input.  
+
+\begin{table}
+    \centering
+    \input{Tables/kernel_compare_results_small.tex} 
+    \caption{Performance of compiled kernels against default kernel in a synthetic benchmark.} 
+\end{table}
+
+Our compiled kernels preformed well, achieving approximately an order of magnitude speedup over the \textit{default} kernels.
+This translated to a \textbf{speedup of 5\% - 15\% in ExaHyPE}, which was to be expected for our memory bound test problems.
+
+We also compared a hand optimised kernel against a compiled kernel. 
+\begin{table}
+    \centering
+    \input{Tables/hand-made-vs-generated-tab.tex} 
+    \caption{Performance of kernel optimised by hand against compiled kernel.}
+\end{table}
+
+We found a \textbf{$2.3\times$ speedup of compiled kernels over manual optimisation}.
+This was due to \textbf{increased automatic SIMD vectorization} by the \textit{aocc} and \textit{ipcx} compilers.
+Using the MAQAO static analysis tool \cite{MAQAO}, we observed a 60\% floating point vectorization ratio which was almost double that of the hand optimised kernels.
