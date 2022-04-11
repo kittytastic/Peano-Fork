@@ -48,16 +48,16 @@ PDE a-z: http://www.scholarpedia.org/article/Partial_differential_equation#:~:te
 # Feedback - TODO
 ## Intro
 (0:00)
-[ ] Fix generic beginning - mention per core efficiency and how lots of recent gains have been from that 
-[ ] Change wording - Exahype abstraction causes problems, can't use domain specific knowledge, there is nothing wrong with tooling.
+[x] Fix generic beginning - mention per core efficiency and how lots of recent gains have been from that 
+[x] Change wording - Exahype abstraction causes problems, can't use domain specific knowledge, there is nothing wrong with tooling.
 
 (2:37)
-[ ] Refine compiler part - waffling
-[ ] Refine compiler part - what are compiler good at compiler good at long simple compilers, compilers good at simple loops
-[ ] Make clear - not writing a compiler, writing something that passes code to the compiler
+[x] Refine compiler part - waffling
+[-] Refine compiler part - what are compiler good at compiler good at long simple compilers, compilers good at simple loops
+[x] Make clear - not writing a compiler, writing something that passes code to the compiler
 
 (3:50)
-[ ] Add research question - Can code be user friendly and make aggressive optimisations 
+[x] Add research question - Can code be user friendly and make aggressive optimisations 
 
 
 ## Problem statement

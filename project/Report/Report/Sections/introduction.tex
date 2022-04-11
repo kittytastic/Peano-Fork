@@ -39,33 +39,22 @@ Upon completing these placeholder functions, the project can be compiled and run
 
 % Exahype - benifits of exahype (fast flexible, friendly)
 At ExaHyPEs core it is fast, flexible and user-friendly, allowing users to create fast programs to solve a wide range of problems while requiring minimal effort from the user.
-However, as the quality of tooling increases so to does the ambition of users, who seek to tackle larger and more complex problems.
-Hence, there will always be the desire to further improve the tooling to meet these loftier ambitions.
-This paper will focus on developing a general technique that can be used to accelerate the speed of users code, and reduce the onus for a user to invest time in optimisation.
-We will use a compiler based approach, which in turn leverages the power of conventional compilers such as gcc.
-The compiler we present is called \phlat, its name reflecting its approach to code generation, producing code that is: Flat Long And potentially Transformed. 
-We use the term \textit{conventional compiler} to refer to optimismising compilers such as \texttt{gcc}, \texttt{clang}, \texttt{ipcx}.  
+However, the abstraction required within ExaHyPE to achieve this limits the opportunities for optimistations, especially at the boundary between user and engine code.
+In this paper we set out to solve this problem using our compiler based approach \phlat, so called for the Flat Long and potentially Transformed code it produces.
+\phlat aims to bridge the gap in ExaHyPE between being general and user-friendly, while producing fast C++.  
 
+\phlat{}'s approach to optimisation is to generate C++ that \texttt{g++}, \texttt{clang++}, \texttt{ipcx}, e.t.c. are more capable of optimising.  
+Namely, \phlat can be used to generate monolithic functions tens of thousands of lines long.
+In this paper we investigate the performance of these kernels and thus how well they are optimised by compilers.
 
-% Shout out to compilers
-The effects of conventional compliers on HPC codes are often overlooked, and they are rarely afforded the recognition they deserve.
-It is a given that HPC codes will be compiled with \texttt{-O3} or \texttt{-Ofast} flags.
-However, if we take a step back to appreciate this, by simply adding a single flag to our compiler arguments we have achieved an order (or a few orders) of magnitude speedup.
-This is effectively free performance.
-And the benefits don't stop there, vendor specific compilers like Intel's \texttt{ipcx} and AMD's AOCC, offer hardware specific optimisations.
-So by switching compiler you can create a highly efficient binary that targets specific hardware, no coding required.
-
-It is possible to beat the conventional compiler with manual optimisation, especially at higher levels of abstraction.
-However, it gets increasingly more challenging (and impractical to try) as you approach assembly.
-And conventional compilers are only getting more advanced, narrowing this gap.   
-Much current research focuses on using Machine learning to improve compilers \cite{compiler-ml-opt,lots-of-compiler-options}.
-And developments such as CompilerGym, an environment for exploring compiler optimisation in AI research \cite{compiler-gym}, are indicators that this field of research will continue to expand. 
-
-As such, we propose that a valid method of HPC codes optimisation is to simply use the conventional compiler better.
-Our \phlat compiler has a simple goal, to transform user codes into compiler friendly codes.    
-In partial we focus on generating monolithic functions, from FV kernels.
+Relying on the compiler for optimisations is often taken for granted, simply appending an \texttt{-O3} flag to the compiler arguments can increase the performance of code by orders of magnitude.
+And by using vendor specific compilers, like Intel's \texttt{ipcx}, code can undergo hardware specific optimisation.
+As such, relying primarily on compilers for optimisation is a promising direction of exploration.
+And looking to the future, see that compilers are only getting more advanced.
+Most recently the application of Machine Learning within compilers is being explored \cite{compiler-ml-opt,lots-of-compiler-options}, and development enviroments such as CompilerGym \cite{compiler-gym} suggest this area of research is set to expand.
+This suggests that a relying on compilers also offers an aspect of longevity to optimisations as well.
 
 % what is in each section
-In the next section we will introduce the problem within ExaHyPE that \phlat is used to solve, followed by discussing similar compiler based approaches.
+In the next section we go into depth about what problem \phlat solves within ExaHyPE, followed by discussing similar compiler based approaches.
 In Section \ref{sec:methodology} we explain the architecture of \phlat and how it is used to generate compute kernels.
-And in Section \ref{sec:results} we will discuss the performance of kernels generated along with the practicalities of using \phlat. 
+And in Section \ref{sec:results} we will discuss the performance of kernels generated along with the practicalities of using \phlat.
