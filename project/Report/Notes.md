@@ -62,21 +62,22 @@ PDE a-z: http://www.scholarpedia.org/article/Partial_differential_equation#:~:te
 
 ## Problem statement
 (4:36)
-[ ] Remove term - HPDE
-[ ] Fix wording - formula isn't general, it is first oder
-[ ] Fix formatting - formulas should be embedded into text, full stops and comma at tend of formula, no colons prefacing them 
+[x] Remove term - HPDE
+[x] Fix wording - formula isn't general, it is first oder
+[x] Fix formatting - formulas should be embedded into text, full stops and comma at tend of formula, no colons prefacing them 
 (6:07)
-[ ] Clarify - Euler has 2+d unknowns
+[-] Clarify - Euler has 2+d unknowns
 (6:22)
-[ ] Refine CCZ4 - 58 unknowns, ref FO-CCZ4 paper
-[ ] Fix wording - FD derivation isn't a simplification, its a special case its with B as 0
-[ ] Fix formatting - Refer to equation 1 as (1), don't use the word equation unless starting a sentence.
-[ ] Fix formatting - Only enumerate equations that you then refer to
-[ ] Fix missing word - we then
-[ ] Fix wording - change all the "We thens" in derivation.
+[x] Refine CCZ4 - 58 unknowns, ref FO-CCZ4 paper
+[x] Fix wording - FD derivation isn't a simplification, its a special case its with B as 0
+[x] Fix formatting - Refer to equation 1 as (1), don't use the word equation unless starting a sentence.
+[x] Fix formatting - Only enumerate equations that you then refer to
+[x] Fix missing word - we then
+[x] Fix wording - change all the "We thens" in derivation.
 (9:25)
-[ ] Fix formatting - Equation 5, put full stop at the end
-[ ] Consistency - 6 face 3D, 4 face 2D 
+[x] Fix formatting - Equation 5, put full stop at the end
+[x] Consistency - 6 face 3D, 4 face 2D 
+
 [ ] Clarify - "Is a majority of engine code"
 [ ] Update wording - ExaHyPE uses a functional programming paradigm
 (10:42)
