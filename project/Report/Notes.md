@@ -120,12 +120,11 @@ Doesnt like Exahype Seciton
 ???
 
 [ ] Mention - What doesnt work
-[ ] Mention - open question, to which degree challenges approach
+[ ] Mention - Didnt add a front end
+[ ] Mention - open question, to which degree challenges approach, are big DAGs bad
 (21:00)
-remove redundant comp -- register presure
-
+[ ] Mention - remove redundant comp -- register presure
 [ ] Mention - DAGs could have side effects, mby look at latest ISC poster
-
 [ ] Mention - Not clear if it would work in GPUs
 [ ] Mention - Not clear if compilers require for loops, mby compilers like for loops
 
