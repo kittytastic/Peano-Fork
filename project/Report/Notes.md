@@ -47,84 +47,89 @@ PDE a-z: http://www.scholarpedia.org/article/Partial_differential_equation#:~:te
 
 # Feedback - TODO
 ## Intro
-Generic beginning - Mention per core efficiency, lots of preformance from increase per core capabilities
+(0:00)
+[ ] Fix generic beginning - mention per core efficiency and how lots of recent gains have been from that 
+[ ] Change wording - Exahype abstraction causes problems, can't use domain specific knowledge, there is nothing wrong with tooling.
 
-Exahype - abstraction, performance, nothing can use domain specific knowledge <-- not tooling
+(2:37)
+[ ] Refine compiler part - waffling
+[ ] Refine compiler part - what are compiler good at compiler good at long simple compilers, compilers good at simple loops
+[ ] Make clear - not writing a compiler, writing something that passes code to the compiler
 
-problem statement, compiler good at long simple compilers, compilers good at simple loops,
+(3:50)
+[ ] Add research question - Can code be user friendly and make aggressive optimisations 
 
-
-intro - specific research question, something doesnt work: can me keep user friendly and aggressive 
 
 ## Problem statement
-bin Hpde
-
-formula is first order - not general
-
-formula embedded in text, no colons
-
-Euler has 2+d unknowns
-
-CCz4 59 - olinda 
-
-example of FD formula
-
-Dont write equation 1, (1), only equation when you start sentance with
-
-Equations 1-5, dont enuerate all equation, only named
-
-First problem statement, remove we thens!
-Equation 5, put a full stop at the end
-6 face cube, 4 face .
-
-Is a majority of engine code.
-
-Functional programming patten.
-??? 11:25
+(4:36)
+[ ] Remove term - HPDE
+[ ] Fix wording - formula isn't general, it is first oder
+[ ] Fix formatting - formulas should be embedded into text, full stops and comma at tend of formula, no colons prefacing them 
+(6:07)
+[ ] Clarify - Euler has 2+d unknowns
+(6:22)
+[ ] Refine CCZ4 - 58 unknowns, ref FO-CCZ4 paper
+[ ] Fix wording - FD derivation isn't a simplification, its a special case its with B as 0
+[ ] Fix formatting - Refer to equation 1 as (1), don't use the word equation unless starting a sentence.
+[ ] Fix formatting - Only enumerate equations that you then refer to
+[ ] Fix missing word - we then
+[ ] Fix wording - change all the "We thens" in derivation.
+(9:25)
+[ ] Fix formatting - Equation 5, put full stop at the end
+[ ] Consistency - 6 face 3D, 4 face 2D 
+[ ] Clarify - "Is a majority of engine code"
+[ ] Update wording - ExaHyPE uses a functional programming paradigm
+(10:42)
+polish exahype
+???
+math = numerics
+Doesnt like Exahype Seciton
 
 
 ## Related Work
-python templating, not c++ templating
-numbers less than 12 as words
-we belive - bin
-challenge term optimisation expert, compiler is the expert, need a transform expert, adds seperation of concern
+[ ] Clarify - python templating, not c++ templating
+[ ] Fix formatting - Use words for numbers less than 12
+(12:07)
+[ ] Fix tone - Remove we believe
+[ ] Elaborate - Challenge the term optimisation expert as compiler is the expert. Replace them with a transform expert which adds separation of concern
 
-(13:40)
-YATeTo likes this seperation of code
-It is not clear if compiler or BLAS is better <--- add need to investigate
-YATeTo only works with linear systems
-Not clear if rebuilding
+(13:16)
+[ ] Follow on - YATeTo uses this separation of concern
+[ ] Elaborate - It is not clear if a compiler or BLAS is better, that needs to be investigated
+[ ] Clarify - YATeTo only works with linear systems
+[ ] Elaborate - Not clear if rebuilding matrices at every time step for non-linear would be worth it
 
 (15:40)
-General, why you study these things, 
-in which way have these things effected decisions
+???
+[ ] Add a summary section - Why you study these things? In which way have these things effected decisions?
 
-Could look at stencil compilers.
+[ ] Potentially - look at stencil compilers, PLUTO is interesting
 
 ## Solution
-move data
-DAG, what is done, SymPy doesnt exist
-move D forward
+(17:00)
+[ ] Refine - only talk about what is done, don't mention SymPy e.t.c.
+[ ] Refine - Move Architecture overview forward, Context then Depth
 
 ## Results
-Normalization again base line is weird
+[ ] Look at - Normalization against handopt is weird
 
 ## Evaluation section
-Add discussion about results
+[] Add  - Evaluation section that discusses results
 
 (19:12)
 ???
 
-What doesnt work,
-open question, to which degree challenges approach
+[ ] Mention - What doesnt work
+[ ] Mention - open question, to which degree challenges approach
 (21:00)
 remove redundant comp -- register presure
 
-DAGs could have side effects, mby look at latest ISC poster
+[ ] Mention - DAGs could have side effects, mby look at latest ISC poster
 
-Not clear if it would work in GPUs
-Not clear if compilers require for loops, mby compilers like for loops
+[ ] Mention - Not clear if it would work in GPUs
+[ ] Mention - Not clear if compilers require for loops, mby compilers like for loops
 
 ## Conclusion
 (23:30)
-This is the Q we wanted to answer in into - this is how we answered it
+[ ] Refine - This is the Q we wanted to answer in into, this is how we answered it
+[ ] Add - investigate compilers vs BLAS (14:00)
