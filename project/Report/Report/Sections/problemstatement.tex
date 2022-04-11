@@ -30,8 +30,12 @@ Rearranging (\ref{eq:fv-almost-done}) for the time derivative we find
 \end{equation}
 
 If we select an simple geometry for our cell, squares/cubes are used in ExaHyPE, then calculating the 2D surface integral is simply a sum across the 4 faces of a square (or in 3D, the 6 faces of a cube).
-Applying this calculation to (3) gives the time derivative of $Q$, which can then be used in a time stepping scheme such as explicit Euler to progress $Q$.
-%This method can be generalised and applied to Equation \ref{eq:non-lin-pde}, to give the FV scheme used within ExaHyPE.  
+Asserting $S_i$ is a finite set of faces allows us to simply the surface integral
+\begin{equation}\label{eq:fv-simple}
+   \frac{\partial \bar{\mathbf{Q}_i}}{\partial t} = -\frac{1}{v_i} \sum_{S_i}\mathbf{F}(\mathbf{Q})\cdot \mathbf{n}.
+\end{equation}
+This provides a method to calculate the time derivative of $Q$, which can be used in a time stepping scheme such as explicit Euler to progress $Q$.
+
 
 \subsection{ExaHyPE}
 
