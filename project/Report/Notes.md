@@ -78,31 +78,27 @@ PDE a-z: http://www.scholarpedia.org/article/Partial_differential_equation#:~:te
 [x] Fix formatting - Equation 5, put full stop at the end
 [x] Consistency - 6 face 3D, 4 face 2D 
 
-[ ] Clarify - "Is a majority of engine code"
-[ ] Update wording - ExaHyPE uses a functional programming paradigm
+[x] Clarify - "Is a majority of engine code"
+[x] Update wording - ExaHyPE uses a functional programming paradigm
 (10:42)
-polish exahype
-???
-math = numerics
-Doesnt like Exahype Seciton
-
+[x] Rewrite - Exahype part
 
 ## Related Work
-[ ] Clarify - python templating, not c++ templating
-[ ] Fix formatting - Use words for numbers less than 12
+[x] Clarify - python templating, not c++ templating
+[x] Fix formatting - Use words for numbers less than 12
 (12:07)
-[ ] Fix tone - Remove we believe
-[ ] Elaborate - Challenge the term optimisation expert as compiler is the expert. Replace them with a transform expert which adds separation of concern
+[x] Fix tone - Remove we believe
+[x] Elaborate - Challenge the term optimisation expert as compiler is the expert. Replace them with a transform expert which adds separation of concern
 
 (13:16)
-[ ] Follow on - YATeTo uses this separation of concern
-[ ] Elaborate - It is not clear if a compiler or BLAS is better, that needs to be investigated
-[ ] Clarify - YATeTo only works with linear systems
-[ ] Elaborate - Not clear if rebuilding matrices at every time step for non-linear would be worth it
+[x] Follow on - YATeTo uses this separation of concern
+[x] Elaborate - It is not clear if a compiler or BLAS is better, that needs to be investigated
+[x] Clarify - YATeTo only works with linear systems
+[x] Elaborate - Not clear if rebuilding matrices at every time step for non-linear would be worth it
 
 (15:40)
 ???
-[ ] Add a summary section - Why you study these things? In which way have these things effected decisions?
+[x] Add a summary section - Why you study these things? In which way have these things effected decisions?
 
 [ ] Potentially - look at stencil compilers, PLUTO is interesting
 

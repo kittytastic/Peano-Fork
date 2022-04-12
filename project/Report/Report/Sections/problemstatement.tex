@@ -64,7 +64,7 @@ And, this support adds additional barriers to optimisation.
 
 Referring back to (\ref{eq:fv-simple}), a user must provide code to calculate $F(Q)\cdot\mathbf{n}$, which we will call one of the \proc{Problem Descriptions}.
 If their equation has a non-zero source term and NCP term a user will also need to provide code to calculate these quantities.
-Additionally Rusanov and mesh/timestep refinement requires the max-eigenvalues of a cell, so this must also be provided by the user.
+Additionally Rusanov requires the max-eigenvalues of a cell, so this must also be provided by the user.
 Finally a user will need to provide code that describes the boundary conditions of the problem.
 This is all the code a user needs to provide.
 
@@ -119,9 +119,9 @@ As this calculation and its potential use lies across function calls it is possi
 
 Beyond unused computation, there can also be repeated computation.
 One such example is when we use Rusanov as our \proc{Numerical Ingredient}.
-To calculate the change of state at the shared face of 2 cells $\alpha,\beta$ Rusanov begins by calculating $flux(\alpha), flux(\beta), max\_eigenvalue(\alpha), max\_eigenvalue(\beta)$.
+To calculate the change of state at the shared face of 2 cells $\alpha,\beta$ Rusanov begins by calculating $flux(\alpha)$, $flux(\beta)$, $max\_eigenvalue(\alpha)$, $max\_eigenvalue(\beta)$.
 Then using these values the change of state is calculated.
-If we then calculate the change of state between $\beta,\gamma$ note that the computation of $flux(\beta), max\_eigenvalue(\beta)$ is repeated.
+If we then calculate the change of state between $\beta,\gamma$ note that the computation of $flux(\beta)$, $max\_eigenvalue(\beta)$ is repeated.
 It may be challenging for the compiler to spot this repetition, especially as it again lies across multiple different functions.
 Furthermore, \proc{Patch Update} cannot be optimised to take advantage of this property of Runsnov, as it would no longer work with any \proc{Numerical Ingredient}.
 
@@ -137,6 +137,6 @@ This is one of the major downsides of engine code not knowing anything about use
 % ISSUE: branching
 % MAYBE ISSUE: consts as function arguments
 
-This is not an exhausive list of potential performance issues currently experience in ExaHyPE \proc{Patch Update} function.
+This is not an exhaustive list of potential performance issues currently experience in ExaHyPE \proc{Patch Update} function.
 But it does highlight some of the issues that static code generation faces while having to operate safely across a wide domain of user's problem.
 \phlat aims to employ dynamic code generation to maintain the flexibility currently afforded in ExaHyPE, while allowing more aggressive optimisation to take place.
