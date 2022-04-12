@@ -5,7 +5,7 @@ As such, solutions to PDEs can have much real world impact by, for example, impr
 
 Analytical PDE solutions are challenging to derive, and general solutions for any initial conditions or boundary conditions do not exist.
 As such, we rely on numerical methods to calculate approximate solutions.
-However, numerical methods are computationally intensive; increasing the size of the problem, or the accuracy of the solution, increases the computational work.
+However, numerical methods are computationally intensive; increasing the size of the problem, or the accuracy of the solution, increases the computational work required.
 Many real world problems require billions of degrees of freedom to model.
 The sheer scale of these computations requires the use of high performance computing (HPC), where algorithmic advances and supercomputers make these problems tractable.
 
@@ -13,7 +13,7 @@ In HPC, there are 2 ways to increase computational throughput, either by using m
 Super computing hardware is ever improving, and Exa-Scale systems are on the horizon.
 However, relying on hardware scaling comes with the cost and availability issues around using more hardware.
 Therefore, optimising code to better use the hardware is often preferable.
-In HPC codes there are many levels at which optimisation can occur, one of the most fundamental is improving the throughput of a single core.
+In HPC codes there are many levels at which optimisation can occur, one of the most fundamental being improving the throughput of a single core.
 There are many example in literature of this having a significant effect on the performance of HPC code \cite{YATeTo,seisolPFLOP,codegen_dg_SIMD}, and this will be the area of optimisation we explore.     
 
 % Exhaype - what it is
@@ -31,26 +31,26 @@ Every patch is updated by a single core using the FV scheme.
 It is this update process we will optimise.
 
 To use ExaHyPE, a user begins by describing their problem to the ExaHyPE toolkit using a python interface.
-A user will specify information such as: how many unknowns and auxillary variables are used; weather their problem uses a non-conservative product (NCP); what numerical scheme they want to use; if they want to use fix or adaptive time stepping; how frequently the solution should be plotted; and more.
+A user will specify information such as: how many unknowns and auxillary variables are used; whether their problem uses a non-conservative product (NCP); what numerical scheme they want to use; if they want to use fix or adaptive time stepping; how frequently the solution should be plotted; and more.
 This is used by the ExaHyPE toolkit to generate a project.
-This project is primarily populated by glue code that calls ExaHyPE, however there are a few placeholders function that need to be filed in by the user.
+This project is primarily populated by glue code that invokes ExaHyPE, however there are a few placeholders function that need to be filed in by the user.
 These place holder functions are used to describe the PDE, calculating: flux, eigenvalues, initial conditions, boundary conditions, and non-conservative products (if applicable).
 Upon completing these placeholder functions, the project can be compiled and run on systems ranging from a laptop to a supercomputer.
 
 % Exahype - benifits of exahype (fast flexible, friendly)
-At ExaHyPEs core it is fast, flexible and user-friendly, allowing users to create fast programs to solve a wide range of problems while requiring minimal effort from the user.
-However, the abstraction required within ExaHyPE to achieve this limits the opportunities for optimistations, especially at the boundary between user and engine code.
+ExaHyPEs is designed to be fast, flexible and user-friendly; allowing users to create fast programs to solve a wide range of problems while requiring minimal effort from the user.
+However, being flexible and user friendly often limits the opportunities for optimistations, especially at the boundary between user and engine code.
 In this paper we set out to solve this problem using our compiler based approach \phlat, so called for the Flat Long and potentially Transformed code it produces.
-\phlat aims to bridge the gap in ExaHyPE between being general and user-friendly, while producing fast C++.  
+\phlat aims to bridge the gap in ExaHyPE between being flexible and friendly, while producing fast C++.  
 
 \phlat{}'s approach to optimisation is to generate C++ that \texttt{g++}, \texttt{clang++}, \texttt{ipcx}, e.t.c. are more capable of optimising.  
-Namely, \phlat can be used to generate monolithic functions tens of thousands of lines long.
+Namely, \phlat can be used to generate monolithic functions that are tens of thousands of lines long.
 In this paper we investigate the performance of these kernels and thus how well they are optimised by compilers.
 
 Relying on the compiler for optimisations is often taken for granted, simply appending an \texttt{-O3} flag to the compiler arguments can increase the performance of code by orders of magnitude.
 And by using vendor specific compilers, like Intel's \texttt{ipcx}, code can undergo hardware specific optimisation.
 As such, relying primarily on compilers for optimisation is a promising direction of exploration.
-And looking to the future, see that compilers are only getting more advanced.
+Also looking to the future, we see that compilers are only getting more advanced.
 Most recently the application of Machine Learning within compilers is being explored \cite{compiler-ml-opt,lots-of-compiler-options}, and development enviroments such as CompilerGym \cite{compiler-gym} suggest this area of research is set to expand.
 This suggests that a relying on compilers also offers an aspect of longevity to optimisations as well.
 
