@@ -104,8 +104,8 @@ PDE a-z: http://www.scholarpedia.org/article/Partial_differential_equation#:~:te
 
 ## Solution
 (17:00)
-[ ] Refine - only talk about what is done, don't mention SymPy e.t.c.
-[ ] Refine - Move Architecture overview forward, Context then Depth
+[x] Refine - only talk about what is done, don't mention SymPy e.t.c.
+[x] Refine - Move Architecture overview forward, Context then Depth
 
 ## Results
 [ ] Look at - Normalization against handopt is weird

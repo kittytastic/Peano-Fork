@@ -9,7 +9,7 @@
 % pure functions with numerical input
 % ignore the effects of numerical machine precision
 Our solution, \phlat, is a domain specific compiler that generates code for a conventional compiler e.g. g++ to optimise and turn into machine instructions.
-Our goals for \phlat are that it:
+Our goals for \phlat are that it
 \begin{itemize}
     \item Supports a large range of problems
     \item Generates code that is faster than the current default code
@@ -66,7 +66,6 @@ An overview of \phlat{}'s architecture can be found in Figure \ref{fig:arch}.
 % [ ] Control flow hoisting
 
 \phlat begins with a Directed Acyclic Graph (DAG) as an input.
-Currently it is the responsibility of a user to create such a DAG, however it would be entirely possible to generate a DAG using a user friendly format such as from a SymPy \cite{sympy} formula.
 The DAG model we propose takes inspiration from hardware design languages.
 
 In a hardware design language you define electrical components.
@@ -82,7 +81,7 @@ Or a node may be composite, where it is a DAG itself.
 Composite nodes would map to functions in the final code output.
 Figure \ref{fig:bn} demonstrates composite nodes with the calculation $out_0 = (in_0)^3 + in_1$ where the function \textit{cubed} has been implemented as a subgraph.
 The nested structure that provided by composite nodes gives the DAG model a lot of expressive power and modularity.
-For example, a user can create Problem Definition DAGs, then hand those DAGs to pre-made \proc{Patch Update} and \proc{Numerical Ingredient} DAG builders to create a DAG that describes the full \proc{Patch Update} process.
+For example, a user can create \proc{Problem Definition} DAGs, then hand those DAGs to pre-made \proc{Patch Update} and \proc{Numerical Ingredient} DAG builders to create a DAG that describes the full \proc{Patch Update} process.
 
 
 \begin{figure}[h!]
