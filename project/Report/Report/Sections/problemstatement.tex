@@ -8,6 +8,7 @@ We express these PDEs mathematically with the equation
 where $\mathbf{Q}(x,t)\subset \mathbb{R}^q$ is a time and space dependent state vector for any $x$ in our spatial domain $\Omega\subset \mathbb{R}^{d \in \{2,3\}}$ and $t>0$.
 The number of conserved state variables, $q$, can vary from $5$ in the 3D Euler Equations, $58$ in the Einstien Relativity equations (CCZ4) \cite{CCZ4}.
 $\mathbf{F}$ is the conserved flux vector, $\mathbf{B}$ the (system) matrix composing the non-conservative fluxes and $\mathbf{S}(\mathbf{Q})$ the source term.
+The $\mathbf{B}(\mathbf{Q}) \cdot \nabla \mathbf{Q}(x,t)$ term is often called the NCP (non-conservative product).
 
 
 We will derive the FV scheme for  (\ref{eq:non-lin-pde}) in the case that $B(Q)=S(Q)=0$
@@ -38,11 +39,41 @@ This provides a method to calculate the time derivative of $Q$, which can be use
 
 
 \subsection{ExaHyPE}
+\newcommand{\proc}[1]{\textit{#1}}
+Algorithmically a FV cell is an array of \texttt{double}.
+In ExaHyPE cells are grouped up into patches, commonly $3\times 3$ cells in 2D or $3\times 3 \times 3$ cells in 3D, and these patches are store as an AoS (Array of Structures).
+The Peano framework within ExaHyPE is responsible for distributing these patches across processing cores and nodes, where they are updated using (\ref{eq:fv-simple}) and an explicit euler time stepping scheme, by a single core.
+We will refer to this update process as \proc{Patch Update}.
+As an aside, In (\ref{eq:fv-simple}) we set $B(Q)=S(Q)=0$ for simplicity, however in the case $B(Q), S(Q)\neq 0$ the update process is broadly similar to (\ref{eq:fv-simple}), the main feature of which being a sum across the faces of a cell.
+
+An issue encountered in (\ref{eq:fv-simple}) is: what is the value of $Q$ at a face?
+Take a the face between cells $\alpha$ and $\beta$.
+We know the average state across $\alpha$ which we call $Q_\alpha$, and likewise for $\beta$ with average state $Q_\beta$.
+However the face, $f$, lies on the boundary of $\alpha$ and $\beta$ the state of which is a discontinuity between $Q_\alpha$ and $Q_\beta$ so what should $Q_f$ be?
+This is know as the Riemann problems.
+Simple solutions exist, such as taking an average $Q_f = \frac{Q_\alpha + Q_\beta}{2}$, and the best choice of scheme is problem specific.
+By default, ExaHyPE uses the Rusanov scheme \cite{rusanov} as a general purpose solution to the Riemann problem, however user have the option to provide their own scheme.
+Once a value of $Q_f$ has been decided upon then $F(Q_f)\cdot \mathbf{n}$ (and additionally NCP terms if applicable) can be calculated.
+We call this process the \proc{Numerical Ingredient}, and we can trace it back to the evaluation of $F(Q)\cdot\mathbf{n}$ in (\ref{eq:fv-simple}).
+
+Adding further complexity to \proc{Numerical Ingredient}, it is not always the case that we want to model the face between $\alpha$ and $\beta$ as a shared face.
+Sometimes we treat $f$ as two faces $f_\alpha, f_\beta$, which means we cannot assume that evaluating the \proc{Numerical Ingredient} while updating $\alpha$ will be the same as when updating $\beta$.
+The Rusanov scheme used by default in ExaHyPE doesn't experience this complication, treating the face as a shared face. 
+Thus, this is a good example of ExaHyPE supporting functionality which is not required by default, but may be required for certain problems.
+And, this support adds additional barriers to optimisation.
+
+Referring back to (\ref{eq:fv-simple}), a user must provide code to calculate $F(Q)\cdot\mathbf{n}$, which we will call one of the \proc{Problem Descriptions}.
+If their equation has a non-zero source term and NCP term a user will also need to provide code to calculate these quantities.
+Additionally Rusanov and mesh/timestep refinement requires the max-eigenvalues of a cell, so this must also be provided by the user.
+Finally a user will need to provide code that describes the boundary conditions of the problem.
+This is all the code a user needs to provide.
+
+These 3 process are split into 3 functions in ExaHyPE, a summary of the number of inputs and outputs of these functions can be found in Table \ref{tab:patch_update}.
+
 
 
 % Can we make exahype better
 % while not making it worse
-\newcommand{\proc}[1]{\textbf{#1}}
 
 % we will focus on patch update
 An ExaHyPE project is a majority of engine code, and a small amount of user code which is used to describe the PDE.
