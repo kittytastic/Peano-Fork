@@ -41,15 +41,15 @@ This provides a method to calculate the time derivative of $Q$, which can be use
 \subsection{ExaHyPE}
 \newcommand{\proc}[1]{\textit{#1}}
 Algorithmically a FV cell is an array of \texttt{double}.
-In ExaHyPE cells are grouped up into patches, commonly $3\times 3$ cells in 2D or $3\times 3 \times 3$ cells in 3D, and these patches are store as an AoS (Array of Structures).
+In ExaHyPE cells are grouped up into patches, commonly $3\times 3$ cells in 2D or $3\times 3 \times 3$ cells in 3D, and these patches are stored as an AoS (Array of Structures).
 The Peano framework within ExaHyPE is responsible for distributing these patches across processing cores and nodes, where they are updated using (\ref{eq:fv-simple}) and an explicit euler time stepping scheme, by a single core.
 We will refer to this update process as \proc{Patch Update}.
-As an aside, In (\ref{eq:fv-simple}) we set $B(Q)=S(Q)=0$ for simplicity, however in the case $B(Q), S(Q)\neq 0$ the update process is broadly similar to (\ref{eq:fv-simple}), the main feature of which being a sum across the faces of a cell.
+As an aside, in (\ref{eq:fv-simple}) we set $B(Q)=S(Q)=0$ for simplicity, however in the case $B(Q), S(Q)\neq 0$ the update process is broadly similar to (\ref{eq:fv-simple}), the main feature still being a sum across the faces of a cell.
 
 An issue encountered in (\ref{eq:fv-simple}) is: what is the value of $Q$ at a face?
 Take a the face between cells $\alpha$ and $\beta$.
 We know the average state across $\alpha$ which we call $Q_\alpha$, and likewise for $\beta$ with average state $Q_\beta$.
-However the face, $f$, lies on the boundary of $\alpha$ and $\beta$ the state of which is a discontinuity between $Q_\alpha$ and $Q_\beta$ so what should $Q_f$ be?
+However the face, $f$, lies on the boundary of $\alpha$ and $\beta$, and its sate $Q_f$ is at discontinuity between $Q_\alpha$ and $Q_\beta$, so what should $Q_f$ be?
 This is know as the Riemann problems.
 Simple solutions exist, such as taking an average $Q_f = \frac{Q_\alpha + Q_\beta}{2}$, and the best choice of scheme is problem specific.
 By default, ExaHyPE uses the Rusanov scheme \cite{rusanov} as a general purpose solution to the Riemann problem, however user have the option to provide their own scheme.
@@ -70,79 +70,6 @@ This is all the code a user needs to provide.
 
 These 3 process are split into 3 functions in ExaHyPE, a summary of the number of inputs and outputs of these functions can be found in Table \ref{tab:patch_update}.
 
-
-
-% Can we make exahype better
-% while not making it worse
-
-% we will focus on patch update
-An ExaHyPE project is a majority of engine code, and a small amount of user code which is used to describe the PDE.
-The interface between the engine and user code is built on the patten of passing function pointers of user functions to engine code.
-Here is an example:
-\begin{lstlisting}[language=c]
-void engine_function(std::function<...> user_function){
-    // ... Do something
-    val = user_function();
-    // ... Use the value of the user function 
-}
-
-void engine_core(){
-    auto user_func = project::user_land::foo;
-    engine_function(user_func);
-}
-\end{lstlisting}
-
-This patten is good design practice, as it completely decouples engine functions from user functions, apart from at a single crossover point.
-Thereby allowing the engine to be developed in isolation from user codes, and allowing the engine to support any user codes that respect the required function signatures.
-However, this patten, and the total disconnect between user and engine code it allows, is not without its disadvantages, as we will discuss.
-
-Our focus will be on the \proc{Patch Update} process.
-This process is heavily reliant on user code, and as such dominates the runtime of user code.
-Furthermore, for arithmetic intense PDEs, this process dominates the entire running time of an ExaHyPE program.
-We will begin by explaining the \proc{Patch Update} process.
-Then proceed to highlight inefficiencies within this process. 
-
-The smallest unit of space in a FV scheme is a cell.
-Algorithmically a cell is an array of \lstinline{double} that store the state of that cell.
-As mentioned previously the size of the state vector can vary from $4$ values to over $40$.
-Cells are then grouped up into a patch.
-Within ExaHyPE, patch data is stored in a AoS (Array of Structures) form.
-Patch sizes are typically 3x3 cells in 2D or 3x3x3 cells in 3D.
-The size of patches can be adjusted by a user, say to 5x5, however a patch size is a constant throughout the runtime of the program.
-Within ExaHyPE, the Peano Framework \cite{PeanoFramework} is responsible for splicing the spacial domain into patches, and distributing patches across compute nodes and compute threads.
-As such, we are concerned with the single threaded process of \proc{Patch Update}.
-\proc{Patch Update} is used to evolve the values of cells in a patch by a given timestep.
-This is done by applying source terms to the cells, then calculating flux and non-conservative products (NCP) for every face of a cell and applying it to the cells state.
-As a technical detail, to evaluate every face of every cell in a patch we require a halo of cells as demonstrated in Figure \ref{fig:patch}.
-
-\begin{figure}[h!]
-    \begin{center}
-        \includegraphics[width=.2\textwidth]{patch.png}
-        \caption{Example of a 3x3 patch, with a halo of cells.}
-        \label{fig:patch}
-    \end{center}
-\end{figure}
-
-
-In summary, \proc{Patch Update} is a function whose input is: a haloed patch; a timestep; and patch meta-data such as its size in space. And whose output is: the patch (without a halo) that has been progressed in time. 
-
-Calculating the flux and NCP at a shared face between 2 cells a non-trivial task.
-This is because the face is at a discontinuity between the states of the 2 cells, and is known as the Riemann problem in FV.
-As such, we require a scheme to solve the Riemann problem, which we will call the \proc{Numerical Ingredient}.
-Many such schemes exist, such as Upwind and Downwind schemes, and the correct scheme to use depends on the problem.
-Within ExaHyPE the Rusanov scheme \cite{rusanov} is used by default, as it well serves the role of a general \proc{Numerical Ingredient}.
-The \proc{Numerical Ingredient} has an input of 2 cells and meta data about the face (e.g. its position in space).
-And outputs 2 state vectors describing the change of state experienced by each cell.
-
-At the bottom level of this hierarchy we have the \proc{Problem Descriptions}.
-These are a collection of user defined functions the calculate: flux, NCP, source terms, and maximum eigenvalues.
-All these functions share a similar input interface, taking single cell and the meta data for that cell.
-And they output either a state vector or single value, depending on what quantity they are calculating.
-In the default ExaHyPE setup, it will be \proc{Patch Update} that calls the source term function.
-And \proc{Numerical Ingredient} that calls the flux, NCP and max eigenvalue functions.
-
-A summary of the abstraction hierarchy of \proc{Patch Update} can be found in Table \ref{tab:patch_update}
-
 \begin{table}
 \begin{tabular}{lllcc}
     \toprule
@@ -156,73 +83,60 @@ A summary of the abstraction hierarchy of \proc{Patch Update} can be found in Ta
 \caption{A summary of the level of abstraction within the \proc{Patch Update} function. $p$ is the number of cells along 1 dimension in a patch, $d$ is the dimension of the patch, $q$ are the number of state variables, $m$ is the size of patch/state metadata.}\label{tab:patch_update}
 \end{table}
 
-Now we have an understanding of \proc{Patch Update} we can investigate some of the potential performance issues it experiences.
-% ISSUE: lambda functions, not inline
-Firstly, as mentioned at the beginning of this section, ExaHyPE implements the function pointer pattern to interface between user and engine code.
-As such, the definition of \proc{Patch Update} looks like this:
+ExaHyPE uses a functional paradigm to implement these 3 groups of functions.
+An overview is given below:
 \begin{lstlisting}[language=c]
-void full_numerical_ingredient(
-    std::function<...> flux, std::function<...> ncp,
-    /* other args */);
-void full_patch_update(
-    std::function<...> numerical_ingredient, std::function<...> source_term,
-    /* other args */);
+void numerical_ingredient(std::function<...> user_flux, ...){
+    // ... Do something
+    flux = user_flux(...);
+    // ... Use the value of flux and ncp (if applicable) 
+};
 
-void engine_core(){
-    std::function<...> numerical_ingredient = [&](/*other args*/){
-        full_numerical_ingredient(
-            user_land::flux, user_land::ncp, /* other args*/
-        );
-    };
-    std::function patch_update = [&](/*other args*/){
-        full_patch_update(
-            numerical_ingredient, user_land::source_term, /*other args */
-        );
-    };
+void patch_update(std::function<...> numerical_ingredient, ...){
+    // ... Do something
+    face_value = numerical_ingredient(...);
+    // ... Use the value of numerical ingredient
+};
 
-    patch_update(double * in_patch, double * out_patch, ...);
-}
+void generated_glue_code(){
+    auto user_flux = project::user_land::flux;
+    auto numerical_ingredient_lambda = [&](...){numerical_ingredient(user_flux, ...)};
+    patch_update(numerical_ingredient_lambda, ...);
+};
 \end{lstlisting}
-This is non-trivial to fully inline, hence there is the potential the compiler choices to make function calls.
-However, function calls hinder vectorization, therefore this code may not be vectorized well.
+This patten completely decouples engine functions like \texttt{patch\_update} and \texttt{rusanov} from user functions, hence enabling support of any user \proc{Problem Definitions} provided they implement the required function signatures.
+This paradigm helps ExaHyPE achieve its goals of being flexible and user friendly but introduces some pitfalls for the compiler that may hinder optimisation.
+
+Firstly, it is non-trivial to inline this paradigm.
+As such, there may be function calls in our final assembly, which limits the amount of SIMD vectorization the compiler can preform.
+This is because function calls may overwrite SIMD registers, so the compiler must treat the contents of a SIMD register as unknown after a function call, ultimately stifling vectorization.
+
+The next issue with this paradigm is it obscures the existence of unused and repeated computation.
+Metadata, such as the current time and timestep size, is passed through all functions to bottom level \proc{Problem Definition} functions.
+Some of this metadata is repeatedly calculated e.g. the spacial coordinate of the face being processed by the \proc{Numerical Ingredient}.
+Although some \proc{Numerical Ingredients} and \proc{Problem Definitions} may use this calcualted metadata, many don't.
+As this calculation and its potential use lies across function calls it is possible the compiler is unable to remove this redundant code.
+
+Beyond unused computation, there can also be repeated computation.
+One such example is when we use Rusanov as our \proc{Numerical Ingredient}.
+To calculate the change of state at the shared face of 2 cells $\alpha,\beta$ Rusanov begins by calculating $flux(\alpha), flux(\beta), max\_eigenvalue(\alpha), max\_eigenvalue(\beta)$.
+Then using these values the change of state is calculated.
+If we then calculate the change of state between $\beta,\gamma$ note that the computation of $flux(\beta), max\_eigenvalue(\beta)$ is repeated.
+It may be challenging for the compiler to spot this repetition, especially as it again lies across multiple different functions.
+Furthermore, \proc{Patch Update} cannot be optimised to take advantage of this property of Runsnov, as it would no longer work with any \proc{Numerical Ingredient}.
 
 
 % ISSUE: heap allocation
-The next issue we encounter is the use of heap allocation.
-The implementation of \proc{Patch Update} allows us to use a single function for many different user codes.
-However, this also means algorithmic precautions must be take to safely handel any user codes.
-Within both \proc{Patch Update} and \proc{Numerical Ingredient} temporary variables are used to receive the result of function calls.
-The size of these temporary variables depend on the size of a cells state.
-Hence, safe behaviour dictates that these temporary variables are declared on the heap as opposed to the stack, which is slow. 
-
+The final issue we will highlight is the use of heap allocation.
+User's problems can have an arbitrary number of unknowns and auxillary variables, 
+as such we cannot assume it is safe to allocate temporary state variables on the stack.
+We must instead initiate temporary state variables on the heap, which is slow.
+Both \proc{Patch Update} and \proc{Numerical Ingredient} need to create these temporary variables, which leads to a lot of heap allocation.
+This is one of the major downsides of engine code not knowing anything about use code, we must implement defensive engine code.
 
 % ISSUE: branching
 % MAYBE ISSUE: consts as function arguments
 
-
-
-% ISSUE: repeated + unused comp
-The final issue we will acknowledge is the existence of repeated and unused computations.
-As we saw, every functional call within \proc{Patch Update} takes a meta data argument.
-Some of this meta data needs to be calculated for every function call.
-For example, \proc{Numerical Ingredient} requires the coordinates for the center of the face it is processing.
-These coordinates are calculated using the coordinates of the 2 cells that share this face.
-However, \proc{Numerical Ingredients} such as Rusanov use this coordinate.
-Hence, we run the risk of the compiler not eliminating this redundant computation, especially as its definition and usage lie across different functions. 
-Beyond unused computation, there can also be repeated computation.
-If we look at using Rusanov as our \proc{Numerical Ingredient} there are many repeated computations.
-To calculate the flux at the shared face of 2 cells $a,b$ Rusanov calculates $flux(a), flux(b), max\_eigenvalue(a), max\_eigenvalue(b)$.
-The flux at the face is then a function of these 4 values.
-If we were to then calculate the flux between $b,c$ note that the computation of $flux(b), max\_eigenvalue(b)$ is repeated.
-It may be challenging for the compiler to spot this repetition, especially as it again lies across multiple different functions.
-Furthermore, \proc{Patch Update} cannot be optimised to take advantage of this property of Runsnov, as it would no longer work with any \proc{Numerical Ingredient}.
-
-To summarize, \proc{Patch Update} has the constraint of supporting any \proc{Numerical Ingredient} or \proc{Problem Description}. 
-Within \proc{Patch Update} the function pointer patten and safe behaviour such as heap allocation is used to meet this constraint.
-However, this constraint is in contension with performance.
-Although optimisations can be made for specific pairings of \proc{Numerical Ingredient} and \proc{Problem Description}, there is limited scope for general optimisations. 
-And at the end of the day, case by case optimisation detracts from the draw of using a PDE engine in the first place.
-
-It is desirable to use a technique that maintains the modularity of \proc{Patch Update} but increases potential for optimisation.
-This is what we will explore, applying a compiler based approach to achieve these goals.
-
+This is not an exhausive list of potential performance issues currently experience in ExaHyPE \proc{Patch Update} function.
+But it does highlight some of the issues that static code generation faces while having to operate safely across a wide domain of user's problem.
+\phlat aims to employ dynamic code generation to maintain the flexibility currently afforded in ExaHyPE, while allowing more aggressive optimisation to take place.
