@@ -1,15 +1,20 @@
-This paper presents using a complier that takes an input problem encoded as a DAG and generating a \textit{compiled kernel} which is a single monolithic function.
-After generating a binary with a conventional compiler, the compiled kernel out preforms the default kernels currently used in ExaHyPE by an order of magnitude in synthetic benchmarking.
-This result is entirely a product of conventional compilers being able to preform more optimisation on the monolithic compiled kernel as opposed to the fragmented default kernel.
-In particular conventional compilers, given the freedom of the \texttt{-ffast-math}, are able to increase the SIMD vectorisation of the compiled kernel, likely leading to their speedup.
-This is in contrast to a hand optimised kernel, that was unable to make such use of the \texttt{-ffast-math} flag and achieved approximately half the speed of the compiled kernels.
-However, performance gains within a ExaHyPE project are limited to $\sim 10\%$ due to our test problems being memory bound.
+This paper presents \phlat as a method for bridging the gap in ExaHyPE, between being flexible and user-friendly, while producing fast C++.
+\phlat delivers on producing fast C++, producing kernels that were up to $16\times$ faster than kernels currently used in ExaHyPE.
+This speedup was enabled by \phlat{}'s dynamic code generation approach, that produced monolithic compute kernels, thousands of lines long.
+Compiled kernels even out preformed a hand optimised kernel, owing to better automatic vectorisation of the compiled kernels while using the \texttt{-ffast-math} flag.
 
-Using our compiler on larger, compute bound, is currently infeasible as we are limited in both compile time and the inconvenience of using DAGs as an input format.
-However, both these problems can be addressed, and in particular the possibility of a SymPy frontend offers an exciting opportunity for users to declare their problem in a convenient way that is used to generated fast code. 
-The results of our compiler on the 3 test problems warrant exploring these avenues and seeing if the observed performance gains also carry over to larger problems.
+As would be expected, this speed up didn't directly carry over to preformance of our memory bound test problems in ExaHyPE.
+Here, we saw speedups of $5\% - 15\%$, the best being in the Euler 3D test problem which is the most computationally intense of the 3 test problems.
 
-Furthermore, a compiler based approach offers an interesting way for a user to create reusable optimisations that can be applied to all their kernels.
-However, a user may struggle to create any optimisations that a conventional compiler doesn't already preform.
+This leads on to \phlat{}'s shortcomings.
+The nested structure of DAGs in \phlat mirrors the modularity that users of ExaHyPE currently experience.
+However, the cumbersome process of creating a DAG edge by edge is not user friendly, and limits the size of DAGs that can be reasonably created.
+The development of front end to \phlat such as via a DSL or SymPy interface, would help mitigate these issues and allow \phlat to tackle larger problems.
 
+The behaviour of \phlat on large problems is unknown, and it may be the case that \phlat, in its current state, is unsutible for large problems.
+However, the improvements witnessed on small test problems does warrenant the development of a front end, so \phlat{}'s performance on larger problems can be explored.
+
+Furthermore, the switch from static to dynamic code generation in ExaHyPE opens up many more avenues for exploration.
+In \phlat users can define their own domain specific transforms, which may prove a useful feature.
+And further afield, dynamic code generation may allow for CPU/GPU agnostic code, which is an interesting direction for further exploration.
 
