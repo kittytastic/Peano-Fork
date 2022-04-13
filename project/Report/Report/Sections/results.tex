@@ -36,7 +36,7 @@ This testing will repeatedly run a kernel on fixed input data, allowing us to ca
 This will mimic what happens within ExaHyPE, but removes all the overhead experienced by the engine, such as memory copies.
 This will be our primary metric to compare kernels.
 
-This testing is preformed by a small program, called \texttt{KernelCompare}, that we created.
+This testing is preformed by a small program that we created called \texttt{KernelCompare}.
 This test program creates input data from test cases and creates an output array.
 Then the program repeatedly calls the kernel with the same input data and output array, until some time limit is reached e.g. 5 seconds.
 We can then use the number of iterations preformed within this time limit to inspect the performance of a kernel.
@@ -90,7 +90,7 @@ This is to be expected as values in the Euler 3D patch experience a slightly hig
 % [ ] Talk about compiler flag result
 
 Why do compiled kernels preform better than their default counterpart?
-To explore this we will focus on the Euler 2D problem, and investigate the differences between the compiled kernel and a kernel that was optimised by hand.
+To explore this we focus on the Euler 2D problem, and investigate the differences between the compiled kernel and a kernel that was optimised by hand.
 We will refer to this hand optimised kernel as \textit{handopt}.
 The handopt kernel has 3 notable changes over the default kernel.
 Firstly, all heap allocation was either eliminated or replaced with stack allocation.
@@ -110,14 +110,14 @@ However, the compiled kernel exhibits a $2.31\times$ speedup over the handopt ke
 This shows us that the compiled kernels advantage must gained by other mechanisms beyond removing heap allocation.
 
 During our testing we observed a significant difference in the performance of compiled kernels when using the \texttt{-O3} and \texttt{-Ofast} compiler flag on both Intel and AMD compilers.
-Our investigation found that the \texttt{-ffast-math} flag, which is active in \texttt{-Ofast} but not in \texttt{-O3}, caused this difference.
+Our investigation on the AMD compiler found that the \texttt{-ffast-math} flag, which is active in \texttt{-Ofast} but not in \texttt{-O3}, caused this difference.
 In particular the \texttt{-fno-math-errno} flag, which is activated by \texttt{-ffast-math} caused a majority of the improvements.
 Table \ref{tab:ffast_math} shows the effect these compiler flags have on the speed of the compiled and handopt kernels.
 
 \begin{table}
     \centering
 \input{Tables/o3_results.tex} 
-\caption{}\label{tab:ffast_math} 
+\caption{The effect of compiler flags on compiled kernels using the AMD compiler. We see the relative speedup of various compiler flags compared to using \texttt{-O3}.}\label{tab:ffast_math} 
 \end{table}
 
 The most interesting result from Table \ref{tab:ffast_math} is that the \texttt{-ffast-math} makes very little difference to the Euler 2D handopt kernel, however the compiled kernel experience a $2.63\times$ improvement.
@@ -125,7 +125,7 @@ A majority of that improvement comes from the \texttt{-fno-math-errno} flag.
 
 The \texttt{-fno-math-errno} flag disables setting the \texttt{errno} variable which can by exception handlers to detect floating point errors.
 Enabling this flag doesn't have any algorithmic effect, as none of the kernels perform any runtime exception handling.
-However, enabling this flag does has large knock on consequences in performance.
+However, enabling this flag does have knock on consequences in performance.
 In particular, removing this constraints gives the compiler further freedom to make more aggressive optimisations.
 
 Using the MAQAO assembler analysis tool \cite{MAQAO} we found that the \texttt{-fno-math-errno} flag allowed the compiler to preform much more aggressive SIMD vectorisation.
@@ -138,8 +138,8 @@ The effect of these flags on the compiled kernels is in contrast to the effect \
 % Effect of computation reduction
 % [ ] Adding comp dedup speed
 
-Our compiler supports user transform/optimisation steps.
-We created 2 optimisations to explore their effects on the compiled kernels performance.
+\phlat supports user transform/optimisation steps.
+We created 2 optimisations to explore their effects on performance of compiled kernels.
 The first optimization removes basic arithmetic no-ops from the DAG such as adding 0 or multiplying by 1.
 The second optimization removes all repeated computation.
 In summary, this optimisation combines any DAG node with an equivalent function and inputs, into a single node.
@@ -159,18 +159,18 @@ On the AMD system it took approx 2s to compile the SWE and Euler 2D kernels, how
 This is due to the larger size of the Euler 3D graph to the Euler 2D and SWE graphs, 32091 nodes to 6736 and 5089 nodes, generating 10235, 2090, and 1511 lines of code respectively.
 However, the Euler 3D graph is only $5\times$ larger than Euler 2D graph but takes $\sim 20\times$ longer to compile.
 This alludes to the $O(n^2)$ runtime of parts of the compiler.
-Much of the compiler has run time $O(n)$, however numerous IR transforms have a $O(n^2)$ runtime.
-By caching the location of variables in the IR, the runtime of all standard IR transforms can be reduced to $O(n)$.
-Such optimisation would need to be made if the compiler were to tackle large problems like the CCZ4 equations.
-And also for such a large problem, a refactor out of python may be required.
+%Much of the compiler has run time $O(n)$, however numerous IR transforms have a $O(n^2)$ runtime.
+%By caching the location of variables in the IR, the runtime of all standard IR transforms can be reduced to $O(n)$.
+%Such optimisation would need to be made if the compiler were to tackle large problems like the CCZ4 equations.
+%And also for such a large problem, a refactor out of python may be required.
 
 Secondly, we will look at how a user inputs a problem.
 Currently, a user must create a DAG themselves and pass this to the compiler.
 The DAG creation process requires a user to manually create every node (e.g an Addition node), and then specify every input edge to that node.
 The process is tedious, time consuming and prone to error.
 The larger a problem is, the harder it is to create a DAG, and problems such as CCZ4 are totally infeasible.
-Therefore, more tooling is required to make the compiler practical to use.
-Such tooling may be a SymPy interface that would transforms a SymPy symbolic formula into a DAG.
-Or alternatively taking an approach like YATeTo and creating a DSL for DAG creation \cite{YATeTo}.
-Or further still, DAGs could be generated from code analysis of users existing code.
-Any of these solutions could drastically decrease the amount of effort required by a user to input their problem.  
+%Therefore, more tooling is required to make the compiler practical to use.
+%Such tooling may be a SymPy interface that would transforms a SymPy symbolic formula into a DAG.
+%Or alternatively taking an approach like YATeTo and creating a DSL for DAG creation \cite{YATeTo}.
+%Or further still, DAGs could be generated from code analysis of users existing code.
+%Any of these solutions could drastically decrease the amount of effort required by a user to input their problem.  

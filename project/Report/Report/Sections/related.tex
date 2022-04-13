@@ -24,7 +24,7 @@ This structure would further increase the separation of algorithm experts from o
 
 
 % Yateto used a compiler
-YATeTo (Yet Another Tensor Toolbox) \cite{YATeTo} takes this approach of a translation expert.
+YATeTo (Yet Another Tensor Toolbox) \cite{YATeTo} uses this approach of a translation expert.
 YATeTo operates in the domain of linear hyperbolic PDEs, in particular, it is part of the Seisol project \cite{seisolPFLOP}, which focuses on applying the linear elastic wave PDE to model seismic activity.
 YATeTo is a tool that allows users to transform their problem into highly efficient code.   
 
@@ -59,9 +59,9 @@ However, their approach differs from YATeTo, as they choose to preform SIMD vect
 \citeauthor{codegen_dg_SIMD} state that there are two paths to introduce vectorisation within code.
 Automatic vectorisation through conventional compilers, and explicit vectorisation where SIMD intrinsic instructions are introduced by developers.
 They argue that although the former is preferable, the latter will likely be more performant due to a developers problem specific knowledge.
-As such, they introduce a compiler architecture that automatically preforms explicit vectorisation, using observations and deductions that arise from the tensor decomposition of linear HPDEs.
+As such, they introduce a compiler architecture that automatically preforms explicit vectorisation, using observations and deductions that arise from the tensor decomposition of linear hyperbolic PDEs.
 
-Again, our requirement of supporting non-linear HPDEs prohibits us from exploiting tensor contractions, and instead exposes us to a more varied range of inputs.
+Again, our requirement of supporting non-linear hyperbolic PDEs prohibits us from exploiting tensor contractions, and instead exposes us to a more varied range of inputs.
 As such, we choose to use the former of  \citeauthor{codegen_dg_SIMD} path to vectorisation, relying entirely on the compiler to automatically vectorize our code.
 However, this paper does show that users of \phlat may wish to explore the use of explicit techniques and problem specific knowledge to improve the performance of their programs.
 Hence, as a design requirement \phlat should support this.
@@ -69,6 +69,6 @@ Hence, as a design requirement \phlat should support this.
 Although, they noted that there was potential for further performance improvements with addition tweaking.
 
 In summary, \citeauthor{templateExahype}, although focusing on team coherency, validates the problem we are solving within ExaHyPE and demonstrates the performance increases that static code generation techniques can achieve.
-YATeTo shows us that dynamic code generation that increases single core throughput can have a drastic impact on the performance of an entire of PDE solver; validating our focus on improving single core performance using dynamic code generation.
+YATeTo shows us that dynamic code generation which increases single core throughput can have a drastic impact on the performance of an entire of PDE solver; validating our focus on improving single core performance using dynamic code generation.
 Both YATeTo and \citeauthor{codegen_dg_SIMD} demonstrate architectures used to generate code, of which we base our own architecture on.
 Furthermore, YATeTo and \citeauthor{codegen_dg_SIMD} both implement powerful domain specific transformations, adding a design requirement to \phlat to support user defined transforms.  

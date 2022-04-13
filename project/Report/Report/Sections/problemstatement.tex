@@ -1,5 +1,5 @@
 \subsection{Background}
-Our focus will be applying the Finite Volume (FV) scheme to solve linear and non-linear hyperbolic PDEs in first order form.
+Our focus is on applying the Finite Volume (FV) scheme to solve linear and non-linear hyperbolic PDEs in first order form.
 We express these PDEs mathematically with the equation
 % See exahype template
 \begin{equation}\label{eq:non-lin-pde}
@@ -31,7 +31,7 @@ Rearranging (\ref{eq:fv-almost-done}) for the time derivative we find
 \end{equation}
 
 If we select an simple geometry for our cell, squares/cubes are used in ExaHyPE, then calculating the 2D surface integral is simply a sum across the 4 faces of a square (or in 3D, the 6 faces of a cube).
-Asserting $S_i$ is a finite set of faces allows us to simply the surface integral
+Asserting $S_i$ is a finite set of faces, allows us to simplify the surface integral
 \begin{equation}\label{eq:fv-simple}
    \frac{\partial \bar{\mathbf{Q}_i}}{\partial t} = -\frac{1}{v_i} \sum_{S_i}\mathbf{F}(\mathbf{Q})\cdot \mathbf{n}.
 \end{equation}
@@ -40,8 +40,8 @@ This provides a method to calculate the time derivative of $Q$, which can be use
 
 \subsection{ExaHyPE}
 \newcommand{\proc}[1]{\textit{#1}}
-Algorithmically a FV cell is an array of \texttt{double}.
-In ExaHyPE cells are grouped up into patches, commonly $3\times 3$ cells in 2D or $3\times 3 \times 3$ cells in 3D, and these patches are stored as an AoS (Array of Structures).
+Algorithmically a FV cell is an array of \lstinline{double}.
+In ExaHyPE cells are grouped up into patches, commonly $3\times 3$ cells in 2D or $3\times 3 \times 3$ cells in 3D, these patches are stored as an AoS (Array of Structures).
 The Peano framework within ExaHyPE is responsible for distributing these patches across processing cores and nodes, where they are updated using (\ref{eq:fv-simple}) and an explicit euler time stepping scheme, by a single core.
 We will refer to this update process as \proc{Patch Update}.
 As an aside, in (\ref{eq:fv-simple}) we set $B(Q)=S(Q)=0$ for simplicity, however in the case $B(Q), S(Q)\neq 0$ the update process is broadly similar to (\ref{eq:fv-simple}), the main feature still being a sum across the faces of a cell.
@@ -50,20 +50,20 @@ An issue encountered in (\ref{eq:fv-simple}) is: what is the value of $Q$ at a f
 Take a the face between cells $\alpha$ and $\beta$.
 We know the average state across $\alpha$ which we call $Q_\alpha$, and likewise for $\beta$ with average state $Q_\beta$.
 However the face, $f$, lies on the boundary of $\alpha$ and $\beta$, and its sate $Q_f$ is at discontinuity between $Q_\alpha$ and $Q_\beta$, so what should $Q_f$ be?
-This is know as the Riemann problems.
-Simple solutions exist, such as taking an average $Q_f = \frac{Q_\alpha + Q_\beta}{2}$, and the best choice of scheme is problem specific.
+This is know as the Riemann problem.
+Simple schemes to solve this problem exist, such as taking an average $Q_f = \frac{Q_\alpha + Q_\beta}{2}$, and the best choice of scheme is problem specific.
 By default, ExaHyPE uses the Rusanov scheme \cite{rusanov} as a general purpose solution to the Riemann problem, however user have the option to provide their own scheme.
 Once a value of $Q_f$ has been decided upon then $F(Q_f)\cdot \mathbf{n}$ (and additionally NCP terms if applicable) can be calculated.
 We call this process the \proc{Numerical Ingredient}, and we can trace it back to the evaluation of $F(Q)\cdot\mathbf{n}$ in (\ref{eq:fv-simple}).
 
-Adding further complexity to \proc{Numerical Ingredient}, it is not always the case that we want to model the face between $\alpha$ and $\beta$ as a shared face.
+Adding further complexity to the \proc{Numerical Ingredient}, it is not always the case that we want to model the face between $\alpha$ and $\beta$ as a shared face.
 Sometimes we treat $f$ as two faces $f_\alpha, f_\beta$, which means we cannot assume that evaluating the \proc{Numerical Ingredient} while updating $\alpha$ will be the same as when updating $\beta$.
 The Rusanov scheme used by default in ExaHyPE doesn't experience this complication, treating the face as a shared face. 
 Thus, this is a good example of ExaHyPE supporting functionality which is not required by default, but may be required for certain problems.
 And, this support adds additional barriers to optimisation.
 
-Referring back to (\ref{eq:fv-simple}), a user must provide code to calculate $F(Q)\cdot\mathbf{n}$, which we will call one of the \proc{Problem Descriptions}.
-If their equation has a non-zero source term and NCP term a user will also need to provide code to calculate these quantities.
+Referring back to (\ref{eq:fv-simple}), a user must provide code to calculate $F(Q)\cdot\mathbf{n}$, which we call a \proc{Problem Description}.
+If a user's equation has a non-zero source term and NCP term they will also need to provide code to calculate these quantities.
 Additionally Rusanov requires the max-eigenvalues of a cell, so this must also be provided by the user.
 Finally a user will need to provide code that describes the boundary conditions of the problem.
 This is all the code a user needs to provide.
@@ -80,7 +80,7 @@ These 3 process are split into 3 functions in ExaHyPE, a summary of the number o
     \proc{Problem Descriptions} (\proc{PD}) & User& - & $q+m$ & $q$ or $1$\\
     \bottomrule
 \end{tabular}
-\caption{A summary of the level of abstraction within the \proc{Patch Update} function. $p$ is the number of cells along 1 dimension in a patch, $d$ is the dimension of the patch, $q$ are the number of state variables, $m$ is the size of patch/state metadata.}\label{tab:patch_update}
+\caption{A summary of components within the \proc{Patch Update} function. $p$ is the number of cells along 1 dimension in a patch, $d$ is the dimension of the patch, $q$ are the number of state variables, $m$ is the size of patch/state metadata.}\label{tab:patch_update}
 \end{table}
 
 ExaHyPE uses a functional paradigm to implement these 3 groups of functions.
@@ -104,7 +104,7 @@ void generated_glue_code(){
     patch_update(numerical_ingredient_lambda, ...);
 };
 \end{lstlisting}
-This patten completely decouples engine functions like \texttt{patch\_update} and \texttt{rusanov} from user functions, hence enabling support of any user \proc{Problem Definitions} provided they implement the required function signatures.
+This paradigm completely decouples engine functions like \lstinline{patch_update} and \lstinline{rusanov} from user functions, hence enabling support of any user \proc{Problem Definitions} provided they implement the required function signatures.
 This paradigm helps ExaHyPE achieve its goals of being flexible and user friendly but introduces some pitfalls for the compiler that may hinder optimisation.
 
 Firstly, it is non-trivial to inline this paradigm.
@@ -115,13 +115,13 @@ The next issue with this paradigm is it obscures the existence of unused and rep
 Metadata, such as the current time and timestep size, is passed through all functions to bottom level \proc{Problem Definition} functions.
 Some of this metadata is repeatedly calculated e.g. the spacial coordinate of the face being processed by the \proc{Numerical Ingredient}.
 Although some \proc{Numerical Ingredients} and \proc{Problem Definitions} may use this calcualted metadata, many don't.
-As this calculation and its potential use lies across function calls it is possible the compiler is unable to remove this redundant code.
+As this calculation, and its potential use, lies across function calls it is possible the compiler is unable to remove this redundant code.
 
 Beyond unused computation, there can also be repeated computation.
 One such example is when we use Rusanov as our \proc{Numerical Ingredient}.
 To calculate the change of state at the shared face of 2 cells $\alpha,\beta$ Rusanov begins by calculating $flux(\alpha)$, $flux(\beta)$, $max\_eigenvalue(\alpha)$, $max\_eigenvalue(\beta)$.
 Then using these values the change of state is calculated.
-If we then calculate the change of state between $\beta,\gamma$ note that the computation of $flux(\beta)$, $max\_eigenvalue(\beta)$ is repeated.
+If we then calculate the change of state between $\beta,\gamma$ note that the computation of $flux(\beta)$, $max\_eigenvalue(\beta)$ are repeated.
 It may be challenging for the compiler to spot this repetition, especially as it again lies across multiple different functions.
 Furthermore, \proc{Patch Update} cannot be optimised to take advantage of this property of Runsnov, as it would no longer work with any \proc{Numerical Ingredient}.
 
