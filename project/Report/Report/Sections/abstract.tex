@@ -6,4 +6,4 @@ Users describe their problem as a DAG (Directed Acyclic Graph), where every node
 This highly nested structure is then flattened and transformed into code; we target C++.
 Generated kernels are typically thousands of lines long.
 We found these kernels out preformed the kernels currently used within ExaHyPE by $9\times$ to $16\times$.
-We explore why conventional compiles, such as \texttt{gcc}, can better optimise our compiled kernels, deducing that our compiled kernels can be better vectorized on SIMD architectures. 
+We explore why conventional compiles, such as \texttt{gcc}, can better optimise our compiled kernels, deducing that our compiled kernels can be better vectorized on SIMD architectures over hand optimised kernels.
