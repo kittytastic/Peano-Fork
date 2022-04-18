@@ -9,7 +9,7 @@
 % pure functions with numerical input
 % ignore the effects of numerical machine precision
 Our solution, \phlat, is a domain specific compiler that generates code for a conventional compiler (e.g. g++) to optimise and turn into machine instructions.
-Our goals for \phlat are that it
+Our goals for \phlat are that it:
 \begin{itemize}
     \item Supports a large range of problems
     \item Generates code that is faster than the current default code
@@ -18,7 +18,7 @@ Our goals for \phlat are that it
 \end{itemize}
 
 \phlat will operate in a restricted domain, specifically a domain that supports the definition of \proc{Patch Update}, \proc{Numerical Ingredient} and \proc{Problem Definitions}.
-We define \phlat{}'s domain as follows
+We define \phlat{}'s domain as follows:
 \begin{enumerate}
     \item All functions are pure functions
     \item All functions have a fixed number of inputs and outputs
@@ -36,10 +36,10 @@ And \proc{Patch Update} code contains both \lstinline{for} and \lstinline{if} st
 However, as we will discuss in Section \ref{sec:DAG} a majority, if not all, control flow can be hoisted to DAG (Directed Acyclic Graph) creation, hence this condition isn't as restrict as it first seems.
 An exception to this are peicewise functions e.g.
 \[
-    y = \begin{cases} g(x)  & \text{if } x<0.5 \\  h(x)  & \text{if } x\geq 0.5 \\\end{cases}
+    f(x) = \begin{cases} g(x)  & \text{if } x<0.5 \\  h(x)  & \text{if } x\geq 0.5 \\\end{cases}
 \]
 these are not supported by \phlat.
-As disgusted in \ref{sec:DAG} DAGs are a fundamental feature in \phlat, as such we can give an alternative definition of \phlat{}'s domain as: any problem that can be described as a DAG.
+As will be elaborated in Section \ref{sec:DAG}, DAGs are a fundamental feature in \phlat, as such we can give an alternative definition of \phlat{}'s domain as: any problem that can be described as a DAG.
 
 At a very high level, \phlat takes an input DAG and compiles it to C++.
 To do this, \phlat makes various transforms to the DAG and to an Intermediate Representation (IR) described in Section \ref{sec:IR}.
@@ -72,7 +72,7 @@ Furthermore, it is common place to see specifications and test cases along side 
 
 In our DAG every node has a set of input and output ports.
 Every input port must receive a single value and every output port can transmit copies of a single value.
-Every node $n$ in our graph describes a function: $\vecc{out ports}=n(\vecc{in ports})$ with the number of inputs and outputs being of a fixed length.
+Every node $n$ in out DAG describes a function: $\vecc{out ports}=n(\vecc{in ports})$ with the number of inputs and outputs being of a fixed length.
 
 A node may be primitive and directly map to a primitive code operation, for example an addition node maps to $out_1 = in_1 + in_2$ (see Figure \ref{fig:bin_add}).
 Or a node may be composite, where it is a DAG itself.
@@ -158,7 +158,7 @@ It should be easy to transform the DAG into an IR, and it should be easy to tran
 The IR we use takes inspiration from LLVM.
 It is a set of function definitions, and within each function definition there is a linear sequence of instructions.
 
-One of the main challenges we came across during the code generation process was variable management.
+Variable management is the main code generation challenge we encounter.
 \phlat supports interchangeable code generation backends, allowing different languages to be targeted.
 This means it's preferable to include information such as variable declaration and complex function signatures in the IR, allowing code generation backends to stay as slim as possible.
 However, the complications induced by variable declarations and function signatures are a key reason why code generation directly from a DAG is hard.   
@@ -171,7 +171,7 @@ A loose IR doesn't worry about variable declaration, variable declaration is imp
 There are also useful tools available in loose IRs such as a special class of temporary variables.
 Additionally, loose function signatures are kept very simple.
 A loose function maintains a list of (possibility hundreds) of single value input variables and a list of (possibly hundreds) of single value output variables.
-The relaxed nature of the loose IR makes it ideal for preforming transforms (such as for optimisations) as there are few ways to invalidate a loose IR.
+The relaxed nature of the loose IR makes it ideal for preforming transforms and optimisations as there are few ways to invalidate a loose IR.
 
 On the other hand, a tight IR is much stricter.
 In a tight IR all variable must be named and declared.
@@ -237,8 +237,7 @@ An overview of \phlat{}'s architecture can be found in Figure \ref{fig:arch}
 
 
 % DAG Transforms
-In the DAG transform stage a series of user defined transforms can be applied to the DAG, followed by some default transforms.
-The most notable default transform is the flatten transform.
+In the DAG transform stage a series of user defined transforms can be applied to the DAG, followed by a collection of default transforms.
 
 \begin{figure}[h!]
     \centering
@@ -250,12 +249,13 @@ The most notable default transform is the flatten transform.
     \caption{Example of the DAG flatten operation. Colours are used to indicated depth of nodes. Blue = depth 0, Orange = depth 1.}\label{fig:flatten_example}
 \end{figure}
 
-This transform takes a nested DAG (i.e. a DAG containing composite nodes) and for every composite node, the composite node is deleted and replaced by a copy of the DAG contained within the composite node.
+The most notable default transform is the flatten transform.
+This transform takes a nested DAG (i.e. a DAG containing composite nodes) and for every composite node: the composite node is deleted and replaced by a copy of the DAG contained within the composite node.
 Applied recursively, a highly nested DAG can be reduced to only contain primitive nodes, i.e. it is flattened.
 This transform causes the final output code to be a single monolithic function, as opposed to a function containing many function calls.
 An example of the flatten transform can be found in Figure \ref{fig:flatten_example}
 
-Another notable user transform we investigated was the removal of duplicated computation.
+A user transform we investigated was the removal of duplicated computation.
 Within a DAG, duplicate computation manifests itself as 2 equivalent nodes (e.g. 2 addition nodes) that share the same inputs.
 Once 2 such nodes are identified one can be deleted, and its output edges copied over to the node that remains.
 Some care has to be taken if an operations is commutative (e.g. addition and max) or not (e.g. subtraction and division).
@@ -280,7 +280,7 @@ For example, in the IR you can create transforms to arrange a programs memory la
 %   - variable model
 %   - function stencil 
 Much like the DAG stage, the first part of the IR transform stage allows users to apply their own transforms.
-Once this is complete the IR is transformed into a its tight form.
+Once this is complete the IR is transformed into its tight form.
 This process begins by applying user defined function signatures to loose IR functions, these are called function stencils.
 This transforms all loose functions and function calls into tight functions.
 A function function stencil consists of 3 parts: the desired arrangement of arguments in the tight function; a map from input variable to variable in the function argument; and a map of output variable to function arguments.
@@ -307,17 +307,17 @@ For example, the required standard library headers are inserted, and variable de
 
 \subsection{Using \phlat to Generate Compute Kernel}
 Using \phlat we can generate a compute kernel that preforms \proc{Patch Update}.
-A user begins by creating DAGs of their \proc{Problem Definition}, using the builder patten (creating a function that returns a DAG).
+A user begins by creating \proc{Problem Definition} DAGs, using the builder patten (creating a function that returns a DAG).
 DAGs can be tested using \texttt{DAG.eval}, to ensure validity.
-These DAG builders can then be passed to pre-existing \proc{Patch Update} and Rusanov DAG builders.
+These DAG builders are then passed to pre-existing \proc{Patch Update} and Rusanov DAG builders.
 A user provides DAG builders instead of DAGs directly for 2 reasons.
 Firstly, it allows them to hoist any control flow.
 Secondly, it allows a new DAG to be built for every use of a user function.
 
-The final output of the \proc{Patch Update} builder is the compute kernel DAG, which will contain many copies for the \proc{Numerical Ingredient} and \proc{Problem Description} DAGs.
+The output of the \proc{Patch Update} builder is the compute kernel DAG, which will contain many copies for the \proc{Numerical Ingredient} and \proc{Problem Description} DAGs.
 This DAG is then passed through \phlat, where it undergoes DAG transforms, a DAG to IR transform, IR transforms, and finally code generation.
 Users have the option to provide additional DAG or IR transforms.
-The code is now ready to replace the old \proc{Patch Update} within ExaHyPE.
+The generated code is now ready to replace the old \proc{Patch Update} within ExaHyPE.
 The most notable step of the default transform chain is the DAG flatten transform that turns many nested DAGS into a single flat DAG.
 This transform is responsible for \phlat's characteristic compute kernels which are: Flat, Long (And potential Transformed).
 Typically compute kernels will be thousands to tens of thousands of lines long, and contain no function calls.   

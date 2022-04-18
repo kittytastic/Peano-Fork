@@ -28,7 +28,7 @@ Consequently, within an ExaHyPE program we would not expect improving kernel spe
 
 As will be discussed in Section \ref{sec:practical}, creating input DAGs in a non-trivial job.
 The size of DAGs that compute bound problems, such as the CCZ4 equations, would require are infeasible to create with the current tooling.
-Hence, this seminal work will seek to verify the applicability of our compiler based approach on smaller problems, before tooling is improved to make larger problems tractable.
+Hence, this seminal work will seek to verify the applicability of \phlat to smaller problems.
 
 Given the use of memory bound problems, only testing the performance of kernels within ExaHyPE will not show us the whole picture.
 Therefore, we will also test each kernel in isolation.
@@ -62,7 +62,7 @@ On this system, unless stated otherwise, all code was compiled with AMD's aocc \
 % [ ] exahype results 
 
 We tested our compiled kernels against the default kernels in both the \texttt{KernelCompare} tester and within ExaHyPE.
-The compiled kernels exhibited an impressive speedup over their default counterparts, as seen in Table \ref{tab:kernel_comapre}.
+The compiled kernels exhibited an large speedup over their default counterparts, as seen in Table \ref{tab:kernel_comapre}.
 Over every test we witnessed approximately an order of magnitude speedup of the compiled kernels over the default kernels.
 Compiled kernels preformed better on the Intel system than on the AMD system, likely due to differences between the Intel and AMD compilers. 
 
@@ -117,7 +117,7 @@ Table \ref{tab:ffast_math} shows the effect these compiler flags have on the spe
 \begin{table}
     \centering
 \input{Tables/o3_results.tex} 
-\caption{The effect of compiler flags on compiled kernels using the AMD compiler. We see the relative speedup of various compiler flags compared to using \texttt{-O3}.}\label{tab:ffast_math} 
+\caption{The effect of compiler flags on compiled kernels on the AMD system. We see the relative speedup of various compiler flags compared to using \texttt{-O3}.}\label{tab:ffast_math} 
 \end{table}
 
 The most interesting result from Table \ref{tab:ffast_math} is that the \texttt{-ffast-math} makes very little difference to the Euler 2D handopt kernel, however the compiled kernel experience a $2.63\times$ improvement.
@@ -126,7 +126,6 @@ A majority of that improvement comes from the \texttt{-fno-math-errno} flag.
 The \texttt{-fno-math-errno} flag disables setting the \texttt{errno} variable which can by exception handlers to detect floating point errors.
 Enabling this flag doesn't have any algorithmic effect, as none of the kernels perform any runtime exception handling.
 However, enabling this flag does have knock on consequences in performance.
-In particular, removing this constraints gives the compiler further freedom to make more aggressive optimisations.
 
 Using the MAQAO assembler analysis tool \cite{MAQAO} we found that the \texttt{-fno-math-errno} flag allowed the compiler to preform much more aggressive SIMD vectorisation.
 The kernel only using the \texttt{-O3} flag was compiled into 4855 x86 instructions, whereas the kernel using both \texttt{-O3} and \texttt{-fno-math-errno} flags was compiled into 1371 x86 instructions.
@@ -152,7 +151,7 @@ The Intel and AMD compilers likely already preform these simple optimisations, a
 % [ ] Compiler speed
 % [ ] Input interface practicalities
 % Einstein equations from relativistic astrophysics (CCZ4)
-Beyond the performance of compiled kernels, it is also important that our compiler is practical to use.
+Beyond the performance of compiled kernels, it is also important that \phlat is practical to use.
 
 Firstly, we look at compile times.
 On the AMD system it took approx 2s to compile the SWE and Euler 2D kernels, however it takes approx 40s to compile the Euler 3D kernel.

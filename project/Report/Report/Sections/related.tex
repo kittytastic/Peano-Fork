@@ -37,8 +37,6 @@ Hence, using GEMM libraries can give code a system agnostic speedup.
 
 Furthermore, YATeTo preforms optimisations within its compilation steps, such as strength reduction, sparsity patten exploitation and memory layout optimisation.
 Overall, YATeTo achieved a speedups between $1.1\times$ to $6.5 \times$ within SeiSol, which is impressive.
-YATeTo shows that automation of the optimisation process using a compiler can be very effective.
-Especially while using high performance, system agnostic libraries such as GEMM.
 Unfortunately, the use of tensor contractions cannot be carried over to non-linear hyperbolic PDEs, due to their non-linearity.
 Applying the YATeTo approach to non-linear problems would require rebuilding the tensor contractions at every time step, an idea which is yet to be explored.
 However, we intend to stray away from the linear constraints of BLAS and GEMM by instead using the general technique of leveraging the compiler.   
@@ -53,14 +51,14 @@ However, we intend to stray away from the linear constraints of BLAS and GEMM by
 %Auto code gen
 % SIMD - problem specific
 YATeTo is not alone in the space of automatic optimisations using a compiler based approach.
-\citeauthor{codegen_dg_SIMD} explore a similar linear domain as YATeTo in their paper that addresses optimising for modern architectures \cite{codegen_dg_SIMD}. 
+\citeauthor{codegen_dg_SIMD} explore a similar linear domain as YATeTo in their paper that addresses optimising for SIMD architectures \cite{codegen_dg_SIMD}. 
 However, their approach differs from YATeTo, as they choose to preform SIMD vectorisation within their compiler, introducing SIMD intrinsics to the output code, as opposed to YATeTo which uses GEMM libraries.
 \citeauthor{codegen_dg_SIMD} state that there are two paths to introduce vectorisation within code.
 Automatic vectorisation through conventional compilers, and explicit vectorisation where SIMD intrinsic instructions are introduced by developers.
 They argue that although the former is preferable, the latter will likely be more performant due to a developers problem specific knowledge.
 As such, they introduce a compiler architecture that automatically preforms explicit vectorisation, using observations and deductions that arise from the tensor decomposition of linear hyperbolic PDEs.
 
-Again, our requirement of supporting non-linear hyperbolic PDEs prohibits us from exploiting tensor contractions, and instead exposes us to a more varied range of inputs.
+Again, our requirement of supporting non-linear hyperbolic PDEs prohibits us from exploiting tensor contractions, instead exposing us to a more varied range of inputs.
 As such, we choose to use the former of  \citeauthor{codegen_dg_SIMD} path to vectorisation, relying entirely on the compiler to automatically vectorize our code.
 However, this paper does show that users of \phlat may wish to explore the use of explicit techniques and problem specific knowledge to improve the performance of their programs.
 Hence, as a design requirement \phlat should support this.
