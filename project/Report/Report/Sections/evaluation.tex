@@ -1,7 +1,7 @@
 % Discuss Results
-Our results are encouraging for our test problems, and we certainly meet our goal of creating faster kernels than the default.
+Our results are good for our test problems, and we certainly meet our goal of creating faster kernels than the default.
 The test methodology used, particularly the \texttt{Kernel Compare} program, provides a simple way to measure kernel performance and was sutible for testing our kernels.
-We found the results of \texttt{Kernel Compare} are noisy, fundamentally depending on the clock speed of the test system.
+We found the results from \texttt{Kernel Compare} are noisy, fundamentally depending on the clock speed of the test system.
 We found across different runs on different days, \texttt{Kernel Compare} results could vary by approx $+/-10\%$, this can be traced to the use of a shared system, and varying amounts of other work being preformed on the shared nodes.
 This could be controlled for by having exclusive use of a system, while disabling features such as dynamic clock speeds
 Alternatively we could have taken more samples and averaged them.
@@ -15,6 +15,10 @@ As previously discussed it is infeasible to manually create DAGs for larger prob
 Tooling that convert SymPy formulas \cite{sympy} or exiting user code directly into a DAG would drastically improve the user friendliness of \phlat.
 Alternatively \phlat could take an approach like YATeTo offering a DSL that makes DAGs easier to define.
 It is an open question if this can be done, but we cant invisage any significant barriers.
+
+Also \phlat is on the edge of being practical to use, with a compile time of 45s for the Euler3D problems.
+A $O(n^2)$ runtime will prove restrictive if \phlat is used on larger problems.
+This runtime scaling arises from implementation choices, as opposed to anything algorithmically fundamental, hence could be rectified in the future.
 
 There are several questions invoked by this paper.
 Firstly, how does \phlat scale?
@@ -30,7 +34,7 @@ For example modern compilers have many advanced loop vectorisation features, doe
 
 Finally, how does \phlat preform compared to other approaches?
 The most promenent point of comparison would be to YATeTo.
-Both ExaHyPE and YATeTo can evalute the elastic wave equations, and YATeTo achieved an impressive speedup of these equations, so this would be an interesting point of comparison.
+Both ExaHyPE and YATeTo can evalute the elastic wave equations, and YATeTo achieved an impressive speedup on these equations, so this would be an interesting point of comparison.
 Equally, can YATeTo be adapted to work with non-linear equations by recreating the contractions every time step?
 If so, how does this approach compare to \phlat?
 
