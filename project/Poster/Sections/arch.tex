@@ -1,3 +1,12 @@
+    \begin{figure}[h!]
+    \begin{center}
+        \includegraphics[width=.65
+        \textwidth]{comp-arch.png}
+        \caption{Overview of FLAT's architecture.}
+        \label{fig:arch}
+    \end{center}
+\end{figure}
+
 \textbf{DAG}: Our compiler, FLAT, takes a DAG (Directed Acyclic Graph) as an input.
 Every node in the DAG has input and output ports.
 Nodes are either a primative operation such add addition or subtraction.
@@ -62,11 +71,3 @@ define VOID @kernel (new #list(in), new #list(out)):
 \label{fig:tight_loose}
 \end{figure}
 
-    \begin{figure}[h!]
-    \begin{center}
-        \includegraphics[width=.7
-        \textwidth]{comp-arch.png}
-        \caption{Overview of FLAT's architecture.}
-        \label{fig:arch}
-    \end{center}
-\end{figure}
