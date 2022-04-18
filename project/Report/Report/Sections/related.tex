@@ -6,10 +6,10 @@
 % CCZ4 1.27
 Much of ExaHyPE's code generation is preformed in python using the jinja2 templating library.
 Templating is a powerful, yet simple method to generate large sections of glue code.
-Although as discussed in section \ref{sec:problem_statement}, static code generation using templating along the boundary of user and engine code leaves opportunities for improvements.  
+Although, static code generation using templating along the boundary of user and engine code leaves opportunities for improvements.  
 A solution to this problems was proposed by \citeauthor{templateExahype} by extending the domain of templating to user code \cite{templateExahype}.
 
-\citeauthor{templateExahype} observed that while creating an ExaHyPE projects there are often 3 separable roles preformed by users.
+\citeauthor{templateExahype} observed that while creating an ExaHyPE project there are often 3 separable roles preformed by users.
 These are: application experts, who focus on configuration of ExaHyPE; algorithm experts, who understand and implement the PDEs; and optimisation experts, who work at a lower level to increase performance.
 The idea behind further templating is to allow these roles, which may be fulfilled by different people, to operate synergistically.
 Increased templating also offers a convenient way to implement architecture aware optimisations, increasing code portability and speed.
@@ -19,7 +19,7 @@ They found that the memory bound Euler 3D problem experienced a $1.05\times$ spe
 
 While templating serves a vital role within ExaHyPE, we challenge the need for an optimisation expert and thus the need for templating in user code.
 Ideally the compiler would take the role of optimisation expert.
-Instead of a optimisation expert there would be a transformation expert whose role would encompass transforming the algorithm expert's code into compiler friendly code using \phlat.
+Instead of an optimisation expert there would be a transformation expert whose role would encompass transforming the algorithm expert's code into compiler friendly code using \phlat.
 This structure would further increase the separation of algorithm experts from optimisation.
 
 
@@ -33,8 +33,7 @@ YATeTo offers a Domain Specific Language (DSL) within python for users to descri
 Then through a series of compilation steps outputs C++, which crucially contains many calls to GEMM libraries.
 Highly performant GEMM libraries and BLAS (Basic Linear Algebra Subprograms) libraries are often distributed by system vendors.
 These libraries are optimised for a wide range of input problems sizes, and often include hardware specific optimisations like improved cache usage.
-It is unlikely that a user of these libraries could write code that was more performant than the library, and even if they could they would have to write new code for every system they used.
-Hence, utlizing GEMM libraries can drastically speedup code.
+Hence, using GEMM libraries can give code a system agnostic speedup.
 
 Furthermore, YATeTo preforms optimisations within its compilation steps, such as strength reduction, sparsity patten exploitation and memory layout optimisation.
 Overall, YATeTo achieved a speedups between $1.1\times$ to $6.5 \times$ within SeiSol, which is impressive.
