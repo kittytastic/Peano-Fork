@@ -123,7 +123,7 @@ Table \ref{tab:ffast_math} shows the effect these compiler flags have on the spe
 The most interesting result from Table \ref{tab:ffast_math} is that the \texttt{-ffast-math} makes very little difference to the Euler 2D handopt kernel, however the compiled kernel experience a $2.63\times$ improvement.
 A majority of that improvement comes from the \texttt{-fno-math-errno} flag.
 
-The \texttt{-fno-math-errno} flag disables setting the \texttt{errno} variable which can by exception handlers to detect floating point errors.
+The \texttt{-fno-math-errno} flag disables setting the \texttt{errno} variable which can be used by exception handlers to detect floating point errors.
 Enabling this flag doesn't have any algorithmic effect, as none of the kernels perform any runtime exception handling.
 However, enabling this flag does have knock on consequences in performance.
 

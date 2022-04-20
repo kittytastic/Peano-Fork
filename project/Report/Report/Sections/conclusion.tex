@@ -3,7 +3,7 @@ This paper presents \phlat as a method for bridging the gap in ExaHyPE, between 
 This speedup was enabled by \phlat{}'s dynamic code generation approach, that produced monolithic compute kernels, thousands of lines long.
 Compiled kernels even out preformed a hand optimised kernel, owing to better automatic vectorisation of the compiled kernels while using the \texttt{-ffast-math} flag.
 
-As would be expected, this speed up didn't directly carry over to preformance of our memory bound test problems in ExaHyPE.
+As would be expected, this speed up didn't directly carry over to performance of our memory bound test problems in ExaHyPE.
 Here, we saw speedups of $5\% - 15\%$, the best being in the Euler 3D test problem which is the most computationally intense of the 3 test problems.
 
 This leads on to \phlat{}'s shortcomings.
@@ -11,8 +11,8 @@ The nested structure of DAGs in \phlat mirrors the modularity that users of ExaH
 However, the cumbersome process of creating a DAG edge by edge is not user friendly, and limits the size of DAGs that can be reasonably created.
 The development of front end to \phlat such as via a DSL or SymPy interface, would help mitigate these issues and allow \phlat to tackle larger problems.
 
-The behaviour of \phlat on large problems is unknown, and it may be the case that \phlat, in its current state, is unsutible for large problems.
-However, the improvements witnessed on small test problems does warrenant the development of a front end, so \phlat{}'s performance on larger problems can be explored.
+The behaviour of \phlat on large problems is unknown, and it may be the case that \phlat, in its current state, is unsuitable for large problems.
+However, the improvements witnessed on small test problems does warrant the development of a front end, so \phlat{}'s performance on larger problems can be explored.
 
 Furthermore, the switch from static to dynamic code generation in ExaHyPE opens up many more avenues for exploration.
 In \phlat users can define their own domain specific transforms, which may prove a useful feature.

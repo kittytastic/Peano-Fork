@@ -4,7 +4,7 @@
 
 % Euler 3D SIMD speedup 1.04
 % CCZ4 1.27
-Much of ExaHyPE's code generation is preformed in python using the jinja2 templating library.
+Much of ExaHyPE's code generation is preformed in Python using the jinja2 templating library.
 Templating is a powerful, yet simple method to generate large sections of glue code.
 Although, static code generation using templating along the boundary of user and engine code leaves opportunities for improvements.  
 A solution to this problems was proposed by \citeauthor{templateExahype} by extending the domain of templating to user code \cite{templateExahype}.
@@ -29,7 +29,7 @@ YATeTo operates in the domain of linear hyperbolic PDEs, in particular, it is pa
 YATeTo is a tool that allows users to transform their problem into highly efficient code.   
 
 The Discontinuous Galerkin method often used to to solve hyperbolic PDEs can, in the linear case, be discretized into a series of Tensor contractions.
-YATeTo offers a Domain Specific Language (DSL) within python for users to describe their tensor contractions.
+YATeTo offers a Domain Specific Language (DSL) within Python for users to describe their tensor contractions.
 Then through a series of compilation steps outputs C++, which crucially contains many calls to GEMM libraries.
 Highly performant GEMM libraries and BLAS (Basic Linear Algebra Subprograms) libraries are often distributed by system vendors.
 These libraries are optimised for a wide range of input problems sizes, and often include hardware specific optimisations like improved cache usage.
@@ -59,7 +59,7 @@ They argue that although the former is preferable, the latter will likely be mor
 As such, they introduce a compiler architecture that automatically preforms explicit vectorisation, using observations and deductions that arise from the tensor decomposition of linear hyperbolic PDEs.
 
 Again, our requirement of supporting non-linear hyperbolic PDEs prohibits us from exploiting tensor contractions, instead exposing us to a more varied range of inputs.
-As such, we choose to use the former of  \citeauthor{codegen_dg_SIMD} path to vectorisation, relying entirely on the compiler to automatically vectorize our code.
+As such, we choose to use the former path to vectorisation of \citeauthor{codegen_dg_SIMD} , relying entirely on the compiler to automatically vectorize our code.
 However, this paper does show that users of \phlat may wish to explore the use of explicit techniques and problem specific knowledge to improve the performance of their programs.
 Hence, as a design requirement \phlat should support this.
 \citeauthor{codegen_dg_SIMD} found that their explicit vectorisation achieved 50\% peak floating point performance solving the diffusion-reaction Equation on an Intel Haswell system.
@@ -67,5 +67,5 @@ Although, they noted that there was potential for further performance improvemen
 
 In summary, \citeauthor{templateExahype}, although focusing on team coherency, validates the problem we are solving within ExaHyPE and demonstrates the performance increases that static code generation techniques can achieve.
 YATeTo shows us that dynamic code generation which increases single core throughput can have a drastic impact on the performance of an entire of PDE solver; validating our focus on improving single core performance using dynamic code generation.
-Both YATeTo and \citeauthor{codegen_dg_SIMD} demonstrate architectures used to generate code, of which we base our own architecture on.
+Both YATeTo and \citeauthor{codegen_dg_SIMD} demonstrate architectures used to generate code, and \phlat{}'s architecture is loosely based of these.
 Furthermore, YATeTo and \citeauthor{codegen_dg_SIMD} both implement powerful domain specific transformations, adding a design requirement to \phlat to support user defined transforms.  

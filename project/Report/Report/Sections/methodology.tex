@@ -34,7 +34,7 @@ Condition \ref{cond:no-cf} may at first seem the most restrictive condition.
 User code in ExaHyPE currently contains control flow in the form of a \lstinline{switch} statement depending on the normal vector.
 And \proc{Patch Update} code contains both \lstinline{for} and \lstinline{if} statements.
 However, as we will discuss in Section \ref{sec:DAG} a majority, if not all, control flow can be hoisted to DAG (Directed Acyclic Graph) creation, hence this condition isn't as restrict as it first seems.
-An exception to this are peicewise functions e.g.
+An exception to this are piecewise functions e.g.
 \[
     f(x) = \begin{cases} g(x)  & \text{if } x<0.5 \\  h(x)  & \text{if } x\geq 0.5 \\\end{cases}
 \]
@@ -68,11 +68,11 @@ The DAG model we propose takes inspiration from hardware design languages.
 
 In a hardware design language you define electrical components.
 Each component has input and output ports and its output is a function of its input.
-Furthermore, it is common place to see specifications and test cases along side a component to be used in verification.
+Furthermore, it is common place to see specifications and test cases alongside a component to be used in verification.
 
 In our DAG every node has a set of input and output ports.
 Every input port must receive a single value and every output port can transmit copies of a single value.
-Every node $n$ in out DAG describes a function: $\vecc{out ports}=n(\vecc{in ports})$ with the number of inputs and outputs being of a fixed length.
+Every node $n$ in our DAG describes a function: $\vecc{out ports}=n(\vecc{in ports})$ with the number of inputs and outputs being of a fixed length.
 
 A node may be primitive and directly map to a primitive code operation, for example an addition node maps to $out_1 = in_1 + in_2$ (see Figure \ref{fig:bin_add}).
 Or a node may be composite, where it is a DAG itself.
@@ -100,11 +100,11 @@ For example, a user can create \proc{Problem Definition} DAGs, then pass those D
 
 Provided that our DAGs are indeed acyclic, we can always find an order to evaluate every internal node and thus process some given input.
 In \phlat every DAG node implements an \texttt{eval} function which takes an array on input values, applies that node's function to the input, and output the results.
-This allows DAGs to be evaluated directly within python opening up the door to writing unit and integration tests to verify DAGs.
+This allows DAGs to be evaluated directly within Python opening up the door to writing unit and integration tests to verify DAGs.
 
-DAGs are created in python.
+DAGs are created in Python.
 Every node type is a class.
-To create a node you create an object from the class of node you desire.
+To create a node you create an instance from the class of node you desire.
 DAGs are a special class of node that implement additional functions.
 Namely, DAG nodes store a sparse definition of the graph they represent and provide an interface for users to add edges to the graph.
 The \texttt{eval} functions of all the primitive nodes are simple, often only preforming one operation.
@@ -132,7 +132,7 @@ void flux(
 }
 \end{lstlisting}
 The switch statement is run every evaluation of flux and depends on the value of the normal.
-However, in \proc{Patch Update} the value the normal is known at compile time.
+However, in \proc{Patch Update} the value of the normal is known at compile time.
 Therefore, we can use a builder patten in python to hoist this control flow out of the flux function.
 \begin{lstlisting}[language=python]
 def build_flux_DAG(normal:int)->DAG:
@@ -161,7 +161,7 @@ It is a set of function definitions, and within each function definition there i
 Variable management is the main code generation challenge we encounter.
 \phlat supports interchangeable code generation backends, allowing different languages to be targeted.
 This means it's preferable to include information such as variable declaration and complex function signatures in the IR, allowing code generation backends to stay as slim as possible.
-However, the complications induced by variable declarations and function signatures are a key reason why code generation directly from a DAG is hard.   
+However, the complications introduced by variable declarations and function signatures are a key reason why code generation directly from a DAG is hard.   
 
 
 To combat these opposing requirements we create 2 standards for our IR.
@@ -174,8 +174,8 @@ A loose function maintains a list of (possibility hundreds) of single value inpu
 The relaxed nature of the loose IR makes it ideal for preforming transforms and optimisations as there are few ways to invalidate a loose IR.
 
 On the other hand, a tight IR is much stricter.
-In a tight IR all variable must be named and declared.
-And a tight function signature mirrors that of the target output code, containing a mixture of input and output variable that can be single values or arrays.
+In a tight IR all variables must be named and declared.
+And a tight function signature mirrors that of the target output code, containing a mixture of input and output variables that can be single values or arrays.
 Figure \ref{fig:tight_loose} provides an example of loose and tight IR. 
 
 \newsavebox{\looseIRlisting}
@@ -258,7 +258,7 @@ An example of the flatten transform can be found in Figure \ref{fig:flatten_exam
 A user transform we investigated was the removal of duplicated computation.
 Within a DAG, duplicate computation manifests itself as 2 equivalent nodes (e.g. 2 addition nodes) that share the same inputs.
 Once 2 such nodes are identified one can be deleted, and its output edges copied over to the node that remains.
-Some care has to be taken if an operations is commutative (e.g. addition and max) or not (e.g. subtraction and division).
+Some care has to be taken if an operation is commutative (e.g. addition and max) or not (e.g. subtraction and division).
 
 % DAG -> IR
 Once all the DAG transforms are completed the DAG is transformed into the IR.
@@ -285,12 +285,12 @@ This process begins by applying user defined function signatures to loose IR fun
 This transforms all loose functions and function calls into tight functions.
 A function function stencil consists of 3 parts: the desired arrangement of arguments in the tight function; a map from input variable to variable in the function argument; and a map of output variable to function arguments.
 
-Once function stencil are applied, every temporary variable is replaced with a named variable.
+Once function stencils are applied, every temporary variable is replaced with a named variable.
 A named variable is any variable that has a unique name and can be generated into code e.g. a normal variable and an array element.
 The distinction between temporary variables and named variables may seem like unnecessary bloat, however it does serve an important propose.
-Users may choice to create transforms that arrange their programs memory layout, for example targeting a SIMD friendly layout.
+Users may choose to create transforms that arrange their program's memory layout, for example targeting a SIMD friendly layout.
 To do so they will replace temporary variables with named variables.
-As it is not expected that users will tackle memory layout this transform creates a new normal variable for every temporary variable. 
+As it is not expected that users will tackle memory layout, this transform creates a new normal variable for every temporary variable. 
 Finally all the named variables are defined, creating a tight IR.
 For the most part this involves defining a variable the first time it is observed.
 However, special care is required for variables that are defined in the function signature and also for elements of arrays.
@@ -319,5 +319,5 @@ This DAG is then passed through \phlat, where it undergoes DAG transforms, a DAG
 Users have the option to provide additional DAG or IR transforms.
 The generated code is now ready to replace the old \proc{Patch Update} within ExaHyPE.
 The most notable step of the default transform chain is the DAG flatten transform that turns many nested DAGS into a single flat DAG.
-This transform is responsible for \phlat's characteristic compute kernels which are: Flat, Long (And potential Transformed).
+This transform is responsible for \phlat's characteristic compute kernels which are: Flat, Long (And potentially Transformed).
 Typically compute kernels will be thousands to tens of thousands of lines long, and contain no function calls.   

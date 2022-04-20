@@ -24,16 +24,16 @@ ExaHyPE's domain is linear and non-linear hyperbolic systems of PDEs written in 
 
 ExaHyPE offers many features to its users.
 ExaHyPE supports both the FV and ADER-DG (Arbitrary high-order using Derivatives - Discontinuous Galerkin) numerical schemes.
-Along with supporting, both adaptive or fixed time stepping and adaptive or fixed meshes.
+Either adaptive or fixed time stepping can be used, along with either adaptive of fixed meshes.
 The Peano framework \cite{PeanoFramework} lies at the heart of ExaHyPE.
 This is responsible for dividing the spacial domain into smaller patches and distributing these patches across computing resources.
 Every patch is updated by a single core using the FV scheme.
 It is this update process we will optimise.
 
-To use ExaHyPE, a user begins by describing their problem to the ExaHyPE toolkit using a python interface.
-A user will specify information such as: how many unknowns and auxillary variables are used; whether their problem uses a non-conservative product (NCP); what numerical scheme they want to use; if they want to use fix or adaptive time stepping; how frequently the solution should be plotted; and more.
+To use ExaHyPE, a user begins by describing their problem to the ExaHyPE toolkit using a Python interface.
+A user will specify information such as: how many unknowns and auxillary variables are used; whether their problem uses a non-conservative product (NCP); what numerical scheme they want to use; if they want to use fixed or adaptive time stepping; how frequently the solution should be plotted; and more.
 This is used by the ExaHyPE toolkit to generate a project.
-This project is primarily populated by glue code that invokes ExaHyPE, however there are a few placeholders function that need to be filed in by the user.
+This project is primarily populated by glue code that invokes ExaHyPE, however there are a few placeholder functions that need to be filed in by the user.
 These placeholder functions are used to describe the PDE, calculating: flux, eigenvalues, initial conditions, boundary conditions, and non-conservative products (if applicable).
 Upon completing these placeholder functions, the project can be compiled and run on systems ranging from a laptop to a supercomputer.
 
@@ -52,9 +52,9 @@ And by using vendor specific compilers, like Intel's \texttt{ipcx}, code can und
 As such, relying primarily on compilers for optimisation is a promising direction for exploration.
 Also looking to the future, we see that compilers are only getting more advanced.
 Most recently the application of Machine Learning within compilers is being explored \cite{compiler-ml-opt,lots-of-compiler-options}, and development enviroments such as CompilerGym \cite{compiler-gym} suggest this area of research is set to expand.
-This suggests that a relying on compilers also offers an aspect of longevity to optimisations as well.
+This suggests that relying on compilers also offers an aspect of longevity to optimisations as well.
 
 % what is in each section
 In the next section we go into depth about what problem \phlat solves within ExaHyPE, followed by discussing similar compiler based approaches.
 In Section \ref{sec:methodology} we explain the architecture of \phlat and how it is used to generate compute kernels.
-And in Section \ref{sec:results} we will discuss the performance of kernels generated along with the practicalities of using \phlat.
+In Section \ref{sec:results} we will discuss the performance of kernels generated along with the practicalities of using \phlat.
