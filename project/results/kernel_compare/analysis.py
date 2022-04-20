@@ -142,6 +142,7 @@ def ofastmath(all_results: pd.DataFrame):
                       categories=[sys_name_map["ham8-o3"], sys_name_map["ham8-o3-fnoerrno"], sys_name_map["ham8-o3-fastmath"],sys_name_map["ham8"]],
                       ordered=True)
     df = df.sort_values(by=["group", "sys"])
+    df = df[["group", "sys", "rel_speedup_o3"]]
     df = df.rename(columns={"group":"Problem", "speedup":"Speedup vs Default", "sys": "Compiler Options", "rel_speedup_o3": "Relative Speedup", "rel_speedup_o3fast": "Relative Speedup"})    
     
     s= df.style
