@@ -1,18 +1,18 @@
 % Discuss Results
-Our results are good for our test problems, and we certainly meet our goal of creating faster kernels than the default.
-The test methodology used, particularly the \texttt{Kernel Compare} program, provides a simple way to measure kernel performance and was suitable for testing our kernels.
+Our results for the test problems are promising, and we certainly meet our goal of creating faster kernels than the default.
+The test methodology used, particularly the \texttt{Kernel Compare} program, provides a simple way to measure kernel performance, while removing memory performance issues, and was suitable for testing our kernels.
 We found the results from \texttt{Kernel Compare} are noisy, fundamentally depending on the clock speed of the test system.
 We found across different runs on different days, \texttt{Kernel Compare} results could vary by approx $+/-10\%$, this can be traced to the use of a shared system, and varying amounts of other work being preformed on the shared nodes.
 This could be controlled for by having exclusive use of a system, while disabling features such as dynamic clock speeds
 Alternatively we could have taken more samples and averaged them.
 This was the approach we took when comparing ExaHyPE results, and lead to more consistent results.
 To account for this noise, we favour comparing \texttt{Kernel Compare} speedups over raw data, as this somewhat eliminates external factors.
-However, our results were well above the noise floor of \texttt{Kernel Compare} so we take them as significant.
+However, our results are well above the noise floor of \texttt{Kernel Compare} so we take them as significant.
 
 \phlat{}'s architecture successfully allows it to support a wide range of problems, but in practicality it is difficult use \phlat on large problems.
 \phlat fell short of delivering a user friendly interface to enter problems, instead relying on user to manually create DAGs.
 As previously discussed it is infeasible to manually create DAGs for larger problems, although it would be possible if more frontend tooling were created.
-Tooling that convert SymPy formulas \cite{sympy} or exiting user code directly into a DAG would drastically improve the user friendliness of \phlat.
+Tooling that converts SymPy formulas \cite{sympy} or exiting user code directly into a DAG would drastically improve the user friendliness of \phlat.
 Alternatively \phlat could take an approach like YATeTo offering a DSL that makes DAGs easier to define.
 It is an open question if this can be done, but we can not envisage any significant barriers.
 

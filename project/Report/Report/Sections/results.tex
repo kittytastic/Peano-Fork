@@ -61,7 +61,7 @@ On this system, unless stated otherwise, all code was compiled with AMD's aocc \
 % [ ] kernel compare results 
 % [ ] exahype results 
 
-We tested our compiled kernels against the default kernels in both the \texttt{KernelCompare} tester and within ExaHyPE.
+We tested our compiled kernels against the default kernels in both the \texttt{KernelCompare} test program and within ExaHyPE.
 The compiled kernels exhibited an large speedup over their default counterparts, as seen in Table \ref{tab:kernel_comapre}.
 Over every test we witnessed approximately an order of magnitude speedup of the compiled kernels over the default kernels.
 Compiled kernels preformed better on the Intel system than on the AMD system, likely due to differences between the Intel and AMD compilers. 
@@ -151,8 +151,7 @@ The Intel and AMD compilers likely already preform these simple optimisations, a
 % [ ] Compiler speed
 % [ ] Input interface practicalities
 % Einstein equations from relativistic astrophysics (CCZ4)
-Beyond the performance of compiled kernels, it is also important that \phlat is practical to use.
-
+Beyond the performance, it is also important that \phlat is practical to use.
 Firstly, we look at compile times.
 On the AMD system it took approx 2s to compile the SWE and Euler 2D kernels, however it takes approx 40s to compile the Euler 3D kernel.
 This is due to the larger size of the Euler 3D graph to the Euler 2D and SWE graphs, 32091 nodes to 6736 and 5089 nodes, generating 10235, 2090, and 1511 lines of code respectively.
