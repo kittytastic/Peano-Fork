@@ -64,11 +64,10 @@ An overview of \phlat{}'s architecture can be found in Figure \ref{fig:arch}.
 % [ ] Control flow hoisting
 
 \phlat begins with a Directed Acyclic Graph (DAG) as an input.
-The DAG model we propose takes inspiration from hardware design languages.
-
-In a hardware design language you define electrical components.
+The DAG model we propose takes inspiration from hardware design.
+In a hardware design you define electrical components.
 Each component has an ordered set of input and output ports and its output is a function of its input.
-Furthermore, it is common place to see specifications and test cases alongside a component to be used in verification.
+It is common, to also see test cases alongside a component to be used in verification.
 
 In our DAG every node has a set of input and output ports.
 Every input port must receive a single value and every output port can transmit copies of a single value.
