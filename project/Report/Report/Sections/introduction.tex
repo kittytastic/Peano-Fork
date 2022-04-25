@@ -13,7 +13,7 @@ In HPC, there are 2 ways to increase computational throughput, either by using m
 Supercomputing hardware is ever improving, and exa-scale systems are on the horizon.
 However, relying on more hardware runs into cost and availability issues.
 Therefore, optimising code to better use the hardware is often preferable.
-In HPC codes there are many levels at which optimisation can occur, one of the most fundamental being improving the throughput of a single core.
+In HPC code there are many levels at which optimisation can occur, one of the most fundamental being improving the throughput of a single core.
 There are many example in literature of this having a significant effect on the performance of HPC code \cite{YATeTo,seisolPFLOP,codegen_dg_SIMD}, and this will be the area of optimisation we explore.     
 
 % Exhaype - what it is
@@ -22,9 +22,6 @@ Implementing a HPC FV solver is a non-trivial task, and can take research teams 
 This is the problem that ExaHyPE solves by providing a generalised framework to create solvers for many different problems.
 ExaHyPE's domain is linear and non-linear hyperbolic systems of PDEs written in first order form.
 
-ExaHyPE offers many features to its users.
-ExaHyPE supports both the FV and ADER-DG (Arbitrary high-order using Derivatives - Discontinuous Galerkin) numerical schemes.
-Either adaptive or fixed time stepping can be used, along with either adaptive of fixed meshes.
 The Peano framework \cite{PeanoFramework} lies at the heart of ExaHyPE.
 This is responsible for dividing the spacial domain into smaller patches and distributing these patches across computing resources.
 Every patch is updated by a single core using the FV scheme.
@@ -48,11 +45,11 @@ Namely, \phlat can be used to generate monolithic functions that are tens of tho
 In this paper we investigate the performance of these kernels and thus how well they are optimised by compilers.
 
 Relying on the compiler for optimisations is often taken for granted, simply appending an \texttt{-O3} flag to the compiler arguments can increase the performance of code by orders of magnitude.
-And by using vendor specific compilers, like Intel's \texttt{ipcx}, code can undergo hardware specific optimisation.
+And using vendor specific compiler, like Intel's \texttt{ipcx}, offers code hardware specific optimisation.
 As such, relying primarily on compilers for optimisation is a promising direction for exploration.
 Also looking to the future, we see that compilers are only getting more advanced.
-Most recently the application of Machine Learning within compilers is being explored \cite{compiler-ml-opt,lots-of-compiler-options}, and development enviroments such as CompilerGym \cite{compiler-gym} suggest this area of research is set to expand.
-This suggests that relying on compilers also offers an aspect of longevity to optimisations as well.
+Most recently the application of Machine Learning within compilers is being explored \cite{compiler-ml-opt,lots-of-compiler-options}, and development environments such as CompilerGym \cite{compiler-gym} suggest this area of research is set to expand.
+Thus suggesting that relying on compilers also offers an aspect of longevity to optimisations as well.
 
 % what is in each section
 In the next section we go into depth about what problem \phlat solves within ExaHyPE, followed by discussing similar compiler based approaches.
