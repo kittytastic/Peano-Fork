@@ -105,7 +105,7 @@ void generated_glue_code(){
     patch_update(numerical_ingredient_lambda, ...);
 };
 \end{lstlisting}
-This paradigm completely decouples engine functions like \lstinline{patch_update} and \lstinline{rusanov} from user functions, hence enabling support for any user \proc{Problem Definitions}, provided they implement the required function signatures.
+This paradigm decouples engine functions like \lstinline{patch_update} and \lstinline{rusanov} from user functions, hence enabling support for any user \proc{Problem Definitions}, provided they implement the required function signatures.
 This paradigm helps ExaHyPE achieve its goals of being flexible and user friendly but introduces some challenges for the compiler that may hinder optimisation.
 
 Firstly, it is non-trivial to inline this paradigm.
@@ -129,8 +129,8 @@ It may be challenging for the compiler to spot this repetition, especially as it
 The final issue we will highlight with this paradigm is the use of heap allocation.
 User's problems can have an arbitrary number of unknowns and auxillary variables, 
 as such we cannot assume it is safe to allocate temporary state variables on the stack, instead we use heap allocation which is slow.
-Both \proc{Patch Update} and the \proc{Numerical Ingredient} need to create temporary state variables, which amounts to a significant amount heap allocation.
-This is one of the major downsides of engine code not knowing anything about use code, engine code must be implemented defensively
+Both \proc{Patch Update} and the \proc{Numerical Ingredient} need temporary state variables, which amounts to a significant amount heap allocation.
+This is one of the major downsides of engine code not knowing anything about use code, engine code must be implemented defensively.
 
 % ISSUE: branching
 % MAYBE ISSUE: consts as function arguments

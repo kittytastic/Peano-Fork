@@ -5,9 +5,8 @@
 % Euler 3D SIMD speedup 1.04
 % CCZ4 1.27
 Much of ExaHyPE's code generation is preformed in Python using the jinja2 templating library.
-Templating is a powerful, yet simple method to generate large sections of glue code.
-Although, static code generation using templating along the boundary of user and engine code leaves opportunities for improvements.  
-A solution to this problems was proposed by \citeauthor{templateExahype} by extending the domain of templating to user code \cite{templateExahype}.
+Although templating can be used as a rudimentary method of dynamic code generation, it primary use within ExaHyPE is to statically generate large sections of glue code.
+\citeauthor{templateExahype} explored using templating in ExaHyPE user code \cite{templateExahype}, with a primary focus on improving productivity and exploring the optimisation opportunities.
 
 \citeauthor{templateExahype} observed that while creating an ExaHyPE project there are often 3 separable roles preformed by users.
 These are: application experts, who focus on configuration of ExaHyPE; algorithm experts, who understand and implement the PDEs; and optimisation experts, who work at a lower level to increase performance.
@@ -25,11 +24,12 @@ This structure would further increase the separation of algorithm experts from o
 
 % Yateto used a compiler
 YATeTo (Yet Another Tensor Toolbox) \cite{YATeTo} uses this approach of a translation expert.
+A problem is defined in a Domain Specific Language (DSL), and using YATeTo, it is translated into code.
 YATeTo operates in the domain of linear hyperbolic PDEs, in particular, it is part of the Seisol project \cite{seisolPFLOP}, which focuses on applying the linear elastic wave PDE to model seismic activity.
 YATeTo is a tool that allows users to transform their problem into highly efficient code.   
 
 The Discontinuous Galerkin method often used to to solve hyperbolic PDEs can, in the linear case, be discretized into a series of Tensor contractions.
-YATeTo offers a Domain Specific Language (DSL) within Python for users to describe their tensor contractions.
+YATeTo offers a DSL within Python for users to describe their tensor contractions.
 Then through a series of compilation steps outputs C++, which crucially contains many calls to GEMM libraries.
 Highly performant GEMM libraries and BLAS (Basic Linear Algebra Subprograms) libraries are often distributed by system vendors.
 These libraries are optimised for a wide range of input problems sizes, and often include hardware specific optimisations like improved cache usage.
