@@ -19,35 +19,35 @@ SWE & 3+1 & 2 & 3x3 & \checkmark & \checkmark \\
 \vspace{1em}
 
 These problems were chosen as they are prototypical hyperbolic PDE test problems that exhibit a wide range of features, such as 2D and 3D domains and the use of NCP and auxiliary variables.
-Also, each of theses problems are provided as example within the ExaHyPE repository.
-The kernels from these examples solutions will be treated as a control for the compiled kernels.
+Also, each of theses problems are provided as example projects within the ExaHyPE repository.
+The kernels from these examples projects will be treated as a control for the compiled kernels.
 We will refer to these kernels as default kernels. 
 
 None of the test problems are compute bound problems, they are all memory bound problems.
-Consequently, within an ExaHyPE program we would not expect improving kernel speeds to have a large effect on the total runtime of the program, as the program is bottle necked by memory throughput.
+Consequently, we would not expect improving kernel speeds to have a large effect on the total runtime of the ExaHyPE program, as the program is bottle necked by memory throughput.
 
-As will be discussed in Section \ref{sec:practical}, creating input DAGs in a non-trivial job.
+As will be discussed in Section \ref{sec:practical}, creating input DAGs is a non-trivial task.
 The size of DAGs that compute bound problems, such as the CCZ4 equations, would require are infeasible to create with the current tooling.
 Hence, this seminal work will seek to verify the applicability of \phlat to smaller problems.
 
 Given the use of memory bound problems, only testing the performance of kernels within ExaHyPE will not show us the whole picture.
 Therefore, we will also test each kernel in isolation.
 This testing will repeatedly run a kernel on fixed input data, allowing us to calculate how many iterations per second a kernel can achieve.
-This will mimic what happens within ExaHyPE, but removes all the overhead experienced by the engine, such as memory copies.
+This will mimic what happens within ExaHyPE, but removes all the overhead experienced by ExaHyPE, such as memory copies.
 This will be our primary metric to compare kernels.
 
-This testing is preformed by a small program that we created called \texttt{KernelCompare}.
+This testing is preformed by a small program we created called \texttt{KernelCompare}.
 This test program creates input data from test cases and creates an output array.
 Then the program repeatedly calls the kernel with the same input data and output array, until some time limit is reached e.g. 5 seconds.
 We can then use the number of iterations preformed within this time limit to inspect the performance of a kernel.
-To ensure the compiler doesn't introduce any unexpected behaviour the test and benchmark orchestration code is compiled without any optimisation flags, whereas all compute kernels are compiled with optimisation flags.
+To ensure the compiler doesn't introduce any unexpected behaviour, the test and benchmark orchestration code is compiled without any optimisation flags, whereas all compute kernels are compiled with optimisation flags.
 
 However, kernel comparison extends beyond performance.
 It is also important to validate each of the compiled kernels against the default kernels.
-This is achieved by probing the control programs, and extracting input and output data around the default kernel call.
+This is achieved by probing the example ExaHyPE projects, and extracting input and output data around the default kernel call.
 The extracted data is used to create integration tests.
 To ensure a variety in the integration tests we extract data when some component of the input state vector is larger than a target value. 
-This ensures that our test data wont just be repeats of an empty patch.
+This ensures that our test data isn't just be repeats of an empty patch.
 Every kernel mentioned in our results underwent validity testing using 10 integration tests and passed each one.
 
 Test results are gathered on 2 systems.
@@ -62,7 +62,7 @@ On this system, unless stated otherwise, all code was compiled with AMD's aocc \
 % [ ] exahype results 
 
 We tested our compiled kernels against the default kernels in both the \texttt{KernelCompare} test program and within ExaHyPE.
-The compiled kernels exhibited an large speedup over their default counterparts, as seen in Table \ref{tab:kernel_comapre}.
+In \texttt{KernelCompare}, the compiled kernels exhibited an large speedup over their default counterparts, as seen in Table \ref{tab:kernel_comapre}.
 Over every test we witnessed approximately an order of magnitude speedup of the compiled kernels over the default kernels.
 Compiled kernels preformed better on the Intel system than on the AMD system, likely due to differences between the Intel and AMD compilers. 
 
@@ -101,7 +101,7 @@ And finally, all constants known at compile time (e.g. the number of cells per p
 \begin{table}
     \centering
     \input{Tables/hand-made-vs-generated-tab.tex} 
-    \caption{Performance of kernel optimised by hand against compiled kernel. Results we gathered on the AMD system.}\label{tab:hand_v_compiled}
+    \caption{Performance of a hand optimised kernel against a compiled kernel. Results were gathered on the AMD system.}\label{tab:hand_v_compiled}
 \end{table}
 
 Table \ref{tab:hand_v_compiled} shows the relative speedup of the handopt and compiled kernel.
@@ -117,7 +117,7 @@ Table \ref{tab:ffast_math} shows the effect these compiler flags have on the spe
 \begin{table}
     \centering
 \input{Tables/o3_results.tex} 
-\caption{The effect of compiler flags on compiled kernels on the AMD system. We see the relative speedup of various compiler flags compared to using \texttt{-O3}.}\label{tab:ffast_math} 
+\caption{The effect of compiler flags on the compiled and hand optimised kernels on the AMD system. We see the relative speedup of various compiler flags compared to using \texttt{-O3}.}\label{tab:ffast_math} 
 \end{table}
 
 The most interesting result from Table \ref{tab:ffast_math} is that the \texttt{-ffast-math} makes very little difference to the Euler 2D handopt kernel, however the compiled kernel experience a $2.63\times$ improvement.
@@ -155,7 +155,7 @@ Beyond the performance, it is also important that \phlat is practical to use.
 Firstly, we look at compile times.
 On the AMD system it took approx 2s to compile the SWE and Euler 2D kernels, however it takes approx 40s to compile the Euler 3D kernel.
 This is due to the larger size of the Euler 3D graph to the Euler 2D and SWE graphs, 32091 nodes to 6736 and 5089 nodes, generating 10235, 2090, and 1511 lines of code respectively.
-However, the Euler 3D graph is only $5\times$ larger than Euler 2D graph but takes $\sim 20\times$ longer to compile.
+The Euler 3D graph is only $5\times$ larger than Euler 2D graph but takes $\sim 20\times$ longer to compile.
 This alludes to the $O(n^2)$ runtime of parts of the compiler.
 %Much of the compiler has run time $O(n)$, however numerous IR transforms have a $O(n^2)$ runtime.
 %By caching the location of variables in the IR, the runtime of all standard IR transforms can be reduced to $O(n)$.
@@ -164,7 +164,7 @@ This alludes to the $O(n^2)$ runtime of parts of the compiler.
 
 Secondly, we will look at how a user inputs a problem.
 Currently, a user must create a DAG themselves and pass this to the compiler.
-The DAG creation process requires a user to manually create every node (e.g an Addition node), and then specify every input edge to that node.
+The DAG creation process requires a user to manually create every node (e.g an addition node), and then specify every input edge to that node.
 The process is tedious, time consuming and prone to error.
 The larger a problem is, the harder it is to create a DAG, and problems such as CCZ4 are totally infeasible.
 %Therefore, more tooling is required to make the compiler practical to use.
