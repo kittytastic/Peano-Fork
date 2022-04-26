@@ -1,4 +1,4 @@
-from compute_graph.main import dag_to_IR
+from compute_graph.DAG.IR_tf import dag_to_IR
 from compute_graph.DAG import Graph
 from compute_graph.DAG.transform import DAG_TransformChain
 from compute_graph.IR.transform import IR_TransformChain

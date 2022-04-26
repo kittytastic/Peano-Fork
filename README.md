@@ -1,3 +1,20 @@
+# Masters Dissertation - Jack Slingsby
+This repo is a fork of the Peano Repo: https://gitlab.lrz.de/hpcsoftware/Peano
+In particular we use ExaHyPE from this repo.
+
+All work from this master dissertation can be found in the subdirectory: `/project/`
+
+As overview of the contents of this directory:
+* `/project/benchmark`       contains the kernel compare benchmarking and testing program
+* `/project/compute_graph`   contains the FLAT compiler
+* `/project/exahype`         contains all the test ExaHyPE projects, both default and optimised
+* `/project/Poster`          contains the poster latex
+* `/project/Presentation`    contains the presentation slides and notes
+* `/project/Report`          contains the report latex
+* `/project/results`         contains all the results and analysis scripts
+
+
+# Original README
 #  Peano
 
 Peano is an open source framework for solvers on dynamically adaptive

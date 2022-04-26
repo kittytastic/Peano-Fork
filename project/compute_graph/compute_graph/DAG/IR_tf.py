@@ -6,7 +6,17 @@ from compute_graph.DAG.ops import Divide, Max, Sqrt, Abs
 from compute_graph.DAG.primitive_node import Constant
 from compute_graph.IR.symbols import IR_Assign, IR_CallLooseFunction, IR_DataTypes, IR_LooseFunction, IR_Symbol, IR_TempVariable, IR_Variable, IR_SingleAssign, IR_Add, IR_Mul, IR_Sub, UniqueVariableName, IR_Div, IR_Const
 from compute_graph.DAG import Graph, Add, Subtract, Multiply, TerminalInput, PassThroughNode, InputInterface, OutputInterface
-from compute_graph.IR.symbols.functions import IR_BasicLibCall 
+from compute_graph.IR.symbols.functions import IR_BasicLibCall, IR_File 
+
+
+def dag_to_IR(g:Graph)->IR_File:
+    sub_v = DAG_GatherSubgraphVisitor()
+    all_g = sub_v.visit(g)
+
+    v = DAGToIRVisitor()
+    body = [v.visit(sg, []) for sg in all_g]
+    
+    return IR_File(body)
 
 class DAG_GatherSubgraphVisitor(DAG_Visitor[List[Graph]]):
     
