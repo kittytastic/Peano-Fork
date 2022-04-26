@@ -95,7 +95,7 @@ We will refer to this hand optimised kernel as \textit{handopt}.
 The handopt kernel has 3 notable changes over the default kernel.
 Firstly, all heap allocation was either eliminated or replaced with stack allocation.
 Next, all lambda functions were replaced with direct function calls.
-And finally, all constants known at compile time (e.g. the number of cells per patch) were removed from function signatures and declared directly in function bodies as constants.
+And finally, all constants known at compile time (e.g. the number of cells per patch) were removed from function signatures and declared as constants in function bodies.
 
 
 \begin{table}
@@ -139,7 +139,7 @@ The effect of these flags on the compiled kernels is in contrast to the effect \
 
 \phlat supports user transform/optimisation steps.
 We created 2 optimisations to explore their effects on performance of compiled kernels.
-The first optimization removes basic arithmetic no-ops from the DAG such as adding 0 or multiplying by 1.
+The first optimization removes basic arithmetic no-ops from the DAG such as multiplying by 1.
 The second optimization removes all repeated computation.
 In summary, this optimisation combines any DAG node with an equivalent function and inputs, into a single node.
 This optimisation removes approx 10\% of nodes in the Euler 3D graph.

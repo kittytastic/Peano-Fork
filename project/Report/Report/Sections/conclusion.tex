@@ -1,6 +1,6 @@
 This paper presents \phlat as a method for bridging the gap in ExaHyPE, between being flexible and user-friendly, while producing fast C++.
 \phlat delivers on producing fast C++, producing kernels that were up to $16\times$ faster than kernels currently used in ExaHyPE.
-This speedup was enabled by \phlat{}'s dynamic code generation approach, that produced monolithic compute kernels, thousands of lines long.
+This speedup was enabled by \phlat{}'s dynamic code generation, that produced monolithic compute kernels, thousands of lines long.
 Compiled kernels even out preformed a hand optimised kernel, owing to better automatic vectorisation of the compiled kernels while using the \texttt{-ffast-math} flag.
 
 As would be expected, this speed up didn't directly carry over to the performance of our memory bound test problems in ExaHyPE.

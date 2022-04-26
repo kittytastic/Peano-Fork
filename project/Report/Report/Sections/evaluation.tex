@@ -28,7 +28,7 @@ We do not know if our approach will scale well to larger compute bound problems.
 Secondly, are monolithic functions the best format to target?
 We have seen that monolithic functions do provide an advantage over the functional kernels currently used in ExaHyPE, however it may be the case that we can do better.
 For example modern compilers have many advanced loop vectorisation features.
-Does \phlat{}'s loop free code suffer from not experiencing these optimisations?
+Does \phlat{}'s generated code suffer from its lack of loops?
 
 %Next, can \phlat{}'s dynamic code generation be used more broadly to, for example, target GPUs?
 %The ExaHyPE project is working towards better GPU support, and it would be very valuable to have a technique that maintained ExaHyPE agnostic approach to hardware, while creating fast code.
