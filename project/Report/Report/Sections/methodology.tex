@@ -65,7 +65,7 @@ An overview of \phlat{}'s architecture can be found in Figure \ref{fig:arch}.
 
 \phlat begins with a Directed Acyclic Graph (DAG) as an input.
 The DAG model we propose takes inspiration from hardware design.
-In a hardware design you define electrical components.
+In hardware design you define electrical components.
 Each component has an ordered set of input and output ports and its output is a function of its input.
 It is common, to also see test cases alongside a component to be used in verification.
 
@@ -232,8 +232,8 @@ define VOID @kernel (new #list(in), new #list(out)):
 
 \subsection{Compiler Architecture}
 \phlat consists of 3 stages: the DAG transform stage; the IR transform stage; and the code generation stage.
-An overview of \phlat{}'s architecture can be found in Figure \ref{fig:arch}
-In the DAG transform stage a series of default transforms are applied to the DAG, followed optional user transforms.
+An overview of \phlat{}'s architecture can be found in Figure \ref{fig:arch}.
+In the DAG transform stage a series of default transforms are applied to the DAG, followed by optional user transforms.
 
 \begin{figure}[h!]
     \centering

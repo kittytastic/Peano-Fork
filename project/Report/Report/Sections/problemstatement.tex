@@ -84,7 +84,7 @@ A summary of \proc{Patch Update}, the \proc{Numerical Ingredient} and \proc{Prob
 \caption{A summary of the 3 main processes comprising \proc{Patch Update}. $p$ is the number of cells along 1 dimension of a patch; $d$ is the dimension of the patch; $q$ is the number of state variables; and $m$ is the size of patch/state metadata.}\label{tab:patch_update}
 \end{table}
 
-ExaHyPE uses a functional paradigm to implement these 3 process.
+ExaHyPE uses a functional paradigm to implement these 3 processes.
 An overview is given below:
 \begin{lstlisting}[language=c]
 void numerical_ingredient(std::function<...> user_flux, ...){
