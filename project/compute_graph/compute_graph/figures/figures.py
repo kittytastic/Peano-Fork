@@ -12,7 +12,7 @@ from compute_graph.IR.symbols.variables import IR_Array, UniqueVariableName
 from compute_graph.IR.transform.base import FilterApply, IR_TransformChain
 from compute_graph.IR.transform.build import DefineAllVars, FileApplyCallStencil, FunctionStencil, RemoveAllTemp
 from compute_graph.IR.transform.tidy import RemoveBackwardsAlias, RemoveForwardAlias
-from compute_graph.main import dag_to_IR
+from compute_graph.DAG.IR_tf import dag_to_IR
 import numpy as np
 
 
