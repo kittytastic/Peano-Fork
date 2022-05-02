@@ -104,4 +104,20 @@ is FLAT the right way to go, maybe some loops would be benificial
 how does it compare with other approaches, e.g. YATeTo
 
 
+# Script
+# Background
+- Field of HPC
+- In particual solving PDEs, of which HPDE
+- Cant solve analytically
 
+
+- The issue here, if I want to solve an EQ got to write an entier program 
+- Exahype deals with the orchestraction, solving, 
+
+# FV
+
+- this patch update process is where we look for improvemtn
+
+# Solution
+
+- How it fits into ExaHyPE
